@@ -1,5 +1,39 @@
 import styled from '@emotion/styled';
 
+export const HomePage = () => {
+  return (
+    <Section>
+      <Heading>
+        <Label>Foundation</Label>
+        <Title>Router, API, MSW, and styling are ready to evolve.</Title>
+        <Description>
+          This workspace now boots with the v2 shell, shared API contracts,
+          refresh-aware axios clients, and a minimal route layout that can
+          absorb the new page architecture.
+        </Description>
+      </Heading>
+      <Grid>
+        <Card>
+          <CardTitle>API contracts</CardTitle>
+          <CardCopy>Auth, info, event, and admin request-response types are ported.</CardCopy>
+        </Card>
+        <Card>
+          <CardTitle>Axios core</CardTitle>
+          <CardCopy>Public and private clients share config and refresh expired tokens once.</CardCopy>
+        </Card>
+        <Card>
+          <CardTitle>MSW hooks</CardTitle>
+          <CardCopy>Mock handlers remain available behind `VITE_ENABLE_MSW=true` in development.</CardCopy>
+        </Card>
+        <Card>
+          <CardTitle>Routing shell</CardTitle>
+          <CardCopy>Only `/`, `/auth/*`, and `*` exist so the new IA can be designed cleanly.</CardCopy>
+        </Card>
+      </Grid>
+    </Section>
+  );
+};
+
 const Section = styled.section`
   display: grid;
   gap: 18px;
@@ -62,37 +96,3 @@ const CardCopy = styled.p`
   margin: 0;
   color: #50584f;
 `;
-
-export const HomePage = () => {
-  return (
-    <Section>
-      <Heading>
-        <Label>Foundation</Label>
-        <Title>Router, API, MSW, and styling are ready to evolve.</Title>
-        <Description>
-          This workspace now boots with the v2 shell, shared API contracts,
-          refresh-aware axios clients, and a minimal route layout that can
-          absorb the new page architecture.
-        </Description>
-      </Heading>
-      <Grid>
-        <Card>
-          <CardTitle>API contracts</CardTitle>
-          <CardCopy>Auth, info, event, and admin request-response types are ported.</CardCopy>
-        </Card>
-        <Card>
-          <CardTitle>Axios core</CardTitle>
-          <CardCopy>Public and private clients share config and refresh expired tokens once.</CardCopy>
-        </Card>
-        <Card>
-          <CardTitle>MSW hooks</CardTitle>
-          <CardCopy>Mock handlers remain available behind `VITE_ENABLE_MSW=true` in development.</CardCopy>
-        </Card>
-        <Card>
-          <CardTitle>Routing shell</CardTitle>
-          <CardCopy>Only `/`, `/auth/*`, and `*` exist so the new IA can be designed cleanly.</CardCopy>
-        </Card>
-      </Grid>
-    </Section>
-  );
-};

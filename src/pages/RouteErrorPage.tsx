@@ -1,6 +1,32 @@
 import styled from '@emotion/styled';
 import { isRouteErrorResponse, Link, useRouteError } from 'react-router-dom';
 
+const getMessage = (error: unknown) => {
+  if (isRouteErrorResponse(error)) {
+    return `${error.status} ${error.statusText}`;
+  }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return 'An unexpected routing error occurred.';
+};
+
+export const RouteErrorPage = () => {
+  const error = useRouteError();
+
+  return (
+    <Wrapper>
+      <Card>
+        <Title>Routing error</Title>
+        <Copy>{getMessage(error)}</Copy>
+        <BackLink to="/">Return home</BackLink>
+      </Card>
+    </Wrapper>
+  );
+};
+
 const Wrapper = styled.section`
   display: grid;
   gap: 14px;
@@ -36,29 +62,3 @@ const BackLink = styled(Link)`
   background: #152021;
   color: #f8f4ea;
 `;
-
-const getMessage = (error: unknown) => {
-  if (isRouteErrorResponse(error)) {
-    return `${error.status} ${error.statusText}`;
-  }
-
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  return 'An unexpected routing error occurred.';
-};
-
-export const RouteErrorPage = () => {
-  const error = useRouteError();
-
-  return (
-    <Wrapper>
-      <Card>
-        <Title>Routing error</Title>
-        <Copy>{getMessage(error)}</Copy>
-        <BackLink to="/">Return home</BackLink>
-      </Card>
-    </Wrapper>
-  );
-};

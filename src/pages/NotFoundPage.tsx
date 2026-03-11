@@ -1,6 +1,16 @@
 import styled from '@emotion/styled';
 import { Link } from 'react-router-dom';
 
+export const NotFoundPage = () => {
+  return (
+    <Wrapper>
+      <Title>Route not found</Title>
+      <Copy>The v2 shell only exposes the root and auth namespaces for now.</Copy>
+      <BackLink to="/">Return home</BackLink>
+    </Wrapper>
+  );
+};
+
 const Wrapper = styled.section`
   display: grid;
   gap: 14px;
@@ -27,13 +37,3 @@ const BackLink = styled(Link)`
   background: #152021;
   color: #f8f4ea;
 `;
-
-export const NotFoundPage = () => {
-  return (
-    <Wrapper>
-      <Title>Route not found</Title>
-      <Copy>The v2 shell only exposes the root and auth namespaces for now.</Copy>
-      <BackLink to="/">Return home</BackLink>
-    </Wrapper>
-  );
-};

@@ -3,6 +3,34 @@ import { NavLink, Outlet } from 'react-router-dom';
 
 import { APP_PATH } from '@/router/path';
 
+const App = () => {
+  return (
+    <Shell>
+      <Frame>
+        <Header>
+          <Brand>
+            <Eyebrow>GuideRun</Eyebrow>
+            <Title>Front v2 foundation</Title>
+          </Brand>
+          <Nav aria-label="Primary">
+            <NavItem end to={APP_PATH.HOME}>
+              Home
+            </NavItem>
+            <NavItem to={APP_PATH.AUTH}>
+              Auth
+            </NavItem>
+          </Nav>
+        </Header>
+        <Content>
+          <Outlet />
+        </Content>
+      </Frame>
+    </Shell>
+  );
+};
+
+export default App;
+
 const Shell = styled.div`
   min-height: 100vh;
   padding: 32px;
@@ -79,31 +107,3 @@ const NavItem = styled(NavLink)`
 const Content = styled.main`
   display: grid;
 `;
-
-const App = () => {
-  return (
-    <Shell>
-      <Frame>
-        <Header>
-          <Brand>
-            <Eyebrow>GuideRun</Eyebrow>
-            <Title>Front v2 foundation</Title>
-          </Brand>
-          <Nav aria-label="Primary">
-            <NavItem end to={APP_PATH.HOME}>
-              Home
-            </NavItem>
-            <NavItem to={APP_PATH.AUTH}>
-              Auth
-            </NavItem>
-          </Nav>
-        </Header>
-        <Content>
-          <Outlet />
-        </Content>
-      </Frame>
-    </Shell>
-  );
-};
-
-export default App;

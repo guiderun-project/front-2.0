@@ -1,6 +1,22 @@
 import styled from '@emotion/styled';
 import { useLocation } from 'react-router-dom';
 
+export const AuthPlaceholderPage = () => {
+  const { pathname } = useLocation();
+
+  return (
+    <Panel>
+      <Title>Auth space is reserved.</Title>
+      <Copy>
+        The authentication namespace is live, but the actual login, signup,
+        and OAuth screens can now be rebuilt without carrying over the old page
+        tree.
+      </Copy>
+      <RouteChip>{pathname}</RouteChip>
+    </Panel>
+  );
+};
+
 const Panel = styled.section`
   display: grid;
   gap: 16px;
@@ -31,19 +47,3 @@ const RouteChip = styled.code`
   color: #152021;
   font-size: 0.92rem;
 `;
-
-export const AuthPlaceholderPage = () => {
-  const { pathname } = useLocation();
-
-  return (
-    <Panel>
-      <Title>Auth space is reserved.</Title>
-      <Copy>
-        The authentication namespace is live, but the actual login, signup,
-        and OAuth screens can now be rebuilt without carrying over the old page
-        tree.
-      </Copy>
-      <RouteChip>{pathname}</RouteChip>
-    </Panel>
-  );
-};
