@@ -1,8 +1,22 @@
-import styled from '@emotion/styled';
+import { Text } from "@/components";
+import styled from "@emotion/styled";
 
 export const HomePage = () => {
   return (
     <Section>
+      <Text font="display-l">안녕</Text>
+      <Text font="heading-l-b">안녕</Text>
+      <Text font="heading-m-b">안녕</Text>
+      <Text font="heading-m-m">안녕</Text>
+      <Text font="heading-m-r">안녕</Text>
+      <Text font="heading-s-m">안녕</Text>
+      <Text font="body-l-sb">안녕</Text>
+      <Text font="body-m-sb">안녕</Text>
+      <Text font="body-s-sb">안녕</Text>
+      <Text font="body-s-r">안녕</Text>
+      <Text font="detail-m-m">안녕</Text>
+      <Text font="detail-m-r">안녕</Text>
+      <Text font="detail-s-r">안녕</Text>
       <Heading>
         <Label>Foundation</Label>
         <Title>Router, API, MSW, and styling are ready to evolve.</Title>
@@ -15,19 +29,30 @@ export const HomePage = () => {
       <Grid>
         <Card>
           <CardTitle>API contracts</CardTitle>
-          <CardCopy>Auth, info, event, and admin request-response types are ported.</CardCopy>
+          <CardCopy>
+            Auth, info, event, and admin request-response types are ported.
+          </CardCopy>
         </Card>
         <Card>
           <CardTitle>Axios core</CardTitle>
-          <CardCopy>Public and private clients share config and refresh expired tokens once.</CardCopy>
+          <CardCopy>
+            Public and private clients share config and refresh expired tokens
+            once.
+          </CardCopy>
         </Card>
         <Card>
           <CardTitle>MSW hooks</CardTitle>
-          <CardCopy>Mock handlers remain available behind `VITE_ENABLE_MSW=true` in development.</CardCopy>
+          <CardCopy>
+            Mock handlers remain available behind `VITE_ENABLE_MSW=true` in
+            development.
+          </CardCopy>
         </Card>
         <Card>
           <CardTitle>Routing shell</CardTitle>
-          <CardCopy>Only `/`, `/auth/*`, and `*` exist so the new IA can be designed cleanly.</CardCopy>
+          <CardCopy>
+            Only `/`, `/auth/*`, and `*` exist so the new IA can be designed
+            cleanly.
+          </CardCopy>
         </Card>
       </Grid>
     </Section>
@@ -40,7 +65,11 @@ const Section = styled.section`
   padding: 28px;
   border-radius: 32px;
   background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(246, 238, 224, 0.92)),
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.95),
+      rgba(246, 238, 224, 0.92)
+    ),
     rgba(255, 255, 255, 0.88);
   border: 1px solid rgba(21, 32, 33, 0.08);
   box-shadow: 0 20px 60px rgba(18, 31, 28, 0.08);
