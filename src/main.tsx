@@ -1,6 +1,6 @@
 import { StrictMode } from 'react';
 
-import { Global } from '@emotion/react';
+import { Global, ThemeProvider } from '@emotion/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
@@ -8,6 +8,7 @@ import { RouterProvider } from 'react-router-dom';
 import { baseURL } from '@/api/core/client';
 import { router } from '@/router/router';
 import { globalStyles } from '@/styles/globalStyles';
+import { theme } from '@/styles/theme';
 
 const rootElement = document.getElementById('root');
 
@@ -44,8 +45,10 @@ const bootstrap = async () => {
   createRoot(rootElement).render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <Global styles={globalStyles} />
-        <RouterProvider router={router} />
+        <ThemeProvider theme={theme}>
+          <Global styles={globalStyles} />
+          <RouterProvider router={router} />
+        </ThemeProvider>
       </QueryClientProvider>
     </StrictMode>,
   );
