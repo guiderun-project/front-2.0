@@ -19,7 +19,7 @@ export const AuthPlaceholderPage = () => {
 
 const Panel = styled.section`
   display: grid;
-  gap: 16px;
+  gap: ${({ theme }) => theme.spacing.xl};
   padding: 28px;
   border-radius: 32px;
   background: linear-gradient(180deg, rgba(255, 250, 240, 0.94), rgba(240, 244, 237, 0.95));
@@ -42,7 +42,7 @@ const RouteChip = styled.code`
   display: inline-flex;
   width: fit-content;
   padding: 10px 14px;
-  border-radius: 999px;
+  border-radius: ${({ theme }) => theme.radius.full};
   background: rgba(21, 32, 33, 0.08);
   color: #152021;
   font-size: 0.92rem;

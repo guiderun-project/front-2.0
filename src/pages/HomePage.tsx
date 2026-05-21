@@ -77,7 +77,7 @@ const Section = styled.section`
 
 const Heading = styled.div`
   display: grid;
-  gap: 8px;
+  gap: ${({ theme }) => theme.spacing.md};
 `;
 
 const Label = styled.span`
@@ -109,7 +109,7 @@ const Grid = styled.div`
 
 const Card = styled.article`
   display: grid;
-  gap: 8px;
+  gap: ${({ theme }) => theme.spacing.md};
   padding: 18px;
   border-radius: 22px;
   background: rgba(21, 32, 33, 0.04);

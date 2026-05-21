@@ -32,7 +32,7 @@ const Wrapper = styled.section`
   gap: 14px;
   min-height: 100vh;
   place-content: center;
-  padding: 32px;
+  padding: ${({ theme }) => theme.spacing['4xl']};
 `;
 
 const Card = styled.div`
@@ -57,8 +57,8 @@ const Copy = styled.p`
 
 const BackLink = styled(Link)`
   width: fit-content;
-  padding: 10px 16px;
-  border-radius: 999px;
+  padding: 10px ${({ theme }) => theme.spacing.xl};
+  border-radius: ${({ theme }) => theme.radius.full};
   background: #152021;
   color: #f8f4ea;
 `;

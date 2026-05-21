@@ -14,7 +14,7 @@ export const NotFoundPage = () => {
 const Wrapper = styled.section`
   display: grid;
   gap: 14px;
-  padding: 32px 28px;
+  padding: ${({ theme }) => theme.spacing['4xl']} 28px;
   border-radius: 32px;
   background: rgba(255, 255, 255, 0.92);
   border: 1px solid rgba(21, 32, 33, 0.08);
@@ -32,8 +32,8 @@ const Copy = styled.p`
 
 const BackLink = styled(Link)`
   width: fit-content;
-  padding: 10px 16px;
-  border-radius: 999px;
+  padding: 10px ${({ theme }) => theme.spacing.xl};
+  border-radius: ${({ theme }) => theme.radius.full};
   background: #152021;
   color: #f8f4ea;
 `;

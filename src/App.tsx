@@ -33,12 +33,12 @@ export default App;
 
 const Shell = styled.div`
   min-height: 100vh;
-  padding: 32px;
+  padding: ${({ theme }) => theme.spacing['4xl']};
 `;
 
 const Frame = styled.div`
   display: grid;
-  gap: 24px;
+  gap: ${({ theme }) => theme.spacing['3xl']};
   width: min(1180px, 100%);
   margin: 0 auto;
 `;
@@ -47,8 +47,8 @@ const Header = styled.header`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 20px;
-  padding: 20px 24px;
+  gap: ${({ theme }) => theme.spacing['2xl']};
+  padding: ${({ theme }) => theme.spacing['2xl']} ${({ theme }) => theme.spacing['3xl']};
   border: 1px solid rgba(21, 32, 33, 0.1);
   border-radius: 28px;
   background:
@@ -78,13 +78,13 @@ const Title = styled.h1`
 
 const Nav = styled.nav`
   display: flex;
-  gap: 12px;
+  gap: ${({ theme }) => theme.spacing.lg};
   flex-wrap: wrap;
 `;
 
 const NavItem = styled(NavLink)`
-  padding: 10px 16px;
-  border-radius: 999px;
+  padding: 10px ${({ theme }) => theme.spacing.xl};
+  border-radius: ${({ theme }) => theme.radius.full};
   color: #1f2620;
   background: rgba(255, 255, 255, 0.72);
   border: 1px solid transparent;
