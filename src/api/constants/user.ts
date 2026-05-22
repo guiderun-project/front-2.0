@@ -1,0 +1,10 @@
+export const MY_ACTIVITY_EVENT_RELATION_FILTERS = {
+  TOTAL: 'TOTAL',
+  PARTICIPATED: 'PARTICIPATED',
+  HOSTED: 'HOSTED',
+} as const;
+
+export const MY_ACTIVITY_PARTNER_SORTS = {
+  RECENT: 'RECENT',
+  OLD: 'OLD',
+} as const;
