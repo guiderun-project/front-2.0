@@ -1,0 +1,47 @@
+import {
+  EVENT_LIST_TABS,
+  EVENT_LIST_TYPE_FILTERS,
+  RECRUIT_STATUS_FILTERS,
+} from '@/api/constants/common';
+
+type ValueOf<T> = T[keyof T];
+
+export type UserType = 'VI' | 'GUIDE';
+export type DisabilityType = UserType;
+export type Gender = 'MALE' | 'FEMALE';
+export type RunningGroup = 'A' | 'B' | 'C' | 'D' | 'E' | 'P';
+export type EventType = 'TRAINING' | 'COMPETITION';
+export type EventCategory = 'GENERAL' | 'GROUP' | 'TEAM';
+
+export type EventListTab = ValueOf<typeof EVENT_LIST_TABS>;
+
+export type EventListTypeFilter = ValueOf<typeof EVENT_LIST_TYPE_FILTERS>;
+
+export type RecruitStatus =
+  | 'RECRUIT_UPCOMING'
+  | 'RECRUIT_OPEN'
+  | 'RECRUIT_CLOSE'
+  | 'RECRUIT_END';
+
+export type RecruitStatusFilter = ValueOf<typeof RECRUIT_STATUS_FILTERS>;
+
+export type RoleEnum =
+  | 'ROLE_NEW'
+  | 'ROLE_WAIT'
+  | 'ROLE_USER'
+  | 'ROLE_ADMIN'
+  | 'ROLE_REJECT'
+  | 'ROLE_COACH'
+  | 'ROLE_WITHDRAWAL';
+
+export type AdditionalQuestionType = 'TEXT' | 'SELECT';
+
+export type Pagination = {
+  page: number;
+  size: number;
+  totalCount: number;
+  totalPages: number;
+  hasNext: boolean;
+};
+
+export type PageInfo = Omit<Pagination, 'hasNext'>;
