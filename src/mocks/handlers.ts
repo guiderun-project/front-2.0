@@ -1,13 +1,19 @@
-import { http, HttpHandler, HttpResponse } from 'msw';
+import type { HttpHandler } from 'msw';
 
-export type NoneType = Record<string, never>;
-
-//You can add HTTP handler by msw DOCS
-//https://mswjs.io/docs/network-behavior/rest
+import { applicationHandlers } from './handlers/applicationHandlers';
+import { attendanceHandlers } from './handlers/attendanceHandlers';
+import { authHandlers } from './handlers/authHandlers';
+import { commentHandlers } from './handlers/commentHandlers';
+import { eventHandlers } from './handlers/eventHandlers';
+import { matchingHandlers } from './handlers/matchingHandlers';
+import { userHandlers } from './handlers/userHandlers';
 
 export const handlers: HttpHandler[] = [
-  //   Example code
-  http.get('/post', () => {
-    return HttpResponse.json();
-  }),
+  ...authHandlers,
+  ...userHandlers,
+  ...applicationHandlers,
+  ...attendanceHandlers,
+  ...matchingHandlers,
+  ...commentHandlers,
+  ...eventHandlers,
 ];
