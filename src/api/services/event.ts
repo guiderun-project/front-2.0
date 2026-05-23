@@ -1,545 +1,199 @@
-import { isAxiosError } from 'axios';
-
-import { axiosInstanceWithToken } from '../core/client';
-import { ErrorType } from '../contracts/error';
-import {
-  EventCalendarDetailGetRequest,
-  EventCalendarDetailGetResponse,
-  EventCalendarGetResponse,
-  EventCalendarGetRequest,
-  EventPopupGetRequest,
-  EventPopupGetResponse,
-  MyEventGetRequest,
-  MyEventGetResponse,
-  SearchEventCountGetRequest,
-  SearchEventCountGetResponse,
-  SearchEventGetRequest,
-  SearchEventGetResponse,
-  UpcomingEventDdayGetResponse,
-  AllEventCountGetRequest,
-  AllEventCountGetResponse,
-  AllEventGetRequest,
-  AllEventGetResponse,
-  EventTypeCountGetResponse,
-  NewEventPostRequest,
-  NewEventPostResponse,
-  EventTypeCountGetRequest,
-  EventGetRequest,
-  EventGetResponse,
-  EditEventPatchResponse,
-  EditEventPatchRequest,
-  CloseEventPatchRequest,
-  EventLikeCountGetRequest,
-  EventLikeCountGetResponse,
-  EventLikePostResponse,
-  EventLikePoseRequest,
-  EventCommentCountGetRequest,
-  EventCommentCountGetResponse,
-  EventCommentGetRequest,
-  EventCommentGetResponse,
-  EventCommentLikeCountGetRequest,
-  EventCommentLikeCountGetResponse,
-  EventCommentLikePostRequest,
-  EventCommentLikePostResponse,
-  EventCommentPostRequest,
-  EventCommentPostResponse,
-  EventCommentPatchRequest,
-  EventCommentPatchResponse,
-  EventCommentDeleteRequest,
-  EventCommentDeleteResponse,
-  EventApplyGetRequest,
-  EventApplyGetResponse,
-  EventApplyPatchRequest,
-  EventApplyPatchResponse,
-  EventApplyPostRequest,
-  EventApplyPostResponse,
-  EventApplyCountGetRequest,
-  EventApplyCountGetResponse,
-  EventApplyStatusGetRequest,
-  EventApplyStatusGetResponse,
-  EventAttendPostRequest,
-  EventAttendStatusCountGetRequest,
-  EventAttendStatusCountGetResponse,
-  EventMatchingPostRequest,
-  EventMatchingDeleteRequest,
-  EventNotMatchingCountGetRequest,
-  EventNotMatchingCountGetResponse,
-  EventNotMatchingGetRequest,
-  EventNotMatchingGetResponse,
-  EventMatchedViCountGetRequest,
-  EventMatchedViCountGetResponse,
-  EventMatchedViGetRequest,
-  EventMatchedViGetResponse,
-  EventMatchedGuideCountGetRequest,
-  EventMatchedGuideCountGetResponse,
-  EventMatchedGuideGetRequest,
-  EventMatchedGuideGetResponse,
-  EventApplyAllGetRequest,
-  EventApplyAllGetResponse,
-  EventApplyDeleteRequest,
-  EventDeleteRequest,
-} from '../contracts/event';
+import { optionalAuthApi, privateApi } from '@/api/core/client';
+import { handleApiRequest } from '@/api/core/request';
+import type {
+  EventClosePath,
+  EventCreateRequest,
+  EventCreateResponse,
+  EventDeletePath,
+  EventDetailPath,
+  EventDetailResponse,
+  EventListGetRequest,
+  EventListGetResponse,
+  EventRunningDistancePatchRequest,
+  EventRunningDistancePatchResponse,
+  EventRunningDistancePath,
+  EventSearchGetRequest,
+  EventSearchGetResponse,
+  EventsSummaryGetResponse,
+  EventUpdatePath,
+  EventUpdateRequest,
+  EventUpdateResponse,
+  MissingRunningDistanceGetResponse,
+  UpcomingEventsGetResponse,
+} from '@/api/types/event';
 
 class EventApi {
-  private async handleRequest<T>(request: () => Promise<T>) {
-    try {
-      return await request();
-    } catch (error) {
-      if (isAxiosError<ErrorType>(error)) {
-        throw error;
-      }
-      throw new Error('예상치 못한 에러 발생');
-    }
-  }
+  /**
+   * 이벤트 공개 요약과 로그인 사용자의 누적 참여 요약을 조회한다.
+   * 비회원은 공개 요약만, 회원은 개인 누적 참여 요약도 함께 받는다.
+   *
+   * @see https://www.notion.so/35d9802df4968111a2dacb358e745142?pvs=1
+   */
+  summaryGet = async () => {
+    return handleApiRequest(async () => {
+      const response =
+        await optionalAuthApi.get<EventsSummaryGetResponse>('/event/summary');
 
-  eventGet = async ({ eventId }: EventGetRequest) => {
-    return this.handleRequest(async () => {
-      const res = await axiosInstanceWithToken.get<EventGetResponse>(
+      return response.data;
+    });
+  };
+
+  /**
+   * 다가오는 이벤트 목록을 조회한다.
+   * 비회원은 공개 모임, 회원은 본인이 참여한 모임을 기준으로 반환된다.
+   *
+   * @see https://www.notion.so/35d9802df49681b893efce4acc4f02ea?pvs=1
+   */
+  upcomingGet = async () => {
+    return handleApiRequest(async () => {
+      const response =
+        await optionalAuthApi.get<UpcomingEventsGetResponse>('/event/upcoming');
+
+      return response.data;
+    });
+  };
+
+  /**
+   * 전체 이벤트 목록을 탭, 유형, 모집 상태, 페이지 기준으로 조회한다.
+   * totalCount는 pagination에 포함된다.
+   *
+   * @see https://www.notion.so/35d9802df49681ec8a99e7ffc5ae5baf?pvs=1
+   */
+  allGet = async (query: EventListGetRequest) => {
+    return handleApiRequest(async () => {
+      const response = await optionalAuthApi.get<EventListGetResponse>(
+        '/event/all',
+        { params: query },
+      );
+
+      return response.data;
+    });
+  };
+
+  /**
+   * 검색어와 목록 필터 조건으로 이벤트 목록을 검색한다.
+   *
+   * @see https://www.notion.so/35d9802df49681b9be3aeed1596e240f?pvs=1
+   */
+  searchGet = async (query: EventSearchGetRequest) => {
+    return handleApiRequest(async () => {
+      const response = await optionalAuthApi.get<EventSearchGetResponse>(
+        '/event/search',
+        { params: query },
+      );
+
+      return response.data;
+    });
+  };
+
+  /**
+   * 이벤트 상세 정보를 조회한다.
+   * 비공개 이벤트도 링크 접근 시 상세 조회가 가능하다.
+   *
+   * @see https://www.notion.so/3629802df49681339103fa37e3670802?pvs=1
+   */
+  detailGet = async ({ eventId }: EventDetailPath) => {
+    return handleApiRequest(async () => {
+      const response = await optionalAuthApi.get<EventDetailResponse>(
         `/event/${eventId}`,
       );
-      return res.data;
+
+      return response.data;
     });
   };
 
-  eventDelete = async ({ eventId }: EventDeleteRequest) => {
-    return this.handleRequest(async () => {
-      const res = await axiosInstanceWithToken.delete(`/event/${eventId}`);
-      return res.data;
-    });
-  };
-
-  allEventCountGet = async ({ kind, sort, type }: AllEventCountGetRequest) => {
-    return this.handleRequest(async () => {
-      const res = await axiosInstanceWithToken.get<AllEventCountGetResponse>(
-        `/event/all/count`,
-        { params: { sort, type, kind } },
-      );
-      return res.data.count;
-    });
-  };
-
-  allEventGet = async ({
-    start = 0,
-    limit = 6,
-    kind,
-    sort,
-    type,
-  }: AllEventGetRequest) => {
-    return this.handleRequest(async () => {
-      const res = await axiosInstanceWithToken.get<AllEventGetResponse>(
-        `/event/all`,
-        { params: { start, limit, kind, sort, type } },
-      );
-      return res.data.items;
-    });
-  };
-
-  eventPopupGet = async ({ eventId }: EventPopupGetRequest) => {
-    return this.handleRequest(async () => {
-      const res = await axiosInstanceWithToken.get<EventPopupGetResponse>(
-        `/event/pop/${eventId}`,
-      );
-      return res.data;
-    });
-  };
-
-  upcomingEventDdayGet = async () => {
-    return this.handleRequest(async () => {
-      const res =
-        await axiosInstanceWithToken.get<UpcomingEventDdayGetResponse>(
-          '/event/dday',
-        );
-      return res.data.eventItems;
-    });
-  };
-
-  myEventGet = async ({ year, sort }: MyEventGetRequest) => {
-    return this.handleRequest(async () => {
-      const res = await axiosInstanceWithToken.get<MyEventGetResponse>(
-        `/event/my`,
-        { params: { sort, year } },
-      );
-      return res.data.items;
-    });
-  };
-
-  searchEventCountGet = async ({ title }: SearchEventCountGetRequest) => {
-    return this.handleRequest(async () => {
-      const res = await axiosInstanceWithToken.get<SearchEventCountGetResponse>(
-        `/event/search/count`,
-        { params: { title } },
-      );
-      return res.data.count;
-    });
-  };
-
-  searchEventGet = async ({ title, limit, start }: SearchEventGetRequest) => {
-    return this.handleRequest(async () => {
-      const res = await axiosInstanceWithToken.get<SearchEventGetResponse>(
-        `/event/search`,
-        { params: { title, limit, start } },
-      );
-      return res.data.items;
-    });
-  };
-
-  eventCalendarGet = async ({ month, year }: EventCalendarGetRequest) => {
-    return this.handleRequest(async () => {
-      const res = await axiosInstanceWithToken.get<EventCalendarGetResponse>(
-        `/event/calendar`,
-        { params: { year, month } },
-      );
-      return res.data.result;
-    });
-  };
-
-  eventCalendarDetailGet = async ({
-    day,
-    month,
-    year,
-  }: EventCalendarDetailGetRequest) => {
-    return this.handleRequest(async () => {
-      const res =
-        await axiosInstanceWithToken.get<EventCalendarDetailGetResponse>(
-          `/event/calendar/detail`,
-          { params: { year, month, day } },
-        );
-      return res.data.items;
-    });
-  };
-
-  eventTypeCountGet = async ({ userId }: EventTypeCountGetRequest) => {
-    return this.handleRequest(async () => {
-      const res = await axiosInstanceWithToken.get<EventTypeCountGetResponse>(
-        `/user/event-type/count/${userId}`,
-      );
-      return res.data;
-    });
-  };
-
-  newEventPost = async (body: NewEventPostRequest) => {
-    return this.handleRequest(async () => {
-      const res = await axiosInstanceWithToken.post<NewEventPostResponse>(
+  /**
+   * 이벤트를 생성한다.
+   * 비공개 여부, 예상 러닝 거리, 추가정보 질문 정의를 함께 저장할 수 있다.
+   *
+   * @see https://www.notion.so/35e9802df496814f95a7f823d4c558a3?pvs=1
+   */
+  createPost = async (body: EventCreateRequest) => {
+    return handleApiRequest(async () => {
+      const response = await privateApi.post<EventCreateResponse>(
         '/event',
         body,
       );
-      return res.data;
+
+      return response.data;
     });
   };
 
-  editEventPatch = async ({
-    eventId,
-    EditEventPatchRequestBody,
-  }: EditEventPatchRequest) => {
-    return this.handleRequest(async () => {
-      const res = await axiosInstanceWithToken.patch<EditEventPatchResponse>(
+  /**
+   * 이벤트 생성과 동일한 주요 필드를 수정한다.
+   *
+   * @see https://www.notion.so/35e9802df4968186af03fb26e5334eb8?pvs=1
+   */
+  updatePatch = async ({ eventId, body }: EventUpdatePath & { body: EventUpdateRequest }) => {
+    return handleApiRequest(async () => {
+      const response = await privateApi.patch<EventUpdateResponse>(
         `/event/${eventId}`,
-        EditEventPatchRequestBody,
+        body,
       );
-      return res.data;
+
+      return response.data;
     });
   };
 
-  closeEventPatch = async ({ eventId }: CloseEventPatchRequest) => {
-    return this.handleRequest(async () => {
-      const res = await axiosInstanceWithToken.patch(`/event/close/${eventId}`);
-      return res.data;
+  /**
+   * 주최자가 이벤트를 삭제한다.
+   *
+   * @see https://www.notion.so/35e9802df49681bc91e1d8224a5e17ae?pvs=1
+   */
+  delete = async ({ eventId }: EventDeletePath) => {
+    return handleApiRequest(async () => {
+      const response = await privateApi.delete<void>(`/event/${eventId}`);
+
+      return response.data;
     });
   };
 
-  eventLikeCountGet = async ({ eventId }: EventLikeCountGetRequest) => {
-    return this.handleRequest(async () => {
-      const res = await axiosInstanceWithToken.get<EventLikeCountGetResponse>(
-        `/event/${eventId}/likes/count`,
+  /**
+   * 주최자가 이벤트 모집을 조기 마감한다.
+   *
+   * @see https://www.notion.so/3609802df4968140b54ddb44815e4e00?pvs=1
+   */
+  closePatch = async ({ eventId }: EventClosePath) => {
+    return handleApiRequest(async () => {
+      const response = await privateApi.patch<string>(
+        `/event/close/${eventId}`,
       );
-      return res.data;
+
+      return response.data;
     });
   };
 
-  eventLikePost = async ({ eventId }: EventLikePoseRequest) => {
-    return this.handleRequest(async () => {
-      const res = await axiosInstanceWithToken.post<EventLikePostResponse>(
-        `/event/${eventId}/likes`,
+  /**
+   * 현재 로그인 사용자가 주최한 종료 이벤트 중 러닝 거리 미입력 이벤트를 조회한다.
+   *
+   * @see https://www.notion.so/35e9802df49681f28560f81a9243c464?pvs=1
+   */
+  missingRunningDistanceGet = async () => {
+    return handleApiRequest(async () => {
+      const response = await privateApi.get<MissingRunningDistanceGetResponse>(
+        '/event/missing-running-distance',
       );
-      return res.data.likes;
+
+      return response.data;
     });
   };
 
-  eventCommentCountGet = async ({ eventId }: EventCommentCountGetRequest) => {
-    return this.handleRequest(async () => {
-      const res =
-        await axiosInstanceWithToken.get<EventCommentCountGetResponse>(
-          `/event/${eventId}/comments/count`,
-        );
-      return res.data.count;
-    });
-  };
-
-  eventCommentGet = async ({
+  /**
+   * 러닝 거리가 비어 있는 이벤트에 예상 러닝 거리를 등록한다.
+   *
+   * @see https://www.notion.so/35e9802df496816db2f5e231ce44c156?pvs=1
+   */
+  runningDistancePatch = async ({
     eventId,
-    limit = 4,
-    start = 0,
-  }: EventCommentGetRequest) => {
-    return this.handleRequest(async () => {
-      const res = await axiosInstanceWithToken.get<EventCommentGetResponse>(
-        `/event/${eventId}/comments`,
-        { params: { limit, start } },
+    body,
+  }: EventRunningDistancePath & { body: EventRunningDistancePatchRequest }) => {
+    return handleApiRequest(async () => {
+      const response = await privateApi.patch<EventRunningDistancePatchResponse>(
+        `/event/${eventId}/running-distance`,
+        body,
       );
-      return res.data.comments;
-    });
-  };
 
-  eventCommentLikeCountGet = async ({
-    commentId,
-  }: EventCommentLikeCountGetRequest) => {
-    return this.handleRequest(async () => {
-      const res =
-        await axiosInstanceWithToken.get<EventCommentLikeCountGetResponse>(
-          `/event/comment/${commentId}/likes/count`,
-        );
-      return res.data;
-    });
-  };
-
-  eventCommentLikePost = async ({ commentId }: EventCommentLikePostRequest) => {
-    return this.handleRequest(async () => {
-      const res =
-        await axiosInstanceWithToken.post<EventCommentLikePostResponse>(
-          `/event/comment/${commentId}/likes`,
-        );
-      return res.data.likes;
-    });
-  };
-
-  eventCommentPost = async ({
-    eventId,
-    EventCommentPostBody,
-  }: EventCommentPostRequest) => {
-    return this.handleRequest(async () => {
-      const res = await axiosInstanceWithToken.post<EventCommentPostResponse>(
-        `/event/${eventId}/comments`,
-        EventCommentPostBody,
-      );
-      return res.data.commentId;
-    });
-  };
-
-  eventCommentPatch = async ({
-    eventId,
-    commentId,
-    EventCommentPatchBody,
-  }: EventCommentPatchRequest) => {
-    return this.handleRequest(async () => {
-      const res = await axiosInstanceWithToken.patch<EventCommentPatchResponse>(
-        `/event/${eventId}/${commentId}`,
-        EventCommentPatchBody,
-      );
-      return res.data.commentId;
-    });
-  };
-
-  eventCommentDelete = async ({
-    commentId,
-    eventId,
-  }: EventCommentDeleteRequest) => {
-    return this.handleRequest(async () => {
-      const res =
-        await axiosInstanceWithToken.delete<EventCommentDeleteResponse>(
-          `/event/${eventId}/${commentId}`,
-        );
-      return res.data.commentId;
-    });
-  };
-
-  eventApplyGet = async ({ eventId, userId }: EventApplyGetRequest) => {
-    return this.handleRequest(async () => {
-      const res = await axiosInstanceWithToken.get<EventApplyGetResponse>(
-        `/event/${eventId}/form/${userId}`,
-      );
-      return res.data;
-    });
-  };
-
-  eventApplyPatch = async ({
-    eventId,
-    EventApplyPatchRequestBody,
-  }: EventApplyPatchRequest) => {
-    return this.handleRequest(async () => {
-      const res = await axiosInstanceWithToken.patch<EventApplyPatchResponse>(
-        `/event/${eventId}/form`,
-        EventApplyPatchRequestBody,
-      );
-      return res.data.requestId;
-    });
-  };
-
-  eventApplyPost = async ({
-    EventApplyPostRequestBody,
-    eventId,
-  }: EventApplyPostRequest) => {
-    return this.handleRequest(async () => {
-      const res = await axiosInstanceWithToken.post<EventApplyPostResponse>(
-        `/event/${eventId}/form`,
-        EventApplyPostRequestBody,
-      );
-      return res.data.requestId;
-    });
-  };
-
-  eventApplyDelete = async ({ eventId }: EventApplyDeleteRequest) => {
-    return this.handleRequest(async () => {
-      const res = await axiosInstanceWithToken.delete(`/event/${eventId}/form`);
-      return res.data;
-    });
-  };
-
-  eventApplyCountGet = async ({ eventId }: EventApplyCountGetRequest) => {
-    return this.handleRequest(async () => {
-      const res = await axiosInstanceWithToken.get<EventApplyCountGetResponse>(
-        `/event/${eventId}/forms/count`,
-      );
-      return res.data;
-    });
-  };
-
-  eventApplyStatusGet = async ({ eventId }: EventApplyStatusGetRequest) => {
-    return this.handleRequest(async () => {
-      const res = await axiosInstanceWithToken.get<EventApplyStatusGetResponse>(
-        `/event/${eventId}/forms`,
-      );
-      return res.data;
-    });
-  };
-
-  eventAttendPost = async ({ eventId, userId }: EventAttendPostRequest) => {
-    return this.handleRequest(async () => {
-      const res = await axiosInstanceWithToken.post(
-        `/event/${eventId}/attend/${userId}`,
-      );
-      return res.data;
-    });
-  };
-
-  eventAttendStatusCountGet = async ({
-    eventId,
-  }: EventAttendStatusCountGetRequest) => {
-    return this.handleRequest(async () => {
-      const res =
-        await axiosInstanceWithToken.get<EventAttendStatusCountGetResponse>(
-          `/event/${eventId}/attend/count`,
-        );
-      return res.data;
-    });
-  };
-
-  eventMatchingPost = async ({
-    eventId,
-    userId,
-    viId,
-  }: EventMatchingPostRequest) => {
-    return this.handleRequest(async () => {
-      const res = await axiosInstanceWithToken.post(
-        `/event/${eventId}/match/${viId}/${userId}`,
-      );
-      return res.data;
-    });
-  };
-
-  eventNotMatchingCountGet = async ({
-    eventId,
-  }: EventNotMatchingCountGetRequest) => {
-    return this.handleRequest(async () => {
-      const res =
-        await axiosInstanceWithToken.get<EventNotMatchingCountGetResponse>(
-          `/event/${eventId}/match/not/count`,
-        );
-      return res.data;
-    });
-  };
-
-  eventNotMatchingGet = async ({ eventId }: EventNotMatchingGetRequest) => {
-    return this.handleRequest(async () => {
-      const res = await axiosInstanceWithToken.get<EventNotMatchingGetResponse>(
-        `/event/${eventId}/match/list`,
-      );
-      return res.data;
-    });
-  };
-
-  eventMatchedViCountGet = async ({
-    eventId,
-  }: EventMatchedViCountGetRequest) => {
-    return this.handleRequest(async () => {
-      const res =
-        await axiosInstanceWithToken.get<EventMatchedViCountGetResponse>(
-          `/event/${eventId}/match/vi/count`,
-        );
-      return res.data;
-    });
-  };
-
-  eventMatchedViGet = async ({ eventId }: EventMatchedViGetRequest) => {
-    return this.handleRequest(async () => {
-      const res = await axiosInstanceWithToken.get<EventMatchedViGetResponse>(
-        `/event/${eventId}/match/vi/list`,
-      );
-      return res.data;
-    });
-  };
-
-  eventMatchedGuideCountGet = async ({
-    eventId,
-    viId,
-  }: EventMatchedGuideCountGetRequest) => {
-    return this.handleRequest(async () => {
-      const res =
-        await axiosInstanceWithToken.get<EventMatchedGuideCountGetResponse>(
-          `/event/${eventId}/match/${viId}/count`,
-        );
-      return res.data;
-    });
-  };
-
-  eventMatchedGuideGet = async ({
-    eventId,
-    viId,
-  }: EventMatchedGuideGetRequest) => {
-    return this.handleRequest(async () => {
-      const res =
-        await axiosInstanceWithToken.get<EventMatchedGuideGetResponse>(
-          `/event/${eventId}/match/${viId}/list`,
-        );
-      return res.data;
-    });
-  };
-
-  eventApplyAllGet = async ({ eventId }: EventApplyAllGetRequest) => {
-    return this.handleRequest(async () => {
-      const res = await axiosInstanceWithToken.get<EventApplyAllGetResponse>(
-        `/event/${eventId}/forms/all`,
-      );
-      return res.data;
-    });
-  };
-
-  eventMatchingDelete = async ({
-    eventId,
-    userId,
-  }: EventMatchingDeleteRequest) => {
-    return this.handleRequest(async () => {
-      const res = await axiosInstanceWithToken.delete(
-        `/event/${eventId}/match/${userId}`,
-      );
-      return res.data;
-    });
-  };
-
-  eventAutoMatching = async (eventId: number) => {
-    return this.handleRequest(async () => {
-      const res = await axiosInstanceWithToken.post(
-        `event/${eventId}/match/auto`,
-      );
-      return res.data;
+      return response.data;
     });
   };
 }

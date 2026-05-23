@@ -4,7 +4,7 @@ import axios, {
   type InternalAxiosRequestConfig,
 } from 'axios';
 
-import type { AccessTokenGetResponse } from '@/api/contracts/auth';
+import type { AccessTokenReissuePostResponse } from '@/api/types/auth';
 import {
   clearAccessToken,
   getAccessToken,
@@ -30,6 +30,7 @@ const sharedConfig = {
 
 export const publicApi = axios.create(sharedConfig);
 export const privateApi = axios.create(sharedConfig);
+export const optionalAuthApi = axios.create(sharedConfig);
 
 export const axiosInstance = publicApi;
 export const axiosInstanceWithToken = privateApi;
@@ -56,7 +57,7 @@ const setAuthorizationHeader = (
 
 const refreshAccessToken = async () => {
   try {
-    const response = await publicApi.get<AccessTokenGetResponse>(
+    const response = await publicApi.post<AccessTokenReissuePostResponse>(
       '/oauth/login/reissue',
     );
     const nextAccessToken = response.data.accessToken;
@@ -77,6 +78,16 @@ const refreshAccessToken = async () => {
 };
 
 privateApi.interceptors.request.use((config) => {
+  const accessToken = getAccessToken();
+
+  if (accessToken) {
+    setAuthorizationHeader(config, accessToken);
+  }
+
+  return config;
+});
+
+optionalAuthApi.interceptors.request.use((config) => {
   const accessToken = getAccessToken();
 
   if (accessToken) {
