@@ -1,10 +1,25 @@
 import { css } from '@emotion/react';
 
 export const globalStyles = css`
+  @font-face {
+    font-family: "Pretendard";
+    src: url("/fonts/pretendard/PretendardVariable.woff2") format("woff2");
+    font-weight: 45 920;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "April16th";
+    src: url("/fonts/april16th/April16th-Promise.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
   :root {
     font-family:
-      "IBM Plex Sans KR",
-      "Pretendard Variable",
+      "Pretendard",
       "SF Pro Display",
       sans-serif;
     line-height: 1.5;
