@@ -1,0 +1,17 @@
+export const EVENT_LIST_TABS = {
+  UPCOMING: 'UPCOMING',
+  PAST: 'PAST',
+} as const;
+
+export const EVENT_LIST_TYPE_FILTERS = {
+  TOTAL: 'TOTAL',
+  COMPETITION: 'COMPETITION',
+  TRAINING: 'TRAINING',
+} as const;
+
+export const RECRUIT_STATUS_FILTERS = {
+  ALL: 'RECRUIT_ALL',
+  UPCOMING: 'RECRUIT_UPCOMING',
+  OPEN: 'RECRUIT_OPEN',
+  CLOSE: 'RECRUIT_CLOSE',
+} as const;

@@ -21,16 +21,17 @@ export const HomePage = () => {
         <Label>Foundation</Label>
         <Title>Router, API, MSW, and styling are ready to evolve.</Title>
         <Description>
-          This workspace now boots with the v2 shell, shared API contracts,
+          This workspace now boots with the v2 shell, confirmed API types,
           refresh-aware axios clients, and a minimal route layout that can
           absorb the new page architecture.
         </Description>
       </Heading>
       <Grid>
         <Card>
-          <CardTitle>API contracts</CardTitle>
+          <CardTitle>API types</CardTitle>
           <CardCopy>
-            Auth, info, event, and admin request-response types are ported.
+            Auth, user, event, application, attendance, matching, and comment
+            types are ready.
           </CardCopy>
         </Card>
         <Card>
