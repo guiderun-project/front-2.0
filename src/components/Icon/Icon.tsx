@@ -1,18 +1,11 @@
 import type { ReactElement, SVGProps } from 'react';
 
-import styled from '@emotion/styled';
-
 import { resolveColorToken, type ColorToken } from '@/styles/tokens';
 
 import { iconRegistry, type IconName } from './iconRegistry';
 
 const DEFAULT_ICON_SIZE = 20;
 const DEFAULT_ICON_COLOR = 'icon.primary' satisfies ColorToken;
-
-type IconStyleProps = {
-  $color: ColorToken;
-  $size: number;
-};
 
 export type IconProps = {
   icon: IconName;
@@ -27,31 +20,29 @@ export const Icon = ({
   icon,
   role,
   size = DEFAULT_ICON_SIZE,
+  style,
   ...props
 }: IconProps): ReactElement => {
   const SvgIcon = iconRegistry[icon];
   const isDecorative = !ariaLabel;
 
   return (
-    <StyledIcon
-      $color={color}
-      $size={size}
+    <SvgIcon
       aria-hidden={isDecorative ? (ariaHidden ?? true) : ariaHidden}
       aria-label={ariaLabel}
-      as={SvgIcon}
       height={size}
       role={isDecorative ? role : (role ?? 'img')}
+      style={{
+        ...style,
+        color: resolveColorToken(color),
+        display: 'inline-block',
+        flexShrink: 0,
+        height: size,
+        verticalAlign: 'middle',
+        width: size,
+      }}
       width={size}
       {...props}
     />
   );
 };
-
-const StyledIcon = styled.svg<IconStyleProps>(({ $color, $size }) => ({
-  color: resolveColorToken($color),
-  display: 'inline-block',
-  flexShrink: 0,
-  height: $size,
-  verticalAlign: 'middle',
-  width: $size,
-}));

@@ -37,21 +37,60 @@ const TEXT_EXAMPLES: ReadonlyArray<{ font: TypographyToken; label: string; sampl
   { font: 'detail-s-r', label: 'detail-s-r', sample: 'Detail Small Regular' },
 ];
 
+const TEXT_CODE_EXAMPLES = [
+  {
+    label: 'Heading',
+    code: `<Text as="h1" font="heading-l-b">
+  Components
+</Text>`,
+  },
+  {
+    label: 'Secondary copy',
+    code: `<Text color="text.secondary" font="body-s-r">
+  Shared UI primitives currently available in the app.
+</Text>`,
+  },
+] as const;
+
 const ICON_EXAMPLES: ReadonlyArray<{ icon: IconName; color?: ColorToken }> = [
+  { icon: 'check-lined', color: 'text.brand' },
   { icon: 'chevron-down-lined' },
   { icon: 'chevron-left-lined' },
   { icon: 'chevron-right-lined' },
   { icon: 'chevron-up-lined' },
   { icon: 'delete-lined', color: 'text.danger' },
+  { icon: 'download-lined', color: 'icon.secondary' },
+  { icon: 'edit-lined', color: 'icon.secondary' },
   { icon: 'help-circle-filled', color: 'bg.brand' },
   { icon: 'home-filled' },
   { icon: 'home-lined' },
+  { icon: 'link-lined', color: 'text.brand' },
   { icon: 'list-filled' },
   { icon: 'list-lined' },
+  { icon: 'more-vertical-lined' },
+  { icon: 'plus-lined', color: 'text.brand' },
   { icon: 'search-lined' },
+  { icon: 'share-lined', color: 'icon.secondary' },
+  { icon: 'trash-lined', color: 'text.danger' },
   { icon: 'user-filled' },
   { icon: 'user-lined' },
+  { icon: 'user-x-lined', color: 'text.danger' },
 ];
+
+const ICON_CODE_EXAMPLES = [
+  {
+    label: 'Default',
+    code: `<Icon icon="home-filled" />`,
+  },
+  {
+    label: 'Size and color',
+    code: `<Icon
+  icon="trash-lined"
+  size={24}
+  color="text.danger"
+/>`,
+  },
+] as const;
 
 const ICON_BUTTON_EXAMPLES: ReadonlyArray<{
   ariaLabel: string;
@@ -69,23 +108,116 @@ const ICON_BUTTON_EXAMPLES: ReadonlyArray<{
     background: 'bg.elevated',
     icon: 'delete-lined',
     iconSize: 24,
-    label: 'round / 48',
+    label: '48 round',
     shape: 'round',
     size: 48,
   },
-  { ariaLabel: '뒤로가기', icon: 'chevron-left-lined', iconSize: 24, label: 'icon 24' },
-  { ariaLabel: '닫기', icon: 'delete-lined', iconSize: 24, label: 'icon 24' },
-  { ariaLabel: '프로필', icon: 'user-lined', iconSize: 24, label: 'icon 24' },
-  { ariaLabel: '메뉴', icon: 'list-lined', iconSize: 24, label: 'icon 24' },
+  { ariaLabel: '뒤로가기', icon: 'chevron-left-lined', iconSize: 24, label: '24 bare' },
+  {
+    ariaLabel: '검색',
+    background: 'bg.brand-weak',
+    color: 'text.brand',
+    icon: 'search-lined',
+    iconSize: 18,
+    label: '32 brand weak',
+    size: 32,
+  },
+  {
+    ariaLabel: '추가',
+    background: 'bg.brand',
+    color: 'text.inverse',
+    icon: 'plus-lined',
+    iconSize: 20,
+    label: '40 brand',
+    shape: 'round',
+    size: 40,
+  },
+  {
+    ariaLabel: '편집',
+    background: 'bg.surface',
+    color: 'icon.secondary',
+    icon: 'edit-lined',
+    iconSize: 20,
+    label: '36 surface',
+    size: 36,
+  },
+  {
+    ariaLabel: '공유',
+    background: 'bg.brand-weak2',
+    color: 'text.brand',
+    icon: 'share-lined',
+    iconSize: 18,
+    label: '32 round',
+    shape: 'round',
+    size: 32,
+  },
+  {
+    ariaLabel: '완료',
+    background: 'bg.inverse',
+    color: 'text.inverse',
+    icon: 'check-lined',
+    iconSize: 18,
+    label: '36 inverse',
+    shape: 'round',
+    size: 36,
+  },
+  { ariaLabel: '메뉴', icon: 'more-vertical-lined', iconSize: 24, label: '24 menu' },
+  {
+    ariaLabel: '다운로드',
+    background: 'bg.elevated',
+    color: 'icon.secondary',
+    icon: 'download-lined',
+    iconSize: 22,
+    label: '44 elevated',
+    shape: 'round',
+    size: 44,
+  },
   {
     ariaLabel: '삭제',
+    background: 'bg.surface',
+    color: 'text.danger',
+    icon: 'trash-lined',
+    iconSize: 20,
+    label: '40 danger',
+    size: 40,
+  },
+  {
+    ariaLabel: '회원 제외',
     color: 'text.danger',
     disabled: true,
-    icon: 'delete-lined',
+    icon: 'user-x-lined',
     iconSize: 24,
     label: 'disabled',
   },
 ];
+
+const ICON_BUTTON_CODE_EXAMPLES = [
+  {
+    label: 'Bare action',
+    code: `<IconButton
+  icon="chevron-left-lined"
+  iconSize={24}
+  aria-label="뒤로가기"
+/>`,
+  },
+  {
+    label: 'Round action',
+    code: `<IconButton
+  icon="plus-lined"
+  size={40}
+  iconSize={20}
+  color="text.inverse"
+  background="bg.brand"
+  shape="round"
+  aria-label="추가"
+/>`,
+  },
+] as const;
+
+type CodeExample = {
+  label: string;
+  code: string;
+};
 
 export const HomePage = () => {
   const [colorMode, setColorMode] = useState<ColorMode>('light');
@@ -129,6 +261,7 @@ export const HomePage = () => {
             </TextRow>
           ))}
         </TextList>
+        <CodeExamples examples={TEXT_CODE_EXAMPLES} />
       </ShowcaseSection>
 
       <ShowcaseSection>
@@ -164,6 +297,7 @@ export const HomePage = () => {
             </IconTableRow>
           ))}
         </IconTable>
+        <CodeExamples examples={ICON_CODE_EXAMPLES} />
       </ShowcaseSection>
 
       <ShowcaseSection>
@@ -172,7 +306,7 @@ export const HomePage = () => {
             IconButton
           </Text>
           <Text color="text.tertiary" font="detail-m-r">
-            Size, background, shape, disabled
+            Size, icon color, background, shape, disabled
           </Text>
         </SectionTitle>
         <IconButtonGrid>
@@ -196,10 +330,26 @@ export const HomePage = () => {
             ),
           )}
         </IconButtonGrid>
+        <CodeExamples examples={ICON_BUTTON_CODE_EXAMPLES} />
       </ShowcaseSection>
     </Page>
   );
 };
+
+const CodeExamples = ({ examples }: { examples: ReadonlyArray<CodeExample> }) => (
+  <CodeExampleGrid>
+    {examples.map(({ code, label }) => (
+      <CodeExampleItem key={label}>
+        <Text color="text.tertiary" font="detail-m-m">
+          {label}
+        </Text>
+        <CodeBlock>
+          <Code>{code}</Code>
+        </CodeBlock>
+      </CodeExampleItem>
+    ))}
+  </CodeExampleGrid>
+);
 
 const getModeVariables = (mode: ColorMode) => css`
   ${colorModeCssVariables[mode]}
@@ -314,4 +464,34 @@ const IconButtonSample = styled.div`
   display: inline-grid;
   justify-items: center;
   gap: ${({ theme }) => theme.spacing.sm};
+`;
+
+const CodeExampleGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, ${({ theme }) => theme.pxToRem(280)}), 1fr));
+  gap: ${({ theme }) => theme.spacing.md};
+`;
+
+const CodeExampleItem = styled.div`
+  display: grid;
+  gap: ${({ theme }) => theme.spacing.sm};
+  min-width: 0;
+`;
+
+const CodeBlock = styled.pre`
+  min-width: 0;
+  margin: 0;
+  overflow-x: auto;
+  padding: ${({ theme }) => theme.spacing.md};
+  border: 1px solid ${({ theme }) => theme.color.border.subtle};
+  border-radius: ${({ theme }) => theme.radius.sm};
+  background: ${({ theme }) => theme.color.bg.surface};
+`;
+
+const Code = styled.code`
+  color: ${({ theme }) => theme.color.text.secondary};
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: ${({ theme }) => theme.pxToRem(12)};
+  line-height: 1.6;
+  white-space: pre-wrap;
 `;
