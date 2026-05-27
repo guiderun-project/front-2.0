@@ -1,4 +1,6 @@
 export const fontFamily = {
+  base: '"Pretendard", "SF Pro Display", sans-serif',
+  point: '"April16th", "Pretendard", sans-serif',
   pretendard: '"Pretendard", "SF Pro Display", sans-serif',
   april16th: '"April16th", "Pretendard", sans-serif',
 } as const;
@@ -10,4 +12,3 @@ export const fontWeight = {
   bold: 700,
   promise: 400,
 } as const;
-

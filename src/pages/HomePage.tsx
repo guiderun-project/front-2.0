@@ -25,6 +25,7 @@ const TEXT_EXAMPLES: ReadonlyArray<{ font: TypographyToken; label: string; sampl
   { font: 'heading-s-m', label: 'heading-s-m', sample: 'Heading Small Medium' },
   { font: 'body-l-b', label: 'body-l-b', sample: 'Body Large Bold' },
   { font: 'body-l-sb', label: 'body-l-sb', sample: 'Body Large Semibold' },
+  { font: 'body-l-m', label: 'body-l-m', sample: 'Body Large Medium' },
   { font: 'body-m-sb', label: 'body-m-sb', sample: 'Body Medium Semibold' },
   { font: 'body-m-m', label: 'body-m-m', sample: 'Body Medium Medium' },
   { font: 'body-s-sb', label: 'body-s-sb', sample: 'Body Small Semibold' },
