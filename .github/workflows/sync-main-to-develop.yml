@@ -1,0 +1,88 @@
+name: Sync main to develop
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: sync-main-to-develop
+  cancel-in-progress: false
+
+jobs:
+  create-sync-pr:
+    name: Create main to develop PR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Compare develop with main
+        id: compare
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          ahead_by="$(gh api "repos/${REPOSITORY}/compare/develop...main" --jq '.ahead_by')"
+          behind_by="$(gh api "repos/${REPOSITORY}/compare/develop...main" --jq '.behind_by')"
+          status="$(gh api "repos/${REPOSITORY}/compare/develop...main" --jq '.status')"
+
+          {
+            echo "ahead_by=${ahead_by}"
+            echo "behind_by=${behind_by}"
+            echo "status=${status}"
+          } >> "${GITHUB_OUTPUT}"
+
+          if [ "${ahead_by}" = "0" ]; then
+            echo "develop already contains main. No sync PR is needed."
+          else
+            echo "main is ${ahead_by} commit(s) ahead of develop."
+          fi
+
+      - name: Create or update sync PR
+        if: steps.compare.outputs.ahead_by != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          TITLE: Sync main to develop
+          BODY: |
+            ## Summary
+            - Synchronizes the latest `main` branch changes into `develop`.
+            - This PR is opened automatically whenever `main` receives new commits.
+
+            ## Notes
+            - Merge this PR only after the expected checks pass.
+            - GitHub's PR UI does not support a true fast-forward merge. If this PR is merged through the UI, `develop` can appear ahead of `main` by the merge commit even when the file contents are synchronized.
+            - To avoid that extra ahead commit entirely, `develop` must be fast-forwarded to `main` directly by a protected/manual sync workflow or by an authorized maintainer command.
+        run: |
+          set -euo pipefail
+
+          existing_pr="$(
+            gh pr list \
+              --repo "${REPOSITORY}" \
+              --base develop \
+              --head main \
+              --state open \
+              --json number \
+              --jq '.[0].number // ""'
+          )"
+
+          if [ -n "${existing_pr}" ]; then
+            gh pr edit "${existing_pr}" \
+              --repo "${REPOSITORY}" \
+              --title "${TITLE}" \
+              --body "${BODY}"
+            echo "Updated existing sync PR #${existing_pr}."
+          else
+            gh pr create \
+              --repo "${REPOSITORY}" \
+              --base develop \
+              --head main \
+              --title "${TITLE}" \
+              --body "${BODY}"
+          fi

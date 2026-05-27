@@ -1,134 +1,222 @@
-import { http, HttpHandler, HttpResponse } from 'msw';
+import { http, HttpResponse, type HttpHandler } from 'msw';
 
-import { NoneType } from '../handlers';
-
-import { baseURL } from '@/api/core/client';
-import {
-  AccessTokenGetResponse,
+import type {
+  AccountIdVerificationIssueRequest,
   CheckCertificationTokenPostRequest,
-  CheckCertificationTokenPostResponse,
-  CheckDuplicatedPostRequest,
-  CheckDuplicatedPostResponse,
-  GetCertificationTokenIdPostRequest,
-  GetCertificationTokenPasswordPostRequest,
-  GetUserIdPostRequest,
-  GetUserIdPostResponse,
-  GuideSignupPostRequest,
-  KakaoAuthPostResponse,
   LoginPostRequest,
-  LoginPostResponse,
-  RenewalPasswordPatchRequest,
-  SignupPostResponse,
-  ViSignupPostRequest,
-  WithdrawDeleteRequest,
-} from '@/api/contracts/auth';
-import { RoleEnum } from '@/api/contracts/common/group';
+  PasswordVerificationIssueRequest,
+  SignupPostRequest,
+  SmsVerificationExtendRequest,
+} from '@/api/types/auth';
+import { mockDb } from '@/mocks/fixtures';
+import {
+  apiUrl,
+  badRequest,
+  expiredRefreshTokenCookie,
+  noContent,
+  refreshTokenCookie,
+} from '@/mocks/http';
 
-const SIGN_UP_DATA: SignupPostResponse = {
-  accessToken: '123',
-  role: RoleEnum.Admin,
-  userId: '123',
+const createVerificationResponse = (
+  verificationId: string,
+  purpose: 'ACCOUNT_ID' | 'PASSWORD',
+) => {
+  const serverTime = new Date().toISOString();
+  const expiresAt = new Date(Date.now() + 180_000).toISOString();
+
+  return {
+    verificationId,
+    purpose,
+    expiresInSeconds: 180,
+    expiresAt,
+    serverTime,
+    canExtend: true,
+  };
 };
 
 export const authHandlers: HttpHandler[] = [
-  //kakaoAuthPost
-  http.post<NoneType, NoneType, KakaoAuthPostResponse>(
-    baseURL + '/oauth/login/kakao',
-    () => {
-      return HttpResponse.json({ accessToken: '123', isExist: false });
-    },
-  ),
+  http.post(apiUrl('/oauth/login/kakao'), ({ request }) => {
+    const code = new URL(request.url).searchParams.get('code');
 
-  //viSignupPost
-  http.post<NoneType, ViSignupPostRequest, SignupPostResponse>(
-    baseURL + '/signup/vi',
-    () => {
-      return HttpResponse.json(SIGN_UP_DATA);
-    },
-  ),
+    if (code === 'signup-required') {
+      return HttpResponse.json({
+        status: 'SIGNUP_REQUIRED',
+        signupToken: 'mock-signup-token',
+        provider: 'KAKAO',
+      });
+    }
 
-  //guideSignupPost
-  http.post<NoneType, GuideSignupPostRequest, SignupPostResponse>(
-    baseURL + '/signup/guide',
-    () => {
-      return HttpResponse.json(SIGN_UP_DATA);
-    },
-  ),
-
-  //accessTokenGet
-  http.get<NoneType, NoneType, AccessTokenGetResponse>(
-    baseURL + '/oauth/login/reissue',
-    () => {
-      return HttpResponse.json({ accessToken: '123', isExist: true });
-    },
-  ),
-
-  //checkDuplicatedPost
-  http.post<NoneType, CheckDuplicatedPostRequest, CheckDuplicatedPostResponse>(
-    baseURL + '/signup/duplicated',
-    () => {
-      return HttpResponse.json({ isUnique: true });
-    },
-  ),
-
-  //loginPost
-  http.post<NoneType, LoginPostRequest, LoginPostResponse>(
-    baseURL + '/login',
-    () => {
-      return HttpResponse.json({ accessToken: '123', isExist: true });
-      // return HttpResponse.json({}, { status: 500 });
-    },
-  ),
-
-  // getCertificationTokenPasswordPost
-  http.post<NoneType, GetCertificationTokenPasswordPostRequest>(
-    baseURL + '/sms/password',
-    () => {
-      return HttpResponse.json();
-    },
-  ),
-
-  // getCertificationTokenIdPost
-  http.post<NoneType, GetCertificationTokenIdPostRequest>(
-    baseURL + '/sms/accountId',
-    () => {
-      return HttpResponse.json();
-    },
-  ),
-
-  //checkCertificationTokenPost
-  http.post<
-    NoneType,
-    CheckCertificationTokenPostRequest,
-    CheckCertificationTokenPostResponse
-  >(baseURL + '/sms/token', () => {
-    return HttpResponse.json({ token: 'token' });
+    return HttpResponse.json(
+      {
+        status: 'LOGIN_SUCCESS',
+        accessToken: 'mock-access-token',
+        user: {
+          userId: 'user-vi-1',
+          role: 'ROLE_USER',
+          disabilityType: 'VI',
+        },
+      },
+      {
+        headers: {
+          'Set-Cookie': refreshTokenCookie,
+        },
+      },
+    );
   }),
 
-  // renewalPasswordPatch
-  http.patch<NoneType, RenewalPasswordPatchRequest>(
-    baseURL + '/new-password',
-    () => {
-      return HttpResponse.json();
-    },
-  ),
+  http.post(apiUrl('/login'), async ({ request }) => {
+    const body = (await request.json()) as LoginPostRequest;
+    const user = mockDb.users.find(
+      (item) => item.accountId === body.accountId && item.password === body.password,
+    );
 
-  //getUserIdPost
-  http.post<NoneType, GetUserIdPostRequest, GetUserIdPostResponse>(
-    baseURL + '/accountId',
-    () => {
-      return HttpResponse.json({
-        accountId: 'guide_run_project',
-        createdAt: '0000-00-00',
-      });
-    },
-  ),
+    if (!user) {
+      return badRequest('Invalid accountId or password.');
+    }
 
-  //withdrawDelete
-  http.delete<NoneType, { data: WithdrawDeleteRequest }>(
-    baseURL + '/withdrawal',
-    () => {
-      return HttpResponse.json({});
-    },
-  ),
+    return HttpResponse.json(
+      { accessToken: 'mock-access-token' },
+      {
+        headers: {
+          'Set-Cookie': refreshTokenCookie,
+        },
+      },
+    );
+  }),
+
+  http.post(apiUrl('/oauth/login/reissue'), () => {
+    return HttpResponse.json(
+      { accessToken: 'mock-rotated-access-token' },
+      {
+        headers: {
+          'Set-Cookie': refreshTokenCookie,
+        },
+      },
+    );
+  }),
+
+  http.post(apiUrl('/logout'), () => {
+    return new HttpResponse(null, {
+      status: 204,
+      headers: {
+        'Set-Cookie': expiredRefreshTokenCookie,
+      },
+    });
+  }),
+
+  http.post(apiUrl('/signup'), async ({ request }) => {
+    const body = (await request.json()) as SignupPostRequest;
+
+    if (!body.common.privacy || !body.common.portraitRights) {
+      return badRequest('privacy and portraitRights must be true.');
+    }
+
+    const nextUserId = `user-${body.disabilityType.toLowerCase()}-${mockDb.users.length + 1}`;
+    const runningInfo =
+      body.disabilityType === 'VI' ? body.vi : body.guide;
+
+    mockDb.users.push({
+      userId: nextUserId,
+      name: body.common.name,
+      gender: 'FEMALE',
+      phoneNumber: body.common.phoneNumber,
+      birthDate: body.common.birthDate,
+      recordDegree: runningInfo.runningGroup,
+      snsId: body.common.snsId,
+      id1365: body.disabilityType === 'GUIDE' ? body.guide.id1365 ?? null : null,
+      role: 'ROLE_WAIT',
+      type: body.disabilityType,
+      accountId: null,
+      password: 'password123!',
+      detailRecord: runningInfo.detailRecord,
+      hopePrefs: runningInfo.hopePrefs,
+      firstParticipation: true,
+    });
+
+    return HttpResponse.json(
+      {
+        userId: nextUserId,
+        accessToken: 'mock-access-token',
+        role: 'ROLE_WAIT',
+        disabilityType: body.disabilityType,
+      },
+      {
+        headers: {
+          'Set-Cookie': refreshTokenCookie,
+        },
+      },
+    );
+  }),
+
+  http.post(apiUrl('/sms/accountId'), async ({ request }) => {
+    const body = (await request.json()) as AccountIdVerificationIssueRequest;
+
+    if (!body.phoneNum) {
+      return badRequest('phoneNum is required.');
+    }
+
+    return HttpResponse.json(
+      createVerificationResponse('mock-account-id-verification', 'ACCOUNT_ID'),
+    );
+  }),
+
+  http.post(apiUrl('/sms/password'), async ({ request }) => {
+    const body = (await request.json()) as PasswordVerificationIssueRequest;
+    const user = mockDb.users.find(
+      (item) => item.accountId === body.accountId && item.phoneNumber === body.phoneNum,
+    );
+
+    if (!user) {
+      return badRequest('No account matches the request.');
+    }
+
+    return HttpResponse.json(
+      createVerificationResponse('mock-password-verification', 'PASSWORD'),
+    );
+  }),
+
+  http.post(apiUrl('/sms/token'), async ({ request }) => {
+    const body = (await request.json()) as CheckCertificationTokenPostRequest;
+    const purpose = body.verificationId.includes('password')
+      ? 'PASSWORD'
+      : 'ACCOUNT_ID';
+
+    return HttpResponse.json({
+      token: `mock-${purpose.toLowerCase()}-token`,
+      purpose,
+    });
+  }),
+
+  http.post(apiUrl('/sms/verification/extend'), async ({ request }) => {
+    const body = (await request.json()) as SmsVerificationExtendRequest;
+
+    if (!body.verificationId) {
+      return badRequest('verificationId is required.');
+    }
+
+    return HttpResponse.json({
+      verificationId: body.verificationId,
+      expiresInSeconds: 180,
+      expiresAt: new Date(Date.now() + 180_000).toISOString(),
+      serverTime: new Date().toISOString(),
+      canExtend: false,
+    });
+  }),
+
+  http.post(apiUrl('/accountId'), () => {
+    return HttpResponse.json({
+      accountId: 'minseo',
+      createdAt: '2025-01-10T09:00:00.000Z',
+    });
+  }),
+
+  http.patch(apiUrl('/new-password'), async ({ request }) => {
+    const body = (await request.json()) as { token: string; newPassword: string };
+
+    if (!body.token || !body.newPassword) {
+      return badRequest('token and newPassword are required.');
+    }
+
+    return noContent();
+  }),
 ];
