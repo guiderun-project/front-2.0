@@ -23,7 +23,7 @@ jobs:
       - name: Generate PR description with Claude
         uses: anthropics/claude-code-action@v1
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           track_progress: true
           prompt: |
             이 저장소는 React 19 + TypeScript + Vite + Emotion + TanStack Query 기반의
