@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
-import { Icon, IconButton, Text, type IconButtonShape, type IconName } from '@/components';
+import { CheckBox, Icon, IconButton, Text, type IconButtonShape, type IconName } from '@/components';
 import {
   colorModeCssVariables,
   type ColorMode,
@@ -215,6 +215,35 @@ const ICON_BUTTON_CODE_EXAMPLES = [
   },
 ] as const;
 
+const CHECKBOX_EXAMPLES: ReadonlyArray<{
+  defaultChecked?: boolean;
+  disabled?: boolean;
+  label: string;
+}> = [
+  { label: 'Unchecked' },
+  { defaultChecked: true, label: 'Checked' },
+  { disabled: true, label: 'Disabled unchecked' },
+  { defaultChecked: true, disabled: true, label: 'Disabled checked' },
+];
+
+const CHECKBOX_CODE_EXAMPLES = [
+  {
+    label: 'Label wrapper',
+    code: `<label>
+  <CheckBox checked={checked} onChange={handleChange} />
+  <Text>전체 동의</Text>
+</label>`,
+  },
+  {
+    label: 'Standalone',
+    code: `<CheckBox
+  aria-label="공지 선택"
+  checked={checked}
+  onChange={handleChange}
+/>`,
+  },
+] as const;
+
 type CodeExample = {
   label: string;
   code: string;
@@ -222,6 +251,7 @@ type CodeExample = {
 
 export const HomePage = () => {
   const [colorMode, setColorMode] = useState<ColorMode>('light');
+  const [isCheckBoxSelected, setIsCheckBoxSelected] = useState(false);
 
   const handleToggleColorMode = () => {
     setColorMode((currentMode) => (currentMode === 'light' ? 'dark' : 'light'));
@@ -332,6 +362,35 @@ export const HomePage = () => {
           )}
         </IconButtonGrid>
         <CodeExamples examples={ICON_BUTTON_CODE_EXAMPLES} />
+      </ShowcaseSection>
+
+      <ShowcaseSection>
+        <SectionTitle>
+          <Text as="h2" font="heading-s-m">
+            CheckBox
+          </Text>
+          <Text color="text.tertiary" font="detail-m-r">
+            Unchecked, checked, disabled
+          </Text>
+        </SectionTitle>
+        <CheckBoxGrid>
+          {CHECKBOX_EXAMPLES.map(({ defaultChecked, disabled, label }) => (
+            <CheckBoxSample key={label} $disabled={disabled}>
+              <CheckBox defaultChecked={defaultChecked} disabled={disabled} />
+              <Text color={disabled ? 'text.disabled' : 'text.secondary'} font="detail-m-r">
+                {label}
+              </Text>
+            </CheckBoxSample>
+          ))}
+        </CheckBoxGrid>
+        <InteractiveCheckBoxSample>
+          <CheckBox
+            checked={isCheckBoxSelected}
+            onChange={(event) => setIsCheckBoxSelected(event.target.checked)}
+          />
+          <Text font="body-s-r">Interactive sample</Text>
+        </InteractiveCheckBoxSample>
+        <CodeExamples examples={CHECKBOX_CODE_EXAMPLES} />
       </ShowcaseSection>
     </Page>
   );
@@ -465,6 +524,30 @@ const IconButtonSample = styled.div`
   display: inline-grid;
   justify-items: center;
   gap: ${({ theme }) => theme.spacing.sm};
+`;
+
+const CheckBoxGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, ${({ theme }) => theme.pxToRem(180)}), 1fr));
+  gap: ${({ theme }) => theme.spacing.md};
+`;
+
+const CheckBoxSample = styled.label<{ $disabled?: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: ${({ theme }) => theme.pxToRem(32)};
+  gap: ${({ theme }) => theme.spacing.md};
+  cursor: ${({ $disabled }) => ($disabled ? 'not-allowed' : 'pointer')};
+`;
+
+const InteractiveCheckBoxSample = styled.label`
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: ${({ theme }) => theme.pxToRem(32)};
+  gap: ${({ theme }) => theme.spacing.md};
+  cursor: pointer;
 `;
 
 const CodeExampleGrid = styled.div`

@@ -10,6 +10,7 @@ import {
   radius,
   spacing,
   typography,
+  zIndex,
 } from './tokens';
 
 export const theme = {
@@ -24,6 +25,7 @@ export const theme = {
   radius,
   spacing,
   typography,
+  zIndex,
 } as const;
 
 export type AppTheme = typeof theme;
