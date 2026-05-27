@@ -1,9 +1,17 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
-import { CheckBox, Icon, IconButton, Text, type IconButtonShape, type IconName } from '@/components';
+import {
+  CheckBox,
+  ConfirmPopup,
+  Icon,
+  IconButton,
+  Text,
+  type IconButtonShape,
+  type IconName,
+} from '@/components';
 import {
   colorModeCssVariables,
   type ColorMode,
@@ -244,6 +252,63 @@ const CHECKBOX_CODE_EXAMPLES = [
   },
 ] as const;
 
+const CONFIRM_POPUP_CODE_EXAMPLES = [
+  {
+    label: 'Default',
+    code: `<ConfirmPopup
+  open={open}
+  subtitle="러닝 그룹"
+  title="변경사항을 저장할까요?"
+  description="저장하지 않으면 지금 입력한 내용이 사라져요."
+  onCancel={close}
+  onConfirm={save}
+/>`,
+  },
+  {
+    label: 'Loading',
+    code: `<ConfirmPopup
+  open={open}
+  title="초대장을 보낼까요?"
+  confirmText="보내기"
+  confirmLoading={isSending}
+  onCancel={close}
+  onConfirm={sendInvite}
+/>`,
+  },
+] as const;
+
+const CONFIRM_POPUP_EXAMPLES = {
+  default: {
+    actionLabel: 'default',
+    buttonLabel: 'Open default',
+    confirmText: '저장',
+    description: '저장하지 않으면 지금 입력한 내용이 사라져요.',
+    subtitle: '러닝 그룹',
+    title: '변경사항을 저장할까요?',
+    variant: 'default',
+  },
+  danger: {
+    actionLabel: 'danger',
+    buttonLabel: 'Open danger',
+    confirmText: '삭제',
+    description: '삭제한 러닝 그룹은 다시 복구할 수 없어요.',
+    subtitle: '러닝 그룹 삭제',
+    title: '정말 삭제할까요?',
+    variant: 'danger',
+  },
+  loading: {
+    actionLabel: 'loading',
+    buttonLabel: 'Open loading',
+    confirmText: '보내기',
+    description: '초대 대상자에게 알림이 전송됩니다.',
+    subtitle: '초대장 발송',
+    title: '초대장을 보낼까요?',
+    variant: 'default',
+  },
+} as const;
+
+type ConfirmPopupExample = keyof typeof CONFIRM_POPUP_EXAMPLES;
+
 type CodeExample = {
   label: string;
   code: string;
@@ -252,10 +317,92 @@ type CodeExample = {
 export const HomePage = () => {
   const [colorMode, setColorMode] = useState<ColorMode>('light');
   const [isCheckBoxSelected, setIsCheckBoxSelected] = useState(false);
+  const [activeConfirmPopup, setActiveConfirmPopup] = useState<ConfirmPopupExample | null>(null);
+  const [isConfirmPopupLoading, setIsConfirmPopupLoading] = useState(false);
+  const [lastConfirmPopupAction, setLastConfirmPopupAction] = useState('Last action: none');
+  const confirmPopupLoadingTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const previousColorMode = root.getAttribute('data-color-mode');
+
+    root.setAttribute('data-color-mode', colorMode);
+
+    return () => {
+      if (previousColorMode) {
+        root.setAttribute('data-color-mode', previousColorMode);
+        return;
+      }
+
+      root.removeAttribute('data-color-mode');
+    };
+  }, [colorMode]);
+
+  useEffect(() => {
+    return () => {
+      if (confirmPopupLoadingTimerRef.current !== null) {
+        window.clearTimeout(confirmPopupLoadingTimerRef.current);
+      }
+    };
+  }, []);
+
+  const clearConfirmPopupLoadingTimer = () => {
+    if (confirmPopupLoadingTimerRef.current === null) {
+      return;
+    }
+
+    window.clearTimeout(confirmPopupLoadingTimerRef.current);
+    confirmPopupLoadingTimerRef.current = null;
+  };
 
   const handleToggleColorMode = () => {
     setColorMode((currentMode) => (currentMode === 'light' ? 'dark' : 'light'));
   };
+
+  const handleOpenConfirmPopup = (example: ConfirmPopupExample) => {
+    clearConfirmPopupLoadingTimer();
+    setIsConfirmPopupLoading(false);
+    setActiveConfirmPopup(example);
+  };
+
+  const handleCancelConfirmPopup = () => {
+    const actionLabel = activeConfirmPopup
+      ? CONFIRM_POPUP_EXAMPLES[activeConfirmPopup].actionLabel
+      : 'popup';
+
+    clearConfirmPopupLoadingTimer();
+    setIsConfirmPopupLoading(false);
+    setLastConfirmPopupAction(`Last action: ${actionLabel} canceled`);
+    setActiveConfirmPopup(null);
+  };
+
+  const handleConfirmPopup = () => {
+    if (!activeConfirmPopup) {
+      return;
+    }
+
+    const actionLabel = CONFIRM_POPUP_EXAMPLES[activeConfirmPopup].actionLabel;
+
+    if (activeConfirmPopup !== 'loading') {
+      setLastConfirmPopupAction(`Last action: ${actionLabel} confirmed`);
+      setActiveConfirmPopup(null);
+      return;
+    }
+
+    setIsConfirmPopupLoading(true);
+    setLastConfirmPopupAction('Last action: loading started');
+    clearConfirmPopupLoadingTimer();
+    confirmPopupLoadingTimerRef.current = window.setTimeout(() => {
+      setIsConfirmPopupLoading(false);
+      setLastConfirmPopupAction(`Last action: ${actionLabel} confirmed`);
+      setActiveConfirmPopup(null);
+      confirmPopupLoadingTimerRef.current = null;
+    }, 1200);
+  };
+
+  const activeConfirmPopupExample = activeConfirmPopup
+    ? CONFIRM_POPUP_EXAMPLES[activeConfirmPopup]
+    : null;
 
   return (
     <Page $colorMode={colorMode} data-color-mode={colorMode}>
@@ -392,6 +539,51 @@ export const HomePage = () => {
         </InteractiveCheckBoxSample>
         <CodeExamples examples={CHECKBOX_CODE_EXAMPLES} />
       </ShowcaseSection>
+
+      <ShowcaseSection>
+        <SectionTitle>
+          <Text as="h2" font="heading-s-m">
+            ConfirmPopup
+          </Text>
+          <Text color="text.tertiary" font="detail-m-r">
+            Default, danger, loading
+          </Text>
+        </SectionTitle>
+        <PopupSampleGrid>
+          {(Object.keys(CONFIRM_POPUP_EXAMPLES) as ConfirmPopupExample[]).map((example) => (
+            <SampleButton
+              key={example}
+              type="button"
+              onClick={() => handleOpenConfirmPopup(example)}
+            >
+              {CONFIRM_POPUP_EXAMPLES[example].buttonLabel}
+            </SampleButton>
+          ))}
+        </PopupSampleGrid>
+        <Text color="text.secondary" font="body-s-r">
+          {lastConfirmPopupAction}
+        </Text>
+        <CodeExamples examples={CONFIRM_POPUP_CODE_EXAMPLES} />
+      </ShowcaseSection>
+
+      {activeConfirmPopupExample ? (
+        <ConfirmPopup
+          confirmLoading={activeConfirmPopup === 'loading' && isConfirmPopupLoading}
+          confirmText={activeConfirmPopupExample.confirmText}
+          description={activeConfirmPopupExample.description}
+          open={activeConfirmPopup !== null}
+          subtitle={activeConfirmPopupExample.subtitle}
+          title={activeConfirmPopupExample.title}
+          variant={activeConfirmPopupExample.variant}
+          onCancel={handleCancelConfirmPopup}
+          onConfirm={handleConfirmPopup}
+          onOpenChange={(nextOpen) => {
+            if (!nextOpen) {
+              setActiveConfirmPopup(null);
+            }
+          }}
+        />
+      ) : null}
     </Page>
   );
 };
@@ -548,6 +740,48 @@ const InteractiveCheckBoxSample = styled.label`
   min-height: ${({ theme }) => theme.pxToRem(32)};
   gap: ${({ theme }) => theme.spacing.md};
   cursor: pointer;
+`;
+
+const PopupSampleGrid = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: ${({ theme }) => theme.spacing.md};
+`;
+
+const SampleButton = styled.button`
+  min-height: ${({ theme }) => theme.pxToRem(40)};
+  padding: ${({ theme }) => `${theme.spacing.md} ${theme.spacing.xl}`};
+  border: 1px solid ${({ theme }) => theme.color.border.subtle};
+  border-radius: ${({ theme }) => theme.radius.full};
+  color: ${({ theme }) => theme.color.text.primary};
+  background: ${({ theme }) => theme.color.bg.surface};
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    transform 120ms ease;
+
+  &:hover {
+    background: ${({ theme }) => theme.color.bg.subtle};
+    border-color: ${({ theme }) => theme.color.border.default};
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.color.border.focused};
+    outline-offset: ${({ theme }) => theme.spacing.xs};
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+
+    &:active {
+      transform: none;
+    }
+  }
 `;
 
 const CodeExampleGrid = styled.div`
