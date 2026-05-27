@@ -1,0 +1,70 @@
+name: Claude PR Description
+
+on:
+  pull_request:
+    types: [opened]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  id-token: write
+
+jobs:
+  write-description:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.user.type != 'Bot'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate PR description with Claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          track_progress: true
+          prompt: |
+            이 저장소는 React 19 + TypeScript + Vite + Emotion + TanStack Query 기반의
+            guiderun-front-v2 프로젝트입니다. PR #${{ github.event.pull_request.number }} 의
+            변경 사항을 분석해서 PR description 을 작성하세요.
+
+            ## 작업 절차
+            1. `gh pr diff ${{ github.event.pull_request.number }}` 로 diff 확인
+            2. `gh pr view ${{ github.event.pull_request.number }} --json title,body,commits`
+               로 현재 정보 확인
+            3. 변경된 파일들의 맥락을 빠르게 파악 (필요 시 Read/Grep)
+            4. 아래 템플릿으로 description 작성 후
+               `gh pr edit ${{ github.event.pull_request.number }} --body "..."` 로 갱신
+
+            ## Description 템플릿 (한국어, GitHub Flavored Markdown)
+            ```
+            ## 변경 사항
+            - <어떤 도메인/레이어에 무엇이 추가·수정·삭제되었는지 bullet 3~6개>
+
+            ## 변경 이유
+            - <"왜" 변경했는지. 커밋 메시지/브랜치명에서 추론>
+
+            ## 주요 구현 포인트
+            - <설계 결정·트레이드오프·주의 깊게 본 부분>
+
+            ## 영향 범위
+            - <영향받는 라우트, API, 컴포넌트, 빌드 등>
+
+            ## 체크리스트
+            - [ ] 빌드/lint 통과
+            - [ ] MSW 핸들러 영향 확인
+            - [ ] 새 환경변수 (`.env.example`) 반영
+            ```
+
+            ## 규칙
+            - 본문은 한국어로 작성
+            - 시간 추정치(예: "5분이면 됨") 금지
+            - 추측 금지. diff 와 파일에서 확인되는 사실만 기술
+            - 비어있는 섹션이 생기면 해당 섹션은 제거
+            - description 이 이미 충실히 작성되어 있으면 (체크리스트 + 본문 3문단 이상)
+              덮어쓰지 말고 "기존 description 유지" 라고만 comment 남길 것
+          claude_args: |
+            --model claude-opus-4-6
+            --allowed-tools "Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr edit:*),Bash(gh api:*),Bash(git log:*),Bash(git diff:*)"
