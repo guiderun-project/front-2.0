@@ -19,12 +19,12 @@ export const AuthPlaceholderPage = () => {
 
 const Panel = styled.section`
   display: grid;
-  gap: 16px;
+  gap: ${({ theme }) => theme.spacing.xl};
   padding: 28px;
   border-radius: 32px;
-  background: linear-gradient(180deg, rgba(255, 250, 240, 0.94), rgba(240, 244, 237, 0.95));
-  border: 1px solid rgba(21, 32, 33, 0.08);
-  box-shadow: 0 18px 50px rgba(18, 31, 28, 0.07);
+  background: ${({ theme }) => theme.color.bg.elevated};
+  border: 1px solid ${({ theme }) => theme.color.border.subtle};
+  box-shadow: 0 18px 50px ${({ theme }) => theme.color.bg.weak};
 `;
 
 const Title = styled.h2`
@@ -34,7 +34,7 @@ const Title = styled.h2`
 
 const Copy = styled.p`
   margin: 0;
-  color: #465047;
+  color: ${({ theme }) => theme.color.text.secondary};
   max-width: 56ch;
 `;
 
@@ -42,8 +42,8 @@ const RouteChip = styled.code`
   display: inline-flex;
   width: fit-content;
   padding: 10px 14px;
-  border-radius: 999px;
-  background: rgba(21, 32, 33, 0.08);
-  color: #152021;
+  border-radius: ${({ theme }) => theme.radius.full};
+  background: ${({ theme }) => theme.color.bg.weak};
+  color: ${({ theme }) => theme.color.text.primary};
   font-size: 0.92rem;
 `;

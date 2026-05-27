@@ -33,12 +33,12 @@ export default App;
 
 const Shell = styled.div`
   min-height: 100vh;
-  padding: 32px;
+  padding: ${({ theme }) => theme.spacing['4xl']};
 `;
 
 const Frame = styled.div`
   display: grid;
-  gap: 24px;
+  gap: ${({ theme }) => theme.spacing['3xl']};
   width: min(1180px, 100%);
   margin: 0 auto;
 `;
@@ -47,14 +47,12 @@ const Header = styled.header`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 20px;
-  padding: 20px 24px;
-  border: 1px solid rgba(21, 32, 33, 0.1);
+  gap: ${({ theme }) => theme.spacing['2xl']};
+  padding: ${({ theme }) => theme.spacing['2xl']} ${({ theme }) => theme.spacing['3xl']};
+  border: 1px solid ${({ theme }) => theme.color.border.subtle};
   border-radius: 28px;
-  background:
-    linear-gradient(135deg, rgba(252, 247, 238, 0.94), rgba(255, 255, 255, 0.9)),
-    rgba(255, 255, 255, 0.85);
-  box-shadow: 0 18px 60px rgba(18, 31, 28, 0.08);
+  background: ${({ theme }) => theme.color.bg.elevated};
+  box-shadow: 0 18px 60px ${({ theme }) => theme.color.bg.weak};
   backdrop-filter: blur(18px);
 `;
 
@@ -67,7 +65,7 @@ const Eyebrow = styled.span`
   font-size: 0.72rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #5b5f4c;
+  color: ${({ theme }) => theme.color.text.tertiary};
 `;
 
 const Title = styled.h1`
@@ -78,15 +76,15 @@ const Title = styled.h1`
 
 const Nav = styled.nav`
   display: flex;
-  gap: 12px;
+  gap: ${({ theme }) => theme.spacing.lg};
   flex-wrap: wrap;
 `;
 
 const NavItem = styled(NavLink)`
-  padding: 10px 16px;
-  border-radius: 999px;
-  color: #1f2620;
-  background: rgba(255, 255, 255, 0.72);
+  padding: 10px ${({ theme }) => theme.spacing.xl};
+  border-radius: ${({ theme }) => theme.radius.full};
+  color: ${({ theme }) => theme.color.text.primary};
+  background: ${({ theme }) => theme.color.bg.elevated};
   border: 1px solid transparent;
   transition:
     transform 160ms ease,
@@ -95,12 +93,12 @@ const NavItem = styled(NavLink)`
 
   &:hover {
     transform: translateY(-1px);
-    border-color: rgba(21, 32, 33, 0.14);
+    border-color: ${({ theme }) => theme.color.border.default};
   }
 
   &.active {
-    background: #152021;
-    color: #f8f4ea;
+    background: ${({ theme }) => theme.color.bg.inverse};
+    color: ${({ theme }) => theme.color.text.inverse};
   }
 `;
 
