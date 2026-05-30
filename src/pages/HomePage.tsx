@@ -4,6 +4,7 @@ import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
 import {
+  BottomSheet,
   CheckBox,
   CONFIRM_POPUP_VARIANT,
   ConfirmPopup,
@@ -282,6 +283,72 @@ const CONFIRM_POPUP_CODE_EXAMPLES = [
   },
 ] as const;
 
+const BOTTOM_SHEET_CODE_EXAMPLES = [
+  {
+    label: 'Heading and footer',
+    code: `<BottomSheet
+  open={open}
+  heading={{
+    subtitle: '서브 타이틀',
+    title: '타이틀을 작성해주세요',
+    description: '설명을 작성해주세요',
+  }}
+  footer={<Button>다음</Button>}
+  isBackdropCloseDisabled
+  onOpenChange={setOpen}
+>
+  <FormContent />
+</BottomSheet>`,
+  },
+  {
+    label: 'Top bar list',
+    code: `<BottomSheet
+  open={open}
+  topBarTitle="러닝 모집 관리"
+  onOpenChange={setOpen}
+>
+  <ActionList />
+</BottomSheet>`,
+  },
+  {
+    label: 'Label only',
+    code: `<BottomSheet
+  open={open}
+  ariaLabel="공유 옵션"
+  onOpenChange={setOpen}
+>
+  <ShareOptions />
+</BottomSheet>`,
+  },
+  {
+    label: 'Scrollable content',
+    code: `<BottomSheet
+  open={open}
+  maxHeight="26.25rem"
+  heading={{ title: '긴 콘텐츠 예시' }}
+  footer={<Button>고정 Footer</Button>}
+  onOpenChange={setOpen}
+>
+  <LongContent />
+</BottomSheet>`,
+  },
+] as const;
+
+const SCROLL_BOTTOM_SHEET_ITEMS = [
+  '러닝 이름',
+  '러닝 날짜',
+  '집결 장소',
+  '모집 인원',
+  '러닝 거리',
+  '평균 페이스',
+  '준비물',
+  '참가비',
+  '환불 안내',
+  '안전 수칙',
+  '뒤풀이 여부',
+  '추가 공지',
+] as const;
+
 const CONFIRM_POPUP_EXAMPLES = {
   default: {
     actionLabel: 'default',
@@ -314,6 +381,8 @@ const CONFIRM_POPUP_EXAMPLES = {
 
 type ConfirmPopupExample = keyof typeof CONFIRM_POPUP_EXAMPLES;
 
+type BottomSheetExample = 'heading' | 'list' | 'scroll';
+
 type CodeExample = {
   label: string;
   code: string;
@@ -323,6 +392,7 @@ export const HomePage = () => {
   const [colorMode, setColorMode] = useState<ColorMode>('light');
   const [isCheckBoxSelected, setIsCheckBoxSelected] = useState(false);
   const [activeConfirmPopup, setActiveConfirmPopup] = useState<ConfirmPopupExample | null>(null);
+  const [activeBottomSheet, setActiveBottomSheet] = useState<BottomSheetExample | null>(null);
   const [isConfirmPopupLoading, setIsConfirmPopupLoading] = useState(false);
   const [lastConfirmPopupAction, setLastConfirmPopupAction] = useState('Last action: none');
   const confirmPopupLoadingTimerRef = useRef<number | null>(null);
@@ -368,6 +438,14 @@ export const HomePage = () => {
     clearConfirmPopupLoadingTimer();
     setIsConfirmPopupLoading(false);
     setActiveConfirmPopup(example);
+  };
+
+  const handleOpenBottomSheet = (example: BottomSheetExample) => {
+    setActiveBottomSheet(example);
+  };
+
+  const handleCloseBottomSheet = () => {
+    setActiveBottomSheet(null);
   };
 
   const handleCancelConfirmPopup = () => {
@@ -571,6 +649,29 @@ export const HomePage = () => {
         <CodeExamples examples={CONFIRM_POPUP_CODE_EXAMPLES} />
       </ShowcaseSection>
 
+      <ShowcaseSection>
+        <SectionTitle>
+          <Text as="h2" font="heading-s-m">
+            BottomSheet
+          </Text>
+          <Text color="text.tertiary" font="detail-m-r">
+            Heading, top bar, fixed footer
+          </Text>
+        </SectionTitle>
+        <PopupSampleGrid>
+          <SampleButton type="button" onClick={() => handleOpenBottomSheet('heading')}>
+            Open heading sheet
+          </SampleButton>
+          <SampleButton type="button" onClick={() => handleOpenBottomSheet('list')}>
+            Open action list
+          </SampleButton>
+          <SampleButton type="button" onClick={() => handleOpenBottomSheet('scroll')}>
+            Open scroll footer
+          </SampleButton>
+        </PopupSampleGrid>
+        <CodeExamples examples={BOTTOM_SHEET_CODE_EXAMPLES} />
+      </ShowcaseSection>
+
       {activeConfirmPopupExample ? (
         <ConfirmPopup
           confirmLoading={activeConfirmPopup === 'loading' && isConfirmPopupLoading}
@@ -589,6 +690,102 @@ export const HomePage = () => {
           }}
         />
       ) : null}
+
+      <BottomSheet
+        footer={
+          <BottomSheetFooterButton type="button" onClick={handleCloseBottomSheet}>
+            다음
+          </BottomSheetFooterButton>
+        }
+        heading={{
+          subtitle: '서브 타이틀',
+          title: '타이틀을 작성해주세요',
+          description: '설명을 작성해주세요',
+        }}
+        isBackdropCloseDisabled
+        open={activeBottomSheet === 'heading'}
+        onOpenChange={(nextOpen) => {
+          if (!nextOpen) {
+            handleCloseBottomSheet();
+          }
+        }}
+      >
+        <BottomSheetFormContent>
+          <DemoField aria-label="이름" placeholder="이름" />
+          <DemoFieldInfo>
+            <Text color="text.tertiary" font="detail-m-m">
+              안내 메시지
+            </Text>
+            <Text color="text.tertiary" font="detail-m-r">
+              <Text as="span" color="text.brand" font="detail-m-m">
+                0
+              </Text>
+              /00자
+            </Text>
+          </DemoFieldInfo>
+        </BottomSheetFormContent>
+      </BottomSheet>
+
+      <BottomSheet
+        open={activeBottomSheet === 'list'}
+        topBarTitle="러닝 모집 관리"
+        onOpenChange={(nextOpen) => {
+          if (!nextOpen) {
+            handleCloseBottomSheet();
+          }
+        }}
+      >
+        <BottomSheetActionList aria-label="러닝 모집 관리 작업">
+          <BottomSheetActionItem type="button" onClick={handleCloseBottomSheet}>
+            <Icon aria-hidden={true} color="icon.secondary" icon="list-lined" size={20} />
+            <Text font="body-m-m">모집 마감하기</Text>
+          </BottomSheetActionItem>
+          <BottomSheetActionItem type="button" onClick={handleCloseBottomSheet}>
+            <Icon aria-hidden={true} color="icon.secondary" icon="edit-lined" size={20} />
+            <Text font="body-m-m">모집 게시글 수정하기</Text>
+          </BottomSheetActionItem>
+          <BottomSheetActionItem type="button" onClick={handleCloseBottomSheet}>
+            <Icon aria-hidden={true} color="text.danger" icon="trash-lined" size={20} />
+            <Text color="text.danger" font="body-m-m">
+              모집 게시글 삭제하기
+            </Text>
+          </BottomSheetActionItem>
+          <BottomSheetActionItem type="button" onClick={handleCloseBottomSheet}>
+            <Icon aria-hidden={true} color="icon.secondary" icon="download-lined" size={20} />
+            <Text font="body-m-m">출석 인원 명단 추출</Text>
+          </BottomSheetActionItem>
+        </BottomSheetActionList>
+      </BottomSheet>
+
+      <BottomSheet
+        footer={
+          <BottomSheetFooterButton type="button" onClick={handleCloseBottomSheet}>
+            고정 Footer
+          </BottomSheetFooterButton>
+        }
+        heading={{
+          title: '긴 콘텐츠 예시',
+          description: '항목이 많아져도 하단 액션은 같은 자리에 유지됩니다.',
+        }}
+        maxHeight="26.25rem"
+        open={activeBottomSheet === 'scroll'}
+        onOpenChange={(nextOpen) => {
+          if (!nextOpen) {
+            handleCloseBottomSheet();
+          }
+        }}
+      >
+        <BottomSheetScrollContent>
+          {SCROLL_BOTTOM_SHEET_ITEMS.map((label, index) => (
+            <BottomSheetScrollItem key={label}>
+              <Text color="text.tertiary" font="detail-m-m">
+                {String(index + 1).padStart(2, '0')}
+              </Text>
+              <Text font="body-m-m">{label}</Text>
+            </BottomSheetScrollItem>
+          ))}
+        </BottomSheetScrollContent>
+      </BottomSheet>
     </Page>
   );
 };
@@ -786,6 +983,142 @@ const SampleButton = styled.button`
     &:active {
       transform: none;
     }
+  }
+`;
+
+const BottomSheetFormContent = styled.div`
+  display: grid;
+  gap: ${({ theme }) => theme.spacing.md};
+  width: 100%;
+  padding: ${({ theme }) => `${theme.spacing.none} ${theme.spacing['2xl']} ${theme.spacing['3xl']}`};
+`;
+
+const DemoField = styled.input`
+  width: 100%;
+  min-height: ${({ theme }) => theme.pxToRem(74)};
+  padding: ${({ theme }) => theme.spacing.xl};
+  border: 1px solid ${({ theme }) => theme.color.border.subtle};
+  border-radius: ${({ theme }) => theme.radius.md};
+  color: ${({ theme }) => theme.color.text.primary};
+  background: ${({ theme }) => theme.color.bg.default};
+  ${({ theme }) => theme.typography['heading-s-m']}
+
+  &::placeholder {
+    color: ${({ theme }) => theme.color.text.tertiary};
+  }
+
+  &:focus {
+    outline: 2px solid ${({ theme }) => theme.color.border.focused};
+    outline-offset: ${({ theme }) => theme.spacing.xs};
+  }
+`;
+
+const DemoFieldInfo = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: ${({ theme }) => theme.spacing.lg};
+`;
+
+const BottomSheetFooterButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: ${({ theme }) => theme.pxToRem(54)};
+  padding: ${({ theme }) => `${theme.spacing.md} ${theme.spacing.xl}`};
+  border: 1px solid ${({ theme }) => theme.color.border.brand};
+  border-radius: ${({ theme }) => theme.radius.md};
+  color: ${({ theme }) => theme.color.text.inverse};
+  background: ${({ theme }) => theme.color.bg.brand};
+  cursor: pointer;
+  ${({ theme }) => theme.typography['body-l-b']}
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
+
+  &:hover {
+    opacity: 0.88;
+  }
+
+  &:active {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.color.border.focused};
+    outline-offset: ${({ theme }) => theme.spacing.xs};
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+
+    &:active {
+      transform: none;
+    }
+  }
+`;
+
+const BottomSheetActionList = styled.div`
+  display: grid;
+  width: 100%;
+  padding: ${({ theme }) => `${theme.spacing.none} ${theme.spacing.none} ${theme.spacing['3xl']}`};
+`;
+
+const BottomSheetActionItem = styled.button`
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: ${({ theme }) => theme.pxToRem(56)};
+  gap: ${({ theme }) => theme.spacing.lg};
+  padding: ${({ theme }) => `${theme.spacing.xl} ${theme.spacing['2xl']}`};
+  border: 0;
+  color: ${({ theme }) => theme.color.text.primary};
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    background-color 120ms ease,
+    transform 120ms ease;
+
+  &:hover {
+    background: ${({ theme }) => theme.color.bg.subtle};
+  }
+
+  &:active {
+    transform: scale(0.99);
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.color.border.focused};
+    outline-offset: ${({ theme }) => `-${theme.spacing.sm}`};
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+
+    &:active {
+      transform: none;
+    }
+  }
+`;
+
+const BottomSheetScrollContent = styled.div`
+  display: grid;
+  width: 100%;
+  padding: ${({ theme }) => `${theme.spacing.none} ${theme.spacing['2xl']} ${theme.spacing['3xl']}`};
+`;
+
+const BottomSheetScrollItem = styled.div`
+  display: flex;
+  align-items: center;
+  min-height: ${({ theme }) => theme.pxToRem(64)};
+  gap: ${({ theme }) => theme.spacing.lg};
+  border-bottom: 1px solid ${({ theme }) => theme.color.border.subtle};
+
+  &:last-of-type {
+    border-bottom: 0;
   }
 `;
 

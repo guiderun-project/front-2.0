@@ -82,7 +82,7 @@ const dialogEnter = keyframes`
 const StyledModalOverlay = styled(AriaModalOverlay)(({ theme }) => ({
   position: 'fixed',
   inset: 0,
-  zIndex: 1000,
+  zIndex: theme.zIndex.modal,
   display: 'grid',
   placeItems: 'center',
   overflowY: 'auto',
