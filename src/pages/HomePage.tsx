@@ -9,9 +9,11 @@ import {
   ConfirmPopup,
   Icon,
   IconButton,
+  PageLayout,
   Text,
   type IconButtonShape,
   type IconName,
+  type PageLayoutBackground,
 } from '@/components';
 import {
   colorModeCssVariables,
@@ -21,6 +23,24 @@ import {
 } from '@/styles/tokens';
 
 const ICON_SIZES = [24, 20, 16, 12] as const;
+
+type PageBackgroundOption = {
+  background: PageLayoutBackground;
+  label: string;
+};
+
+const COLOR_BACKGROUND_OPTIONS: ReadonlyArray<PageBackgroundOption> = [
+  { background: 'bg.default', label: 'Default' },
+  { background: 'bg.subtle', label: 'Subtle' },
+  { background: 'bg.surface', label: 'Surface' },
+  { background: 'bg.brand-soft', label: 'Brand soft' },
+];
+
+const GRADIENT_BACKGROUND_OPTIONS: ReadonlyArray<PageBackgroundOption> = [
+  { background: 'gradient.bg.subtle', label: 'Subtle' },
+  { background: 'gradient.bg.brand-main', label: 'Brand main' },
+  { background: 'gradient.bg.brand-event', label: 'Brand event' },
+];
 
 const TEXT_EXAMPLES: ReadonlyArray<{ font: TypographyToken; label: string; sample: string }> = [
   { font: 'display-l', label: 'display-l', sample: 'GuideRun' },
@@ -321,6 +341,7 @@ type CodeExample = {
 
 export const HomePage = () => {
   const [colorMode, setColorMode] = useState<ColorMode>('light');
+  const [pageBackground, setPageBackground] = useState<PageLayoutBackground>('bg.subtle');
   const [isCheckBoxSelected, setIsCheckBoxSelected] = useState(false);
   const [activeConfirmPopup, setActiveConfirmPopup] = useState<ConfirmPopupExample | null>(null);
   const [isConfirmPopupLoading, setIsConfirmPopupLoading] = useState(false);
@@ -410,7 +431,7 @@ export const HomePage = () => {
     : null;
 
   return (
-    <Page $colorMode={colorMode} data-color-mode={colorMode}>
+    <Page $colorMode={colorMode} background={pageBackground} data-color-mode={colorMode}>
       <Header>
         <HeaderCopy>
           <Text as="h1" font="heading-l-b">
@@ -420,9 +441,43 @@ export const HomePage = () => {
             Shared UI primitives currently available in the app.
           </Text>
         </HeaderCopy>
-        <ThemeToggle type="button" onClick={handleToggleColorMode}>
-          {colorMode === 'light' ? 'Dark mode' : 'Light mode'}
-        </ThemeToggle>
+        <HeaderControls>
+          <ThemeToggle type="button" onClick={handleToggleColorMode}>
+            {colorMode === 'light' ? 'Dark mode' : 'Light mode'}
+          </ThemeToggle>
+          <BackgroundControls aria-label="Page background">
+            <BackgroundOptionGroup aria-label="Color background" role="group">
+              <BackgroundGroupLabel>bg</BackgroundGroupLabel>
+              <BackgroundOptions>
+                {COLOR_BACKGROUND_OPTIONS.map(({ background, label }) => (
+                  <BackgroundOption
+                    key={background}
+                    aria-pressed={pageBackground === background}
+                    type="button"
+                    onClick={() => setPageBackground(background)}
+                  >
+                    {label}
+                  </BackgroundOption>
+                ))}
+              </BackgroundOptions>
+            </BackgroundOptionGroup>
+            <BackgroundOptionGroup aria-label="Gradient background" role="group">
+              <BackgroundGroupLabel>gradient bg</BackgroundGroupLabel>
+              <BackgroundOptions>
+                {GRADIENT_BACKGROUND_OPTIONS.map(({ background, label }) => (
+                  <BackgroundOption
+                    key={background}
+                    aria-pressed={pageBackground === background}
+                    type="button"
+                    onClick={() => setPageBackground(background)}
+                  >
+                    {label}
+                  </BackgroundOption>
+                ))}
+              </BackgroundOptions>
+            </BackgroundOptionGroup>
+          </BackgroundControls>
+        </HeaderControls>
       </Header>
 
       <ShowcaseSection>
@@ -612,26 +667,32 @@ const getModeVariables = (mode: ColorMode) => css`
   ${colorModeCssVariables[mode]}
 `;
 
-const Page = styled.main<{ $colorMode: ColorMode }>`
+const Page = styled(PageLayout)<{ $colorMode: ColorMode }>`
   ${({ $colorMode }) => getModeVariables($colorMode)}
   display: grid;
   gap: ${({ theme }) => theme.spacing.xl};
-  min-height: 100vh;
   padding: ${({ theme }) => theme.spacing['3xl']};
   color: ${({ theme }) => theme.color.text.primary};
-  background: ${({ theme }) => theme.color.bg.default};
 `;
 
 const Header = styled.header`
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: ${({ theme }) => theme.spacing.xl};
 `;
 
 const HeaderCopy = styled.div`
   display: grid;
   gap: ${({ theme }) => theme.spacing.sm};
+`;
+
+const HeaderControls = styled.div`
+  display: grid;
+  justify-content: flex-end;
+  justify-items: flex-end;
+  gap: ${({ theme }) => theme.spacing.md};
 `;
 
 const ThemeToggle = styled.button`
@@ -650,6 +711,76 @@ const ThemeToggle = styled.button`
   &:focus-visible {
     outline: 2px solid ${({ theme }) => theme.color.border.focused};
     outline-offset: ${({ theme }) => theme.spacing.xs};
+  }
+`;
+
+const BackgroundControls = styled.div`
+  display: grid;
+  justify-items: flex-end;
+  gap: ${({ theme }) => theme.spacing.sm};
+`;
+
+const BackgroundOptionGroup = styled.div`
+  display: grid;
+  justify-items: flex-end;
+  gap: ${({ theme }) => theme.spacing.xs};
+`;
+
+const BackgroundGroupLabel = styled.span`
+  color: ${({ theme }) => theme.color.text.tertiary};
+  font-family: ${({ theme }) => theme.typography['detail-m-m'].fontFamily};
+  font-size: ${({ theme }) => theme.typography['detail-m-m'].fontSize};
+  font-weight: ${({ theme }) => theme.typography['detail-m-m'].fontWeight};
+  letter-spacing: ${({ theme }) => theme.typography['detail-m-m'].letterSpacing};
+  line-height: ${({ theme }) => theme.typography['detail-m-m'].lineHeight};
+`;
+
+const BackgroundOptions = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: ${({ theme }) => theme.spacing.sm};
+`;
+
+const BackgroundOption = styled.button`
+  min-height: ${({ theme }) => theme.pxToRem(36)};
+  padding: ${({ theme }) => `${theme.spacing.sm} ${theme.spacing.lg}`};
+  border: 1px solid ${({ theme }) => theme.color.border.subtle};
+  border-radius: ${({ theme }) => theme.radius.full};
+  color: ${({ theme }) => theme.color.text.secondary};
+  background: ${({ theme }) => theme.color.bg.surface};
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease,
+    transform 120ms ease;
+
+  &[aria-pressed='true'] {
+    border-color: ${({ theme }) => theme.color.border.brand};
+    color: ${({ theme }) => theme.color.text.brand};
+    background: ${({ theme }) => theme.color.bg['brand-soft']};
+  }
+
+  &:hover {
+    border-color: ${({ theme }) => theme.color.border.default};
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.color.border.focused};
+    outline-offset: ${({ theme }) => theme.spacing.xs};
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+
+    &:active {
+      transform: none;
+    }
   }
 `;
 

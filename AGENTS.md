@@ -112,6 +112,12 @@ Page-level conventions are still intentionally light because full page developme
 - When introducing the first pattern for forms, data fetching, layouts, loading states, empty states, or error states, keep the implementation small.
 - Update these guidelines only after a pattern proves reusable.
 - Avoid broad abstractions before at least one real page use case exists.
+- Global mobile width constraints and desktop centering belong in the app-level `AppWrapper` and `MobileViewport`, not in individual pages.
+- New route-level pages must wrap their content with the shared `PageLayout` from the page `index.tsx` or route entry component.
+- Use `HomePage` as the reference example for applying and switching `PageLayout` background tokens.
+- Keep `PageLayout` padding-free by default so pages can support full-bleed backgrounds and sections.
+- Use `PageLayout` background tokens such as `bg.default` or `gradient.bg.brand-main` for page-level backgrounds instead of raw colors or ad hoc gradients.
+- Add horizontal spacing inside page sections only when the design requires it, using existing spacing tokens such as `theme.spacing['2xl']`.
 
 ## Accessibility
 
