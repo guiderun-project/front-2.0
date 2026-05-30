@@ -83,11 +83,13 @@ const TEXT_CODE_EXAMPLES = [
 ] as const;
 
 const ICON_EXAMPLES: ReadonlyArray<{ icon: IconName; color?: ColorToken }> = [
+  { icon: 'calendar-lined', color: 'icon.secondary' },
   { icon: 'check-lined', color: 'text.brand' },
   { icon: 'chevron-down-lined' },
   { icon: 'chevron-left-lined' },
   { icon: 'chevron-right-lined' },
   { icon: 'chevron-up-lined' },
+  { icon: 'delete-filled', color: 'text.danger' },
   { icon: 'delete-lined', color: 'text.danger' },
   { icon: 'download-lined', color: 'icon.secondary' },
   { icon: 'edit-lined', color: 'icon.secondary' },
@@ -97,10 +99,12 @@ const ICON_EXAMPLES: ReadonlyArray<{ icon: IconName; color?: ColorToken }> = [
   { icon: 'link-lined', color: 'text.brand' },
   { icon: 'list-filled' },
   { icon: 'list-lined' },
+  { icon: 'map-lined', color: 'text.brand' },
   { icon: 'more-vertical-lined' },
   { icon: 'plus-lined', color: 'text.brand' },
   { icon: 'search-lined' },
   { icon: 'share-lined', color: 'icon.secondary' },
+  { icon: 'shuffle-lined', color: 'icon.secondary' },
   { icon: 'trash-lined', color: 'text.danger' },
   { icon: 'user-filled' },
   { icon: 'user-lined' },
