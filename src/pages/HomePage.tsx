@@ -668,6 +668,11 @@ const Page = styled(PageLayout)<{ $colorMode: ColorMode }>`
   display: grid;
   gap: ${({ theme }) => theme.spacing.xl};
   padding: ${({ theme }) => theme.spacing['3xl']};
+  padding-top: calc(env(safe-area-inset-top) + ${({ theme }) => theme.spacing['3xl']});
+  padding-bottom: calc(
+    env(safe-area-inset-bottom) + var(--app-fixed-bottom-offset, 0rem) +
+      ${({ theme }) => theme.spacing['3xl']}
+  );
   color: ${({ theme }) => theme.color.text.primary};
 `;
 
