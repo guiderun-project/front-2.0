@@ -22,8 +22,10 @@ const AppWrapper = styled.div`
 `;
 
 const MobileViewport = styled.div`
+  --app-mobile-viewport-width: ${({ theme }) => theme.pxToRem(430)};
+
   width: 100%;
-  max-width: ${({ theme }) => theme.pxToRem(430)};
+  max-width: var(--app-mobile-viewport-width);
   min-height: 100vh;
   min-height: 100dvh;
   overflow-x: hidden;
