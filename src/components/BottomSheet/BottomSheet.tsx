@@ -57,11 +57,14 @@ export const BottomSheet = ({
   const hasHeadingTitle = isRenderable(heading?.title);
   const hasHeadingDescription = isRenderable(heading?.description);
   const hasTopBar = hasTopBarTitle || !isCloseButtonHidden;
-  const labelledById = hasHeadingTitle
-    ? headingTitleId
-    : hasTopBarTitle
-      ? topBarTitleId
-      : undefined;
+  let labelledById: string | undefined;
+
+  if (hasHeadingTitle) {
+    labelledById = headingTitleId;
+  } else if (hasTopBarTitle) {
+    labelledById = topBarTitleId;
+  }
+
   const handleOpenChange = (nextOpen: boolean) => {
     onOpenChange?.(nextOpen);
 
