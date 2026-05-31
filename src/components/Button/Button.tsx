@@ -2,13 +2,7 @@ import type { ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
-import {
-  primitiveColorTokenMap,
-  resolveColorToken,
-  type ColorToken,
-  type PrimitiveColorToken,
-  type TypographyToken,
-} from '@/styles/tokens';
+import { resolveColorToken, type ColorToken, type TypographyToken } from '@/styles/tokens';
 
 import type { ButtonLevel, ButtonProps, ButtonSize, ButtonStatus } from './Button.types';
 
@@ -29,27 +23,12 @@ type ButtonSizeStyle = {
 };
 
 type ButtonColorTokens = {
-  background?: ButtonColorToken;
+  background?: ColorToken;
   border?: {
-    color: ButtonColorToken;
+    color: ColorToken;
     width: number;
   };
-  content: ButtonColorToken;
-  opacity?: number;
-};
-
-type ButtonColorToken = ColorToken | PrimitiveColorToken;
-
-const isPrimitiveColorToken = (token: ButtonColorToken): token is PrimitiveColorToken => {
-  return token in primitiveColorTokenMap;
-};
-
-const resolveButtonColorToken = (token: ButtonColorToken): string => {
-  if (isPrimitiveColorToken(token)) {
-    return primitiveColorTokenMap[token];
-  }
-
-  return resolveColorToken(token);
+  content: ColorToken;
 };
 
 const BUTTON_SIZE_STYLES = {
@@ -82,22 +61,20 @@ const BUTTON_SIZE_STYLES = {
 const BUTTON_COLOR_TOKENS: Record<ButtonLevel, Record<ButtonStatus, ButtonColorTokens>> = {
   primary: {
     default: {
-      background: 'bg.brand',
+      background: 'bg.brand-primary',
       content: 'text.inverse',
     },
     selected: {
-      // Figma defines Button selected/pressed colors with primitive cyan tokens.
-      background: 'primitive.brand.cyan.600',
+      background: 'bg.brand-subtle',
       content: 'text.inverse',
     },
     pressed: {
-      background: 'primitive.brand.cyan.900',
+      background: 'bg.brand-surface',
       content: 'text.inverse',
     },
     disabled: {
-      background: 'bg.brand',
+      background: 'bg.brand-soft2',
       content: 'text.inverse',
-      opacity: 0.32,
     },
   },
   secondary: {
@@ -106,21 +83,20 @@ const BUTTON_COLOR_TOKENS: Record<ButtonLevel, Record<ButtonStatus, ButtonColorT
       content: 'text.brand',
     },
     selected: {
-      background: 'bg.brand-subtle',
+      background: 'bg.brand-soft2',
       border: {
         color: 'text.brand',
         width: 2,
       },
-      content: 'primitive.brand.cyan.600',
+      content: 'text.brand',
     },
     pressed: {
-      background: 'bg.brand-subtle',
-      content: 'primitive.brand.cyan.900',
+      background: 'bg.brand-soft2',
+      content: 'text.brand-subtle',
     },
     disabled: {
       background: 'bg.surface',
       content: 'text.quaternary',
-      opacity: 0.92,
     },
   },
   'line-type': {
@@ -144,7 +120,7 @@ const BUTTON_COLOR_TOKENS: Record<ButtonLevel, Record<ButtonStatus, ButtonColorT
         color: 'border.subtle',
         width: 2,
       },
-      content: 'text.primary',
+      content: 'text.secondary',
     },
     disabled: {
       background: 'bg.subtle',
@@ -153,7 +129,6 @@ const BUTTON_COLOR_TOKENS: Record<ButtonLevel, Record<ButtonStatus, ButtonColorT
         width: 1.4,
       },
       content: 'text.quaternary',
-      opacity: 0.92,
     },
   },
   quaternary: {
@@ -175,7 +150,7 @@ const BUTTON_COLOR_TOKENS: Record<ButtonLevel, Record<ButtonStatus, ButtonColorT
         color: 'border.default',
         width: 2,
       },
-      content: 'text.primary',
+      content: 'text.secondary',
     },
     disabled: {
       background: 'bg.overlay',
@@ -183,8 +158,7 @@ const BUTTON_COLOR_TOKENS: Record<ButtonLevel, Record<ButtonStatus, ButtonColorT
         color: 'border.subtle',
         width: 1.4,
       },
-      content: 'text.disabled',
-      opacity: 0.92,
+      content: 'text.quaternary',
     },
   },
 };
@@ -229,13 +203,13 @@ const StyledButton = styled.button<ButtonStyleProps>(
     const width = 'width' in sizeStyle ? sizeStyle.width : undefined;
     const minWidth = 'minWidth' in sizeStyle ? sizeStyle.minWidth : undefined;
     const borderStyle = defaultTokens.border
-      ? `${theme.pxToRem(defaultTokens.border.width)} solid ${resolveButtonColorToken(defaultTokens.border.color)}`
+      ? `${theme.pxToRem(defaultTokens.border.width)} solid ${resolveColorToken(defaultTokens.border.color)}`
       : 0;
     const activeBorderStyle = pressedTokens.border
-      ? `${theme.pxToRem(pressedTokens.border.width)} solid ${resolveButtonColorToken(pressedTokens.border.color)}`
+      ? `${theme.pxToRem(pressedTokens.border.width)} solid ${resolveColorToken(pressedTokens.border.color)}`
       : 0;
     const disabledBorderStyle = disabledTokens.border
-      ? `${theme.pxToRem(disabledTokens.border.width)} solid ${resolveButtonColorToken(disabledTokens.border.color)}`
+      ? `${theme.pxToRem(disabledTokens.border.width)} solid ${resolveColorToken(disabledTokens.border.color)}`
       : 0;
 
     return {
@@ -250,8 +224,8 @@ const StyledButton = styled.button<ButtonStyleProps>(
       appearance: 'none',
       border: borderStyle,
       borderRadius: theme.radius[sizeStyle.radius],
-      backgroundColor: defaultTokens.background ? resolveButtonColorToken(defaultTokens.background) : 'transparent',
-      color: resolveButtonColorToken(defaultTokens.content),
+      backgroundColor: defaultTokens.background ? resolveColorToken(defaultTokens.background) : 'transparent',
+      color: resolveColorToken(defaultTokens.content),
       cursor: 'pointer',
       fontFamily: typography.fontFamily,
       fontSize: typography.fontSize,
@@ -261,16 +235,14 @@ const StyledButton = styled.button<ButtonStyleProps>(
       textAlign: 'center',
       textDecoration: 'none',
       touchAction: 'manipulation',
-      opacity: defaultTokens.opacity,
       userSelect: 'none',
       verticalAlign: 'middle',
       whiteSpace: 'nowrap',
 
       '&:active:not(:disabled)': {
         border: activeBorderStyle,
-        backgroundColor: pressedTokens.background ? resolveButtonColorToken(pressedTokens.background) : 'transparent',
-        color: resolveButtonColorToken(pressedTokens.content),
-        opacity: pressedTokens.opacity,
+        backgroundColor: pressedTokens.background ? resolveColorToken(pressedTokens.background) : 'transparent',
+        color: resolveColorToken(pressedTokens.content),
       },
 
       '&:focus-visible': {
@@ -280,10 +252,9 @@ const StyledButton = styled.button<ButtonStyleProps>(
 
       '&:disabled': {
         border: disabledBorderStyle,
-        backgroundColor: disabledTokens.background ? resolveButtonColorToken(disabledTokens.background) : 'transparent',
-        color: resolveButtonColorToken(disabledTokens.content),
+        backgroundColor: disabledTokens.background ? resolveColorToken(disabledTokens.background) : 'transparent',
+        color: resolveColorToken(disabledTokens.content),
         cursor: 'not-allowed',
-        opacity: disabledTokens.opacity,
       },
     };
   },
