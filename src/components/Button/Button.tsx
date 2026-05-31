@@ -3,17 +3,32 @@ import type { ReactElement } from 'react';
 import styled from '@emotion/styled';
 
 import { Icon } from '@/components/Icon';
-import { resolveColorToken } from '@/styles/tokens';
+import { resolveColorToken, type ColorToken, type TypographyToken } from '@/styles/tokens';
 
-import type {
-  ButtonColorTokens,
-  ButtonLevel,
-  ButtonProps,
-  ButtonSize,
-  ButtonSizeStyle,
-  ButtonStatus,
-  ButtonStyleProps,
-} from './Button.types';
+import type { ButtonLevel, ButtonProps, ButtonSize, ButtonStatus } from './Button.types';
+
+type ButtonStyleProps = {
+  $fullWidth: boolean;
+  $level: ButtonLevel;
+  $size: ButtonSize;
+  $status: ButtonStatus;
+};
+
+type ButtonSizeStyle = {
+  height: '4xl' | '5xl' | '6xl';
+  minWidth: number;
+  paddingX: 'lg' | 'xl' | '2xl';
+  gap: 'sm';
+  iconSize: number;
+  radius: 's' | 'sm';
+  typography: TypographyToken;
+};
+
+type ButtonColorTokens = {
+  background: ColorToken;
+  border: ColorToken;
+  content: ColorToken;
+};
 
 const BUTTON_SIZE_STYLES = {
   l: {
