@@ -11,9 +11,49 @@ import {
 import { IconButton } from '@/components/Icon';
 import { Text } from '@/components/Text';
 
-import type { BottomSheetProps } from './BottomSheet.types';
+import type { BottomSheetHeading } from './BottomSheet.types';
 
 const DEFAULT_MAX_HEIGHT = 'calc(100dvh - 48px)';
+
+type BottomSheetAccessibleName = Exclude<ReactNode, boolean | null | undefined>;
+
+type BottomSheetBaseProps = {
+  open: boolean;
+  onOpenChange?: (open: boolean) => void;
+  onClose?: () => void;
+  children?: ReactNode;
+  footer?: ReactNode;
+  isCloseButtonHidden?: boolean;
+  isBackdropCloseDisabled?: boolean;
+  isEscapeCloseDisabled?: boolean;
+  maxHeight?: string;
+  className?: string;
+};
+
+type BottomSheetNamedByHeading = {
+  heading: BottomSheetHeading;
+  topBarTitle?: ReactNode;
+  ariaLabel?: string;
+};
+
+type BottomSheetNamedByTopBarTitle = {
+  heading?: undefined;
+  topBarTitle: BottomSheetAccessibleName;
+  ariaLabel?: string;
+};
+
+type BottomSheetNamedByAriaLabel = {
+  heading?: undefined;
+  topBarTitle?: undefined;
+  ariaLabel: string;
+};
+
+type BottomSheetA11yProps =
+  | BottomSheetNamedByHeading
+  | BottomSheetNamedByTopBarTitle
+  | BottomSheetNamedByAriaLabel;
+
+type BottomSheetProps = BottomSheetBaseProps & BottomSheetA11yProps;
 
 export const BottomSheet = ({
   ariaLabel,

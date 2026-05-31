@@ -58,10 +58,15 @@ const resolvePageLayoutBackground = (background: PageLayoutBackground) => {
 };
 
 const StyledPageLayout = styled.main<{ $background: string }>(({ $background }) => {
+  const fixedBottomOffset = 'var(--app-fixed-bottom-offset, 0rem)';
+  const bottomSafeArea = 'env(safe-area-inset-bottom)';
+  const bottomOffset = `calc(${bottomSafeArea} + ${fixedBottomOffset})`;
+
   return {
     minHeight: '100dvh',
     paddingTop: 'env(safe-area-inset-top)',
-    paddingBottom: 'env(safe-area-inset-bottom)',
+    paddingBottom: bottomOffset,
+    scrollPaddingBottom: bottomOffset,
     background: $background,
   };
 });

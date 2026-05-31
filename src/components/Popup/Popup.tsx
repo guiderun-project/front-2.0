@@ -8,9 +8,9 @@ import {
   ModalOverlay as AriaModalOverlay,
 } from 'react-aria-components';
 
-export type PopupRole = 'dialog' | 'alertdialog';
+type PopupRole = 'dialog' | 'alertdialog';
 
-export type PopupProps = {
+type PopupProps = {
   open: boolean;
   children: ReactNode;
   onOpenChange?: (open: boolean) => void;

@@ -20,7 +20,7 @@ type IconButtonStyleProps = {
   $shape: IconButtonShape;
 };
 
-export type IconButtonProps = {
+type IconButtonProps = {
   icon: IconName;
   size?: number;
   iconSize?: number;

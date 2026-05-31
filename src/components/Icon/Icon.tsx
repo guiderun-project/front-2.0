@@ -7,7 +7,7 @@ import { iconRegistry, type IconName } from './iconRegistry';
 const DEFAULT_ICON_SIZE = 20;
 const DEFAULT_ICON_COLOR = 'icon.primary' satisfies ColorToken;
 
-export type IconProps = {
+type IconProps = {
   icon: IconName;
   size?: number;
   color?: ColorToken;

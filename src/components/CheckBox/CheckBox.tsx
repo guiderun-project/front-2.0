@@ -7,7 +7,7 @@ import { Icon } from '@/components/Icon';
 const CHECKBOX_SIZE = 24;
 const CHECKBOX_ICON_SIZE = 16;
 
-export type CheckBoxProps = Omit<ComponentPropsWithoutRef<'input'>, 'children' | 'type'>;
+type CheckBoxProps = Omit<ComponentPropsWithoutRef<'input'>, 'children' | 'type'>;
 
 export const CheckBox = ({ className, disabled, ...props }: CheckBoxProps): ReactElement => {
   return (
