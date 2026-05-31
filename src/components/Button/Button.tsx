@@ -8,7 +8,6 @@ import { resolveColorToken, type ColorToken, type TypographyToken } from '@/styl
 import type { ButtonLevel, ButtonProps, ButtonSize, ButtonStatus } from './Button.types';
 
 type ButtonStyleProps = {
-  $fullWidth: boolean;
   $level: ButtonLevel;
   $size: ButtonSize;
   $status: ButtonStatus;
@@ -155,7 +154,6 @@ export const Button = ({
   'aria-pressed': ariaPressed,
   children,
   disabled,
-  fullWidth = false,
   leftIcon,
   leftIconColor = 'currentColor',
   leftIconName = 'check-lined',
@@ -176,7 +174,6 @@ export const Button = ({
 
   return (
     <StyledButton
-      $fullWidth={fullWidth}
       $level={level}
       $size={size}
       $status={resolvedStatus}
@@ -193,7 +190,7 @@ export const Button = ({
 };
 
 const StyledButton = styled.button<ButtonStyleProps>(
-  ({ $fullWidth, $level, $size, $status, theme }) => {
+  ({ $level, $size, $status, theme }) => {
     const sizeStyle = BUTTON_SIZE_STYLES[$size];
     const defaultTokens = BUTTON_COLOR_TOKENS[$level][$status];
     const hoverTokens = BUTTON_COLOR_TOKENS[$level].selected;
@@ -205,7 +202,7 @@ const StyledButton = styled.button<ButtonStyleProps>(
       display: 'inline-flex',
       alignItems: 'center',
       justifyContent: 'center',
-      width: $fullWidth ? '100%' : 'fit-content',
+      width: 'fit-content',
       minWidth: theme.pxToRem(sizeStyle.minWidth),
       height: theme.spacing[sizeStyle.height],
       padding: `0 ${theme.spacing[sizeStyle.paddingX]}`,

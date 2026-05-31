@@ -16,5 +16,4 @@ export type ButtonProps = {
   rightIconName?: IconName;
   leftIconColor?: IconColor;
   rightIconColor?: IconColor;
-  fullWidth?: boolean;
 } & Omit<ComponentPropsWithoutRef<'button'>, 'color'>;
