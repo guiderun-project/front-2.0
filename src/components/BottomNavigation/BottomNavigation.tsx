@@ -5,42 +5,14 @@ import { NavLink, useLocation } from 'react-router-dom';
 
 import { APP_PATH } from '@/router/path';
 
-import { Icon, type IconName } from '../Icon';
+import { Icon } from '../Icon';
+import {
+  BOTTOM_NAVIGATION_ARIA_LABEL,
+  BOTTOM_NAVIGATION_ITEMS,
+  BOTTOM_NAVIGATION_OFFSET_PX,
+} from './BottomNavigation.constants';
 
-export const BOTTOM_NAVIGATION_OFFSET_PX = 98;
-
-type BottomNavigationItem = {
-  label: string;
-  to: string;
-  end: boolean;
-  activeIcon: IconName;
-  inactiveIcon: IconName;
-};
-
-// TODO: Confirm these destination endpoints once the route contract is finalized.
-const BOTTOM_NAVIGATION_ITEMS = [
-  {
-    label: '전체 모임',
-    to: APP_PATH.EVENT,
-    end: false,
-    activeIcon: 'list-filled',
-    inactiveIcon: 'list-lined',
-  },
-  {
-    label: '홈화면',
-    to: APP_PATH.HOME,
-    end: true,
-    activeIcon: 'home-filled',
-    inactiveIcon: 'home-lined',
-  },
-  {
-    label: '마이페이지',
-    to: APP_PATH.MY,
-    end: false,
-    activeIcon: 'user-filled',
-    inactiveIcon: 'user-lined',
-  },
-] as const satisfies readonly BottomNavigationItem[];
+type BottomNavigationItem = (typeof BOTTOM_NAVIGATION_ITEMS)[number];
 
 type BottomNavigationProps = {
   className?: string;
@@ -54,7 +26,7 @@ export const BottomNavigation = ({ className }: BottomNavigationProps): ReactEle
   const hasActiveItem = activeIndex >= 0;
 
   return (
-    <Navigation aria-label="주요 화면" className={className}>
+    <Navigation aria-label={BOTTOM_NAVIGATION_ARIA_LABEL} className={className}>
       <NavigationTrack $activeIndex={activeIndex}>
         <ActivePill $isVisible={hasActiveItem} aria-hidden="true" />
         {BOTTOM_NAVIGATION_ITEMS.map((item, index) => {
@@ -148,7 +120,7 @@ const NavigationTrack = styled.div<{ $activeIndex: number }>`
 
 const NavigationLink = styled(NavLink)`
   position: relative;
-  z-index: 1;
+  z-index: ${({ theme }) => theme.zIndex.control};
   display: flex;
   min-width: 0;
   min-height: ${({ theme }) => theme.pxToRem(56)};
