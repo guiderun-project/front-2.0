@@ -1,6 +1,4 @@
-import type { ComponentPropsWithoutRef } from 'react';
-
-import type { IconColor, IconName } from '@/components/Icon';
+import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 
 export type ButtonSize = 's' | 'm' | 'l';
 export type ButtonLevel = 'primary' | 'secondary' | 'line-type' | 'quaternary';
@@ -10,10 +8,6 @@ export type ButtonProps = {
   level?: ButtonLevel;
   size?: ButtonSize;
   status?: ButtonStatus;
-  leftIcon?: boolean;
-  rightIcon?: boolean;
-  leftIconName?: IconName;
-  rightIconName?: IconName;
-  leftIconColor?: IconColor;
-  rightIconColor?: IconColor;
+  leftIcon?: ReactNode;
+  rightIcon?: ReactNode;
 } & Omit<ComponentPropsWithoutRef<'button'>, 'color'>;

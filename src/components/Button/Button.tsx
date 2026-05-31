@@ -2,7 +2,6 @@ import type { ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
-import { Icon } from '@/components/Icon';
 import {
   primitiveColorTokenMap,
   resolveColorToken,
@@ -25,7 +24,6 @@ type ButtonSizeStyle = {
   minWidth?: number;
   paddingX: 'md' | 'xl';
   gap: 'sm';
-  iconSize: number;
   radius: 'sm' | 'md';
   typography: TypographyToken;
 };
@@ -60,7 +58,6 @@ const BUTTON_SIZE_STYLES = {
     height: 54,
     paddingX: 'xl',
     gap: 'sm',
-    iconSize: 16,
     radius: 'md',
     typography: 'body-l-b',
   },
@@ -69,7 +66,6 @@ const BUTTON_SIZE_STYLES = {
     height: 42,
     paddingX: 'xl',
     gap: 'sm',
-    iconSize: 16,
     radius: 'md',
     typography: 'body-m-sb',
   },
@@ -78,7 +74,6 @@ const BUTTON_SIZE_STYLES = {
     minWidth: 56,
     paddingX: 'md',
     gap: 'sm',
-    iconSize: 12,
     radius: 'sm',
     typography: 'body-s-sb',
   },
@@ -197,13 +192,9 @@ const BUTTON_COLOR_TOKENS: Record<ButtonLevel, Record<ButtonStatus, ButtonColorT
 export const Button = ({
   children,
   disabled,
-  leftIcon = false,
-  leftIconColor = 'currentColor',
-  leftIconName = 'check-lined',
+  leftIcon,
   level = 'primary',
-  rightIcon = false,
-  rightIconColor = 'currentColor',
-  rightIconName = 'chevron-right-lined',
+  rightIcon,
   size = 'm',
   status = 'default',
   type = 'button',
@@ -211,7 +202,6 @@ export const Button = ({
 }: ButtonProps): ReactElement => {
   const resolvedStatus = disabled ? 'disabled' : status;
   const isDisabled = disabled || resolvedStatus === 'disabled';
-  const iconSize = BUTTON_SIZE_STYLES[size].iconSize;
 
   return (
     <StyledButton
@@ -222,9 +212,9 @@ export const Button = ({
       type={type}
       {...props}
     >
-      {leftIcon ? <Icon aria-hidden={true} color={leftIconColor} icon={leftIconName} size={iconSize} /> : null}
+      {leftIcon ? <IconSlot>{leftIcon}</IconSlot> : null}
       <ButtonLabel>{children}</ButtonLabel>
-      {rightIcon ? <Icon aria-hidden={true} color={rightIconColor} icon={rightIconName} size={iconSize} /> : null}
+      {rightIcon ? <IconSlot>{rightIcon}</IconSlot> : null}
     </StyledButton>
   );
 };
@@ -304,4 +294,10 @@ const ButtonLabel = styled.span`
   overflow: hidden;
   min-width: 0;
   text-overflow: ellipsis;
+`;
+
+const IconSlot = styled.span`
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
 `;
