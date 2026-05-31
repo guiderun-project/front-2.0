@@ -1,4 +1,4 @@
-import type { ChangeEvent, KeyboardEvent, ReactElement, ReactNode } from 'react';
+import type { ChangeEvent, KeyboardEvent, ReactElement } from 'react';
 import { useId, useRef, useState } from 'react';
 
 import styled from '@emotion/styled';
@@ -11,16 +11,11 @@ import {
   LABEL_TYPOGRAPHY,
   typographyStyle,
 } from './fieldStyles';
+import type { TimeInputProps, TimeValue } from './Input.types';
 
 const SEGMENT_PLACEHOLDER = '--';
 
 type SegmentKey = 'hours' | 'minutes' | 'seconds';
-
-export type TimeValue = {
-  hours: string;
-  minutes: string;
-  seconds: string;
-};
 
 const EMPTY_TIME: TimeValue = { hours: '', minutes: '', seconds: '' };
 
@@ -29,16 +24,6 @@ const SEGMENTS: ReadonlyArray<{ key: SegmentKey; label: string; max: number }> =
   { key: 'minutes', label: '분', max: 59 },
   { key: 'seconds', label: '초', max: 59 },
 ];
-
-export type TimeInputProps = {
-  label: string;
-  helperText?: ReactNode;
-  errorText?: ReactNode;
-  value?: TimeValue;
-  defaultValue?: TimeValue;
-  onChange?: (value: TimeValue) => void;
-  className?: string;
-};
 
 const sanitizeSegment = (raw: string, max: number, previous: string): string => {
   const digits = raw.replace(/\D/g, '').slice(0, 2);

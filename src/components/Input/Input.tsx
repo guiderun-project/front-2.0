@@ -1,24 +1,10 @@
-import type { ComponentPropsWithoutRef, ReactElement, ReactNode } from 'react';
+import type { ReactElement } from "react";
 
-import styled from '@emotion/styled';
+import styled from "@emotion/styled";
 
-import { fieldControlStyles } from './fieldStyles';
-import { InputFieldShell } from './InputFieldShell';
-import type { InputFieldOwnProps } from './Input.types';
-
-type NativeInputProps = Omit<
-  ComponentPropsWithoutRef<'input'>,
-  'aria-describedby' | 'aria-invalid' | 'children' | 'id'
->;
-
-export type InputProps = InputFieldOwnProps &
-  NativeInputProps & {
-    clearable?: boolean;
-    clearLabel?: string;
-    onClear?: () => void;
-    trailing?: ReactNode;
-    className?: string;
-  };
+import { fieldControlStyles } from "./fieldStyles";
+import { InputFieldShell } from "./InputFieldShell";
+import type { InputProps } from "./Input.types";
 
 export const Input = ({
   label,
@@ -51,7 +37,9 @@ export const Input = ({
       placeholder={placeholder}
       trailing={trailing}
       value={value}
-      renderControl={(control) => <StyledInput type="text" {...rest} {...control} />}
+      renderControl={(control) => (
+        <StyledInput type="text" {...rest} {...control} />
+      )}
     />
   );
 };

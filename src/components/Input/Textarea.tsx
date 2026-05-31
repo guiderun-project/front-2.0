@@ -1,24 +1,14 @@
-import type { ComponentPropsWithoutRef, ReactElement } from 'react';
-import { useLayoutEffect, useRef } from 'react';
+import type { ReactElement } from "react";
+import { useLayoutEffect, useRef } from "react";
 
-import styled from '@emotion/styled';
+import styled from "@emotion/styled";
 
-import { fieldControlStyles } from './fieldStyles';
-import { InputFieldShell } from './InputFieldShell';
-import type { InputFieldOwnProps } from './Input.types';
-
-type NativeTextareaProps = Omit<
-  ComponentPropsWithoutRef<'textarea'>,
-  'aria-describedby' | 'aria-invalid' | 'children' | 'id'
->;
-
-export type TextareaProps = InputFieldOwnProps &
-  NativeTextareaProps & {
-    className?: string;
-  };
+import { fieldControlStyles } from "./fieldStyles";
+import { InputFieldShell } from "./InputFieldShell";
+import type { TextareaProps } from "./Input.types";
 
 const autoGrow = (element: HTMLTextAreaElement): void => {
-  element.style.height = 'auto';
+  element.style.height = "auto";
   element.style.height = `${element.scrollHeight}px`;
 };
 
@@ -72,4 +62,6 @@ export const Textarea = ({
   );
 };
 
-const StyledTextarea = styled.textarea(({ theme }) => fieldControlStyles(theme, true));
+const StyledTextarea = styled.textarea(({ theme }) =>
+  fieldControlStyles(theme, true),
+);
