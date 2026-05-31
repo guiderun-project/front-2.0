@@ -5,15 +5,16 @@ export const pxToRem = (px: number) => `${px / ROOT_FONT_SIZE}rem`;
 export const spacing = {
   none: pxToRem(0),
   xs: pxToRem(2),
-  sm: pxToRem(4),
+  s: pxToRem(4),
+  sm: pxToRem(6),
   md: pxToRem(8),
   lg: pxToRem(12),
   xl: pxToRem(16),
-  '2xl': pxToRem(20),
-  '3xl': pxToRem(24),
-  '4xl': pxToRem(32),
-  '5xl': pxToRem(40),
-  '6xl': pxToRem(48),
+  "2xl": pxToRem(20),
+  "3xl": pxToRem(24),
+  "4xl": pxToRem(32),
+  "5xl": pxToRem(40),
+  "6xl": pxToRem(48),
 } as const;
 
 export const radius = {

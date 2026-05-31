@@ -7,7 +7,7 @@ import { Icon } from '@/components/Icon';
 const CHECKBOX_SIZE = 24;
 const CHECKBOX_ICON_SIZE = 16;
 
-export type CheckBoxProps = Omit<ComponentPropsWithoutRef<'input'>, 'children' | 'type'>;
+type CheckBoxProps = Omit<ComponentPropsWithoutRef<'input'>, 'children' | 'type'>;
 
 export const CheckBox = ({ className, disabled, ...props }: CheckBoxProps): ReactElement => {
   return (
@@ -15,7 +15,7 @@ export const CheckBox = ({ className, disabled, ...props }: CheckBoxProps): Reac
       <CheckBoxInput disabled={disabled} type="checkbox" {...props} />
       <CheckBoxVisual aria-hidden="true">
         <CheckIconWrap>
-          <Icon aria-hidden={true} color="text.inverse" icon="check-lined" size={CHECKBOX_ICON_SIZE} />
+          <Icon aria-hidden={true} color="text.inverse" icon="check-thick-lined" size={CHECKBOX_ICON_SIZE} />
         </CheckIconWrap>
       </CheckBoxVisual>
     </CheckBoxRoot>

@@ -2,7 +2,7 @@ import type { ReactElement, ReactNode } from 'react';
 
 import styled from '@emotion/styled';
 
-export type HiddenTextProps = {
+type HiddenTextProps = {
   children: ReactNode;
 };
 

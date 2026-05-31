@@ -9,7 +9,7 @@ import type { IconName } from './iconRegistry';
 
 const DEFAULT_ICON_BUTTON_ICON_SIZE = 20;
 const DEFAULT_ICON_BUTTON_COLOR = 'icon.primary' satisfies ColorToken;
-const DISABLED_ICON_BUTTON_COLOR = 'text.disabled' satisfies ColorToken;
+const DISABLED_ICON_BUTTON_COLOR = 'icon.disabled' satisfies ColorToken;
 
 export type IconButtonShape = 'square' | 'round';
 
@@ -20,7 +20,7 @@ type IconButtonStyleProps = {
   $shape: IconButtonShape;
 };
 
-export type IconButtonProps = {
+type IconButtonProps = {
   icon: IconName;
   size?: number;
   iconSize?: number;
@@ -97,7 +97,7 @@ const StyledIconButton = styled.button<IconButtonStyleProps>(
     },
 
     '&:disabled': {
-      color: theme.color.text.disabled,
+      color: theme.color.icon.disabled,
       cursor: 'not-allowed',
       opacity: 0.48,
     },

@@ -12,7 +12,7 @@ type TextStyleProps = {
   $font: TypographyToken;
 };
 
-export type TextProps<T extends ElementType = 'span'> = {
+type TextProps<T extends ElementType = 'span'> = {
   align?: CSSProperties['textAlign'];
   as?: T;
   color?: ColorToken;
