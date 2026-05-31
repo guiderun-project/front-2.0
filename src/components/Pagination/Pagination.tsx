@@ -4,7 +4,6 @@ import styled from "@emotion/styled";
 
 import { Icon } from "@/components/Icon";
 
-/** Number of page buttons shown at once. Pages are grouped into fixed blocks. */
 const BLOCK_SIZE = 5;
 const ITEM_SIZE = 32;
 const CHEVRON_ICON_SIZE = 20;
@@ -13,17 +12,10 @@ const DEFAULT_NAV_LABEL = "페이지네이션";
 export type PaginationProps = {
   /** Currently active page (1-indexed). */
   currentPage: number;
-  /** Total number of pages. */
   totalPages: number;
-  /** Called with the next page number when the user navigates. */
   onChange: (page: number) => void;
 } & Omit<ComponentPropsWithoutRef<"nav">, "onChange" | "children">;
 
-/**
- * Builds the visible page window for the block the current page belongs to.
- * Pages are grouped into fixed blocks of {@link BLOCK_SIZE} (1–5, 6–10, …),
- * so the window jumps a block at a time rather than sliding per page.
- */
 const getVisiblePages = (currentPage: number, totalPages: number): number[] => {
   const blockStart =
     Math.floor((currentPage - 1) / BLOCK_SIZE) * BLOCK_SIZE + 1;
@@ -55,6 +47,7 @@ export const Pagination = ({
     if (page < 1 || page > totalPages || page === currentPage) {
       return;
     }
+
     onChange(page);
   };
 
