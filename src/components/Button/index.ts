@@ -1,2 +1,10 @@
 export * from './Button';
-export type { ButtonLevel, ButtonProps, ButtonSize, ButtonStatus } from './Button.types';
+export * from './ButtonGroup';
+export type {
+  ButtonGroupProps,
+  ButtonGroupRatio,
+  ButtonLevel,
+  ButtonProps,
+  ButtonSize,
+  ButtonStatus,
+} from './Button.types';
