@@ -186,6 +186,7 @@ const findSelectedOption = <TValue extends string>(
   return options.find((option) => option.value === value);
 };
 
+// TODO: 기본 트리거 디자인은 추후 디자인 변경에 맞춰 조정될 수 있습니다.
 const SelectTrigger = styled.button`
   display: flex;
   align-items: center;
