@@ -14,7 +14,7 @@ type PageLayoutGradientBackground = `gradient.${GradientToken}`;
 
 export type PageLayoutBackground = PageLayoutColorBackground | PageLayoutGradientBackground;
 
-export type PageLayoutProps = {
+type PageLayoutProps = {
   background?: PageLayoutBackground;
 } & ComponentPropsWithoutRef<'main'>;
 
