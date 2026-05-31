@@ -15,7 +15,14 @@ export const BottomNavigationLayout = (): ReactElement => {
 };
 
 const BottomNavigationLayoutRoot = styled.div`
-  --app-fixed-bottom-offset: ${({ theme }) => theme.pxToRem(BOTTOM_NAVIGATION_OFFSET_PX)};
+  --bottom-navigation-bottom-offset: max(
+    ${({ theme }) => theme.spacing.md},
+    env(safe-area-inset-bottom)
+  );
+  --app-fixed-bottom-offset: calc(
+    ${({ theme }) => theme.pxToRem(BOTTOM_NAVIGATION_OFFSET_PX)} +
+      var(--bottom-navigation-bottom-offset) - env(safe-area-inset-bottom)
+  );
 
   min-height: 100vh;
   min-height: 100dvh;

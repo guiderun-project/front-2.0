@@ -2,7 +2,7 @@ import { APP_PATH } from '@/router/path';
 
 import type { IconName } from '../Icon';
 
-export const BOTTOM_NAVIGATION_OFFSET_PX = 98;
+export const BOTTOM_NAVIGATION_OFFSET_PX = 64;
 export const BOTTOM_NAVIGATION_ARIA_LABEL = '하단 메뉴';
 
 type BottomNavigationItem = {
