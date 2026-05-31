@@ -18,7 +18,7 @@ const AppWrapper = styled.div`
   min-height: 100vh;
   min-height: 100dvh;
   justify-content: center;
-  background: ${({ theme }) => theme.color.bg.subtle};
+  background: var(--page-layout-background, ${({ theme }) => theme.color.bg.subtle});
 `;
 
 const MobileViewport = styled.div`

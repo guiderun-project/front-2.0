@@ -1,4 +1,4 @@
-import type { ComponentPropsWithoutRef, ReactElement } from 'react';
+import { useEffect, type ComponentPropsWithoutRef, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
@@ -20,12 +20,31 @@ type PageLayoutProps = {
 
 const DEFAULT_BACKGROUND = 'bg.default' satisfies PageLayoutBackground;
 const GRADIENT_BACKGROUND_PREFIX = 'gradient.' as const;
+const APP_WRAPPER_BACKGROUND_VARIABLE = '--page-layout-background';
 
 export const PageLayout = ({
   background = DEFAULT_BACKGROUND,
   ...props
 }: PageLayoutProps): ReactElement => {
-  return <StyledPageLayout $background={background} {...props} />;
+  const resolvedBackground = resolvePageLayoutBackground(background);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const previousBackground = root.style.getPropertyValue(APP_WRAPPER_BACKGROUND_VARIABLE);
+
+    root.style.setProperty(APP_WRAPPER_BACKGROUND_VARIABLE, resolvedBackground);
+
+    return () => {
+      if (previousBackground) {
+        root.style.setProperty(APP_WRAPPER_BACKGROUND_VARIABLE, previousBackground);
+        return;
+      }
+
+      root.style.removeProperty(APP_WRAPPER_BACKGROUND_VARIABLE);
+    };
+  }, [resolvedBackground]);
+
+  return <StyledPageLayout $background={resolvedBackground} {...props} />;
 };
 
 const resolvePageLayoutBackground = (background: PageLayoutBackground) => {
@@ -38,11 +57,11 @@ const resolvePageLayoutBackground = (background: PageLayoutBackground) => {
   return resolveColorToken(background as PageLayoutColorBackground);
 };
 
-const StyledPageLayout = styled.main<{ $background: PageLayoutBackground }>(({ $background }) => {
+const StyledPageLayout = styled.main<{ $background: string }>(({ $background }) => {
   return {
     minHeight: '100dvh',
     paddingTop: 'env(safe-area-inset-top)',
     paddingBottom: 'env(safe-area-inset-bottom)',
-    background: resolvePageLayoutBackground($background),
+    background: $background,
   };
 });
