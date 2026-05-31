@@ -195,7 +195,6 @@ const BUTTON_COLOR_TOKENS: Record<ButtonLevel, Record<ButtonStatus, ButtonColorT
 };
 
 export const Button = ({
-  'aria-pressed': ariaPressed,
   children,
   disabled,
   leftIcon = false,
@@ -213,14 +212,12 @@ export const Button = ({
   const resolvedStatus = disabled ? 'disabled' : status;
   const isDisabled = disabled || resolvedStatus === 'disabled';
   const iconSize = BUTTON_SIZE_STYLES[size].iconSize;
-  const pressed = ariaPressed ?? (resolvedStatus === 'selected' ? true : undefined);
 
   return (
     <StyledButton
       $level={level}
       $size={size}
       $status={resolvedStatus}
-      aria-pressed={pressed}
       disabled={isDisabled}
       type={type}
       {...props}
