@@ -22,6 +22,8 @@ export const DEFAULT_CLEAR_LABEL = '입력 내용 지우기';
 export const CARET_BAR_OFFSET = 6;
 export const CARET_BAR_WIDTH = 2;
 export const CARET_BAR_HEIGHT = 18;
+/** Taller caret bar for the multi-line value line (matches the design). */
+export const MULTILINE_CARET_BAR_HEIGHT = 22;
 
 export const typographyStyle = (theme: Theme, token: TypographyToken) => {
   const value = theme.typography[token];

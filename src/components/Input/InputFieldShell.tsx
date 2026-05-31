@@ -9,12 +9,14 @@ import {
   CARET_BAR_HEIGHT,
   CARET_BAR_WIDTH,
   CLEAR_ICON_SIZE,
+  CONTROL_TOP_SPACE,
   COUNTER_TOTAL_TYPOGRAPHY,
   DEFAULT_CLEAR_LABEL,
   FIELD_MIN_HEIGHT,
   FLOATED_LABEL_SCALE,
   INFO_TYPOGRAPHY,
   LABEL_TYPOGRAPHY,
+  MULTILINE_CARET_BAR_HEIGHT,
   MULTILINE_FIELD_MIN_HEIGHT,
   typographyStyle,
 } from './fieldStyles';
@@ -141,7 +143,8 @@ export const InputFieldShell = <E extends HTMLInputElement | HTMLTextAreaElement
       <FieldBox data-filled={hasValue || undefined} data-multiline={multiline || undefined}>
         <Field>
           <FloatingLabel htmlFor={controlId}>{label}</FloatingLabel>
-          {!multiline && <Caret aria-hidden="true" data-caret="" />}
+          <Caret aria-hidden="true" data-caret="" />
+
           {renderControl({
             id: controlId,
             ref: controlRef,
@@ -212,6 +215,14 @@ const FieldBox = styled.div(({ theme }) => ({
   '&[data-multiline="true"]': {
     alignItems: 'flex-start',
     minHeight: theme.pxToRem(MULTILINE_FIELD_MIN_HEIGHT),
+  },
+
+  // Multi-line: the value starts at the top, so the caret bar sits at the top
+  // of the content area (height 22px) rather than centred on a single line.
+  '&[data-multiline="true"] [data-caret]': {
+    top: theme.pxToRem(CONTROL_TOP_SPACE),
+    bottom: 'auto',
+    height: theme.pxToRem(MULTILINE_CARET_BAR_HEIGHT),
   },
 
   '&[data-multiline="true"] label': {

@@ -13,9 +13,11 @@ import {
   Input,
   Text,
   Textarea,
+  TimeInput,
   TimerInput,
   type IconButtonShape,
   type IconName,
+  type TimeValue,
 } from "@/components";
 import {
   colorModeCssVariables,
@@ -368,6 +370,15 @@ const INPUT_CODE_EXAMPLES = [
   onChange={(event) => setPhone(event.target.value)}
 />`,
   },
+  {
+    label: "Time (시:분:초)",
+    code: `<TimeInput
+  label="10KM 러닝기록"
+  helperText="안내 메시지"
+  value={time}
+  onChange={setTime}
+/>`,
+  },
 ] as const;
 
 const BOTTOM_SHEET_CODE_EXAMPLES = [
@@ -487,6 +498,11 @@ export const HomePage = () => {
     useState("Last action: none");
   const [inputName, setInputName] = useState("");
   const [inputPhone, setInputPhone] = useState("");
+  const [inputTime, setInputTime] = useState<TimeValue>({
+    hours: "",
+    minutes: "",
+    seconds: "",
+  });
   const confirmPopupLoadingTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -767,7 +783,7 @@ export const HomePage = () => {
             Input
           </Text>
           <Text color="text.tertiary" font="detail-m-r">
-            Single-line, multi-line, timer
+            Single-line, multi-line, timer, time
           </Text>
         </SectionTitle>
         <FieldList>
@@ -796,6 +812,12 @@ export const HomePage = () => {
             placeholder="-없이 숫자만 입력"
             timerText="03:00"
             value={inputPhone}
+          />
+          <TimeInput
+            helperText="안내 메시지"
+            label="10KM 러닝기록"
+            onChange={setInputTime}
+            value={inputTime}
           />
         </FieldList>
         <CodeExamples examples={INPUT_CODE_EXAMPLES} />
