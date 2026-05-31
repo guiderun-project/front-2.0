@@ -4,5 +4,6 @@ export * from "./CheckBox";
 export * from "./HiddenText";
 export * from "./Icon";
 export * from "./PageLayout";
+export * from "./Pagination";
 export * from "./Popup";
 export * from "./Text";
