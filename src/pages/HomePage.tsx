@@ -11,10 +11,12 @@ import {
   Icon,
   IconButton,
   PageLayout,
+  Select,
   Text,
   type IconButtonShape,
   type IconName,
   type PageLayoutBackground,
+  type SelectOptions,
 } from '@/components';
 import {
   colorModeCssVariables,
@@ -278,6 +280,73 @@ const CHECKBOX_CODE_EXAMPLES = [
   },
 ] as const;
 
+type OperationType = 'basic' | 'group';
+
+const OPERATION_OPTIONS: SelectOptions<OperationType> = [
+  { value: 'basic', label: '기본 훈련' },
+  {
+    value: 'group',
+    label: '그룹별 훈련',
+    description: '대회준비 그룹과 기초보강 그룹으로 나뉘어요',
+  },
+];
+
+type RecruitmentStatus = 'open' | 'closed';
+
+const RECRUITMENT_STATUS_OPTIONS: SelectOptions<RecruitmentStatus> = [
+  { value: 'open', label: '모집중' },
+  { value: 'closed', label: '모집마감' },
+];
+
+const SELECT_CODE_EXAMPLES = [
+  {
+    label: 'Field trigger',
+    code: `type OperationType = 'basic' | 'group';
+
+const operationOptions: SelectOptions<OperationType> = [
+  { value: 'basic', label: '기본 훈련' },
+  { value: 'group', label: '그룹별 훈련' },
+];
+
+<Select
+  confirmable
+  label="모임 운영방식"
+  placeholder="모임 운영방식"
+  sheetTitle="모임 운영방식"
+  value={operationType}
+  options={operationOptions}
+  onChange={setOperationType}
+/>`,
+  },
+  {
+    label: 'Immediate change',
+    code: `<Select
+  confirmable={false}
+  label="훈련 방식"
+  placeholder="훈련 방식"
+  sheetTitle="훈련 방식"
+  value={trainingType}
+  options={operationOptions}
+  onChange={setTrainingType}
+/>`,
+  },
+  {
+    label: 'Custom trigger',
+    code: `<Select
+  confirmable
+  sheetTitle="모집 상태"
+  value={status}
+  options={statusOptions}
+  onChange={setStatus}
+  renderTrigger={({ open, selectedOption, disabled }) => (
+    <StatusChip type="button" disabled={disabled} onClick={open}>
+      {selectedOption?.label ?? '모집중'}
+    </StatusChip>
+  )}
+/>`,
+  },
+] as const;
+
 const CONFIRM_POPUP_CODE_EXAMPLES = [
   {
     label: 'Default',
@@ -412,6 +481,9 @@ export const HomePage = () => {
   const [colorMode, setColorMode] = useState<ColorMode>('light');
   const [pageBackground, setPageBackground] = useState<PageLayoutBackground>('bg.subtle');
   const [isCheckBoxSelected, setIsCheckBoxSelected] = useState(false);
+  const [operationType, setOperationType] = useState<OperationType>();
+  const [trainingType, setTrainingType] = useState<OperationType>();
+  const [recruitmentStatus, setRecruitmentStatus] = useState<RecruitmentStatus>('open');
   const [activeConfirmPopup, setActiveConfirmPopup] = useState<ConfirmPopupExample | null>(null);
   const [activeBottomSheet, setActiveBottomSheet] = useState<BottomSheetExample | null>(null);
   const [isConfirmPopupLoading, setIsConfirmPopupLoading] = useState(false);
@@ -578,6 +650,68 @@ export const HomePage = () => {
           ))}
         </TextList>
         <CodeExamples examples={TEXT_CODE_EXAMPLES} />
+      </ShowcaseSection>
+
+      <ShowcaseSection>
+        <SectionTitle>
+          <Text as="h2" font="heading-s-m">
+            Select
+          </Text>
+          <Text color="text.tertiary" font="detail-m-r">
+            Field trigger, custom trigger, confirm, immediate
+          </Text>
+        </SectionTitle>
+        <SelectSampleGrid>
+          <SelectSampleItem>
+            <Text color="text.secondary" font="detail-m-r">
+              Default field trigger
+            </Text>
+            <Select
+              confirmable
+              label="모임 운영방식"
+              options={OPERATION_OPTIONS}
+              placeholder="모임 운영방식"
+              sheetTitle="모임 운영방식"
+              value={operationType}
+              onChange={setOperationType}
+            />
+          </SelectSampleItem>
+          <SelectSampleItem>
+            <Text color="text.secondary" font="detail-m-r">
+              Immediate field trigger
+            </Text>
+            <Select
+              confirmable={false}
+              label="훈련 방식"
+              options={OPERATION_OPTIONS}
+              placeholder="훈련 방식"
+              sheetTitle="훈련 방식"
+              value={trainingType}
+              onChange={setTrainingType}
+            />
+          </SelectSampleItem>
+          <SelectSampleItem>
+            <Text color="text.secondary" font="detail-m-r">
+              Custom chip trigger
+            </Text>
+            <Select
+              confirmable
+              options={RECRUITMENT_STATUS_OPTIONS}
+              sheetTitle="모집 상태"
+              value={recruitmentStatus}
+              renderTrigger={({ disabled, open, selectedOption }) => (
+                <StatusChip disabled={disabled} type="button" onClick={open}>
+                  <Text as="span" color="text.brand" font="body-s-sb">
+                    {selectedOption?.label ?? '모집중'}
+                  </Text>
+                  <Icon aria-hidden={true} color="text.brand" icon="chevron-down-lined" size={16} />
+                </StatusChip>
+              )}
+              onChange={setRecruitmentStatus}
+            />
+          </SelectSampleItem>
+        </SelectSampleGrid>
+        <CodeExamples examples={SELECT_CODE_EXAMPLES} />
       </ShowcaseSection>
 
       <ShowcaseSection>
@@ -1084,6 +1218,58 @@ const PopupSampleGrid = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: ${({ theme }) => theme.spacing.md};
+`;
+
+const SelectSampleGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, ${({ theme }) => theme.pxToRem(280)}), 1fr));
+  align-items: start;
+  gap: ${({ theme }) => theme.spacing.xl};
+`;
+
+const SelectSampleItem = styled.div`
+  display: grid;
+  justify-items: start;
+  gap: ${({ theme }) => theme.spacing.sm};
+  width: 100%;
+`;
+
+const StatusChip = styled.button`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: ${({ theme }) => theme.pxToRem(36)};
+  gap: ${({ theme }) => theme.spacing.xs};
+  padding: ${({ theme }) => `${theme.spacing.md} ${theme.spacing.sm} ${theme.spacing.md} ${theme.pxToRem(10)}`};
+  border: 1px solid ${({ theme }) => theme.color.bg['brand-primary']};
+  border-radius: ${({ theme }) => theme.radius.full};
+  background: ${({ theme }) => theme.color.bg['brand-soft']};
+  cursor: pointer;
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.color.border.focused};
+    outline-offset: ${({ theme }) => theme.spacing.xs};
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.48;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+
+    &:active:not(:disabled) {
+      transform: none;
+    }
+  }
 `;
 
 const SampleButton = styled.button`
