@@ -142,9 +142,11 @@ export const Button = ({
   disabled,
   fullWidth = false,
   leftIcon,
+  leftIconColor = 'currentColor',
   leftIconName = 'check-lined',
   level = 'primary',
   rightIcon = false,
+  rightIconColor = 'currentColor',
   rightIconName = 'chevron-right-lined',
   size = 'm',
   status = 'default',
@@ -153,7 +155,6 @@ export const Button = ({
 }: ButtonProps): ReactElement => {
   const resolvedStatus = disabled ? 'disabled' : status;
   const isDisabled = disabled || resolvedStatus === 'disabled';
-  const colorTokens = BUTTON_COLOR_TOKENS[level][isDisabled ? 'disabled' : resolvedStatus];
   const iconSize = BUTTON_SIZE_STYLES[size].iconSize;
   const pressed = ariaPressed ?? (resolvedStatus === 'selected' ? true : undefined);
   const hasLeftIcon = leftIcon ?? (resolvedStatus === 'selected');
@@ -169,9 +170,9 @@ export const Button = ({
       type={type}
       {...props}
     >
-      {hasLeftIcon ? <Icon aria-hidden={true} color={colorTokens.content} icon={leftIconName} size={iconSize} /> : null}
+      {hasLeftIcon ? <Icon aria-hidden={true} color={leftIconColor} icon={leftIconName} size={iconSize} /> : null}
       <ButtonLabel>{children}</ButtonLabel>
-      {rightIcon ? <Icon aria-hidden={true} color={colorTokens.content} icon={rightIconName} size={iconSize} /> : null}
+      {rightIcon ? <Icon aria-hidden={true} color={rightIconColor} icon={rightIconName} size={iconSize} /> : null}
     </StyledButton>
   );
 };

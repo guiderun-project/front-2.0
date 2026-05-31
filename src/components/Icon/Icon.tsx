@@ -7,11 +7,19 @@ import { iconRegistry, type IconName } from './iconRegistry';
 const DEFAULT_ICON_SIZE = 20;
 const DEFAULT_ICON_COLOR = 'icon.primary' satisfies ColorToken;
 
-type IconProps = {
+export type IconProps = {
   icon: IconName;
   size?: number;
-  color?: ColorToken;
+  color?: ColorToken | 'currentColor';
 } & Omit<SVGProps<SVGSVGElement>, 'children' | 'color' | 'height' | 'width'>;
+
+const resolveIconColorValue = (color: ColorToken | 'currentColor'): string => {
+  if (color === 'currentColor') {
+    return color;
+  }
+
+  return resolveColorToken(color);
+};
 
 export const Icon = ({
   'aria-hidden': ariaHidden,
@@ -34,7 +42,7 @@ export const Icon = ({
       role={isDecorative ? role : (role ?? 'img')}
       style={{
         ...style,
-        color: resolveColorToken(color),
+        color: resolveIconColorValue(color),
         display: 'inline-block',
         flexShrink: 0,
         height: size,

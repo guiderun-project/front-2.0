@@ -1,6 +1,6 @@
 import type { ComponentPropsWithoutRef } from 'react';
 
-import type { IconName } from '@/components/Icon';
+import type { IconColor, IconName } from '@/components/Icon';
 import type { ColorToken, TypographyToken } from '@/styles/tokens';
 
 export type ButtonSize = 's' | 'm' | 'l';
@@ -15,6 +15,8 @@ export type ButtonProps = {
   rightIcon?: boolean;
   leftIconName?: IconName;
   rightIconName?: IconName;
+  leftIconColor?: IconColor;
+  rightIconColor?: IconColor;
   fullWidth?: boolean;
 } & Omit<ComponentPropsWithoutRef<'button'>, 'color'>;
 
