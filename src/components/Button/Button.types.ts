@@ -16,12 +16,7 @@ export type ButtonProps = {
   rightIcon?: ButtonIconProps;
 } & Omit<ComponentPropsWithoutRef<'button'>, 'color'>;
 
-type ButtonGroupSharedButtonProps = Pick<
-  ButtonProps,
-  'level' | 'size' | 'status'
->;
-
-export type ButtonGroupProps = ButtonGroupSharedButtonProps & {
+export type ButtonGroupProps = {
   children: ReactNode;
   ratio?: ButtonGroupRatio;
 } & Omit<ComponentPropsWithoutRef<'div'>, 'children'>;

@@ -149,16 +149,16 @@ const BUTTON_GROUP_EXAMPLES: ReadonlyArray<{
 const BUTTON_GROUP_CODE_EXAMPLES = [
   {
     label: 'Ratio',
-    code: `<ButtonGroup ratio="35:65" size="m">
-  <ButtonGroup.Button level="secondary">아니요</ButtonGroup.Button>
-  <ButtonGroup.Button>로그인하기</ButtonGroup.Button>
+    code: `<ButtonGroup ratio="35:65">
+  <ButtonGroup.Button level="secondary" size="m">아니요</ButtonGroup.Button>
+  <ButtonGroup.Button size="m">로그인하기</ButtonGroup.Button>
 </ButtonGroup>`,
   },
   {
     label: 'Vertical',
-    code: `<ButtonGroup ratio="100:100" size="m">
-  <ButtonGroup.Button level="secondary">아니요</ButtonGroup.Button>
-  <ButtonGroup.Button>로그인하기</ButtonGroup.Button>
+    code: `<ButtonGroup ratio="100:100">
+  <ButtonGroup.Button level="secondary" size="m">아니요</ButtonGroup.Button>
+  <ButtonGroup.Button size="m">로그인하기</ButtonGroup.Button>
 </ButtonGroup>`,
   },
 ] as const;
@@ -940,9 +940,13 @@ export const HomePage = () => {
                     {description}
                   </Text>
                 </ButtonGroupSampleTitle>
-                <ButtonGroup ratio={ratio} size="m">
+                <ButtonGroup ratio={ratio}>
                   {buttons.map(({ label: buttonLabel, level }) => (
-                    <ButtonGroup.Button key={buttonLabel} level={level}>
+                    <ButtonGroup.Button
+                      key={buttonLabel}
+                      level={level}
+                      size="m"
+                    >
                       {buttonLabel}
                     </ButtonGroup.Button>
                   ))}
