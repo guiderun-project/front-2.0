@@ -31,20 +31,15 @@ const SEGMENTS: ReadonlyArray<{ key: SegmentKey; label: string; max: number }> =
 ];
 
 export type TimeInputProps = {
-  /** Accessible, always-present field label (e.g. "10KM 러닝기록"). */
   label: string;
-  /** Helper message shown under the field. Replaced by `errorText` when present. */
   helperText?: ReactNode;
-  /** Error message; puts the field in its error state (red border, `aria-invalid`). */
   errorText?: ReactNode;
-  /** Controlled value. Omit (with optional `defaultValue`) for uncontrolled use. */
   value?: TimeValue;
   defaultValue?: TimeValue;
   onChange?: (value: TimeValue) => void;
   className?: string;
 };
 
-/** Keep only digits, cap at two chars, and reject a 2-digit value above `max`. */
 const sanitizeSegment = (raw: string, max: number, previous: string): string => {
   const digits = raw.replace(/\D/g, '').slice(0, 2);
   if (digits.length === 2 && Number(digits) > max) {
@@ -53,17 +48,6 @@ const sanitizeSegment = (raw: string, max: number, previous: string): string => 
   return digits;
 };
 
-/**
- * Segmented duration field (the design's `time` case) — three 시:분:초 inputs
- * with a floating label and helper/error message. Each segment is a real
- * `<input>` labelled 시/분/초 and the trio is wrapped in a `role="group"` named
- * by the floating label, so screen readers announce each part. Typing two
- * digits advances to the next segment; Backspace on an empty segment returns to
- * the previous one. There is no character counter for this case.
- *
- * Value is `{ hours, minutes, seconds }` strings so leading zeros ("05") and
- * empty segments ("") are preserved.
- */
 export const TimeInput = ({
   label,
   helperText,
@@ -117,7 +101,6 @@ export const TimeInput = ({
     };
 
   const handleBoxPointerDown = (event: React.PointerEvent<HTMLDivElement>): void => {
-    // Tapping the empty field focuses the first segment, like a normal input.
     if (event.target === event.currentTarget) {
       event.preventDefault();
       segmentRefs.current[0]?.focus();
@@ -187,8 +170,6 @@ const FieldBox = styled.div(({ theme }) => ({
     boxShadow: `inset 0 0 0 1px ${theme.color.border.brand}`,
   },
 
-  // FloatingLabel is positioned relative to the padded FieldBox, so the floated
-  // resting point is the top padding (not 0, which would glue it to the border).
   '&:focus-within [data-floating-label], &[data-filled="true"] [data-floating-label]': {
     top: theme.spacing.lg,
     transform: `translateY(0) scale(${FLOATED_LABEL_SCALE})`,
@@ -200,10 +181,6 @@ const FieldBox = styled.div(({ theme }) => ({
     color: theme.color.text.brand,
   },
 
-  // The 시:분:초 segments stay hidden until the field is focused or filled, so
-  // the resting state shows only the centred label (matching the design's
-  // Default state). They remain in the DOM (opacity, not display) so screen
-  // readers can still reach them.
   '& [data-segments]': {
     opacity: 0,
     transition: 'opacity 120ms ease',

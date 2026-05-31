@@ -22,11 +22,6 @@ const autoGrow = (element: HTMLTextAreaElement): void => {
   element.style.height = `${element.scrollHeight}px`;
 };
 
-/**
- * Multi-line text field. Shares the floating label, helper/error message and
- * character counter with `Input`, but the label rests at the top and the field
- * grows with its content instead of scrolling.
- */
 export const Textarea = ({
   label,
   helperText,
@@ -41,8 +36,6 @@ export const Textarea = ({
 }: TextareaProps): ReactElement => {
   const innerRef = useRef<HTMLTextAreaElement>(null);
 
-  // Keep the height in sync with the content, including the initial
-  // `defaultValue` / controlled `value` render.
   useLayoutEffect(() => {
     if (innerRef.current) {
       autoGrow(innerRef.current);

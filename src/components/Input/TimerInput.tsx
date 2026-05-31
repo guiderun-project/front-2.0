@@ -11,31 +11,13 @@ const CONFIRM_BUTTON_MIN_WIDTH = 56;
 const CONFIRM_BUTTON_HEIGHT = 32;
 
 export type TimerInputProps = Omit<InputProps, 'trailing'> & {
-  /**
-   * Countdown text shown before the confirm button (e.g. "03:00"). The countdown
-   * itself is owned by the parent — pass the formatted remaining time. Hidden
-   * when omitted.
-   */
   timerText?: string;
-  /** Accessible description for the timer (e.g. "남은 시간"). */
   timerLabel?: string;
-  /** Confirm button label. Defaults to "확인". */
   confirmLabel?: string;
   onConfirm?: () => void;
   confirmDisabled?: boolean;
 };
 
-/**
- * Phone-number style field with a trailing countdown timer and confirm button
- * (the design's `button` case). The confirm button is a temporary inline button
- * until the shared Button component lands. Input is numeric by default.
- *
- * The countdown value is parent-controlled: pass `timerText` as the already
- * formatted remaining time and run the timer/resend logic in the page.
- *
- * A clear (×) button is shown while the field has a value (before the timer and
- * confirm button); pass `clearable={false}` to opt out.
- */
 export const TimerInput = ({
   timerText,
   timerLabel = '남은 시간',

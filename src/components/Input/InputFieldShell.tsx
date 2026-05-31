@@ -24,7 +24,7 @@ import type { InputFieldOwnProps } from './Input.types';
 
 type FieldValue = string | number | readonly string[];
 
-export type InputControlRenderProps<E extends HTMLInputElement | HTMLTextAreaElement> = {
+type InputControlRenderProps<E extends HTMLInputElement | HTMLTextAreaElement> = {
   id: string;
   ref: RefObject<E | null>;
   placeholder?: string;
@@ -36,29 +36,21 @@ export type InputControlRenderProps<E extends HTMLInputElement | HTMLTextAreaEle
   'aria-describedby': string | undefined;
 };
 
-export type InputFieldShellProps<E extends HTMLInputElement | HTMLTextAreaElement> =
+type InputFieldShellProps<E extends HTMLInputElement | HTMLTextAreaElement> =
   InputFieldOwnProps & {
     placeholder?: string;
     value?: FieldValue;
     defaultValue?: FieldValue;
     onChange?: ChangeEventHandler<E>;
-    /** Shows a clear button (and wires its behaviour) while the field has a value. */
     clearable?: boolean;
-    /** Accessible name for the clear button. */
     clearLabel?: string;
     onClear?: () => void;
-    /** Extra trailing content rendered after the clear button (timer, confirm button, …). */
     trailing?: ReactNode;
-    /** Top-aligns the label and field box for the auto-growing `Textarea` layout. */
     multiline?: boolean;
     className?: string;
     renderControl: (control: InputControlRenderProps<E>) => ReactNode;
   };
 
-/**
- * Reset a field to an empty value the way the browser would, so React's
- * synthetic `onChange` fires for both controlled and uncontrolled fields.
- */
 const setNativeValue = (
   element: HTMLInputElement | HTMLTextAreaElement,
   nextValue: string,
@@ -73,13 +65,6 @@ const setNativeValue = (
   element.dispatchEvent(new Event('input', { bubbles: true }));
 };
 
-/**
- * Private layout + accessibility shell for the Input family. Owns the floating
- * label, helper/error message, character counter, clear button, and the ARIA
- * wiring that connects them to the editable control. The visual states
- * (default / focused / typing / filled / error) are derived from CSS and the
- * value the consumer supplies — there is no `status` prop.
- */
 export const InputFieldShell = <E extends HTMLInputElement | HTMLTextAreaElement>({
   label,
   helperText,
@@ -144,7 +129,6 @@ export const InputFieldShell = <E extends HTMLInputElement | HTMLTextAreaElement
         <Field>
           <FloatingLabel htmlFor={controlId}>{label}</FloatingLabel>
           <Caret aria-hidden="true" data-caret="" />
-
           {renderControl({
             id: controlId,
             ref: controlRef,
@@ -205,20 +189,13 @@ const FieldBox = styled.div(({ theme }) => ({
   borderRadius: theme.radius.md,
   border: `1px solid ${theme.color.border.default}`,
   backgroundColor: theme.color.bg.default,
-  // Thicken the border on focus/error via an inset shadow so the 1px → 2px
-  // change never shifts the layout.
   transition: 'border-color 120ms ease, box-shadow 120ms ease',
 
-  // Multi-line: the value starts at the top, so the box and its label are
-  // top-aligned. The label rests at the top (not centred) and only shrinks
-  // when floated.
   '&[data-multiline="true"]': {
     alignItems: 'flex-start',
     minHeight: theme.pxToRem(MULTILINE_FIELD_MIN_HEIGHT),
   },
 
-  // Multi-line: the value starts at the top, so the caret bar sits at the top
-  // of the content area (height 22px) rather than centred on a single line.
   '&[data-multiline="true"] [data-caret]': {
     top: theme.pxToRem(CONTROL_TOP_SPACE),
     bottom: 'auto',
@@ -236,7 +213,6 @@ const FieldBox = styled.div(({ theme }) => ({
     boxShadow: `inset 0 0 0 1px ${theme.color.border.brand}`,
   },
 
-  // Reveal the brand bar before the placeholder while focused and empty.
   '&:focus-within:not([data-filled]) [data-caret]': {
     opacity: 1,
   },
@@ -272,17 +248,11 @@ const Field = styled.div({
   minWidth: 0,
 });
 
-// The clear button sits on the value line (the design places it inside the input
-// content row, not centred in the whole box). Bottom-aligned so it tracks the
-// value beneath the floated label.
 const ClearButton = styled(IconButton)(({ theme }) => ({
   alignSelf: 'flex-end',
   marginBottom: theme.spacing.xs,
 }));
 
-// Solid brand bar shown before the placeholder in the focused empty state
-// (the design's cursor indicator). The real text caret takes over once typing
-// begins. Centred on the value line; hidden by default.
 const Caret = styled.span(({ theme }) => ({
   position: 'absolute',
   left: 0,
