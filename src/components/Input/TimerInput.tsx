@@ -1,0 +1,132 @@
+import type { ReactElement } from 'react';
+
+import styled from '@emotion/styled';
+
+import { HiddenText } from '@/components/HiddenText';
+
+import { Input, type InputProps } from './Input';
+import { INFO_TYPOGRAPHY, typographyStyle } from './fieldStyles';
+
+const CONFIRM_BUTTON_MIN_WIDTH = 56;
+const CONFIRM_BUTTON_HEIGHT = 32;
+
+export type TimerInputProps = Omit<InputProps, 'trailing'> & {
+  /**
+   * Countdown text shown before the confirm button (e.g. "03:00"). The countdown
+   * itself is owned by the parent — pass the formatted remaining time. Hidden
+   * when omitted.
+   */
+  timerText?: string;
+  /** Accessible description for the timer (e.g. "남은 시간"). */
+  timerLabel?: string;
+  /** Confirm button label. Defaults to "확인". */
+  confirmLabel?: string;
+  onConfirm?: () => void;
+  confirmDisabled?: boolean;
+};
+
+/**
+ * Phone-number style field with a trailing countdown timer and confirm button
+ * (the design's `button` case). The confirm button is a temporary inline button
+ * until the shared Button component lands. Input is numeric by default.
+ *
+ * The countdown value is parent-controlled: pass `timerText` as the already
+ * formatted remaining time and run the timer/resend logic in the page.
+ *
+ * A clear (×) button is shown while the field has a value (before the timer and
+ * confirm button); pass `clearable={false}` to opt out.
+ */
+export const TimerInput = ({
+  timerText,
+  timerLabel = '남은 시간',
+  confirmLabel = '확인',
+  onConfirm,
+  confirmDisabled,
+  inputMode = 'numeric',
+  clearable = true,
+  ...inputProps
+}: TimerInputProps): ReactElement => {
+  return (
+    <Input
+      {...inputProps}
+      clearable={clearable}
+      inputMode={inputMode}
+      trailing={
+        <Trailing>
+          {timerText != null && (
+            <Timer>
+              <HiddenText>{timerLabel}</HiddenText>
+              <span aria-hidden={timerLabel ? undefined : true}>{timerText}</span>
+            </Timer>
+          )}
+          <ConfirmButton disabled={confirmDisabled} onClick={onConfirm} type="button">
+            {confirmLabel}
+          </ConfirmButton>
+        </Trailing>
+      }
+    />
+  );
+};
+
+const Trailing = styled.div(({ theme }) => ({
+  display: 'flex',
+  flexShrink: 0,
+  alignItems: 'center',
+  gap: theme.spacing.md,
+}));
+
+const Timer = styled.span(({ theme }) => ({
+  flexShrink: 0,
+  color: theme.color.text.secondary,
+  whiteSpace: 'nowrap',
+  fontVariantNumeric: 'tabular-nums',
+  ...typographyStyle(theme, INFO_TYPOGRAPHY),
+}));
+
+// TEMP: inline confirm button. Replace with the shared Button component once it
+// exists, keeping the same bg.brand / inverse-text styling from the design.
+const ConfirmButton = styled.button(({ theme }) => ({
+  display: 'inline-flex',
+  flexShrink: 0,
+  alignItems: 'center',
+  justifyContent: 'center',
+  minWidth: theme.pxToRem(CONFIRM_BUTTON_MIN_WIDTH),
+  height: theme.pxToRem(CONFIRM_BUTTON_HEIGHT),
+  padding: `0 ${theme.spacing.md}`,
+  border: 0,
+  borderRadius: theme.radius.sm,
+  backgroundColor: theme.color.bg.brand,
+  color: theme.color.text.inverse,
+  cursor: 'pointer',
+  touchAction: 'manipulation',
+  ...typographyStyle(theme, 'detail-m-sb'),
+  transition: 'opacity 120ms ease, transform 120ms ease',
+
+  '@media (hover: hover)': {
+    '&:hover:not(:disabled)': {
+      opacity: 0.92,
+    },
+  },
+
+  '&:active:not(:disabled)': {
+    transform: 'scale(0.97)',
+  },
+
+  '&:focus-visible': {
+    outline: `2px solid ${theme.color.border.focused}`,
+    outlineOffset: theme.spacing.xs,
+  },
+
+  '&:disabled': {
+    cursor: 'not-allowed',
+    opacity: 0.48,
+  },
+
+  '@media (prefers-reduced-motion: reduce)': {
+    transition: 'none',
+
+    '&:active:not(:disabled)': {
+      transform: 'none',
+    },
+  },
+}));

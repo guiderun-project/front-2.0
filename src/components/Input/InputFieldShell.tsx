@@ -6,6 +6,8 @@ import styled from '@emotion/styled';
 import { IconButton } from '@/components/Icon';
 
 import {
+  CARET_BAR_HEIGHT,
+  CARET_BAR_WIDTH,
   CLEAR_ICON_SIZE,
   COUNTER_TOTAL_TYPOGRAPHY,
   DEFAULT_CLEAR_LABEL,
@@ -13,6 +15,7 @@ import {
   FLOATED_LABEL_SCALE,
   INFO_TYPOGRAPHY,
   LABEL_TYPOGRAPHY,
+  MULTILINE_FIELD_MIN_HEIGHT,
   typographyStyle,
 } from './fieldStyles';
 import type { InputFieldOwnProps } from './Input.types';
@@ -44,6 +47,8 @@ export type InputFieldShellProps<E extends HTMLInputElement | HTMLTextAreaElemen
     onClear?: () => void;
     /** Extra trailing content rendered after the clear button (timer, confirm button, …). */
     trailing?: ReactNode;
+    /** Top-aligns the label and field box for the auto-growing `Textarea` layout. */
+    multiline?: boolean;
     className?: string;
     renderControl: (control: InputControlRenderProps<E>) => ReactNode;
   };
@@ -86,6 +91,7 @@ export const InputFieldShell = <E extends HTMLInputElement | HTMLTextAreaElement
   clearLabel = DEFAULT_CLEAR_LABEL,
   onClear,
   trailing,
+  multiline = false,
   className,
   renderControl,
 }: InputFieldShellProps<E>): ReactElement => {
@@ -132,9 +138,10 @@ export const InputFieldShell = <E extends HTMLInputElement | HTMLTextAreaElement
 
   return (
     <Root className={className} data-error={hasError || undefined}>
-      <FieldBox data-filled={hasValue || undefined}>
+      <FieldBox data-filled={hasValue || undefined} data-multiline={multiline || undefined}>
         <Field>
           <FloatingLabel htmlFor={controlId}>{label}</FloatingLabel>
+          {!multiline && <Caret aria-hidden="true" data-caret="" />}
           {renderControl({
             id: controlId,
             ref: controlRef,
@@ -148,7 +155,7 @@ export const InputFieldShell = <E extends HTMLInputElement | HTMLTextAreaElement
           })}
         </Field>
         {clearable && hasValue && (
-          <IconButton
+          <ClearButton
             aria-label={clearLabel}
             color="icon.tertiary"
             icon="delete-filled"
@@ -199,9 +206,28 @@ const FieldBox = styled.div(({ theme }) => ({
   // change never shifts the layout.
   transition: 'border-color 120ms ease, box-shadow 120ms ease',
 
+  // Multi-line: the value starts at the top, so the box and its label are
+  // top-aligned. The label rests at the top (not centred) and only shrinks
+  // when floated.
+  '&[data-multiline="true"]': {
+    alignItems: 'flex-start',
+    minHeight: theme.pxToRem(MULTILINE_FIELD_MIN_HEIGHT),
+  },
+
+  '&[data-multiline="true"] label': {
+    top: 0,
+    transform: 'translateY(0) scale(1)',
+    transformOrigin: 'left top',
+  },
+
   '&:focus-within': {
     borderColor: theme.color.border.brand,
     boxShadow: `inset 0 0 0 1px ${theme.color.border.brand}`,
+  },
+
+  // Reveal the brand bar before the placeholder while focused and empty.
+  '&:focus-within:not([data-filled]) [data-caret]': {
+    opacity: 1,
   },
 
   '&:focus-within label, &[data-filled="true"] label': {
@@ -234,6 +260,29 @@ const Field = styled.div({
   flex: 1,
   minWidth: 0,
 });
+
+// The clear button sits on the value line (the design places it inside the input
+// content row, not centred in the whole box). Bottom-aligned so it tracks the
+// value beneath the floated label.
+const ClearButton = styled(IconButton)(({ theme }) => ({
+  alignSelf: 'flex-end',
+  marginBottom: theme.spacing.xs,
+}));
+
+// Solid brand bar shown before the placeholder in the focused empty state
+// (the design's cursor indicator). The real text caret takes over once typing
+// begins. Centred on the value line; hidden by default.
+const Caret = styled.span(({ theme }) => ({
+  position: 'absolute',
+  left: 0,
+  bottom: theme.pxToRem((28 - CARET_BAR_HEIGHT) / 2),
+  width: theme.pxToRem(CARET_BAR_WIDTH),
+  height: theme.pxToRem(CARET_BAR_HEIGHT),
+  borderRadius: theme.pxToRem(1),
+  backgroundColor: theme.color.bg.brand,
+  opacity: 0,
+  pointerEvents: 'none',
+}));
 
 const FloatingLabel = styled.label(({ theme }) => ({
   position: 'absolute',
