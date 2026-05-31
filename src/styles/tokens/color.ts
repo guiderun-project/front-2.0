@@ -282,6 +282,7 @@ export const semanticColorAliases = {
       tertiary: 'primitive.neutral.400',
       inverse: 'primitive.neutral.0',
       brand: 'primitive.cyan.500',
+      disabled: 'primitive.neutral.300',
     },
     badge: {
       bg: {
@@ -361,6 +362,7 @@ export const semanticColorAliases = {
       tertiary: 'primitive.neutral.600',
       inverse: 'primitive.neutral.850',
       brand: 'primitive.cyan.400',
+      disabled: 'primitive.neutral.700',
     },
     badge: {
       bg: {
@@ -443,6 +445,7 @@ export const semanticColorModes = {
       tertiary: '#AEBBC9',
       inverse: '#FFFFFF',
       brand: '#009BDB',
+      disabled: '#C9D2DC',
     },
     badge: {
       bg: {
@@ -522,6 +525,7 @@ export const semanticColorModes = {
       tertiary: '#5D6876',
       inverse: '#202933',
       brand: '#2BAFE0',
+      disabled: '#454F5C',
     },
     badge: {
       bg: {
@@ -603,6 +607,7 @@ export const color = {
     tertiary: 'var(--color-icon-tertiary)',
     inverse: 'var(--color-icon-inverse)',
     brand: 'var(--color-icon-brand)',
+    disabled: 'var(--color-icon-disabled)',
   },
   badge: {
     bg: {
@@ -674,6 +679,7 @@ export const colorTokenMap = {
   'icon.tertiary': 'var(--color-icon-tertiary)',
   'icon.inverse': 'var(--color-icon-inverse)',
   'icon.brand': 'var(--color-icon-brand)',
+  'icon.disabled': 'var(--color-icon-disabled)',
   'badge.bg.gray': 'var(--color-badge-bg-gray)',
   'badge.bg.blue': 'var(--color-badge-bg-blue)',
   'badge.bg.orange': 'var(--color-badge-bg-orange)',
