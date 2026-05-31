@@ -15,6 +15,7 @@ export { fontFamily, fontWeight } from './font';
 export {
   gradient,
   gradientBaseColor,
+  gradientModeCssVariables,
   gradientTokenMap,
   resolveGradientToken,
 } from './gradient';
