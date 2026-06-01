@@ -5,4 +5,5 @@ export * from "./HiddenText";
 export * from "./Icon";
 export * from "./PageLayout";
 export * from "./Popup";
+export * from "./RunnerTypeAvatar";
 export * from "./Text";
