@@ -11,6 +11,7 @@ import {
   Icon,
   IconButton,
   PageLayout,
+  Pagination,
   RunnerTypeAvatar,
   Text,
   type IconButtonShape,
@@ -431,10 +432,22 @@ type CodeExample = {
   code: string;
 };
 
+const PAGINATION_CODE_EXAMPLES = [
+  {
+    label: 'Controlled',
+    code: '<Pagination currentPage={page} totalPages={12} onChange={setPage} />',
+  },
+  {
+    label: 'Single page',
+    code: '<Pagination currentPage={1} totalPages={1} onChange={setPage} />',
+  },
+] as const;
+
 export const HomePage = () => {
   const [colorMode, setColorMode] = useState<ColorMode>('light');
   const [pageBackground, setPageBackground] = useState<PageLayoutBackground>('bg.subtle');
   const [isCheckBoxSelected, setIsCheckBoxSelected] = useState(false);
+  const [paginationPage, setPaginationPage] = useState(1);
   const [activeConfirmPopup, setActiveConfirmPopup] = useState<ConfirmPopupExample | null>(null);
   const [activeBottomSheet, setActiveBottomSheet] = useState<BottomSheetExample | null>(null);
   const [isConfirmPopupLoading, setIsConfirmPopupLoading] = useState(false);
@@ -784,6 +797,48 @@ export const HomePage = () => {
           </SampleButton>
         </PopupSampleGrid>
         <CodeExamples examples={BOTTOM_SHEET_CODE_EXAMPLES} />
+      </ShowcaseSection>
+
+      <ShowcaseSection>
+        <SectionTitle>
+          <Text as="h2" font="heading-s-m">
+            Pagination
+          </Text>
+          <Text color="text.tertiary" font="detail-m-r">
+            Block window, prev/next
+          </Text>
+        </SectionTitle>
+        <PaginationSampleList>
+          <PaginationSampleRow>
+            <Text color="text.secondary" font="detail-m-r">
+              Interactive (12p, page {paginationPage})
+            </Text>
+            <Pagination
+              currentPage={paginationPage}
+              onChange={setPaginationPage}
+              totalPages={12}
+            />
+          </PaginationSampleRow>
+          <PaginationSampleRow>
+            <Text color="text.secondary" font="detail-m-r">
+              1 page
+            </Text>
+            <Pagination currentPage={1} onChange={() => {}} totalPages={1} />
+          </PaginationSampleRow>
+          <PaginationSampleRow>
+            <Text color="text.secondary" font="detail-m-r">
+              3 pages
+            </Text>
+            <Pagination currentPage={1} onChange={() => {}} totalPages={3} />
+          </PaginationSampleRow>
+          <PaginationSampleRow>
+            <Text color="text.secondary" font="detail-m-r">
+              Over 5 (page 6)
+            </Text>
+            <Pagination currentPage={6} onChange={() => {}} totalPages={12} />
+          </PaginationSampleRow>
+        </PaginationSampleList>
+        <CodeExamples examples={PAGINATION_CODE_EXAMPLES} />
       </ShowcaseSection>
 
       {activeConfirmPopupExample ? (
@@ -1166,6 +1221,18 @@ const InteractiveCheckBoxSample = styled.label`
   min-height: ${({ theme }) => theme.pxToRem(32)};
   gap: ${({ theme }) => theme.spacing.md};
   cursor: pointer;
+`;
+
+const PaginationSampleList = styled.div`
+  display: grid;
+  gap: ${({ theme }) => theme.spacing.lg};
+`;
+
+const PaginationSampleRow = styled.div`
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: ${({ theme }) => theme.spacing.lg};
 `;
 
 const PopupSampleGrid = styled.div`
