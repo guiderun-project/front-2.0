@@ -2,7 +2,8 @@ import type { ComponentPropsWithoutRef, ReactElement } from "react";
 
 import styled from "@emotion/styled";
 
-import { Icon } from "@/components/Icon";
+import { IconButton } from "@/components/Icon";
+import { Text } from "@/components/Text";
 
 const BLOCK_SIZE = 5;
 const ITEM_SIZE = 32;
@@ -55,19 +56,15 @@ export const Pagination = ({
     <Nav aria-label={ariaLabel} {...props}>
       <List>
         <li>
-          <ChevronButton
+          <IconButton
             aria-label="이전 페이지"
+            color="icon.secondary"
             disabled={isFirstPage}
+            icon="chevron-left-lined"
+            iconSize={CHEVRON_ICON_SIZE}
             onClick={() => goTo(currentPage - 1)}
-            type="button"
-          >
-            <Icon
-              aria-hidden={true}
-              color={isFirstPage ? "icon.disabled" : "icon.secondary"}
-              icon="chevron-left-lined"
-              size={CHEVRON_ICON_SIZE}
-            />
-          </ChevronButton>
+            size={ITEM_SIZE}
+          />
         </li>
 
         {visiblePages.map((page) => {
@@ -81,26 +78,27 @@ export const Pagination = ({
                 onClick={() => goTo(page)}
                 type="button"
               >
-                {page}
+                <Text
+                  color={isCurrent ? "text.inverse" : "text.secondary"}
+                  font={isCurrent ? "body-s-sb" : "body-s-m"}
+                >
+                  {page}
+                </Text>
               </PageButton>
             </li>
           );
         })}
 
         <li>
-          <ChevronButton
+          <IconButton
             aria-label="다음 페이지"
+            color="icon.secondary"
             disabled={isLastPage}
+            icon="chevron-right-lined"
+            iconSize={CHEVRON_ICON_SIZE}
             onClick={() => goTo(currentPage + 1)}
-            type="button"
-          >
-            <Icon
-              aria-hidden={true}
-              color={isLastPage ? "icon.disabled" : "icon.secondary"}
-              icon="chevron-right-lined"
-              size={CHEVRON_ICON_SIZE}
-            />
-          </ChevronButton>
+            size={ITEM_SIZE}
+          />
         </li>
       </List>
     </Nav>
@@ -134,43 +132,12 @@ const baseButton = `
   touch-action: manipulation;
 `;
 
-const ChevronButton = styled.button`
-  ${baseButton}
-  width: ${({ theme }) => theme.pxToRem(ITEM_SIZE)};
-  height: ${({ theme }) => theme.pxToRem(ITEM_SIZE)};
-  border-radius: ${({ theme }) => theme.radius.sm};
-  transition: background-color 120ms ease;
-
-  @media (hover: hover) {
-    &:hover:not(:disabled) {
-      background-color: ${({ theme }) => theme.color.bg.weak};
-    }
-  }
-
-  &:focus-visible {
-    outline: 2px solid ${({ theme }) => theme.color.border.focused};
-    outline-offset: ${({ theme }) => theme.spacing.xs};
-  }
-
-  &:disabled {
-    cursor: not-allowed;
-  }
-`;
-
 const PageButton = styled.button`
   ${baseButton}
   width: ${({ theme }) => theme.pxToRem(ITEM_SIZE)};
   height: ${({ theme }) => theme.pxToRem(ITEM_SIZE)};
   border-radius: ${({ theme }) => theme.radius.sm};
-  color: ${({ theme }) => theme.color.text.secondary};
-  font-family: ${({ theme }) => theme.typography["body-s-m"].fontFamily};
-  font-size: ${({ theme }) => theme.typography["body-s-m"].fontSize};
-  font-weight: ${({ theme }) => theme.typography["body-s-m"].fontWeight};
-  line-height: ${({ theme }) => theme.typography["body-s-m"].lineHeight};
-  letter-spacing: ${({ theme }) => theme.typography["body-s-m"].letterSpacing};
-  transition:
-    background-color 120ms ease,
-    color 120ms ease;
+  transition: background-color 120ms ease;
 
   @media (hover: hover) {
     &:hover:not([data-current="true"]) {
@@ -185,8 +152,6 @@ const PageButton = styled.button`
 
   &[data-current="true"] {
     background-color: ${({ theme }) => theme.color.bg.brand};
-    color: ${({ theme }) => theme.color.text.inverse};
-    font-weight: ${({ theme }) => theme.typography["body-s-sb"].fontWeight};
     cursor: default;
   }
 `;
