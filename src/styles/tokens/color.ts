@@ -225,6 +225,10 @@ export const primitiveColorTokenMap = {
 
 export type PrimitiveColorToken = keyof typeof primitiveColorTokenMap;
 
+type SemanticColorAliasGroup = {
+  readonly [key: string]: PrimitiveColorToken | SemanticColorAliasGroup;
+};
+
 export const semanticColorAliases = {
   light: {
     bg: {
@@ -234,7 +238,7 @@ export const semanticColorAliases = {
       elevated: 'primitive.neutral.0',
       brand: 'primitive.cyan.500',
       'brand-primary': 'primitive.cyan.400',
-      'brand-soft': 'primitive.cyan.50',
+      'brand-soft': 'primitive.cyan.500-a10',
       'dim-strong': 'primitive.neutral.950-a54',
       'light-strong': 'primitive.neutral.50-a32',
       'brand-subtle': 'primitive.cyan.500-a24',
@@ -397,180 +401,30 @@ export const semanticColorAliases = {
       },
     },
   },
-} as const;
+} as const satisfies Record<ColorMode, SemanticColorAliasGroup>;
 
-export const semanticColorModes = {
-  light: {
-    bg: {
-      default: '#FFFFFF',
-      subtle: '#F7F9FB',
-      surface: '#FFFFFF',
-      elevated: '#FFFFFF',
-      brand: '#009BDB',
-      'brand-primary': '#2BAFE0',
-      'brand-soft': '#EBFDFF',
-      'dim-strong': 'rgba(18, 24, 32, 0.54)',
-      'light-strong': 'rgba(247, 249, 251, 0.32)',
-      'brand-subtle': 'rgba(0, 155, 219, 0.24)',
-      'brand-soft2': 'rgba(43, 175, 224, 0.2)',
-      'brand-surface': '#0C5B7D',
-      'light-soft': 'rgba(255, 255, 255, 0.08)',
-      'dim-soft': 'rgba(18, 24, 32, 0.42)',
-      overlay: 'rgba(18, 24, 32, 0.18)',
-      dim: 'rgba(18, 24, 32, 0.54)',
-      weak: 'rgba(201, 210, 220, 0.24)',
-      'brand-weak': 'rgba(0, 155, 219, 0.1)',
-      'brand-weak2': 'rgba(0, 155, 219, 0.24)',
-      inverse: '#2F3947',
-    },
-    text: {
-      primary: '#151B23',
-      secondary: '#454F5C',
-      tertiary: '#7D8A9A',
-      quaternary: '#AEBBC9',
-      inverse: '#FFFFFF',
-      brand: '#009BDB',
-      disabled: 'rgba(18, 24, 32, 0.54)',
-      danger: '#F04438',
-      'brand-subtle': '#0C5B7D',
-    },
-    border: {
-      default: '#C9D2DC',
-      subtle: '#E0E6EC',
-      danger: '#F04438',
-      focused: 'rgba(0, 155, 219, 0.24)',
-      strong: 'rgba(18, 24, 32, 0.18)',
-      brand: '#009BDB',
-      primary: '#151B23',
-    },
-    profile: {
-      'team-a': '#C9532E',
-      'team-b': '#CE8E38',
-      'team-c': '#6C9D34',
-      'team-d': '#408797',
-      'team-e': '#3F6EBC',
-      vi: '#CB4670',
-      guide: '#5A5CD1',
-    },
-    icon: {
-      primary: '#151B23',
-      secondary: '#7D8A9A',
-      teritary: '#AEBBC9',
-      tertiary: '#AEBBC9',
-      inverse: '#FFFFFF',
-      brand: '#009BDB',
-      disabled: '#C9D2DC',
-      'brand-secondary': '#0C5B7D',
-    },
-    badge: {
-      bg: {
-        gray: 'rgba(51, 59, 70, 0.1)',
-        blue: 'rgba(0, 109, 255, 0.14)',
-        orange: 'rgba(255, 106, 0, 0.14)',
-        violet: 'rgba(124, 60, 255, 0.14)',
-        cyan: 'rgba(0, 155, 219, 0.1)',
-        green: 'rgba(24, 168, 30, 0.14)',
-        'solid-gray': '#7D8A9A',
-        'solid-cyan': '#009BDB',
-      },
-      text: {
-        gray: '#5D6876',
-        blue: '#0054D6',
-        orange: '#C24100',
-        violet: '#7627F5',
-        cyan: '#009BDB',
-        green: '#01830F',
-        primitive: '#FFFFFF',
-        cyan_2: '#026F99',
-      },
-    },
-  },
-  dark: {
-    bg: {
-      default: '#0E1319',
-      subtle: '#151B23',
-      surface: '#202933',
-      elevated: '#0E1319',
-      brand: '#2BAFE0',
-      'brand-primary': '#2BAFE0',
-      'brand-soft': 'rgba(43, 175, 224, 0.12)',
-      'dim-strong': 'rgba(18, 24, 32, 0.54)',
-      'light-strong': 'rgba(247, 249, 251, 0.32)',
-      'brand-subtle': 'rgba(43, 175, 224, 0.2)',
-      'brand-soft2': 'rgba(43, 175, 224, 0.2)',
-      'brand-surface': '#0C5B7D',
-      'light-soft': 'rgba(255, 255, 255, 0.08)',
-      'dim-soft': 'rgba(18, 24, 32, 0.42)',
-      overlay: 'rgba(255, 255, 255, 0.08)',
-      dim: 'rgba(18, 24, 32, 0.54)',
-      weak: 'rgba(247, 249, 251, 0.32)',
-      'brand-weak': 'rgba(43, 175, 224, 0.12)',
-      'brand-weak2': 'rgba(43, 175, 224, 0.2)',
-      inverse: '#EEF2F6',
-    },
-    text: {
-      primary: '#F7F9FB',
-      secondary: '#AEBBC9',
-      tertiary: '#7D8A9A',
-      quaternary: '#5D6876',
-      inverse: '#0E1319',
-      brand: '#2BAFE0',
-      disabled: 'rgba(18, 24, 32, 0.54)',
-      danger: '#FF6B61',
-      'brand-subtle': '#0C5B7D',
-    },
-    border: {
-      default: 'rgba(255, 255, 255, 0.16)',
-      subtle: 'rgba(255, 255, 255, 0.08)',
-      danger: '#FF6B61',
-      focused: 'rgba(43, 175, 224, 0.2)',
-      strong: 'rgba(255, 255, 255, 0.32)',
-      brand: '#2BAFE0',
-      primary: '#F7F9FB',
-    },
-    profile: {
-      'team-a': '#C9532E',
-      'team-b': '#CE8E38',
-      'team-c': '#6C9D34',
-      'team-d': '#408797',
-      'team-e': '#3F6EBC',
-      vi: '#CB4670',
-      guide: '#5A5CD1',
-    },
-    icon: {
-      primary: '#EEF2F6',
-      secondary: '#7D8A9A',
-      teritary: '#5D6876',
-      tertiary: '#5D6876',
-      inverse: '#202933',
-      brand: '#2BAFE0',
-      disabled: '#454F5C',
-      'brand-secondary': '#0C5B7D',
-    },
-    badge: {
-      bg: {
-        gray: 'rgba(255, 255, 255, 0.08)',
-        blue: 'rgba(0, 109, 255, 0.22)',
-        orange: 'rgba(255, 106, 0, 0.22)',
-        violet: 'rgba(124, 60, 255, 0.22)',
-        cyan: 'rgba(43, 175, 224, 0.2)',
-        green: 'rgba(24, 168, 30, 0.22)',
-        'solid-gray': '#5D6876',
-        'solid-cyan': '#009BDB',
-      },
-      text: {
-        gray: '#AEBBC9',
-        blue: '#8CC2FF',
-        orange: '#FF9A41',
-        violet: '#BC9CF5',
-        cyan: '#5ECCF0',
-        green: '#8AE694',
-        primitive: '#EEF2F6',
-        cyan_2: '#2BAFE0',
-      },
-    },
-  },
-} as const;
+type ResolvedSemanticColorAliases<T extends SemanticColorAliasGroup> = {
+  readonly [K in keyof T]: T[K] extends PrimitiveColorToken
+    ? (typeof primitiveColorTokenMap)[T[K]]
+    : T[K] extends SemanticColorAliasGroup
+      ? ResolvedSemanticColorAliases<T[K]>
+      : never;
+};
+
+const resolveSemanticColorAliases = <T extends SemanticColorAliasGroup>(
+  aliases: T,
+): ResolvedSemanticColorAliases<T> => {
+  const resolvedEntries = Object.entries(aliases).map(([key, value]) => [
+    key,
+    typeof value === 'string'
+      ? primitiveColorTokenMap[value]
+      : resolveSemanticColorAliases(value),
+  ]);
+
+  return Object.fromEntries(resolvedEntries) as ResolvedSemanticColorAliases<T>;
+};
+
+export const semanticColorModes = resolveSemanticColorAliases(semanticColorAliases);
 
 export const color = {
   bg: {
