@@ -47,8 +47,8 @@ const CheckBoxInput = styled.input`
     --checkbox-icon-opacity: 1;
     --checkbox-icon-scale: 1;
 
-    border-color: ${({ theme }) => theme.color.bg.brand};
-    background-color: ${({ theme }) => theme.color.bg.brand};
+    border-color: ${({ theme }) => theme.color.bg['brand-primary']};
+    background-color: ${({ theme }) => theme.color.bg['brand-primary']};
   }
 
   &:active:not(:disabled) + span {
