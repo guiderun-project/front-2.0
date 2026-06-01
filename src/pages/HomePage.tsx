@@ -4,6 +4,7 @@ import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
 import {
+  Badge,
   BottomSheet,
   CheckBox,
   CONFIRM_POPUP_VARIANT,
@@ -82,6 +83,36 @@ const TEXT_CODE_EXAMPLES = [
     code: `<Text color="text.secondary" font="body-s-r">
   Shared UI primitives currently available in the app.
 </Text>`,
+  },
+] as const;
+
+const BADGE_SOFT_TONE_EXAMPLES = [
+  { label: 'Neutral', tone: 'gray' },
+  { label: 'Orange', tone: 'orange' },
+  { label: 'Blue', tone: 'blue' },
+  { label: 'Violet', tone: 'violet' },
+  { label: 'Green', tone: 'green' },
+  { label: 'Cyan', tone: 'cyan' },
+  { label: 'Cyan', tone: 'cyan2' },
+] as const;
+
+const BADGE_SOLID_TONE_EXAMPLES = [
+  { label: 'Neutral', tone: 'gray' },
+  { label: 'Cyan', tone: 'cyan' },
+] as const;
+
+const BADGE_CODE_EXAMPLES = [
+  {
+    label: 'Soft',
+    code: `<Badge tone="orange" size="m">
+  Orange
+</Badge>`,
+  },
+  {
+    label: 'Solid',
+    code: `<Badge variant="solid" tone="cyan">
+  Cyan
+</Badge>`,
   },
 ] as const;
 
@@ -619,6 +650,68 @@ export const HomePage = () => {
       <ShowcaseSection>
         <SectionTitle>
           <Text as="h2" font="heading-s-m">
+            Badge
+          </Text>
+          <Text color="text.tertiary" font="detail-m-r">
+            Soft, solid, S/M
+          </Text>
+        </SectionTitle>
+        <BadgeShowcase>
+          <BadgeGroup>
+            <Text color="text.tertiary" font="detail-m-m">
+              Soft S
+            </Text>
+            <BadgeRow>
+              {BADGE_SOFT_TONE_EXAMPLES.map(({ label, tone }) => (
+                <Badge key={`soft-s-${tone}`} tone={tone}>
+                  {label}
+                </Badge>
+              ))}
+            </BadgeRow>
+          </BadgeGroup>
+          <BadgeGroup>
+            <Text color="text.tertiary" font="detail-m-m">
+              Soft M
+            </Text>
+            <BadgeRow>
+              {BADGE_SOFT_TONE_EXAMPLES.map(({ label, tone }) => (
+                <Badge key={`soft-m-${tone}`} size="m" tone={tone}>
+                  {label}
+                </Badge>
+              ))}
+            </BadgeRow>
+          </BadgeGroup>
+          <BadgeGroup>
+            <Text color="text.tertiary" font="detail-m-m">
+              Solid S
+            </Text>
+            <BadgeRow>
+              {BADGE_SOLID_TONE_EXAMPLES.map(({ label, tone }) => (
+                <Badge key={`solid-s-${tone}`} tone={tone} variant="solid">
+                  {label}
+                </Badge>
+              ))}
+            </BadgeRow>
+          </BadgeGroup>
+          <BadgeGroup>
+            <Text color="text.tertiary" font="detail-m-m">
+              Solid M
+            </Text>
+            <BadgeRow>
+              {BADGE_SOLID_TONE_EXAMPLES.map(({ label, tone }) => (
+                <Badge key={`solid-m-${tone}`} size="m" tone={tone} variant="solid">
+                  {label}
+                </Badge>
+              ))}
+            </BadgeRow>
+          </BadgeGroup>
+        </BadgeShowcase>
+        <CodeExamples examples={BADGE_CODE_EXAMPLES} />
+      </ShowcaseSection>
+
+      <ShowcaseSection>
+        <SectionTitle>
+          <Text as="h2" font="heading-s-m">
             Icon
           </Text>
           <Text color="text.tertiary" font="detail-m-r">
@@ -1127,6 +1220,23 @@ const TextRow = styled.div`
   align-items: baseline;
   gap: ${({ theme }) => theme.spacing.xl};
   min-height: ${({ theme }) => theme.pxToRem(32)};
+`;
+
+const BadgeShowcase = styled.div`
+  display: grid;
+  gap: ${({ theme }) => theme.spacing.lg};
+`;
+
+const BadgeGroup = styled.div`
+  display: grid;
+  gap: ${({ theme }) => theme.spacing.sm};
+`;
+
+const BadgeRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.sm};
 `;
 
 const IconTable = styled.div`
