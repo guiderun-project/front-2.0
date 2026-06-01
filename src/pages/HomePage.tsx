@@ -4,6 +4,7 @@ import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
 import {
+  Badge,
   BottomSheet,
   CheckBox,
   CONFIRM_POPUP_VARIANT,
@@ -11,6 +12,8 @@ import {
   Icon,
   IconButton,
   PageLayout,
+  Pagination,
+  RunnerTypeAvatar,
   Select,
   Text,
   type IconButtonShape,
@@ -82,6 +85,36 @@ const TEXT_CODE_EXAMPLES = [
     code: `<Text color="text.secondary" font="body-s-r">
   Shared UI primitives currently available in the app.
 </Text>`,
+  },
+] as const;
+
+const BADGE_SOFT_TONE_EXAMPLES = [
+  { label: 'Neutral', tone: 'gray' },
+  { label: 'Orange', tone: 'orange' },
+  { label: 'Blue', tone: 'blue' },
+  { label: 'Violet', tone: 'violet' },
+  { label: 'Green', tone: 'green' },
+  { label: 'Cyan', tone: 'cyan' },
+  { label: 'Cyan', tone: 'cyan2' },
+] as const;
+
+const BADGE_SOLID_TONE_EXAMPLES = [
+  { label: 'Neutral', tone: 'gray' },
+  { label: 'Cyan', tone: 'cyan' },
+] as const;
+
+const BADGE_CODE_EXAMPLES = [
+  {
+    label: 'Soft',
+    code: `<Badge tone="orange" size="m">
+  Orange
+</Badge>`,
+  },
+  {
+    label: 'Solid',
+    code: `<Badge variant="solid" tone="cyan">
+  Cyan
+</Badge>`,
   },
 ] as const;
 
@@ -248,6 +281,28 @@ const ICON_BUTTON_CODE_EXAMPLES = [
   shape="round"
   aria-label="추가"
 />`,
+  },
+] as const;
+
+const RUNNER_TYPE_AVATAR_SIZES = [
+  { label: 'S / 18px', size: 's' },
+  { label: 'M / 24px', size: 'm' },
+  { label: 'XL / 72px', size: 'xl' },
+] as const;
+
+const RUNNER_TYPE_AVATAR_EXAMPLES = [
+  { label: '시각장애러너', type: 'vi' },
+  { label: '가이드러너', type: 'guide' },
+] as const;
+
+const RUNNER_TYPE_AVATAR_CODE_EXAMPLES = [
+  {
+    label: 'Default size',
+    code: `<RunnerTypeAvatar type="vi" />`,
+  },
+  {
+    label: 'XL guide',
+    code: `<RunnerTypeAvatar type="guide" size="xl" />`,
   },
 ] as const;
 
@@ -477,6 +532,17 @@ type CodeExample = {
   code: string;
 };
 
+const PAGINATION_CODE_EXAMPLES = [
+  {
+    label: 'Controlled',
+    code: '<Pagination currentPage={page} totalPages={12} onChange={setPage} />',
+  },
+  {
+    label: 'Single page',
+    code: '<Pagination currentPage={1} totalPages={1} onChange={setPage} />',
+  },
+] as const;
+
 export const HomePage = () => {
   const [colorMode, setColorMode] = useState<ColorMode>('light');
   const [pageBackground, setPageBackground] = useState<PageLayoutBackground>('bg.subtle');
@@ -484,6 +550,7 @@ export const HomePage = () => {
   const [operationType, setOperationType] = useState<OperationType>();
   const [trainingType, setTrainingType] = useState<OperationType>();
   const [recruitmentStatus, setRecruitmentStatus] = useState<RecruitmentStatus>('open');
+  const [paginationPage, setPaginationPage] = useState(1);
   const [activeConfirmPopup, setActiveConfirmPopup] = useState<ConfirmPopupExample | null>(null);
   const [activeBottomSheet, setActiveBottomSheet] = useState<BottomSheetExample | null>(null);
   const [isConfirmPopupLoading, setIsConfirmPopupLoading] = useState(false);
@@ -655,6 +722,68 @@ export const HomePage = () => {
       <ShowcaseSection>
         <SectionTitle>
           <Text as="h2" font="heading-s-m">
+            Badge
+          </Text>
+          <Text color="text.tertiary" font="detail-m-r">
+            Soft, solid, S/M
+          </Text>
+        </SectionTitle>
+        <BadgeShowcase>
+          <BadgeGroup>
+            <Text color="text.tertiary" font="detail-m-m">
+              Soft S
+            </Text>
+            <BadgeRow>
+              {BADGE_SOFT_TONE_EXAMPLES.map(({ label, tone }) => (
+                <Badge key={`soft-s-${tone}`} tone={tone}>
+                  {label}
+                </Badge>
+              ))}
+            </BadgeRow>
+          </BadgeGroup>
+          <BadgeGroup>
+            <Text color="text.tertiary" font="detail-m-m">
+              Soft M
+            </Text>
+            <BadgeRow>
+              {BADGE_SOFT_TONE_EXAMPLES.map(({ label, tone }) => (
+                <Badge key={`soft-m-${tone}`} size="m" tone={tone}>
+                  {label}
+                </Badge>
+              ))}
+            </BadgeRow>
+          </BadgeGroup>
+          <BadgeGroup>
+            <Text color="text.tertiary" font="detail-m-m">
+              Solid S
+            </Text>
+            <BadgeRow>
+              {BADGE_SOLID_TONE_EXAMPLES.map(({ label, tone }) => (
+                <Badge key={`solid-s-${tone}`} tone={tone} variant="solid">
+                  {label}
+                </Badge>
+              ))}
+            </BadgeRow>
+          </BadgeGroup>
+          <BadgeGroup>
+            <Text color="text.tertiary" font="detail-m-m">
+              Solid M
+            </Text>
+            <BadgeRow>
+              {BADGE_SOLID_TONE_EXAMPLES.map(({ label, tone }) => (
+                <Badge key={`solid-m-${tone}`} size="m" tone={tone} variant="solid">
+                  {label}
+                </Badge>
+              ))}
+            </BadgeRow>
+          </BadgeGroup>
+        </BadgeShowcase>
+        <CodeExamples examples={BADGE_CODE_EXAMPLES} />
+      </ShowcaseSection>
+
+      <ShowcaseSection>
+        <SectionTitle>
+          <Text as="h2" font="heading-s-m">
             Select
           </Text>
           <Text color="text.tertiary" font="detail-m-r">
@@ -786,6 +915,42 @@ export const HomePage = () => {
       <ShowcaseSection>
         <SectionTitle>
           <Text as="h2" font="heading-s-m">
+            RunnerTypeAvatar
+          </Text>
+          <Text color="text.tertiary" font="detail-m-r">
+            VI / Guide, S / M / XL
+          </Text>
+        </SectionTitle>
+        <RunnerTypeAvatarTable>
+          <RunnerTypeAvatarTableHeader>
+            <Text color="text.tertiary" font="detail-m-m">
+              Type
+            </Text>
+            {RUNNER_TYPE_AVATAR_SIZES.map(({ label, size }) => (
+              <Text key={size} align="center" color="text.tertiary" font="detail-m-m">
+                {label}
+              </Text>
+            ))}
+          </RunnerTypeAvatarTableHeader>
+          {RUNNER_TYPE_AVATAR_EXAMPLES.map(({ label, type }) => (
+            <RunnerTypeAvatarTableRow key={type}>
+              <Text color="text.secondary" font="detail-m-r">
+                {label}
+              </Text>
+              {RUNNER_TYPE_AVATAR_SIZES.map(({ size }) => (
+                <RunnerTypeAvatarCell key={`${type}-${size}`}>
+                  <RunnerTypeAvatar size={size} type={type} />
+                </RunnerTypeAvatarCell>
+              ))}
+            </RunnerTypeAvatarTableRow>
+          ))}
+        </RunnerTypeAvatarTable>
+        <CodeExamples examples={RUNNER_TYPE_AVATAR_CODE_EXAMPLES} />
+      </ShowcaseSection>
+
+      <ShowcaseSection>
+        <SectionTitle>
+          <Text as="h2" font="heading-s-m">
             CheckBox
           </Text>
           <Text color="text.tertiary" font="detail-m-r">
@@ -859,6 +1024,48 @@ export const HomePage = () => {
           </SampleButton>
         </PopupSampleGrid>
         <CodeExamples examples={BOTTOM_SHEET_CODE_EXAMPLES} />
+      </ShowcaseSection>
+
+      <ShowcaseSection>
+        <SectionTitle>
+          <Text as="h2" font="heading-s-m">
+            Pagination
+          </Text>
+          <Text color="text.tertiary" font="detail-m-r">
+            Block window, prev/next
+          </Text>
+        </SectionTitle>
+        <PaginationSampleList>
+          <PaginationSampleRow>
+            <Text color="text.secondary" font="detail-m-r">
+              Interactive (12p, page {paginationPage})
+            </Text>
+            <Pagination
+              currentPage={paginationPage}
+              onChange={setPaginationPage}
+              totalPages={12}
+            />
+          </PaginationSampleRow>
+          <PaginationSampleRow>
+            <Text color="text.secondary" font="detail-m-r">
+              1 page
+            </Text>
+            <Pagination currentPage={1} onChange={() => {}} totalPages={1} />
+          </PaginationSampleRow>
+          <PaginationSampleRow>
+            <Text color="text.secondary" font="detail-m-r">
+              3 pages
+            </Text>
+            <Pagination currentPage={1} onChange={() => {}} totalPages={3} />
+          </PaginationSampleRow>
+          <PaginationSampleRow>
+            <Text color="text.secondary" font="detail-m-r">
+              Over 5 (page 6)
+            </Text>
+            <Pagination currentPage={6} onChange={() => {}} totalPages={12} />
+          </PaginationSampleRow>
+        </PaginationSampleList>
+        <CodeExamples examples={PAGINATION_CODE_EXAMPLES} />
       </ShowcaseSection>
 
       {activeConfirmPopupExample ? (
@@ -1149,6 +1356,23 @@ const TextRow = styled.div`
   min-height: ${({ theme }) => theme.pxToRem(32)};
 `;
 
+const BadgeShowcase = styled.div`
+  display: grid;
+  gap: ${({ theme }) => theme.spacing.lg};
+`;
+
+const BadgeGroup = styled.div`
+  display: grid;
+  gap: ${({ theme }) => theme.spacing.sm};
+`;
+
+const BadgeRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.sm};
+`;
+
 const IconTable = styled.div`
   display: grid;
   gap: ${({ theme }) => theme.spacing.sm};
@@ -1190,6 +1414,35 @@ const IconButtonSample = styled.div`
   gap: ${({ theme }) => theme.spacing.sm};
 `;
 
+const RunnerTypeAvatarTable = styled.div`
+  display: grid;
+  gap: ${({ theme }) => theme.spacing.sm};
+  overflow-x: auto;
+`;
+
+const RunnerTypeAvatarTableHeader = styled.div`
+  display: grid;
+  grid-template-columns: minmax(${({ theme }) => theme.pxToRem(140)}, 1fr) repeat(3, ${({ theme }) => theme.pxToRem(96)});
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.md};
+  min-width: ${({ theme }) => theme.pxToRem(440)};
+`;
+
+const RunnerTypeAvatarTableRow = styled.div`
+  display: grid;
+  grid-template-columns: minmax(${({ theme }) => theme.pxToRem(140)}, 1fr) repeat(3, ${({ theme }) => theme.pxToRem(96)});
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.md};
+  min-width: ${({ theme }) => theme.pxToRem(440)};
+  min-height: ${({ theme }) => theme.pxToRem(88)};
+`;
+
+const RunnerTypeAvatarCell = styled.div`
+  display: grid;
+  min-height: ${({ theme }) => theme.pxToRem(76)};
+  place-items: center;
+`;
+
 const CheckBoxGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, ${({ theme }) => theme.pxToRem(180)}), 1fr));
@@ -1212,6 +1465,18 @@ const InteractiveCheckBoxSample = styled.label`
   min-height: ${({ theme }) => theme.pxToRem(32)};
   gap: ${({ theme }) => theme.spacing.md};
   cursor: pointer;
+`;
+
+const PaginationSampleList = styled.div`
+  display: grid;
+  gap: ${({ theme }) => theme.spacing.lg};
+`;
+
+const PaginationSampleRow = styled.div`
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: ${({ theme }) => theme.spacing.lg};
 `;
 
 const PopupSampleGrid = styled.div`
