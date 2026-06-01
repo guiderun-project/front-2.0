@@ -24,7 +24,7 @@ const Panel = styled.section`
   border-radius: 32px;
   background: ${({ theme }) => theme.color.bg.elevated};
   border: 1px solid ${({ theme }) => theme.color.border.subtle};
-  box-shadow: 0 18px 50px ${({ theme }) => theme.color.bg.weak};
+  box-shadow: 0 18px 50px ${({ theme }) => theme.color.bg.overlay};
 `;
 
 const Title = styled.h2`
@@ -43,7 +43,7 @@ const RouteChip = styled.code`
   width: fit-content;
   padding: 10px 14px;
   border-radius: ${({ theme }) => theme.radius.full};
-  background: ${({ theme }) => theme.color.bg.weak};
+  background: ${({ theme }) => theme.color.bg.overlay};
   color: ${({ theme }) => theme.color.text.primary};
   font-size: 0.92rem;
 `;

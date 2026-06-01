@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 
-import { color, colorModeCssVariables } from './tokens';
+import { color, colorModeCssVariables, gradientModeCssVariables } from './tokens';
 
 export const globalStyles = css`
   @font-face {
@@ -22,16 +22,19 @@ export const globalStyles = css`
   :root,
   :root[data-color-mode='light'] {
     ${colorModeCssVariables.light}
+    ${gradientModeCssVariables.light}
   }
 
   @media (prefers-color-scheme: dark) {
     :root:not([data-color-mode='light']) {
       ${colorModeCssVariables.dark}
+      ${gradientModeCssVariables.dark}
     }
   }
 
   :root[data-color-mode='dark'] {
     ${colorModeCssVariables.dark}
+    ${gradientModeCssVariables.dark}
   }
 
   :root {
@@ -77,6 +80,6 @@ export const globalStyles = css`
   }
 
   ::selection {
-    background: ${color.bg.weak};
+    background: ${color.bg.overlay};
   }
 `;
