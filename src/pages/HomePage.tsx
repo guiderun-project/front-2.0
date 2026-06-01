@@ -12,6 +12,7 @@ import {
   IconButton,
   PageLayout,
   Pagination,
+  RunnerTypeAvatar,
   Text,
   type IconButtonShape,
   type IconName,
@@ -247,6 +248,28 @@ const ICON_BUTTON_CODE_EXAMPLES = [
   shape="round"
   aria-label="추가"
 />`,
+  },
+] as const;
+
+const RUNNER_TYPE_AVATAR_SIZES = [
+  { label: 'S / 18px', size: 's' },
+  { label: 'M / 24px', size: 'm' },
+  { label: 'XL / 72px', size: 'xl' },
+] as const;
+
+const RUNNER_TYPE_AVATAR_EXAMPLES = [
+  { label: '시각장애러너', type: 'vi' },
+  { label: '가이드러너', type: 'guide' },
+] as const;
+
+const RUNNER_TYPE_AVATAR_CODE_EXAMPLES = [
+  {
+    label: 'Default size',
+    code: `<RunnerTypeAvatar type="vi" />`,
+  },
+  {
+    label: 'XL guide',
+    code: `<RunnerTypeAvatar type="guide" size="xl" />`,
   },
 ] as const;
 
@@ -660,6 +683,42 @@ export const HomePage = () => {
           )}
         </IconButtonGrid>
         <CodeExamples examples={ICON_BUTTON_CODE_EXAMPLES} />
+      </ShowcaseSection>
+
+      <ShowcaseSection>
+        <SectionTitle>
+          <Text as="h2" font="heading-s-m">
+            RunnerTypeAvatar
+          </Text>
+          <Text color="text.tertiary" font="detail-m-r">
+            VI / Guide, S / M / XL
+          </Text>
+        </SectionTitle>
+        <RunnerTypeAvatarTable>
+          <RunnerTypeAvatarTableHeader>
+            <Text color="text.tertiary" font="detail-m-m">
+              Type
+            </Text>
+            {RUNNER_TYPE_AVATAR_SIZES.map(({ label, size }) => (
+              <Text key={size} align="center" color="text.tertiary" font="detail-m-m">
+                {label}
+              </Text>
+            ))}
+          </RunnerTypeAvatarTableHeader>
+          {RUNNER_TYPE_AVATAR_EXAMPLES.map(({ label, type }) => (
+            <RunnerTypeAvatarTableRow key={type}>
+              <Text color="text.secondary" font="detail-m-r">
+                {label}
+              </Text>
+              {RUNNER_TYPE_AVATAR_SIZES.map(({ size }) => (
+                <RunnerTypeAvatarCell key={`${type}-${size}`}>
+                  <RunnerTypeAvatar size={size} type={type} />
+                </RunnerTypeAvatarCell>
+              ))}
+            </RunnerTypeAvatarTableRow>
+          ))}
+        </RunnerTypeAvatarTable>
+        <CodeExamples examples={RUNNER_TYPE_AVATAR_CODE_EXAMPLES} />
       </ShowcaseSection>
 
       <ShowcaseSection>
@@ -1109,6 +1168,35 @@ const IconButtonSample = styled.div`
   display: inline-grid;
   justify-items: center;
   gap: ${({ theme }) => theme.spacing.sm};
+`;
+
+const RunnerTypeAvatarTable = styled.div`
+  display: grid;
+  gap: ${({ theme }) => theme.spacing.sm};
+  overflow-x: auto;
+`;
+
+const RunnerTypeAvatarTableHeader = styled.div`
+  display: grid;
+  grid-template-columns: minmax(${({ theme }) => theme.pxToRem(140)}, 1fr) repeat(3, ${({ theme }) => theme.pxToRem(96)});
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.md};
+  min-width: ${({ theme }) => theme.pxToRem(440)};
+`;
+
+const RunnerTypeAvatarTableRow = styled.div`
+  display: grid;
+  grid-template-columns: minmax(${({ theme }) => theme.pxToRem(140)}, 1fr) repeat(3, ${({ theme }) => theme.pxToRem(96)});
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.md};
+  min-width: ${({ theme }) => theme.pxToRem(440)};
+  min-height: ${({ theme }) => theme.pxToRem(88)};
+`;
+
+const RunnerTypeAvatarCell = styled.div`
+  display: grid;
+  min-height: ${({ theme }) => theme.pxToRem(76)};
+  place-items: center;
 `;
 
 const CheckBoxGrid = styled.div`
