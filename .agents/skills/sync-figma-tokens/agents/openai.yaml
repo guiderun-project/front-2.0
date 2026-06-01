@@ -1,0 +1,7 @@
+interface:
+  display_name: "Sync Figma Tokens"
+  short_description: "Sync Figma variables into code tokens"
+  default_prompt: "Use $sync-figma-tokens to compare Figma variables with local style tokens and update the code tokens."
+
+policy:
+  allow_implicit_invocation: true
