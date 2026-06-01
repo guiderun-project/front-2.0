@@ -127,7 +127,7 @@ const ICON_EXAMPLES: ReadonlyArray<{ icon: IconName; color?: ColorToken }> = [
   { icon: 'delete-lined', color: 'text.danger' },
   { icon: 'download-lined', color: 'icon.secondary' },
   { icon: 'edit-lined', color: 'icon.secondary' },
-  { icon: 'help-circle-filled', color: 'bg.brand' },
+  { icon: 'help-circle-filled', color: 'bg.brand-primary' },
   { icon: 'home-filled' },
   { icon: 'home-lined' },
   { icon: 'link-lined', color: 'text.brand' },
@@ -183,20 +183,20 @@ const ICON_BUTTON_EXAMPLES: ReadonlyArray<{
   { ariaLabel: '뒤로가기', icon: 'chevron-left-lined', iconSize: 24, label: '24 bare' },
   {
     ariaLabel: '검색',
-    background: 'bg.brand-weak',
+    background: 'bg.brand-soft',
     color: 'text.brand',
     icon: 'search-lined',
     iconSize: 18,
-    label: '32 brand weak',
+    label: '32 brand soft',
     size: 32,
   },
   {
     ariaLabel: '추가',
-    background: 'bg.brand',
+    background: 'bg.brand-primary',
     color: 'text.inverse',
     icon: 'plus-lined',
     iconSize: 20,
-    label: '40 brand',
+    label: '40 brand primary',
     shape: 'round',
     size: 40,
   },
@@ -211,7 +211,7 @@ const ICON_BUTTON_EXAMPLES: ReadonlyArray<{
   },
   {
     ariaLabel: '공유',
-    background: 'bg.brand-weak2',
+    background: 'bg.brand-soft2',
     color: 'text.brand',
     icon: 'share-lined',
     iconSize: 18,
@@ -221,11 +221,11 @@ const ICON_BUTTON_EXAMPLES: ReadonlyArray<{
   },
   {
     ariaLabel: '완료',
-    background: 'bg.inverse',
+    background: 'text.primary',
     color: 'text.inverse',
     icon: 'check-lined',
     iconSize: 18,
-    label: '36 inverse',
+    label: '36 contrast',
     shape: 'round',
     size: 36,
   },
@@ -275,7 +275,7 @@ const ICON_BUTTON_CODE_EXAMPLES = [
   size={40}
   iconSize={20}
   color="text.inverse"
-  background="bg.brand"
+  background="bg.brand-primary"
   shape="round"
   aria-label="추가"
 />`,
@@ -1431,7 +1431,7 @@ const BottomSheetFooterButton = styled.button`
   border: 1px solid ${({ theme }) => theme.color.border.brand};
   border-radius: ${({ theme }) => theme.radius.md};
   color: ${({ theme }) => theme.color.text.inverse};
-  background: ${({ theme }) => theme.color.bg.brand};
+  background: ${({ theme }) => theme.color.bg['brand-primary']};
   cursor: pointer;
   ${({ theme }) => theme.typography['body-l-b']}
   transition:

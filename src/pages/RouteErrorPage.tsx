@@ -43,7 +43,7 @@ const Card = styled.div`
   border-radius: 28px;
   background: ${({ theme }) => theme.color.bg.elevated};
   border: 1px solid ${({ theme }) => theme.color.border.subtle};
-  box-shadow: 0 18px 60px ${({ theme }) => theme.color.bg.weak};
+  box-shadow: 0 18px 60px ${({ theme }) => theme.color.bg.overlay};
 `;
 
 const Title = styled.h2`
@@ -59,6 +59,6 @@ const BackLink = styled(Link)`
   width: fit-content;
   padding: 10px ${({ theme }) => theme.spacing.xl};
   border-radius: ${({ theme }) => theme.radius.full};
-  background: ${({ theme }) => theme.color.bg.inverse};
+  background: ${({ theme }) => theme.color.text.primary};
   color: ${({ theme }) => theme.color.text.inverse};
 `;

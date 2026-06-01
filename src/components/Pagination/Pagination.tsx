@@ -141,7 +141,7 @@ const PageButton = styled.button`
 
   @media (hover: hover) {
     &:hover:not([data-current="true"]) {
-      background-color: ${({ theme }) => theme.color.bg.weak};
+      background-color: ${({ theme }) => theme.color.bg.overlay};
     }
   }
 
@@ -151,7 +151,7 @@ const PageButton = styled.button`
   }
 
   &[data-current="true"] {
-    background-color: ${({ theme }) => theme.color.bg.brand};
+    background-color: ${({ theme }) => theme.color.bg['brand-primary']};
     cursor: default;
   }
 `;

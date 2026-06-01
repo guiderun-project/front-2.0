@@ -80,6 +80,6 @@ export const globalStyles = css`
   }
 
   ::selection {
-    background: ${color.bg.weak};
+    background: ${color.bg.overlay};
   }
 `;
