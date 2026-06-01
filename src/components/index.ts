@@ -7,5 +7,6 @@ export * from "./Icon";
 export * from "./PageLayout";
 export * from "./Pagination";
 export * from "./Popup";
+export * from "./Radio";
 export * from "./RunnerTypeAvatar";
 export * from "./Text";
