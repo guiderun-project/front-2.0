@@ -14,6 +14,7 @@ import {
   PageLayout,
   Pagination,
   RunnerTypeAvatar,
+  Tabs,
   Text,
   type IconButtonShape,
   type IconName,
@@ -333,6 +334,153 @@ const CHECKBOX_CODE_EXAMPLES = [
   },
 ] as const;
 
+const TABS_EQUAL_ITEMS = [
+  {
+    id: 'all',
+    label: '전체',
+    title: '전체 러닝',
+    description: '신청 가능 여부와 관계없이 모든 러닝을 보여줍니다.',
+  },
+  {
+    id: 'recruiting',
+    label: '모집중',
+    title: '모집중 러닝',
+    description: '지금 참가 신청을 받을 수 있는 러닝만 모아봅니다.',
+  },
+  {
+    id: 'closed',
+    label: '마감',
+    title: '마감된 러닝',
+    description: '모집이 마감되었거나 종료된 러닝을 확인합니다.',
+  },
+] as const;
+
+const TABS_SCROLLABLE_ITEMS = [
+  { id: 'week-1', label: '1주차', title: '1주차 러닝' },
+  { id: 'week-2', label: '2주차', title: '2주차 러닝' },
+  { id: 'week-3', label: '3주차', title: '3주차 러닝' },
+  { id: 'week-4', label: '4주차', title: '4주차 러닝' },
+  { id: 'week-5', label: '5주차', title: '5주차 러닝' },
+  { id: 'week-6', label: '6주차', title: '6주차 러닝' },
+  { id: 'week-7', label: '7주차', title: '7주차 러닝' },
+  { id: 'week-8', label: '8주차', title: '8주차 러닝' },
+] as const;
+
+const TABS_COMPACT_ITEMS = [
+  {
+    id: 'summary',
+    isDisabled: false,
+    label: '요약',
+    title: '요약',
+    description: '중요한 운영 지표를 빠르게 확인합니다.',
+  },
+  {
+    id: 'members',
+    isDisabled: false,
+    label: '멤버',
+    title: '멤버',
+    description: '참여 멤버와 역할 정보를 확인합니다.',
+  },
+  {
+    id: 'archive',
+    isDisabled: true,
+    label: '보관함',
+    title: '보관함',
+    description: '비활성 탭은 키보드 이동과 선택 대상에서 제외됩니다.',
+  },
+] as const;
+
+const TABS_KEEP_MOUNTED_ITEMS = [
+  {
+    id: 'memo',
+    label: '메모',
+    title: '메모',
+    placeholder: '탭을 이동해도 입력값이 유지됩니다.',
+  },
+  {
+    id: 'checklist',
+    label: '체크리스트',
+    title: '체크리스트',
+    placeholder: '준비물을 적어보세요.',
+  },
+] as const;
+
+const TABS_CODE_EXAMPLES = [
+  {
+    label: 'Equal panels',
+    code: `<Tabs
+  aria-label="러닝 상태"
+  selectedKey={status}
+  onSelectionChange={(key) => setStatus(String(key))}
+>
+  <Tabs.List>
+    <Tabs.Tab id="all">전체</Tabs.Tab>
+    <Tabs.Tab id="recruiting">모집중</Tabs.Tab>
+    <Tabs.Tab id="closed">마감</Tabs.Tab>
+  </Tabs.List>
+
+  <Tabs.Panels>
+    <Tabs.Panel id="all">
+      <EventList status="all" />
+    </Tabs.Panel>
+    <Tabs.Panel id="recruiting">
+      <EventList status="recruiting" />
+    </Tabs.Panel>
+    <Tabs.Panel id="closed">
+      <EventList status="closed" />
+    </Tabs.Panel>
+  </Tabs.Panels>
+</Tabs>`,
+  },
+  {
+    label: 'Scrollable panels',
+    code: `<Tabs
+  aria-label="주차별 러닝"
+  layout="scrollable"
+  selectedKey={week}
+  onSelectionChange={(key) => setWeek(String(key))}
+>
+  <Tabs.List>
+    {weeks.map((week) => (
+      <Tabs.Tab key={week.id} id={week.id}>
+        {week.label}
+      </Tabs.Tab>
+    ))}
+  </Tabs.List>
+
+  <Tabs.Panels>
+    {weeks.map((week) => (
+      <Tabs.Panel key={week.id} id={week.id}>
+        <WeekSchedule week={week.id} />
+      </Tabs.Panel>
+    ))}
+  </Tabs.Panels>
+</Tabs>`,
+  },
+  {
+    label: 'keepMounted panel',
+    code: `<Tabs
+  aria-label="작성 정보"
+  selectedKey={section}
+  onSelectionChange={(key) => setSection(String(key))}
+>
+  <Tabs.List>
+    <Tabs.Tab id="memo">메모</Tabs.Tab>
+    <Tabs.Tab id="checklist">체크리스트</Tabs.Tab>
+  </Tabs.List>
+
+  <Tabs.Panels>
+    <Tabs.Panel id="memo" keepMounted>
+      <MemoField />
+    </Tabs.Panel>
+    <Tabs.Panel id="checklist" keepMounted>
+      <ChecklistField />
+    </Tabs.Panel>
+  </Tabs.Panels>
+</Tabs>`,
+  },
+] as const;
+
 const CONFIRM_POPUP_CODE_EXAMPLES = [
   {
     label: 'Default',
@@ -478,6 +626,10 @@ export const HomePage = () => {
   const [colorMode, setColorMode] = useState<ColorMode>('light');
   const [pageBackground, setPageBackground] = useState<PageLayoutBackground>('bg.subtle');
   const [isCheckBoxSelected, setIsCheckBoxSelected] = useState(false);
+  const [equalTabKey, setEqualTabKey] = useState('all');
+  const [scrollableTabKey, setScrollableTabKey] = useState('week-4');
+  const [compactTabKey, setCompactTabKey] = useState('summary');
+  const [keepMountedTabKey, setKeepMountedTabKey] = useState('memo');
   const [paginationPage, setPaginationPage] = useState(1);
   const [activeConfirmPopup, setActiveConfirmPopup] = useState<ConfirmPopupExample | null>(null);
   const [activeBottomSheet, setActiveBottomSheet] = useState<BottomSheetExample | null>(null);
@@ -841,6 +993,159 @@ export const HomePage = () => {
           <Text font="body-s-r">Interactive sample</Text>
         </InteractiveCheckBoxSample>
         <CodeExamples examples={CHECKBOX_CODE_EXAMPLES} />
+      </ShowcaseSection>
+
+      <ShowcaseSection>
+        <SectionTitle>
+          <Text as="h2" font="heading-s-m">
+            Tabs
+          </Text>
+          <Text color="text.tertiary" font="detail-m-r">
+            Panels, scrollable, keepMounted
+          </Text>
+        </SectionTitle>
+        <TabsShowcase>
+          <TabsExampleGroup>
+            <Text color="text.tertiary" font="detail-m-m">
+              Full width equal
+            </Text>
+            <Tabs
+              aria-label="러닝 상태"
+              selectedKey={equalTabKey}
+              onSelectionChange={(key) => setEqualTabKey(String(key))}
+            >
+              <Tabs.List>
+                {TABS_EQUAL_ITEMS.map(({ id, label }) => (
+                  <Tabs.Tab id={id} key={id}>
+                    {label}
+                  </Tabs.Tab>
+                ))}
+              </Tabs.List>
+              <Tabs.Panels>
+                {TABS_EQUAL_ITEMS.map(({ description, id, title }) => (
+                  <Tabs.Panel id={id} key={id}>
+                    <TabsPanelContent>
+                      <Text font="body-s-m">{title}</Text>
+                      <Text color="text.secondary" font="detail-m-r">
+                        {description}
+                      </Text>
+                    </TabsPanelContent>
+                  </Tabs.Panel>
+                ))}
+              </Tabs.Panels>
+            </Tabs>
+          </TabsExampleGroup>
+
+          <TabsExampleGroup>
+            <Text color="text.tertiary" font="detail-m-m">
+              Full width scrollable
+            </Text>
+            <Tabs
+              aria-label="주차별 러닝"
+              layout="scrollable"
+              selectedKey={scrollableTabKey}
+              onSelectionChange={(key) => setScrollableTabKey(String(key))}
+            >
+              <Tabs.List>
+                {TABS_SCROLLABLE_ITEMS.map(({ id, label }) => (
+                  <Tabs.Tab id={id} key={id}>
+                    {label}
+                  </Tabs.Tab>
+                ))}
+              </Tabs.List>
+              <Tabs.Panels>
+                {TABS_SCROLLABLE_ITEMS.map(({ id, title }) => (
+                  <Tabs.Panel id={id} key={id}>
+                    <TabsPanelContent>
+                      <Text font="body-s-m">{title}</Text>
+                      <TabsPanelList>
+                        <TabsPanelItem>
+                          <Text color="text.tertiary" font="detail-m-m">
+                            시간
+                          </Text>
+                          <Text color="text.secondary" font="detail-m-r">
+                            토요일 오전 8:00
+                          </Text>
+                        </TabsPanelItem>
+                        <TabsPanelItem>
+                          <Text color="text.tertiary" font="detail-m-m">
+                            코스
+                          </Text>
+                          <Text color="text.secondary" font="detail-m-r">
+                            한강공원 5km
+                          </Text>
+                        </TabsPanelItem>
+                      </TabsPanelList>
+                    </TabsPanelContent>
+                  </Tabs.Panel>
+                ))}
+              </Tabs.Panels>
+            </Tabs>
+          </TabsExampleGroup>
+
+          <TabsExampleGroup>
+            <Text color="text.tertiary" font="detail-m-m">
+              Hug width and disabled
+            </Text>
+            <Tabs
+              aria-label="운영 정보"
+              fullWidth={false}
+              layout="hug"
+              selectedKey={compactTabKey}
+              onSelectionChange={(key) => setCompactTabKey(String(key))}
+            >
+              <Tabs.List>
+                {TABS_COMPACT_ITEMS.map(({ id, isDisabled, label }) => (
+                  <Tabs.Tab id={id} isDisabled={isDisabled} key={id}>
+                    {label}
+                  </Tabs.Tab>
+                ))}
+              </Tabs.List>
+              <Tabs.Panels>
+                {TABS_COMPACT_ITEMS.map(({ description, id, title }) => (
+                  <Tabs.Panel id={id} key={id}>
+                    <TabsPanelContent>
+                      <Text font="body-s-m">{title}</Text>
+                      <Text color="text.secondary" font="detail-m-r">
+                        {description}
+                      </Text>
+                    </TabsPanelContent>
+                  </Tabs.Panel>
+                ))}
+              </Tabs.Panels>
+            </Tabs>
+          </TabsExampleGroup>
+
+          <TabsExampleGroup>
+            <Text color="text.tertiary" font="detail-m-m">
+              keepMounted panels
+            </Text>
+            <Tabs
+              aria-label="작성 정보"
+              selectedKey={keepMountedTabKey}
+              onSelectionChange={(key) => setKeepMountedTabKey(String(key))}
+            >
+              <Tabs.List>
+                {TABS_KEEP_MOUNTED_ITEMS.map(({ id, label }) => (
+                  <Tabs.Tab id={id} key={id}>
+                    {label}
+                  </Tabs.Tab>
+                ))}
+              </Tabs.List>
+              <Tabs.Panels>
+                {TABS_KEEP_MOUNTED_ITEMS.map(({ id, placeholder, title }) => (
+                  <Tabs.Panel id={id} keepMounted key={id}>
+                    <TabsPanelContent>
+                      <Text font="body-s-m">{title}</Text>
+                      <TabsDemoInput aria-label={`${title} 입력`} placeholder={placeholder} />
+                    </TabsPanelContent>
+                  </Tabs.Panel>
+                ))}
+              </Tabs.Panels>
+            </Tabs>
+          </TabsExampleGroup>
+        </TabsShowcase>
+        <CodeExamples examples={TABS_CODE_EXAMPLES} />
       </ShowcaseSection>
 
       <ShowcaseSection>
@@ -1331,6 +1636,56 @@ const InteractiveCheckBoxSample = styled.label`
   min-height: ${({ theme }) => theme.pxToRem(32)};
   gap: ${({ theme }) => theme.spacing.md};
   cursor: pointer;
+`;
+
+const TabsShowcase = styled.div`
+  display: grid;
+  gap: ${({ theme }) => theme.spacing.xl};
+`;
+
+const TabsExampleGroup = styled.div`
+  display: grid;
+  gap: ${({ theme }) => theme.spacing.sm};
+  min-width: 0;
+`;
+
+const TabsPanelContent = styled.div`
+  display: grid;
+  gap: ${({ theme }) => theme.spacing.sm};
+  min-width: 0;
+  padding: ${({ theme }) => `${theme.spacing.xl} ${theme.spacing['2xl']} ${theme.spacing.none}`};
+`;
+
+const TabsPanelList = styled.div`
+  display: grid;
+  gap: ${({ theme }) => theme.spacing.xs};
+`;
+
+const TabsPanelItem = styled.div`
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: ${({ theme }) => theme.spacing.md};
+`;
+
+const TabsDemoInput = styled.input`
+  width: 100%;
+  min-height: ${({ theme }) => theme.pxToRem(44)};
+  padding: ${({ theme }) => `${theme.spacing.md} ${theme.spacing.lg}`};
+  border: 1px solid ${({ theme }) => theme.color.border.subtle};
+  border-radius: ${({ theme }) => theme.radius.sm};
+  color: ${({ theme }) => theme.color.text.primary};
+  background: ${({ theme }) => theme.color.bg.default};
+  ${({ theme }) => theme.typography['body-s-r']}
+
+  &::placeholder {
+    color: ${({ theme }) => theme.color.text.tertiary};
+  }
+
+  &:focus {
+    outline: 2px solid ${({ theme }) => theme.color.border.focused};
+    outline-offset: ${({ theme }) => theme.spacing.xs};
+  }
 `;
 
 const PaginationSampleList = styled.div`

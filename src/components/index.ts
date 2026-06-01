@@ -8,4 +8,5 @@ export * from "./PageLayout";
 export * from "./Pagination";
 export * from "./Popup";
 export * from "./RunnerTypeAvatar";
+export * from "./Tabs";
 export * from "./Text";
