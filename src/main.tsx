@@ -7,6 +7,7 @@ import { RouterProvider } from 'react-router-dom';
 
 import { baseURL } from '@/api/core/client';
 import { router } from '@/router/router';
+import { ColorModeProvider } from '@/styles/colorMode';
 import { globalStyles } from '@/styles/globalStyles';
 import { theme } from '@/styles/theme';
 
@@ -47,7 +48,9 @@ const bootstrap = async () => {
       <QueryClientProvider client={queryClient}>
         <ThemeProvider theme={theme}>
           <Global styles={globalStyles} />
-          <RouterProvider router={router} />
+          <ColorModeProvider>
+            <RouterProvider router={router} />
+          </ColorModeProvider>
         </ThemeProvider>
       </QueryClientProvider>
     </StrictMode>,
