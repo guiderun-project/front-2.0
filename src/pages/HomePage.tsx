@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 
-import { css } from '@emotion/react';
-import styled from '@emotion/styled';
+import { css } from "@emotion/react";
+import styled from "@emotion/styled";
 
 import {
+  Badge,
   BottomSheet,
   CheckBox,
   CONFIRM_POPUP_VARIANT,
@@ -12,6 +13,8 @@ import {
   IconButton,
   Input,
   PageLayout,
+  Pagination,
+  RunnerTypeAvatar,
   Text,
   Textarea,
   TimeInput,
@@ -20,13 +23,13 @@ import {
   type IconName,
   type PageLayoutBackground,
   type TimeValue,
-} from '@/components';
+} from "@/components";
 import {
   colorModeCssVariables,
   type ColorMode,
   type ColorToken,
   type TypographyToken,
-} from '@/styles/tokens';
+} from "@/styles/tokens";
 
 const ICON_SIZES = [24, 20, 16, 12] as const;
 
@@ -36,94 +39,156 @@ type PageBackgroundOption = {
 };
 
 const COLOR_BACKGROUND_OPTIONS: ReadonlyArray<PageBackgroundOption> = [
-  { background: 'bg.default', label: 'Default' },
-  { background: 'bg.subtle', label: 'Subtle' },
-  { background: 'bg.surface', label: 'Surface' },
-  { background: 'bg.brand-soft', label: 'Brand soft' },
+  { background: "bg.default", label: "Default" },
+  { background: "bg.subtle", label: "Subtle" },
+  { background: "bg.surface", label: "Surface" },
+  { background: "bg.brand-soft", label: "Brand soft" },
 ];
 
 const GRADIENT_BACKGROUND_OPTIONS: ReadonlyArray<PageBackgroundOption> = [
-  { background: 'gradient.bg.subtle', label: 'Subtle' },
-  { background: 'gradient.bg.brand-main', label: 'Brand main' },
-  { background: 'gradient.bg.brand-event', label: 'Brand event' },
+  { background: "gradient.bg.subtle", label: "Subtle" },
+  { background: "gradient.bg.brand-main", label: "Brand main" },
+  { background: "gradient.bg.brand-event", label: "Brand event" },
 ];
 
-const TEXT_EXAMPLES: ReadonlyArray<{ font: TypographyToken; label: string; sample: string }> = [
-  { font: 'display-l', label: 'display-l', sample: 'GuideRun' },
-  { font: 'heading-l-b', label: 'heading-l-b', sample: 'Heading Large Bold' },
-  { font: 'heading-l-sb', label: 'heading-l-sb', sample: 'Heading Large Semibold' },
-  { font: 'heading-m-b', label: 'heading-m-b', sample: 'Heading Medium Bold' },
-  { font: 'heading-m-sb', label: 'heading-m-sb', sample: 'Heading Medium Semibold' },
-  { font: 'heading-m-m', label: 'heading-m-m', sample: 'Heading Medium Medium' },
-  { font: 'heading-m-r', label: 'heading-m-r', sample: 'Heading Medium Regular' },
-  { font: 'heading-s-sb', label: 'heading-s-sb', sample: 'Heading Small Semibold' },
-  { font: 'heading-s-m', label: 'heading-s-m', sample: 'Heading Small Medium' },
-  { font: 'body-l-b', label: 'body-l-b', sample: 'Body Large Bold' },
-  { font: 'body-l-sb', label: 'body-l-sb', sample: 'Body Large Semibold' },
-  { font: 'body-l-m', label: 'body-l-m', sample: 'Body Large Medium' },
-  { font: 'body-m-sb', label: 'body-m-sb', sample: 'Body Medium Semibold' },
-  { font: 'body-m-m', label: 'body-m-m', sample: 'Body Medium Medium' },
-  { font: 'body-s-sb', label: 'body-s-sb', sample: 'Body Small Semibold' },
-  { font: 'body-s-m', label: 'body-s-m', sample: 'Body Small Medium' },
-  { font: 'body-s-r', label: 'body-s-r', sample: 'Body Small Regular' },
-  { font: 'detail-m-sb', label: 'detail-m-sb', sample: 'Detail Medium Semibold' },
-  { font: 'detail-m-m', label: 'detail-m-m', sample: 'Detail Medium Medium' },
-  { font: 'detail-m-r', label: 'detail-m-r', sample: 'Detail Medium Regular' },
-  { font: 'detail-s-sb', label: 'detail-s-sb', sample: 'Detail Small Semibold' },
-  { font: 'detail-s-r', label: 'detail-s-r', sample: 'Detail Small Regular' },
+const TEXT_EXAMPLES: ReadonlyArray<{
+  font: TypographyToken;
+  label: string;
+  sample: string;
+}> = [
+  { font: "display-l", label: "display-l", sample: "GuideRun" },
+  { font: "heading-l-b", label: "heading-l-b", sample: "Heading Large Bold" },
+  {
+    font: "heading-l-sb",
+    label: "heading-l-sb",
+    sample: "Heading Large Semibold",
+  },
+  { font: "heading-m-b", label: "heading-m-b", sample: "Heading Medium Bold" },
+  {
+    font: "heading-m-sb",
+    label: "heading-m-sb",
+    sample: "Heading Medium Semibold",
+  },
+  {
+    font: "heading-m-m",
+    label: "heading-m-m",
+    sample: "Heading Medium Medium",
+  },
+  {
+    font: "heading-m-r",
+    label: "heading-m-r",
+    sample: "Heading Medium Regular",
+  },
+  {
+    font: "heading-s-sb",
+    label: "heading-s-sb",
+    sample: "Heading Small Semibold",
+  },
+  { font: "heading-s-m", label: "heading-s-m", sample: "Heading Small Medium" },
+  { font: "body-l-b", label: "body-l-b", sample: "Body Large Bold" },
+  { font: "body-l-sb", label: "body-l-sb", sample: "Body Large Semibold" },
+  { font: "body-l-m", label: "body-l-m", sample: "Body Large Medium" },
+  { font: "body-m-sb", label: "body-m-sb", sample: "Body Medium Semibold" },
+  { font: "body-m-m", label: "body-m-m", sample: "Body Medium Medium" },
+  { font: "body-s-sb", label: "body-s-sb", sample: "Body Small Semibold" },
+  { font: "body-s-m", label: "body-s-m", sample: "Body Small Medium" },
+  { font: "body-s-r", label: "body-s-r", sample: "Body Small Regular" },
+  {
+    font: "detail-m-sb",
+    label: "detail-m-sb",
+    sample: "Detail Medium Semibold",
+  },
+  { font: "detail-m-m", label: "detail-m-m", sample: "Detail Medium Medium" },
+  { font: "detail-m-r", label: "detail-m-r", sample: "Detail Medium Regular" },
+  {
+    font: "detail-s-sb",
+    label: "detail-s-sb",
+    sample: "Detail Small Semibold",
+  },
+  { font: "detail-s-r", label: "detail-s-r", sample: "Detail Small Regular" },
 ];
 
 const TEXT_CODE_EXAMPLES = [
   {
-    label: 'Heading',
+    label: "Heading",
     code: `<Text as="h1" font="heading-l-b">
   Components
 </Text>`,
   },
   {
-    label: 'Secondary copy',
+    label: "Secondary copy",
     code: `<Text color="text.secondary" font="body-s-r">
   Shared UI primitives currently available in the app.
 </Text>`,
   },
 ] as const;
 
+const BADGE_SOFT_TONE_EXAMPLES = [
+  { label: "Neutral", tone: "gray" },
+  { label: "Orange", tone: "orange" },
+  { label: "Blue", tone: "blue" },
+  { label: "Violet", tone: "violet" },
+  { label: "Green", tone: "green" },
+  { label: "Cyan", tone: "cyan" },
+  { label: "Cyan", tone: "cyan2" },
+] as const;
+
+const BADGE_SOLID_TONE_EXAMPLES = [
+  { label: "Neutral", tone: "gray" },
+  { label: "Cyan", tone: "cyan" },
+] as const;
+
+const BADGE_CODE_EXAMPLES = [
+  {
+    label: "Soft",
+    code: `<Badge tone="orange" size="m">
+  Orange
+</Badge>`,
+  },
+  {
+    label: "Solid",
+    code: `<Badge variant="solid" tone="cyan">
+  Cyan
+</Badge>`,
+  },
+] as const;
+
 const ICON_EXAMPLES: ReadonlyArray<{ icon: IconName; color?: ColorToken }> = [
-  { icon: 'calendar-lined', color: 'icon.secondary' },
-  { icon: 'check-lined', color: 'text.brand' },
-  { icon: 'chevron-down-lined' },
-  { icon: 'chevron-left-lined' },
-  { icon: 'chevron-right-lined' },
-  { icon: 'chevron-up-lined' },
-  { icon: 'delete-filled', color: 'text.danger' },
-  { icon: 'delete-lined', color: 'text.danger' },
-  { icon: 'download-lined', color: 'icon.secondary' },
-  { icon: 'edit-lined', color: 'icon.secondary' },
-  { icon: 'help-circle-filled', color: 'bg.brand' },
-  { icon: 'home-filled' },
-  { icon: 'home-lined' },
-  { icon: 'link-lined', color: 'text.brand' },
-  { icon: 'list-filled' },
-  { icon: 'list-lined' },
-  { icon: 'map-lined', color: 'text.brand' },
-  { icon: 'more-vertical-lined' },
-  { icon: 'plus-lined', color: 'text.brand' },
-  { icon: 'search-lined' },
-  { icon: 'share-lined', color: 'icon.secondary' },
-  { icon: 'shuffle-lined', color: 'icon.secondary' },
-  { icon: 'trash-lined', color: 'text.danger' },
-  { icon: 'user-filled' },
-  { icon: 'user-lined' },
-  { icon: 'user-x-lined', color: 'text.danger' },
+  { icon: "calendar-lined", color: "icon.secondary" },
+  { icon: "check-lined", color: "text.brand" },
+  { icon: "chevron-down-lined" },
+  { icon: "chevron-left-lined" },
+  { icon: "chevron-right-lined" },
+  { icon: "chevron-up-lined" },
+  { icon: "delete-filled", color: "text.danger" },
+  { icon: "delete-lined", color: "text.danger" },
+  { icon: "download-lined", color: "icon.secondary" },
+  { icon: "edit-lined", color: "icon.secondary" },
+  { icon: "help-circle-filled", color: "bg.brand-primary" },
+  { icon: "home-filled" },
+  { icon: "home-lined" },
+  { icon: "link-lined", color: "text.brand" },
+  { icon: "list-filled" },
+  { icon: "list-lined" },
+  { icon: "map-lined", color: "text.brand" },
+  { icon: "more-vertical-lined" },
+  { icon: "plus-lined", color: "text.brand" },
+  { icon: "search-lined" },
+  { icon: "share-lined", color: "icon.secondary" },
+  { icon: "shuffle-lined", color: "icon.secondary" },
+  { icon: "trash-lined", color: "text.danger" },
+  { icon: "user-filled" },
+  { icon: "user-lined" },
+  { icon: "user-x-lined", color: "text.danger" },
 ];
 
 const ICON_CODE_EXAMPLES = [
   {
-    label: 'Default',
+    label: "Default",
     code: `<Icon icon="home-filled" />`,
   },
   {
-    label: 'Size and color',
+    label: "Size and color",
     code: `<Icon
   icon="trash-lined"
   size={24}
@@ -144,96 +209,106 @@ const ICON_BUTTON_EXAMPLES: ReadonlyArray<{
   size?: number;
 }> = [
   {
-    ariaLabel: '닫기',
-    background: 'bg.elevated',
-    icon: 'delete-lined',
+    ariaLabel: "닫기",
+    background: "bg.elevated",
+    icon: "delete-lined",
     iconSize: 24,
-    label: '48 round',
-    shape: 'round',
+    label: "48 round",
+    shape: "round",
     size: 48,
   },
-  { ariaLabel: '뒤로가기', icon: 'chevron-left-lined', iconSize: 24, label: '24 bare' },
   {
-    ariaLabel: '검색',
-    background: 'bg.brand-weak',
-    color: 'text.brand',
-    icon: 'search-lined',
+    ariaLabel: "뒤로가기",
+    icon: "chevron-left-lined",
+    iconSize: 24,
+    label: "24 bare",
+  },
+  {
+    ariaLabel: "검색",
+    background: "bg.brand-soft",
+    color: "text.brand",
+    icon: "search-lined",
     iconSize: 18,
-    label: '32 brand weak',
+    label: "32 brand soft",
     size: 32,
   },
   {
-    ariaLabel: '추가',
-    background: 'bg.brand',
-    color: 'text.inverse',
-    icon: 'plus-lined',
+    ariaLabel: "추가",
+    background: "bg.brand-primary",
+    color: "text.inverse",
+    icon: "plus-lined",
     iconSize: 20,
-    label: '40 brand',
-    shape: 'round',
+    label: "40 brand primary",
+    shape: "round",
     size: 40,
   },
   {
-    ariaLabel: '편집',
-    background: 'bg.surface',
-    color: 'icon.secondary',
-    icon: 'edit-lined',
+    ariaLabel: "편집",
+    background: "bg.surface",
+    color: "icon.secondary",
+    icon: "edit-lined",
     iconSize: 20,
-    label: '36 surface',
+    label: "36 surface",
     size: 36,
   },
   {
-    ariaLabel: '공유',
-    background: 'bg.brand-weak2',
-    color: 'text.brand',
-    icon: 'share-lined',
+    ariaLabel: "공유",
+    background: "bg.brand-soft2",
+    color: "text.brand",
+    icon: "share-lined",
     iconSize: 18,
-    label: '32 round',
-    shape: 'round',
+    label: "32 round",
+    shape: "round",
     size: 32,
   },
   {
-    ariaLabel: '완료',
-    background: 'bg.inverse',
-    color: 'text.inverse',
-    icon: 'check-lined',
+    ariaLabel: "완료",
+    background: "text.primary",
+    color: "text.inverse",
+    icon: "check-lined",
     iconSize: 18,
-    label: '36 inverse',
-    shape: 'round',
+    label: "36 contrast",
+    shape: "round",
     size: 36,
   },
-  { ariaLabel: '메뉴', icon: 'more-vertical-lined', iconSize: 24, label: '24 menu' },
   {
-    ariaLabel: '다운로드',
-    background: 'bg.elevated',
-    color: 'icon.secondary',
-    icon: 'download-lined',
+    ariaLabel: "메뉴",
+    icon: "more-vertical-lined",
+    iconSize: 24,
+    label: "24 menu",
+  },
+  {
+    ariaLabel: "다운로드",
+    background: "bg.elevated",
+    color: "icon.secondary",
+    icon: "download-lined",
     iconSize: 22,
-    label: '44 elevated',
-    shape: 'round',
+    label: "44 elevated",
+    shape: "round",
     size: 44,
   },
   {
-    ariaLabel: '삭제',
-    background: 'bg.surface',
-    color: 'text.danger',
-    icon: 'trash-lined',
+    ariaLabel: "삭제",
+    background: "bg.surface",
+    color: "text.danger",
+    icon: "trash-lined",
     iconSize: 20,
-    label: '40 danger',
+    label: "40 danger",
     size: 40,
   },
   {
-    ariaLabel: '회원 제외',
-    color: 'text.danger',
+    ariaLabel: "회원 제외",
+    color: "text.danger",
     disabled: true,
-    icon: 'user-x-lined',
+    icon: "user-x-lined",
     iconSize: 24,
-    label: 'disabled',
+    label: "disabled",
   },
 ];
 
 const ICON_BUTTON_CODE_EXAMPLES = [
   {
-    label: 'Bare action',
+    label: "Bare action",
     code: `<IconButton
   icon="chevron-left-lined"
   iconSize={24}
@@ -241,16 +316,38 @@ const ICON_BUTTON_CODE_EXAMPLES = [
 />`,
   },
   {
-    label: 'Round action',
+    label: "Round action",
     code: `<IconButton
   icon="plus-lined"
   size={40}
   iconSize={20}
   color="text.inverse"
-  background="bg.brand"
+  background="bg.brand-primary"
   shape="round"
   aria-label="추가"
 />`,
+  },
+] as const;
+
+const RUNNER_TYPE_AVATAR_SIZES = [
+  { label: "S / 18px", size: "s" },
+  { label: "M / 24px", size: "m" },
+  { label: "XL / 72px", size: "xl" },
+] as const;
+
+const RUNNER_TYPE_AVATAR_EXAMPLES = [
+  { label: "시각장애러너", type: "vi" },
+  { label: "가이드러너", type: "guide" },
+] as const;
+
+const RUNNER_TYPE_AVATAR_CODE_EXAMPLES = [
+  {
+    label: "Default size",
+    code: `<RunnerTypeAvatar type="vi" />`,
+  },
+  {
+    label: "XL guide",
+    code: `<RunnerTypeAvatar type="guide" size="xl" />`,
   },
 ] as const;
 
@@ -259,22 +356,22 @@ const CHECKBOX_EXAMPLES: ReadonlyArray<{
   disabled?: boolean;
   label: string;
 }> = [
-  { label: 'Unchecked' },
-  { defaultChecked: true, label: 'Checked' },
-  { disabled: true, label: 'Disabled unchecked' },
-  { defaultChecked: true, disabled: true, label: 'Disabled checked' },
+  { label: "Unchecked" },
+  { defaultChecked: true, label: "Checked" },
+  { disabled: true, label: "Disabled unchecked" },
+  { defaultChecked: true, disabled: true, label: "Disabled checked" },
 ];
 
 const CHECKBOX_CODE_EXAMPLES = [
   {
-    label: 'Label wrapper',
+    label: "Label wrapper",
     code: `<label>
   <CheckBox checked={checked} onChange={handleChange} />
   <Text>전체 동의</Text>
 </label>`,
   },
   {
-    label: 'Standalone',
+    label: "Standalone",
     code: `<CheckBox
   aria-label="공지 선택"
   checked={checked}
@@ -285,7 +382,7 @@ const CHECKBOX_CODE_EXAMPLES = [
 
 const CONFIRM_POPUP_CODE_EXAMPLES = [
   {
-    label: 'Default',
+    label: "Default",
     code: `<ConfirmPopup
   open={open}
   subtitle="러닝 그룹"
@@ -296,7 +393,7 @@ const CONFIRM_POPUP_CODE_EXAMPLES = [
 />`,
   },
   {
-    label: 'Loading',
+    label: "Loading",
     code: `<ConfirmPopup
   open={open}
   title="초대장을 보낼까요?"
@@ -310,7 +407,7 @@ const CONFIRM_POPUP_CODE_EXAMPLES = [
 
 const INPUT_CODE_EXAMPLES = [
   {
-    label: 'Single-line',
+    label: "Single-line",
     code: `<Input
   label="이름"
   placeholder="이름을 입력해주세요"
@@ -321,7 +418,7 @@ const INPUT_CODE_EXAMPLES = [
 />`,
   },
   {
-    label: 'Error',
+    label: "Error",
     code: `<Input
   label="이름"
   placeholder="이름을 입력해주세요"
@@ -330,7 +427,7 @@ const INPUT_CODE_EXAMPLES = [
 />`,
   },
   {
-    label: 'Multi-line',
+    label: "Multi-line",
     code: `<Textarea
   label="모임 상세 내용"
   placeholder="상세 내용을 입력해주세요"
@@ -339,7 +436,7 @@ const INPUT_CODE_EXAMPLES = [
 />`,
   },
   {
-    label: 'Timer + confirm',
+    label: "Timer + confirm",
     code: `<TimerInput
   label="전화번호"
   placeholder="-없이 숫자만 입력"
@@ -349,7 +446,7 @@ const INPUT_CODE_EXAMPLES = [
 />`,
   },
   {
-    label: 'Time (시:분:초)',
+    label: "Time (시:분:초)",
     code: `<TimeInput
   label="10KM 러닝기록"
   helperText="안내 메시지"
@@ -361,7 +458,7 @@ const INPUT_CODE_EXAMPLES = [
 
 const BOTTOM_SHEET_CODE_EXAMPLES = [
   {
-    label: 'Heading and footer',
+    label: "Heading and footer",
     code: `<BottomSheet
   open={open}
   heading={{
@@ -377,7 +474,7 @@ const BOTTOM_SHEET_CODE_EXAMPLES = [
 </BottomSheet>`,
   },
   {
-    label: 'Top bar list',
+    label: "Top bar list",
     code: `<BottomSheet
   open={open}
   topBarTitle="러닝 모집 관리"
@@ -387,7 +484,7 @@ const BOTTOM_SHEET_CODE_EXAMPLES = [
 </BottomSheet>`,
   },
   {
-    label: 'Label only',
+    label: "Label only",
     code: `<BottomSheet
   open={open}
   ariaLabel="공유 옵션"
@@ -397,7 +494,7 @@ const BOTTOM_SHEET_CODE_EXAMPLES = [
 </BottomSheet>`,
   },
   {
-    label: 'Scrollable content',
+    label: "Scrollable content",
     code: `<BottomSheet
   open={open}
   maxHeight="26.25rem"
@@ -411,89 +508,105 @@ const BOTTOM_SHEET_CODE_EXAMPLES = [
 ] as const;
 
 const SCROLL_BOTTOM_SHEET_ITEMS = [
-  '러닝 이름',
-  '러닝 날짜',
-  '집결 장소',
-  '모집 인원',
-  '러닝 거리',
-  '평균 페이스',
-  '준비물',
-  '참가비',
-  '환불 안내',
-  '안전 수칙',
-  '뒤풀이 여부',
-  '추가 공지',
+  "러닝 이름",
+  "러닝 날짜",
+  "집결 장소",
+  "모집 인원",
+  "러닝 거리",
+  "평균 페이스",
+  "준비물",
+  "참가비",
+  "환불 안내",
+  "안전 수칙",
+  "뒤풀이 여부",
+  "추가 공지",
 ] as const;
 
 const CONFIRM_POPUP_EXAMPLES = {
   default: {
-    actionLabel: 'default',
-    buttonLabel: 'Open default',
-    confirmText: '저장',
-    description: '저장하지 않으면 지금 입력한 내용이 사라져요.',
-    subtitle: '러닝 그룹',
-    title: '변경사항을 저장할까요?',
+    actionLabel: "default",
+    buttonLabel: "Open default",
+    confirmText: "저장",
+    description: "저장하지 않으면 지금 입력한 내용이 사라져요.",
+    subtitle: "러닝 그룹",
+    title: "변경사항을 저장할까요?",
     variant: CONFIRM_POPUP_VARIANT.DEFAULT,
   },
   danger: {
-    actionLabel: 'danger',
-    buttonLabel: 'Open danger',
-    confirmText: '삭제',
-    description: '삭제한 러닝 그룹은 다시 복구할 수 없어요.',
-    subtitle: '러닝 그룹 삭제',
-    title: '정말 삭제할까요?',
+    actionLabel: "danger",
+    buttonLabel: "Open danger",
+    confirmText: "삭제",
+    description: "삭제한 러닝 그룹은 다시 복구할 수 없어요.",
+    subtitle: "러닝 그룹 삭제",
+    title: "정말 삭제할까요?",
     variant: CONFIRM_POPUP_VARIANT.DANGER,
   },
   loading: {
-    actionLabel: 'loading',
-    buttonLabel: 'Open loading',
-    confirmText: '보내기',
-    description: '초대 대상자에게 알림이 전송됩니다.',
-    subtitle: '초대장 발송',
-    title: '초대장을 보낼까요?',
+    actionLabel: "loading",
+    buttonLabel: "Open loading",
+    confirmText: "보내기",
+    description: "초대 대상자에게 알림이 전송됩니다.",
+    subtitle: "초대장 발송",
+    title: "초대장을 보낼까요?",
     variant: CONFIRM_POPUP_VARIANT.DEFAULT,
   },
 } as const;
 
 type ConfirmPopupExample = keyof typeof CONFIRM_POPUP_EXAMPLES;
 
-type BottomSheetExample = 'heading' | 'list' | 'scroll';
+type BottomSheetExample = "heading" | "list" | "scroll";
 
 type CodeExample = {
   label: string;
   code: string;
 };
 
+const PAGINATION_CODE_EXAMPLES = [
+  {
+    label: "Controlled",
+    code: "<Pagination currentPage={page} totalPages={12} onChange={setPage} />",
+  },
+  {
+    label: "Single page",
+    code: "<Pagination currentPage={1} totalPages={1} onChange={setPage} />",
+  },
+] as const;
+
 export const HomePage = () => {
-  const [colorMode, setColorMode] = useState<ColorMode>('light');
-  const [pageBackground, setPageBackground] = useState<PageLayoutBackground>('bg.subtle');
+  const [colorMode, setColorMode] = useState<ColorMode>("light");
+  const [pageBackground, setPageBackground] =
+    useState<PageLayoutBackground>("bg.subtle");
   const [isCheckBoxSelected, setIsCheckBoxSelected] = useState(false);
-  const [activeConfirmPopup, setActiveConfirmPopup] = useState<ConfirmPopupExample | null>(null);
-  const [activeBottomSheet, setActiveBottomSheet] = useState<BottomSheetExample | null>(null);
+  const [paginationPage, setPaginationPage] = useState(1);
+  const [activeConfirmPopup, setActiveConfirmPopup] =
+    useState<ConfirmPopupExample | null>(null);
+  const [activeBottomSheet, setActiveBottomSheet] =
+    useState<BottomSheetExample | null>(null);
   const [isConfirmPopupLoading, setIsConfirmPopupLoading] = useState(false);
-  const [lastConfirmPopupAction, setLastConfirmPopupAction] = useState('Last action: none');
-  const [inputName, setInputName] = useState('');
-  const [inputPhone, setInputPhone] = useState('');
+  const [lastConfirmPopupAction, setLastConfirmPopupAction] =
+    useState("Last action: none");
+  const [inputName, setInputName] = useState("");
+  const [inputPhone, setInputPhone] = useState("");
   const [inputTime, setInputTime] = useState<TimeValue>({
-    hours: '',
-    minutes: '',
-    seconds: '',
+    hours: "",
+    minutes: "",
+    seconds: "",
   });
   const confirmPopupLoadingTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     const root = document.documentElement;
-    const previousColorMode = root.getAttribute('data-color-mode');
+    const previousColorMode = root.getAttribute("data-color-mode");
 
-    root.setAttribute('data-color-mode', colorMode);
+    root.setAttribute("data-color-mode", colorMode);
 
     return () => {
       if (previousColorMode) {
-        root.setAttribute('data-color-mode', previousColorMode);
+        root.setAttribute("data-color-mode", previousColorMode);
         return;
       }
 
-      root.removeAttribute('data-color-mode');
+      root.removeAttribute("data-color-mode");
     };
   }, [colorMode]);
 
@@ -515,7 +628,7 @@ export const HomePage = () => {
   };
 
   const handleToggleColorMode = () => {
-    setColorMode((currentMode) => (currentMode === 'light' ? 'dark' : 'light'));
+    setColorMode((currentMode) => (currentMode === "light" ? "dark" : "light"));
   };
 
   const handleOpenConfirmPopup = (example: ConfirmPopupExample) => {
@@ -535,7 +648,7 @@ export const HomePage = () => {
   const handleCancelConfirmPopup = () => {
     const actionLabel = activeConfirmPopup
       ? CONFIRM_POPUP_EXAMPLES[activeConfirmPopup].actionLabel
-      : 'popup';
+      : "popup";
 
     clearConfirmPopupLoadingTimer();
     setIsConfirmPopupLoading(false);
@@ -550,14 +663,14 @@ export const HomePage = () => {
 
     const actionLabel = CONFIRM_POPUP_EXAMPLES[activeConfirmPopup].actionLabel;
 
-    if (activeConfirmPopup !== 'loading') {
+    if (activeConfirmPopup !== "loading") {
       setLastConfirmPopupAction(`Last action: ${actionLabel} confirmed`);
       setActiveConfirmPopup(null);
       return;
     }
 
     setIsConfirmPopupLoading(true);
-    setLastConfirmPopupAction('Last action: loading started');
+    setLastConfirmPopupAction("Last action: loading started");
     clearConfirmPopupLoadingTimer();
     confirmPopupLoadingTimerRef.current = window.setTimeout(() => {
       setIsConfirmPopupLoading(false);
@@ -572,7 +685,11 @@ export const HomePage = () => {
     : null;
 
   return (
-    <Page $colorMode={colorMode} background={pageBackground} data-color-mode={colorMode}>
+    <Page
+      $colorMode={colorMode}
+      background={pageBackground}
+      data-color-mode={colorMode}
+    >
       <Header>
         <HeaderCopy>
           <Text as="h1" font="heading-l-b">
@@ -584,7 +701,7 @@ export const HomePage = () => {
         </HeaderCopy>
         <HeaderControls>
           <ThemeToggle type="button" onClick={handleToggleColorMode}>
-            {colorMode === 'light' ? 'Dark mode' : 'Light mode'}
+            {colorMode === "light" ? "Dark mode" : "Light mode"}
           </ThemeToggle>
           <BackgroundControls aria-label="Page background">
             <BackgroundOptionGroup aria-label="Color background" role="group">
@@ -602,7 +719,10 @@ export const HomePage = () => {
                 ))}
               </BackgroundOptions>
             </BackgroundOptionGroup>
-            <BackgroundOptionGroup aria-label="Gradient background" role="group">
+            <BackgroundOptionGroup
+              aria-label="Gradient background"
+              role="group"
+            >
               <BackgroundGroupLabel>gradient bg</BackgroundGroupLabel>
               <BackgroundOptions>
                 {GRADIENT_BACKGROUND_OPTIONS.map(({ background, label }) => (
@@ -646,6 +766,73 @@ export const HomePage = () => {
       <ShowcaseSection>
         <SectionTitle>
           <Text as="h2" font="heading-s-m">
+            Badge
+          </Text>
+          <Text color="text.tertiary" font="detail-m-r">
+            Soft, solid, S/M
+          </Text>
+        </SectionTitle>
+        <BadgeShowcase>
+          <BadgeGroup>
+            <Text color="text.tertiary" font="detail-m-m">
+              Soft S
+            </Text>
+            <BadgeRow>
+              {BADGE_SOFT_TONE_EXAMPLES.map(({ label, tone }) => (
+                <Badge key={`soft-s-${tone}`} tone={tone}>
+                  {label}
+                </Badge>
+              ))}
+            </BadgeRow>
+          </BadgeGroup>
+          <BadgeGroup>
+            <Text color="text.tertiary" font="detail-m-m">
+              Soft M
+            </Text>
+            <BadgeRow>
+              {BADGE_SOFT_TONE_EXAMPLES.map(({ label, tone }) => (
+                <Badge key={`soft-m-${tone}`} size="m" tone={tone}>
+                  {label}
+                </Badge>
+              ))}
+            </BadgeRow>
+          </BadgeGroup>
+          <BadgeGroup>
+            <Text color="text.tertiary" font="detail-m-m">
+              Solid S
+            </Text>
+            <BadgeRow>
+              {BADGE_SOLID_TONE_EXAMPLES.map(({ label, tone }) => (
+                <Badge key={`solid-s-${tone}`} tone={tone} variant="solid">
+                  {label}
+                </Badge>
+              ))}
+            </BadgeRow>
+          </BadgeGroup>
+          <BadgeGroup>
+            <Text color="text.tertiary" font="detail-m-m">
+              Solid M
+            </Text>
+            <BadgeRow>
+              {BADGE_SOLID_TONE_EXAMPLES.map(({ label, tone }) => (
+                <Badge
+                  key={`solid-m-${tone}`}
+                  size="m"
+                  tone={tone}
+                  variant="solid"
+                >
+                  {label}
+                </Badge>
+              ))}
+            </BadgeRow>
+          </BadgeGroup>
+        </BadgeShowcase>
+        <CodeExamples examples={BADGE_CODE_EXAMPLES} />
+      </ShowcaseSection>
+
+      <ShowcaseSection>
+        <SectionTitle>
+          <Text as="h2" font="heading-s-m">
             Icon
           </Text>
           <Text color="text.tertiary" font="detail-m-r">
@@ -658,7 +845,12 @@ export const HomePage = () => {
               Name
             </Text>
             {ICON_SIZES.map((size) => (
-              <Text key={size} align="center" color="text.tertiary" font="detail-m-m">
+              <Text
+                key={size}
+                align="center"
+                color="text.tertiary"
+                font="detail-m-m"
+              >
                 {size}px
               </Text>
             ))}
@@ -690,7 +882,17 @@ export const HomePage = () => {
         </SectionTitle>
         <IconButtonGrid>
           {ICON_BUTTON_EXAMPLES.map(
-            ({ ariaLabel, background, color, disabled, icon, iconSize, label, shape, size }) => (
+            ({
+              ariaLabel,
+              background,
+              color,
+              disabled,
+              icon,
+              iconSize,
+              label,
+              shape,
+              size,
+            }) => (
               <IconButtonSample key={label + icon}>
                 <IconButton
                   aria-label={ariaLabel}
@@ -715,6 +917,47 @@ export const HomePage = () => {
       <ShowcaseSection>
         <SectionTitle>
           <Text as="h2" font="heading-s-m">
+            RunnerTypeAvatar
+          </Text>
+          <Text color="text.tertiary" font="detail-m-r">
+            VI / Guide, S / M / XL
+          </Text>
+        </SectionTitle>
+        <RunnerTypeAvatarTable>
+          <RunnerTypeAvatarTableHeader>
+            <Text color="text.tertiary" font="detail-m-m">
+              Type
+            </Text>
+            {RUNNER_TYPE_AVATAR_SIZES.map(({ label, size }) => (
+              <Text
+                key={size}
+                align="center"
+                color="text.tertiary"
+                font="detail-m-m"
+              >
+                {label}
+              </Text>
+            ))}
+          </RunnerTypeAvatarTableHeader>
+          {RUNNER_TYPE_AVATAR_EXAMPLES.map(({ label, type }) => (
+            <RunnerTypeAvatarTableRow key={type}>
+              <Text color="text.secondary" font="detail-m-r">
+                {label}
+              </Text>
+              {RUNNER_TYPE_AVATAR_SIZES.map(({ size }) => (
+                <RunnerTypeAvatarCell key={`${type}-${size}`}>
+                  <RunnerTypeAvatar size={size} type={type} />
+                </RunnerTypeAvatarCell>
+              ))}
+            </RunnerTypeAvatarTableRow>
+          ))}
+        </RunnerTypeAvatarTable>
+        <CodeExamples examples={RUNNER_TYPE_AVATAR_CODE_EXAMPLES} />
+      </ShowcaseSection>
+
+      <ShowcaseSection>
+        <SectionTitle>
+          <Text as="h2" font="heading-s-m">
             CheckBox
           </Text>
           <Text color="text.tertiary" font="detail-m-r">
@@ -725,7 +968,10 @@ export const HomePage = () => {
           {CHECKBOX_EXAMPLES.map(({ defaultChecked, disabled, label }) => (
             <CheckBoxSample key={label} $disabled={disabled}>
               <CheckBox defaultChecked={defaultChecked} disabled={disabled} />
-              <Text color={disabled ? 'text.disabled' : 'text.secondary'} font="detail-m-r">
+              <Text
+                color={disabled ? "text.disabled" : "text.secondary"}
+                font="detail-m-r"
+              >
                 {label}
               </Text>
             </CheckBoxSample>
@@ -751,15 +997,17 @@ export const HomePage = () => {
           </Text>
         </SectionTitle>
         <PopupSampleGrid>
-          {(Object.keys(CONFIRM_POPUP_EXAMPLES) as ConfirmPopupExample[]).map((example) => (
-            <SampleButton
-              key={example}
-              type="button"
-              onClick={() => handleOpenConfirmPopup(example)}
-            >
-              {CONFIRM_POPUP_EXAMPLES[example].buttonLabel}
-            </SampleButton>
-          ))}
+          {(Object.keys(CONFIRM_POPUP_EXAMPLES) as ConfirmPopupExample[]).map(
+            (example) => (
+              <SampleButton
+                key={example}
+                type="button"
+                onClick={() => handleOpenConfirmPopup(example)}
+              >
+                {CONFIRM_POPUP_EXAMPLES[example].buttonLabel}
+              </SampleButton>
+            ),
+          )}
         </PopupSampleGrid>
         <Text color="text.secondary" font="body-s-r">
           {lastConfirmPopupAction}
@@ -825,22 +1073,75 @@ export const HomePage = () => {
           </Text>
         </SectionTitle>
         <PopupSampleGrid>
-          <SampleButton type="button" onClick={() => handleOpenBottomSheet('heading')}>
+          <SampleButton
+            type="button"
+            onClick={() => handleOpenBottomSheet("heading")}
+          >
             Open heading sheet
           </SampleButton>
-          <SampleButton type="button" onClick={() => handleOpenBottomSheet('list')}>
+          <SampleButton
+            type="button"
+            onClick={() => handleOpenBottomSheet("list")}
+          >
             Open action list
           </SampleButton>
-          <SampleButton type="button" onClick={() => handleOpenBottomSheet('scroll')}>
+          <SampleButton
+            type="button"
+            onClick={() => handleOpenBottomSheet("scroll")}
+          >
             Open scroll footer
           </SampleButton>
         </PopupSampleGrid>
         <CodeExamples examples={BOTTOM_SHEET_CODE_EXAMPLES} />
       </ShowcaseSection>
 
+      <ShowcaseSection>
+        <SectionTitle>
+          <Text as="h2" font="heading-s-m">
+            Pagination
+          </Text>
+          <Text color="text.tertiary" font="detail-m-r">
+            Block window, prev/next
+          </Text>
+        </SectionTitle>
+        <PaginationSampleList>
+          <PaginationSampleRow>
+            <Text color="text.secondary" font="detail-m-r">
+              Interactive (12p, page {paginationPage})
+            </Text>
+            <Pagination
+              currentPage={paginationPage}
+              onChange={setPaginationPage}
+              totalPages={12}
+            />
+          </PaginationSampleRow>
+          <PaginationSampleRow>
+            <Text color="text.secondary" font="detail-m-r">
+              1 page
+            </Text>
+            <Pagination currentPage={1} onChange={() => {}} totalPages={1} />
+          </PaginationSampleRow>
+          <PaginationSampleRow>
+            <Text color="text.secondary" font="detail-m-r">
+              3 pages
+            </Text>
+            <Pagination currentPage={1} onChange={() => {}} totalPages={3} />
+          </PaginationSampleRow>
+          <PaginationSampleRow>
+            <Text color="text.secondary" font="detail-m-r">
+              Over 5 (page 6)
+            </Text>
+            <Pagination currentPage={6} onChange={() => {}} totalPages={12} />
+          </PaginationSampleRow>
+        </PaginationSampleList>
+        <CodeExamples examples={PAGINATION_CODE_EXAMPLES} />
+      </ShowcaseSection>
+
       {activeConfirmPopupExample ? (
         <ConfirmPopup
-          confirmLoading={activeConfirmPopup === 'loading' && isConfirmPopupLoading}
+          confirmLoading={
+            activeConfirmPopup === "loading" && isConfirmPopupLoading
+          }
           confirmText={activeConfirmPopupExample.confirmText}
           description={activeConfirmPopupExample.description}
           open={activeConfirmPopup !== null}
@@ -859,17 +1160,20 @@ export const HomePage = () => {
 
       <BottomSheet
         footer={
-          <BottomSheetFooterButton type="button" onClick={handleCloseBottomSheet}>
+          <BottomSheetFooterButton
+            type="button"
+            onClick={handleCloseBottomSheet}
+          >
             다음
           </BottomSheetFooterButton>
         }
         heading={{
-          subtitle: '서브 타이틀',
-          title: '타이틀을 작성해주세요',
-          description: '설명을 작성해주세요',
+          subtitle: "서브 타이틀",
+          title: "타이틀을 작성해주세요",
+          description: "설명을 작성해주세요",
         }}
         isBackdropCloseDisabled
-        open={activeBottomSheet === 'heading'}
+        open={activeBottomSheet === "heading"}
         onOpenChange={(nextOpen) => {
           if (!nextOpen) {
             handleCloseBottomSheet();
@@ -893,7 +1197,7 @@ export const HomePage = () => {
       </BottomSheet>
 
       <BottomSheet
-        open={activeBottomSheet === 'list'}
+        open={activeBottomSheet === "list"}
         topBarTitle="러닝 모집 관리"
         onOpenChange={(nextOpen) => {
           if (!nextOpen) {
@@ -903,21 +1207,41 @@ export const HomePage = () => {
       >
         <BottomSheetActionList aria-label="러닝 모집 관리 작업">
           <BottomSheetActionItem type="button" onClick={handleCloseBottomSheet}>
-            <Icon aria-hidden={true} color="icon.secondary" icon="list-lined" size={20} />
+            <Icon
+              aria-hidden={true}
+              color="icon.secondary"
+              icon="list-lined"
+              size={20}
+            />
             <Text font="body-m-m">모집 마감하기</Text>
           </BottomSheetActionItem>
           <BottomSheetActionItem type="button" onClick={handleCloseBottomSheet}>
-            <Icon aria-hidden={true} color="icon.secondary" icon="edit-lined" size={20} />
+            <Icon
+              aria-hidden={true}
+              color="icon.secondary"
+              icon="edit-lined"
+              size={20}
+            />
             <Text font="body-m-m">모집 게시글 수정하기</Text>
           </BottomSheetActionItem>
           <BottomSheetActionItem type="button" onClick={handleCloseBottomSheet}>
-            <Icon aria-hidden={true} color="text.danger" icon="trash-lined" size={20} />
+            <Icon
+              aria-hidden={true}
+              color="text.danger"
+              icon="trash-lined"
+              size={20}
+            />
             <Text color="text.danger" font="body-m-m">
               모집 게시글 삭제하기
             </Text>
           </BottomSheetActionItem>
           <BottomSheetActionItem type="button" onClick={handleCloseBottomSheet}>
-            <Icon aria-hidden={true} color="icon.secondary" icon="download-lined" size={20} />
+            <Icon
+              aria-hidden={true}
+              color="icon.secondary"
+              icon="download-lined"
+              size={20}
+            />
             <Text font="body-m-m">출석 인원 명단 추출</Text>
           </BottomSheetActionItem>
         </BottomSheetActionList>
@@ -925,16 +1249,19 @@ export const HomePage = () => {
 
       <BottomSheet
         footer={
-          <BottomSheetFooterButton type="button" onClick={handleCloseBottomSheet}>
+          <BottomSheetFooterButton
+            type="button"
+            onClick={handleCloseBottomSheet}
+          >
             고정 Footer
           </BottomSheetFooterButton>
         }
         heading={{
-          title: '긴 콘텐츠 예시',
-          description: '항목이 많아져도 하단 액션은 같은 자리에 유지됩니다.',
+          title: "긴 콘텐츠 예시",
+          description: "항목이 많아져도 하단 액션은 같은 자리에 유지됩니다.",
         }}
         maxHeight="26.25rem"
-        open={activeBottomSheet === 'scroll'}
+        open={activeBottomSheet === "scroll"}
         onOpenChange={(nextOpen) => {
           if (!nextOpen) {
             handleCloseBottomSheet();
@@ -945,7 +1272,7 @@ export const HomePage = () => {
           {SCROLL_BOTTOM_SHEET_ITEMS.map((label, index) => (
             <BottomSheetScrollItem key={label}>
               <Text color="text.tertiary" font="detail-m-m">
-                {String(index + 1).padStart(2, '0')}
+                {String(index + 1).padStart(2, "0")}
               </Text>
               <Text font="body-m-m">{label}</Text>
             </BottomSheetScrollItem>
@@ -956,7 +1283,11 @@ export const HomePage = () => {
   );
 };
 
-const CodeExamples = ({ examples }: { examples: ReadonlyArray<CodeExample> }) => (
+const CodeExamples = ({
+  examples,
+}: {
+  examples: ReadonlyArray<CodeExample>;
+}) => (
   <CodeExampleGrid>
     {examples.map(({ code, label }) => (
       <CodeExampleItem key={label}>
@@ -979,11 +1310,13 @@ const Page = styled(PageLayout)<{ $colorMode: ColorMode }>`
   ${({ $colorMode }) => getModeVariables($colorMode)}
   display: grid;
   gap: ${({ theme }) => theme.spacing.xl};
-  padding: ${({ theme }) => theme.spacing['3xl']};
-  padding-top: calc(env(safe-area-inset-top) + ${({ theme }) => theme.spacing['3xl']});
+  padding: ${({ theme }) => theme.spacing["3xl"]};
+  padding-top: calc(
+    env(safe-area-inset-top) + ${({ theme }) => theme.spacing["3xl"]}
+  );
   padding-bottom: calc(
     env(safe-area-inset-bottom) + var(--app-fixed-bottom-offset, 0rem) +
-      ${({ theme }) => theme.spacing['3xl']}
+      ${({ theme }) => theme.spacing["3xl"]}
   );
   color: ${({ theme }) => theme.color.text.primary};
 `;
@@ -1041,11 +1374,12 @@ const BackgroundOptionGroup = styled.div`
 
 const BackgroundGroupLabel = styled.span`
   color: ${({ theme }) => theme.color.text.tertiary};
-  font-family: ${({ theme }) => theme.typography['detail-m-m'].fontFamily};
-  font-size: ${({ theme }) => theme.typography['detail-m-m'].fontSize};
-  font-weight: ${({ theme }) => theme.typography['detail-m-m'].fontWeight};
-  letter-spacing: ${({ theme }) => theme.typography['detail-m-m'].letterSpacing};
-  line-height: ${({ theme }) => theme.typography['detail-m-m'].lineHeight};
+  font-family: ${({ theme }) => theme.typography["detail-m-m"].fontFamily};
+  font-size: ${({ theme }) => theme.typography["detail-m-m"].fontSize};
+  font-weight: ${({ theme }) => theme.typography["detail-m-m"].fontWeight};
+  letter-spacing: ${({ theme }) =>
+    theme.typography["detail-m-m"].letterSpacing};
+  line-height: ${({ theme }) => theme.typography["detail-m-m"].lineHeight};
 `;
 
 const BackgroundOptions = styled.div`
@@ -1069,10 +1403,10 @@ const BackgroundOption = styled.button`
     color 120ms ease,
     transform 120ms ease;
 
-  &[aria-pressed='true'] {
+  &[aria-pressed="true"] {
     border-color: ${({ theme }) => theme.color.border.brand};
     color: ${({ theme }) => theme.color.text.brand};
-    background: ${({ theme }) => theme.color.bg['brand-soft']};
+    background: ${({ theme }) => theme.color.bg["brand-soft"]};
   }
 
   &:hover {
@@ -1120,10 +1454,30 @@ const TextList = styled.div`
 
 const TextRow = styled.div`
   display: grid;
-  grid-template-columns: minmax(${({ theme }) => theme.pxToRem(140)}, ${({ theme }) => theme.pxToRem(200)}) 1fr;
+  grid-template-columns: minmax(
+      ${({ theme }) => theme.pxToRem(140)},
+      ${({ theme }) => theme.pxToRem(200)}
+    ) 1fr;
   align-items: baseline;
   gap: ${({ theme }) => theme.spacing.xl};
   min-height: ${({ theme }) => theme.pxToRem(32)};
+`;
+
+const BadgeShowcase = styled.div`
+  display: grid;
+  gap: ${({ theme }) => theme.spacing.lg};
+`;
+
+const BadgeGroup = styled.div`
+  display: grid;
+  gap: ${({ theme }) => theme.spacing.sm};
+`;
+
+const BadgeRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.sm};
 `;
 
 const IconTable = styled.div`
@@ -1134,7 +1488,10 @@ const IconTable = styled.div`
 
 const IconTableHeader = styled.div`
   display: grid;
-  grid-template-columns: minmax(${({ theme }) => theme.pxToRem(180)}, 1fr) repeat(4, ${({ theme }) => theme.pxToRem(48)});
+  grid-template-columns: minmax(${({ theme }) => theme.pxToRem(180)}, 1fr) repeat(
+      4,
+      ${({ theme }) => theme.pxToRem(48)}
+    );
   align-items: center;
   gap: ${({ theme }) => theme.spacing.md};
   min-width: ${({ theme }) => theme.pxToRem(420)};
@@ -1142,7 +1499,10 @@ const IconTableHeader = styled.div`
 
 const IconTableRow = styled.div`
   display: grid;
-  grid-template-columns: minmax(${({ theme }) => theme.pxToRem(180)}, 1fr) repeat(4, ${({ theme }) => theme.pxToRem(48)});
+  grid-template-columns: minmax(${({ theme }) => theme.pxToRem(180)}, 1fr) repeat(
+      4,
+      ${({ theme }) => theme.pxToRem(48)}
+    );
   align-items: center;
   gap: ${({ theme }) => theme.spacing.md};
   min-width: ${({ theme }) => theme.pxToRem(420)};
@@ -1167,9 +1527,47 @@ const IconButtonSample = styled.div`
   gap: ${({ theme }) => theme.spacing.sm};
 `;
 
+const RunnerTypeAvatarTable = styled.div`
+  display: grid;
+  gap: ${({ theme }) => theme.spacing.sm};
+  overflow-x: auto;
+`;
+
+const RunnerTypeAvatarTableHeader = styled.div`
+  display: grid;
+  grid-template-columns: minmax(${({ theme }) => theme.pxToRem(140)}, 1fr) repeat(
+      3,
+      ${({ theme }) => theme.pxToRem(96)}
+    );
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.md};
+  min-width: ${({ theme }) => theme.pxToRem(440)};
+`;
+
+const RunnerTypeAvatarTableRow = styled.div`
+  display: grid;
+  grid-template-columns: minmax(${({ theme }) => theme.pxToRem(140)}, 1fr) repeat(
+      3,
+      ${({ theme }) => theme.pxToRem(96)}
+    );
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.md};
+  min-width: ${({ theme }) => theme.pxToRem(440)};
+  min-height: ${({ theme }) => theme.pxToRem(88)};
+`;
+
+const RunnerTypeAvatarCell = styled.div`
+  display: grid;
+  min-height: ${({ theme }) => theme.pxToRem(76)};
+  place-items: center;
+`;
+
 const CheckBoxGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, ${({ theme }) => theme.pxToRem(180)}), 1fr));
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, ${({ theme }) => theme.pxToRem(180)}), 1fr)
+  );
   gap: ${({ theme }) => theme.spacing.md};
 `;
 
@@ -1179,7 +1577,7 @@ const CheckBoxSample = styled.label<{ $disabled?: boolean }>`
   width: fit-content;
   min-height: ${({ theme }) => theme.pxToRem(32)};
   gap: ${({ theme }) => theme.spacing.md};
-  cursor: ${({ $disabled }) => ($disabled ? 'not-allowed' : 'pointer')};
+  cursor: ${({ $disabled }) => ($disabled ? "not-allowed" : "pointer")};
 `;
 
 const InteractiveCheckBoxSample = styled.label`
@@ -1191,9 +1589,21 @@ const InteractiveCheckBoxSample = styled.label`
   cursor: pointer;
 `;
 
+const PaginationSampleList = styled.div`
+  display: grid;
+  gap: ${({ theme }) => theme.spacing.lg};
+`;
+
+const PaginationSampleRow = styled.div`
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: ${({ theme }) => theme.spacing.lg};
+`;
+
 const FieldList = styled.div`
   display: grid;
-  gap: ${({ theme }) => theme.spacing['3xl']};
+  gap: ${({ theme }) => theme.spacing["3xl"]};
   max-width: ${({ theme }) => theme.pxToRem(335)};
 `;
 
@@ -1243,7 +1653,8 @@ const BottomSheetFormContent = styled.div`
   display: grid;
   gap: ${({ theme }) => theme.spacing.md};
   width: 100%;
-  padding: ${({ theme }) => `${theme.spacing.none} ${theme.spacing['2xl']} ${theme.spacing['3xl']}`};
+  padding: ${({ theme }) =>
+    `${theme.spacing.none} ${theme.spacing["2xl"]} ${theme.spacing["3xl"]}`};
 `;
 
 const DemoField = styled.input`
@@ -1254,7 +1665,7 @@ const DemoField = styled.input`
   border-radius: ${({ theme }) => theme.radius.md};
   color: ${({ theme }) => theme.color.text.primary};
   background: ${({ theme }) => theme.color.bg.default};
-  ${({ theme }) => theme.typography['heading-s-m']}
+  ${({ theme }) => theme.typography["heading-s-m"]}
 
   &::placeholder {
     color: ${({ theme }) => theme.color.text.tertiary};
@@ -1283,9 +1694,9 @@ const BottomSheetFooterButton = styled.button`
   border: 1px solid ${({ theme }) => theme.color.border.brand};
   border-radius: ${({ theme }) => theme.radius.md};
   color: ${({ theme }) => theme.color.text.inverse};
-  background: ${({ theme }) => theme.color.bg.brand};
+  background: ${({ theme }) => theme.color.bg["brand-primary"]};
   cursor: pointer;
-  ${({ theme }) => theme.typography['body-l-b']}
+  ${({ theme }) => theme.typography["body-l-b"]}
   transition:
     opacity 120ms ease,
     transform 120ms ease;
@@ -1316,7 +1727,8 @@ const BottomSheetFooterButton = styled.button`
 const BottomSheetActionList = styled.div`
   display: grid;
   width: 100%;
-  padding: ${({ theme }) => `${theme.spacing.none} ${theme.spacing.none} ${theme.spacing['3xl']}`};
+  padding: ${({ theme }) =>
+    `${theme.spacing.none} ${theme.spacing.none} ${theme.spacing["3xl"]}`};
 `;
 
 const BottomSheetActionItem = styled.button`
@@ -1325,7 +1737,7 @@ const BottomSheetActionItem = styled.button`
   width: 100%;
   min-height: ${({ theme }) => theme.pxToRem(56)};
   gap: ${({ theme }) => theme.spacing.lg};
-  padding: ${({ theme }) => `${theme.spacing.xl} ${theme.spacing['2xl']}`};
+  padding: ${({ theme }) => `${theme.spacing.xl} ${theme.spacing["2xl"]}`};
   border: 0;
   color: ${({ theme }) => theme.color.text.primary};
   background: transparent;
@@ -1360,7 +1772,8 @@ const BottomSheetActionItem = styled.button`
 const BottomSheetScrollContent = styled.div`
   display: grid;
   width: 100%;
-  padding: ${({ theme }) => `${theme.spacing.none} ${theme.spacing['2xl']} ${theme.spacing['3xl']}`};
+  padding: ${({ theme }) =>
+    `${theme.spacing.none} ${theme.spacing["2xl"]} ${theme.spacing["3xl"]}`};
 `;
 
 const BottomSheetScrollItem = styled.div`
@@ -1377,7 +1790,10 @@ const BottomSheetScrollItem = styled.div`
 
 const CodeExampleGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, ${({ theme }) => theme.pxToRem(280)}), 1fr));
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, ${({ theme }) => theme.pxToRem(280)}), 1fr)
+  );
   gap: ${({ theme }) => theme.spacing.md};
 `;
 

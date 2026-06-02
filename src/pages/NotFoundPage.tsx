@@ -34,6 +34,6 @@ const BackLink = styled(Link)`
   width: fit-content;
   padding: 10px ${({ theme }) => theme.spacing.xl};
   border-radius: ${({ theme }) => theme.radius.full};
-  background: ${({ theme }) => theme.color.bg.inverse};
+  background: ${({ theme }) => theme.color.text.primary};
   color: ${({ theme }) => theme.color.text.inverse};
 `;

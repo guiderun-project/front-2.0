@@ -1,3 +1,4 @@
+export * from "./Badge";
 export * from "./BottomNavigation";
 export * from "./BottomSheet";
 export * from "./CheckBox";
@@ -5,5 +6,7 @@ export * from "./HiddenText";
 export * from "./Icon";
 export * from "./Input";
 export * from "./PageLayout";
+export * from "./Pagination";
 export * from "./Popup";
+export * from "./RunnerTypeAvatar";
 export * from "./Text";
