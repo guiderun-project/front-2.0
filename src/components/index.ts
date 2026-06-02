@@ -1,6 +1,7 @@
 export * from "./Badge";
 export * from "./BottomNavigation";
 export * from "./BottomSheet";
+export * from "./Button";
 export * from "./CheckBox";
 export * from "./HiddenText";
 export * from "./Icon";

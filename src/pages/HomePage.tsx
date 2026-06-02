@@ -6,6 +6,7 @@ import styled from "@emotion/styled";
 import {
   Badge,
   BottomSheet,
+  Button,
   CheckBox,
   CONFIRM_POPUP_VARIANT,
   ConfirmPopup,
@@ -16,6 +17,9 @@ import {
   Pagination,
   RunnerTypeAvatar,
   Text,
+  type ButtonLevel,
+  type ButtonSize,
+  type ButtonStatus,
   Textarea,
   TimeInput,
   TimerInput,
@@ -50,6 +54,61 @@ const GRADIENT_BACKGROUND_OPTIONS: ReadonlyArray<PageBackgroundOption> = [
   { background: "gradient.bg.brand-main", label: "Brand main" },
   { background: "gradient.bg.brand-event", label: "Brand event" },
 ];
+
+const BUTTON_SIZE_EXAMPLES: ReadonlyArray<{ label: string; size: ButtonSize }> =
+  [
+    { label: "S", size: "s" },
+    { label: "M", size: "m" },
+    { label: "L", size: "l" },
+  ];
+
+const BUTTON_LEVEL_EXAMPLES: ReadonlyArray<ButtonLevel> = [
+  "primary",
+  "secondary",
+  "line-type",
+  "quaternary",
+];
+
+const BUTTON_STATUS_EXAMPLES: ReadonlyArray<{
+  disabled?: boolean;
+  label: string;
+  status: ButtonStatus;
+}> = [
+  { label: "Default", status: "default" },
+  { label: "Selected", status: "selected" },
+  { label: "Pressed", status: "pressed" },
+  { disabled: true, label: "Disabled", status: "disabled" },
+];
+
+const BUTTON_CODE_EXAMPLES = [
+  {
+    label: "Basic usage",
+    code: `<Button level="primary" size="m">
+  확인
+</Button>`,
+  },
+  {
+    label: "With icon",
+    code: `<Button
+  level="secondary"
+  size="s"
+  leftIcon={{ icon: 'plus-lined' }}
+>
+  추가
+</Button>`,
+  },
+  {
+    label: "State",
+    code: `<Button
+  disabled
+  level="primary"
+  size="l"
+  status="disabled"
+>
+  확인
+</Button>`,
+  },
+] as const;
 
 const TEXT_EXAMPLES: ReadonlyArray<{
   font: TypographyToken;
@@ -740,6 +799,72 @@ export const HomePage = () => {
           </BackgroundControls>
         </HeaderControls>
       </Header>
+
+      <ShowcaseSection>
+        <SectionTitle>
+          <Text as="h2" font="heading-s-m">
+            Button
+          </Text>
+          <Text color="text.tertiary" font="detail-m-r">
+            Size, level, status
+          </Text>
+        </SectionTitle>
+        <ButtonMatrixList>
+          {BUTTON_SIZE_EXAMPLES.map(({ label, size }) => (
+            <ButtonMatrixBlock key={size}>
+              <ButtonMatrixTitle>
+                <Text as="h3" font="heading-s-m">
+                  Size {label}
+                </Text>
+                <Text color="text.tertiary" font="detail-m-r">
+                  level / status
+                </Text>
+              </ButtonMatrixTitle>
+              <ButtonMatrixTable>
+                <ButtonMatrixHeader>
+                  <Text color="text.tertiary" font="detail-m-m">
+                    level
+                  </Text>
+                  {BUTTON_STATUS_EXAMPLES.map(
+                    ({ label: statusLabel, status }) => (
+                      <Text
+                        key={status}
+                        align="center"
+                        color="text.tertiary"
+                        font="detail-m-m"
+                      >
+                        {statusLabel}
+                      </Text>
+                    ),
+                  )}
+                </ButtonMatrixHeader>
+                {BUTTON_LEVEL_EXAMPLES.map((level) => (
+                  <ButtonMatrixRow key={level}>
+                    <ButtonMatrixLabelCell>
+                      <Text color="text.secondary" font="detail-m-r">
+                        {level}
+                      </Text>
+                    </ButtonMatrixLabelCell>
+                    {BUTTON_STATUS_EXAMPLES.map(({ disabled, status }) => (
+                      <ButtonMatrixButtonCell key={status}>
+                        <Button
+                          disabled={disabled}
+                          level={level}
+                          size={size}
+                          status={status}
+                        >
+                          확인
+                        </Button>
+                      </ButtonMatrixButtonCell>
+                    ))}
+                  </ButtonMatrixRow>
+                ))}
+              </ButtonMatrixTable>
+            </ButtonMatrixBlock>
+          ))}
+        </ButtonMatrixList>
+        <CodeExamples examples={BUTTON_CODE_EXAMPLES} />
+      </ShowcaseSection>
 
       <ShowcaseSection>
         <SectionTitle>
@@ -1445,6 +1570,61 @@ const SectionTitle = styled.div`
   align-items: baseline;
   justify-content: space-between;
   gap: ${({ theme }) => theme.spacing.lg};
+`;
+
+const ButtonMatrixList = styled.div`
+  display: grid;
+  gap: ${({ theme }) => theme.spacing.xl};
+`;
+
+const ButtonMatrixBlock = styled.div`
+  display: grid;
+  gap: ${({ theme }) => theme.spacing.md};
+`;
+
+const ButtonMatrixTitle = styled.div`
+  display: inline-flex;
+  align-items: baseline;
+  gap: ${({ theme }) => theme.spacing.sm};
+`;
+
+const ButtonMatrixTable = styled.div`
+  display: grid;
+  gap: ${({ theme }) => theme.spacing.sm};
+  overflow-x: auto;
+`;
+
+const ButtonMatrixHeader = styled.div`
+  display: grid;
+  grid-template-columns:
+    minmax(${({ theme }) => theme.pxToRem(84)}, 0.75fr)
+    repeat(4, minmax(${({ theme }) => theme.pxToRem(112)}, 1fr));
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.sm};
+  min-width: ${({ theme }) => theme.pxToRem(560)};
+`;
+
+const ButtonMatrixRow = styled.div`
+  display: grid;
+  grid-template-columns:
+    minmax(${({ theme }) => theme.pxToRem(84)}, 0.75fr)
+    repeat(4, minmax(${({ theme }) => theme.pxToRem(112)}, 1fr));
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.sm};
+  min-width: ${({ theme }) => theme.pxToRem(560)};
+  min-height: ${({ theme }) => theme.pxToRem(58)};
+`;
+
+const ButtonMatrixLabelCell = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const ButtonMatrixButtonCell = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: ${({ theme }) => theme.pxToRem(58)};
 `;
 
 const TextList = styled.div`
