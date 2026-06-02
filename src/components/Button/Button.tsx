@@ -84,6 +84,11 @@ const StyledButton = styled.button<ButtonStyleProps>(
     const disabledBorderStyle = disabledTokens.border
       ? `${theme.pxToRem(disabledTokens.border.width)} solid ${resolveColorToken(disabledTokens.border.color)}`
       : 0;
+    const pressedColorStyles = {
+      border: activeBorderStyle,
+      backgroundColor: pressedTokens.background ? resolveColorToken(pressedTokens.background) : 'transparent',
+      color: resolveColorToken(pressedTokens.content),
+    };
 
     return {
       display: 'inline-flex',
@@ -97,6 +102,7 @@ const StyledButton = styled.button<ButtonStyleProps>(
       appearance: 'none',
       border: borderStyle,
       borderRadius: theme.radius[sizeStyle.radius],
+      boxSizing: 'border-box',
       backgroundColor: defaultTokens.background ? resolveColorToken(defaultTokens.background) : 'transparent',
       color: resolveColorToken(defaultTokens.content),
       cursor: 'pointer',
@@ -106,11 +112,11 @@ const StyledButton = styled.button<ButtonStyleProps>(
       userSelect: 'none',
       verticalAlign: 'middle',
       whiteSpace: 'nowrap',
+      transition: 'background-color 120ms ease, border-color 120ms ease, color 120ms ease, transform 120ms ease',
 
       '&:active:not(:disabled)': {
-        border: activeBorderStyle,
-        backgroundColor: pressedTokens.background ? resolveColorToken(pressedTokens.background) : 'transparent',
-        color: resolveColorToken(pressedTokens.content),
+        ...pressedColorStyles,
+        transform: 'scale(0.98)',
       },
 
       '&:focus-visible': {
@@ -123,6 +129,14 @@ const StyledButton = styled.button<ButtonStyleProps>(
         backgroundColor: disabledTokens.background ? resolveColorToken(disabledTokens.background) : 'transparent',
         color: resolveColorToken(disabledTokens.content),
         cursor: 'not-allowed',
+      },
+
+      '@media (prefers-reduced-motion: reduce)': {
+        transition: 'none',
+
+        '&:active:not(:disabled)': {
+          transform: 'none',
+        },
       },
     };
   },
