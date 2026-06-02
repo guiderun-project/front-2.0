@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
 import {
   Badge,
   BottomSheet,
   CheckBox,
+  ColorModeToggle,
   CONFIRM_POPUP_VARIANT,
   ConfirmPopup,
   Icon,
@@ -19,12 +19,7 @@ import {
   type IconName,
   type PageLayoutBackground,
 } from '@/components';
-import {
-  colorModeCssVariables,
-  type ColorMode,
-  type ColorToken,
-  type TypographyToken,
-} from '@/styles/tokens';
+import { type ColorToken, type TypographyToken } from '@/styles/tokens';
 
 const ICON_SIZES = [24, 20, 16, 12] as const;
 
@@ -282,6 +277,17 @@ const ICON_BUTTON_CODE_EXAMPLES = [
   },
 ] as const;
 
+const COLOR_MODE_TOGGLE_CODE_EXAMPLES = [
+  {
+    label: 'Default',
+    code: `<ColorModeToggle />`,
+  },
+  {
+    label: 'Disabled',
+    code: `<ColorModeToggle disabled />`,
+  },
+] as const;
+
 const RUNNER_TYPE_AVATAR_SIZES = [
   { label: 'S / 18px', size: 's' },
   { label: 'M / 24px', size: 'm' },
@@ -475,7 +481,6 @@ const PAGINATION_CODE_EXAMPLES = [
 ] as const;
 
 export const HomePage = () => {
-  const [colorMode, setColorMode] = useState<ColorMode>('light');
   const [pageBackground, setPageBackground] = useState<PageLayoutBackground>('bg.subtle');
   const [isCheckBoxSelected, setIsCheckBoxSelected] = useState(false);
   const [paginationPage, setPaginationPage] = useState(1);
@@ -484,22 +489,6 @@ export const HomePage = () => {
   const [isConfirmPopupLoading, setIsConfirmPopupLoading] = useState(false);
   const [lastConfirmPopupAction, setLastConfirmPopupAction] = useState('Last action: none');
   const confirmPopupLoadingTimerRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    const root = document.documentElement;
-    const previousColorMode = root.getAttribute('data-color-mode');
-
-    root.setAttribute('data-color-mode', colorMode);
-
-    return () => {
-      if (previousColorMode) {
-        root.setAttribute('data-color-mode', previousColorMode);
-        return;
-      }
-
-      root.removeAttribute('data-color-mode');
-    };
-  }, [colorMode]);
 
   useEffect(() => {
     return () => {
@@ -516,10 +505,6 @@ export const HomePage = () => {
 
     window.clearTimeout(confirmPopupLoadingTimerRef.current);
     confirmPopupLoadingTimerRef.current = null;
-  };
-
-  const handleToggleColorMode = () => {
-    setColorMode((currentMode) => (currentMode === 'light' ? 'dark' : 'light'));
   };
 
   const handleOpenConfirmPopup = (example: ConfirmPopupExample) => {
@@ -576,7 +561,7 @@ export const HomePage = () => {
     : null;
 
   return (
-    <Page $colorMode={colorMode} background={pageBackground} data-color-mode={colorMode}>
+    <Page background={pageBackground}>
       <Header>
         <HeaderCopy>
           <Text as="h1" font="heading-l-b">
@@ -587,9 +572,7 @@ export const HomePage = () => {
           </Text>
         </HeaderCopy>
         <HeaderControls>
-          <ThemeToggle type="button" onClick={handleToggleColorMode}>
-            {colorMode === 'light' ? 'Dark mode' : 'Light mode'}
-          </ThemeToggle>
+          <ColorModeToggle />
           <BackgroundControls aria-label="Page background">
             <BackgroundOptionGroup aria-label="Color background" role="group">
               <BackgroundGroupLabel>bg</BackgroundGroupLabel>
@@ -776,6 +759,22 @@ export const HomePage = () => {
           )}
         </IconButtonGrid>
         <CodeExamples examples={ICON_BUTTON_CODE_EXAMPLES} />
+      </ShowcaseSection>
+
+      <ShowcaseSection>
+        <SectionTitle>
+          <Text as="h2" font="heading-s-m">
+            ColorModeToggle
+          </Text>
+          <Text color="text.tertiary" font="detail-m-r">
+            Light / dark, disabled
+          </Text>
+        </SectionTitle>
+        <ColorModeToggleShowcase>
+          <ColorModeToggle />
+          <ColorModeToggle disabled />
+        </ColorModeToggleShowcase>
+        <CodeExamples examples={COLOR_MODE_TOGGLE_CODE_EXAMPLES} />
       </ShowcaseSection>
 
       <ShowcaseSection>
@@ -1067,12 +1066,7 @@ const CodeExamples = ({ examples }: { examples: ReadonlyArray<CodeExample> }) =>
   </CodeExampleGrid>
 );
 
-const getModeVariables = (mode: ColorMode) => css`
-  ${colorModeCssVariables[mode]}
-`;
-
-const Page = styled(PageLayout)<{ $colorMode: ColorMode }>`
-  ${({ $colorMode }) => getModeVariables($colorMode)}
+const Page = styled(PageLayout)`
   display: grid;
   gap: ${({ theme }) => theme.spacing.xl};
   padding: ${({ theme }) => theme.spacing['3xl']};
@@ -1102,25 +1096,6 @@ const HeaderControls = styled.div`
   justify-content: flex-end;
   justify-items: flex-end;
   gap: ${({ theme }) => theme.spacing.md};
-`;
-
-const ThemeToggle = styled.button`
-  flex: 0 0 auto;
-  padding: ${({ theme }) => `${theme.spacing.md} ${theme.spacing.lg}`};
-  border: 1px solid ${({ theme }) => theme.color.border.subtle};
-  border-radius: ${({ theme }) => theme.radius.full};
-  color: ${({ theme }) => theme.color.text.primary};
-  background: ${({ theme }) => theme.color.bg.subtle};
-  cursor: pointer;
-
-  &:hover {
-    background: ${({ theme }) => theme.color.bg.surface};
-  }
-
-  &:focus-visible {
-    outline: 2px solid ${({ theme }) => theme.color.border.focused};
-    outline-offset: ${({ theme }) => theme.spacing.xs};
-  }
 `;
 
 const BackgroundControls = styled.div`
@@ -1278,6 +1253,13 @@ const IconButtonSample = styled.div`
   display: inline-grid;
   justify-items: center;
   gap: ${({ theme }) => theme.spacing.sm};
+`;
+
+const ColorModeToggleShowcase = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.lg};
 `;
 
 const RunnerTypeAvatarTable = styled.div`
