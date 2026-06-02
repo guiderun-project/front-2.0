@@ -1,4 +1,4 @@
-import type { ChangeEvent, KeyboardEvent, ReactElement } from "react";
+import type { ChangeEvent, ReactElement } from "react";
 import { useId, useRef, useState } from "react";
 
 import styled from "@emotion/styled";
@@ -19,24 +19,34 @@ type SegmentKey = "hours" | "minutes" | "seconds";
 
 const EMPTY_TIME: TimeValue = { hours: "", minutes: "", seconds: "" };
 
-const SEGMENTS: ReadonlyArray<{ key: SegmentKey; label: string; max: number }> =
-  [
-    { key: "hours", label: "시", max: 99 },
-    { key: "minutes", label: "분", max: 59 },
-    { key: "seconds", label: "초", max: 59 },
-  ];
+const SEGMENTS: ReadonlyArray<{ key: SegmentKey; label: string }> = [
+  { key: "hours", label: "시" },
+  { key: "minutes", label: "분" },
+  { key: "seconds", label: "초" },
+];
 
-const sanitizeSegment = (
-  raw: string,
-  max: number,
-  previous: string,
-): string => {
-  const digits = raw.replace(/\D/g, "").slice(0, 2);
-  if (digits.length === 2 && Number(digits) > max) {
-    return previous;
-  }
-  return digits;
-};
+// TimeInput behaves like a right-to-left shift register: every typed digit
+// enters at the seconds ones-place and pushes the existing digits left
+// (초 → 분 → 시), no matter which segment is focused. The canonical state is the
+// raw typed-digit string (max 6). Segments are filled from the right with no
+// leading-zero padding, so a segment that has not been reached yet stays empty
+// and keeps showing the "--" placeholder.
+const TIME_DIGITS = 6;
+
+const toDigits = (time: TimeValue): string =>
+  time.hours + time.minutes + time.seconds;
+
+const fromDigits = (digits: string): TimeValue => ({
+  hours: digits.slice(0, -4),
+  minutes: digits.slice(-4, -2),
+  seconds: digits.slice(-2),
+});
+
+const pushDigit = (time: TimeValue, digit: string): TimeValue =>
+  fromDigits((toDigits(time) + digit).slice(-TIME_DIGITS));
+
+const popDigit = (time: TimeValue): TimeValue =>
+  fromDigits(toDigits(time).slice(0, -1));
 
 export const TimeInput = ({
   label,
@@ -71,34 +81,35 @@ export const TimeInput = ({
   };
 
   const handleSegmentChange =
-    (index: number) =>
+    (key: SegmentKey) =>
     (event: ChangeEvent<HTMLInputElement>): void => {
-      const { key, max } = SEGMENTS[index];
-      const sanitized = sanitizeSegment(event.target.value, max, current[key]);
-      commit({ ...current, [key]: sanitized });
-
-      if (sanitized.length === 2 && index < SEGMENTS.length - 1) {
-        segmentRefs.current[index + 1]?.focus();
+      const raw = event.target.value.replace(/\D/g, "");
+      const previous = current[key];
+      if (raw.length > previous.length) {
+        // A digit was typed: append the newest one to the shift register.
+        commit(pushDigit(current, raw.slice(-1)));
+      } else if (raw.length < previous.length) {
+        // A digit was deleted: drop the rightmost digit and shift right.
+        commit(popDigit(current));
       }
     };
 
-  const handleSegmentKeyDown =
-    (index: number) =>
-    (event: KeyboardEvent<HTMLInputElement>): void => {
-      const target = event.currentTarget;
-      const isCaretAtStart =
-        target.selectionStart === 0 && target.selectionEnd === 0;
-      if (event.key === "Backspace" && isCaretAtStart && index > 0) {
-        segmentRefs.current[index - 1]?.focus();
-      }
-    };
+  const handleSegmentFocus = (
+    event: React.FocusEvent<HTMLInputElement>,
+  ): void => {
+    // Keep the caret at the end so each keystroke appends to the register.
+    const input = event.currentTarget;
+    const end = input.value.length;
+    input.setSelectionRange(end, end);
+  };
 
   const handleBoxPointerDown = (
     event: React.PointerEvent<HTMLDivElement>,
   ): void => {
     if (event.target === event.currentTarget) {
       event.preventDefault();
-      segmentRefs.current[0]?.focus();
+      // Focus the seconds (rightmost) segment — entry always starts there.
+      segmentRefs.current[SEGMENTS.length - 1]?.focus();
     }
   };
 
@@ -124,8 +135,8 @@ export const TimeInput = ({
                 aria-invalid={hasError || undefined}
                 aria-label={segment.label}
                 inputMode="numeric"
-                onChange={handleSegmentChange(index)}
-                onKeyDown={handleSegmentKeyDown(index)}
+                onChange={handleSegmentChange(segment.key)}
+                onFocus={handleSegmentFocus}
                 placeholder={SEGMENT_PLACEHOLDER}
                 ref={(node) => {
                   segmentRefs.current[index] = node;
