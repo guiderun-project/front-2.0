@@ -4,6 +4,7 @@ import styled from '@emotion/styled';
 
 import { resolveColorToken } from '@/styles/tokens';
 
+import { Text } from '../Text';
 import { BUTTON_COLOR_TOKENS, BUTTON_SIZE_STYLES } from './Button.constants';
 import type { ButtonLevel, ButtonProps, ButtonSize, ButtonStatus } from './Button.types';
 
@@ -26,6 +27,7 @@ export const Button = ({
 }: ButtonProps): ReactElement => {
   const resolvedStatus = disabled ? 'disabled' : status;
   const isDisabled = disabled || resolvedStatus === 'disabled';
+  const labelFont = BUTTON_SIZE_STYLES[size].typography;
 
   return (
     <StyledButton
@@ -37,7 +39,9 @@ export const Button = ({
       {...props}
     >
       {leftIcon ? <IconSlot>{leftIcon}</IconSlot> : null}
-      <ButtonLabel>{children}</ButtonLabel>
+      <ButtonLabel align="center" font={labelFont}>
+        {children}
+      </ButtonLabel>
       {rightIcon ? <IconSlot>{rightIcon}</IconSlot> : null}
     </StyledButton>
   );
@@ -49,7 +53,6 @@ const StyledButton = styled.button<ButtonStyleProps>(
     const defaultTokens = BUTTON_COLOR_TOKENS[$level][$status];
     const pressedTokens = BUTTON_COLOR_TOKENS[$level].pressed;
     const disabledTokens = BUTTON_COLOR_TOKENS[$level].disabled;
-    const typography = theme.typography[sizeStyle.typography];
     const width = 'width' in sizeStyle ? sizeStyle.width : undefined;
     const minWidth = 'minWidth' in sizeStyle ? sizeStyle.minWidth : undefined;
     const borderStyle = defaultTokens.border
@@ -77,11 +80,6 @@ const StyledButton = styled.button<ButtonStyleProps>(
       backgroundColor: defaultTokens.background ? resolveColorToken(defaultTokens.background) : 'transparent',
       color: resolveColorToken(defaultTokens.content),
       cursor: 'pointer',
-      fontFamily: typography.fontFamily,
-      fontSize: typography.fontSize,
-      fontWeight: typography.fontWeight,
-      letterSpacing: typography.letterSpacing,
-      lineHeight: typography.lineHeight,
       textAlign: 'center',
       textDecoration: 'none',
       touchAction: 'manipulation',
@@ -110,7 +108,7 @@ const StyledButton = styled.button<ButtonStyleProps>(
   },
 );
 
-const ButtonLabel = styled.span`
+const ButtonLabel = styled(Text)`
   display: block;
   overflow: hidden;
   min-width: 0;
