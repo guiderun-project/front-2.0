@@ -1,7 +1,7 @@
-import type { ChangeEvent, KeyboardEvent, ReactElement } from 'react';
-import { useId, useRef, useState } from 'react';
+import type { ChangeEvent, KeyboardEvent, ReactElement } from "react";
+import { useId, useRef, useState } from "react";
 
-import styled from '@emotion/styled';
+import styled from "@emotion/styled";
 
 import {
   CONTROL_TOP_SPACE,
@@ -10,23 +10,28 @@ import {
   INFO_TYPOGRAPHY,
   LABEL_TYPOGRAPHY,
   typographyStyle,
-} from './fieldStyles';
-import type { TimeInputProps, TimeValue } from './Input.types';
+} from "./fieldStyles";
+import type { TimeInputProps, TimeValue } from "./Input.types";
 
-const SEGMENT_PLACEHOLDER = '--';
+const SEGMENT_PLACEHOLDER = "--";
 
-type SegmentKey = 'hours' | 'minutes' | 'seconds';
+type SegmentKey = "hours" | "minutes" | "seconds";
 
-const EMPTY_TIME: TimeValue = { hours: '', minutes: '', seconds: '' };
+const EMPTY_TIME: TimeValue = { hours: "", minutes: "", seconds: "" };
 
-const SEGMENTS: ReadonlyArray<{ key: SegmentKey; label: string; max: number }> = [
-  { key: 'hours', label: '시', max: 99 },
-  { key: 'minutes', label: '분', max: 59 },
-  { key: 'seconds', label: '초', max: 59 },
-];
+const SEGMENTS: ReadonlyArray<{ key: SegmentKey; label: string; max: number }> =
+  [
+    { key: "hours", label: "시", max: 99 },
+    { key: "minutes", label: "분", max: 59 },
+    { key: "seconds", label: "초", max: 59 },
+  ];
 
-const sanitizeSegment = (raw: string, max: number, previous: string): string => {
-  const digits = raw.replace(/\D/g, '').slice(0, 2);
+const sanitizeSegment = (
+  raw: string,
+  max: number,
+  previous: string,
+): string => {
+  const digits = raw.replace(/\D/g, "").slice(0, 2);
   if (digits.length === 2 && Number(digits) > max) {
     return previous;
   }
@@ -48,7 +53,9 @@ export const TimeInput = ({
   const segmentRefs = useRef<Array<HTMLInputElement | null>>([]);
 
   const isControlled = value !== undefined;
-  const [internalValue, setInternalValue] = useState<TimeValue>(defaultValue ?? EMPTY_TIME);
+  const [internalValue, setInternalValue] = useState<TimeValue>(
+    defaultValue ?? EMPTY_TIME,
+  );
   const current = isControlled ? value : internalValue;
 
   const hasError = Boolean(errorText);
@@ -79,13 +86,16 @@ export const TimeInput = ({
     (index: number) =>
     (event: KeyboardEvent<HTMLInputElement>): void => {
       const target = event.currentTarget;
-      const isCaretAtStart = target.selectionStart === 0 && target.selectionEnd === 0;
-      if (event.key === 'Backspace' && isCaretAtStart && index > 0) {
+      const isCaretAtStart =
+        target.selectionStart === 0 && target.selectionEnd === 0;
+      if (event.key === "Backspace" && isCaretAtStart && index > 0) {
         segmentRefs.current[index - 1]?.focus();
       }
     };
 
-  const handleBoxPointerDown = (event: React.PointerEvent<HTMLDivElement>): void => {
+  const handleBoxPointerDown = (
+    event: React.PointerEvent<HTMLDivElement>,
+  ): void => {
     if (event.target === event.currentTarget) {
       event.preventDefault();
       segmentRefs.current[0]?.focus();
@@ -94,7 +104,10 @@ export const TimeInput = ({
 
   return (
     <Root className={className} data-error={hasError || undefined}>
-      <FieldBox data-filled={hasValue || undefined} onPointerDown={handleBoxPointerDown}>
+      <FieldBox
+        data-filled={hasValue || undefined}
+        onPointerDown={handleBoxPointerDown}
+      >
         <FloatingLabel data-floating-label="" id={labelId}>
           {label}
         </FloatingLabel>
@@ -124,7 +137,12 @@ export const TimeInput = ({
         </SegmentRow>
       </FieldBox>
       {hasMessage && (
-        <Message $error={hasError} id={messageId} role={hasError ? 'alert' : undefined}>
+        <Message
+          $error={hasError}
+          data-helper={!hasError || undefined}
+          id={messageId}
+          role={hasError ? "alert" : undefined}
+        >
           {message}
         </Message>
       )}
@@ -133,42 +151,46 @@ export const TimeInput = ({
 };
 
 const Root = styled.div(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
+  display: "flex",
+  flexDirection: "column",
   gap: theme.spacing.md,
-  width: '100%',
+  width: "100%",
+  "&:focus-within [data-helper]": {
+    color: theme.color.text.brand,
+  },
 }));
 
 const FieldBox = styled.div(({ theme }) => ({
-  position: 'relative',
-  display: 'flex',
-  alignItems: 'center',
+  position: "relative",
+  display: "flex",
+  alignItems: "center",
   minHeight: theme.pxToRem(FIELD_MIN_HEIGHT),
   padding: `${theme.spacing.lg} ${theme.spacing.xl}`,
   borderRadius: theme.radius.md,
   border: `1px solid ${theme.color.border.default}`,
   backgroundColor: theme.color.bg.default,
-  transition: 'border-color 120ms ease, box-shadow 120ms ease',
+  transition: "border-color 120ms ease, box-shadow 120ms ease",
 
-  '&:focus-within': {
+  "&:focus-within": {
     borderColor: theme.color.border.brand,
     boxShadow: `inset 0 0 0 1px ${theme.color.border.brand}`,
   },
 
-  '&:focus-within [data-floating-label], &[data-filled="true"] [data-floating-label]': {
-    top: theme.spacing.lg,
-    transform: `translateY(0) scale(${FLOATED_LABEL_SCALE})`,
-    transformOrigin: 'left top',
-    color: theme.color.text.tertiary,
-  },
+  '&:focus-within [data-floating-label], &[data-filled="true"] [data-floating-label]':
+    {
+      top: theme.spacing.lg,
+      transform: `translateY(0) scale(${FLOATED_LABEL_SCALE})`,
+      transformOrigin: "left top",
+      color: theme.color.text.tertiary,
+    },
 
-  '&:focus-within [data-floating-label]': {
+  "&:focus-within [data-floating-label]": {
     color: theme.color.text.brand,
   },
 
-  '& [data-segments]': {
+  "& [data-segments]": {
     opacity: 0,
-    transition: 'opacity 120ms ease',
+    transition: "opacity 120ms ease",
   },
 
   '&:focus-within [data-segments], &[data-filled="true"] [data-segments]': {
@@ -184,47 +206,47 @@ const FieldBox = styled.div(({ theme }) => ({
     color: theme.color.text.danger,
   },
 
-  '@media (prefers-reduced-motion: reduce)': {
-    transition: 'none',
+  "@media (prefers-reduced-motion: reduce)": {
+    transition: "none",
 
-    '& [data-segments]': {
-      transition: 'none',
+    "& [data-segments]": {
+      transition: "none",
     },
   },
 }));
 
 const FloatingLabel = styled.span(({ theme }) => ({
-  position: 'absolute',
+  position: "absolute",
   left: theme.spacing.xl,
-  top: '50%',
+  top: "50%",
   maxWidth: `calc(100% - ${theme.spacing.xl} * 2)`,
-  transform: 'translateY(-50%) scale(1)',
-  transformOrigin: 'left center',
-  overflow: 'hidden',
-  whiteSpace: 'nowrap',
-  textOverflow: 'ellipsis',
-  pointerEvents: 'none',
+  transform: "translateY(-50%) scale(1)",
+  transformOrigin: "left center",
+  overflow: "hidden",
+  whiteSpace: "nowrap",
+  textOverflow: "ellipsis",
+  pointerEvents: "none",
   color: theme.color.text.tertiary,
   ...typographyStyle(theme, LABEL_TYPOGRAPHY),
-  transition: 'transform 120ms ease, color 120ms ease, top 120ms ease',
+  transition: "transform 120ms ease, color 120ms ease, top 120ms ease",
 
-  '@media (prefers-reduced-motion: reduce)': {
-    transition: 'color 120ms ease',
+  "@media (prefers-reduced-motion: reduce)": {
+    transition: "color 120ms ease",
   },
 }));
 
 const SegmentRow = styled.div(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  width: '100%',
+  display: "flex",
+  alignItems: "center",
+  width: "100%",
   paddingTop: theme.pxToRem(CONTROL_TOP_SPACE),
 }));
 
 const SegmentSlot = styled.div({
-  display: 'flex',
+  display: "flex",
   flex: 1,
   minWidth: 0,
-  alignItems: 'center',
+  alignItems: "center",
 });
 
 const Separator = styled.span(({ theme }) => ({
@@ -240,19 +262,19 @@ const Segment = styled.input(({ theme }) => ({
   margin: 0,
   padding: `0 ${theme.spacing.xs}`,
   border: 0,
-  outline: 'none',
+  outline: "none",
   borderRadius: theme.radius.s,
-  background: 'transparent',
+  background: "transparent",
   color: theme.color.text.primary,
-  textAlign: 'center',
+  textAlign: "center",
   caretColor: theme.color.text.brand,
   ...typographyStyle(theme, LABEL_TYPOGRAPHY),
 
-  '&::placeholder': {
+  "&::placeholder": {
     color: theme.color.text.quaternary,
   },
 
-  '&:focus': {
+  "&:focus": {
     backgroundColor: theme.color.bg.subtle,
   },
 }));

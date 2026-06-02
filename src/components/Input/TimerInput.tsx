@@ -1,4 +1,5 @@
 import type { ReactElement } from "react";
+import { useId } from "react";
 
 import styled from "@emotion/styled";
 
@@ -21,15 +22,19 @@ export const TimerInput = ({
   clearable = true,
   ...inputProps
 }: TimerInputProps): ReactElement => {
+  const timerId = useId();
+  const hasTimer = timerText != null;
+
   return (
     <Input
       {...inputProps}
       clearable={clearable}
+      describedById={hasTimer ? timerId : undefined}
       inputMode={inputMode}
       trailing={
         <Trailing>
-          {timerText != null && (
-            <Timer>
+          {hasTimer && (
+            <Timer id={timerId} role="text">
               <HiddenText>{timerLabel}</HiddenText>
               <span aria-hidden={timerLabel ? undefined : true}>
                 {timerText}
@@ -76,7 +81,7 @@ const ConfirmButton = styled.button(({ theme }) => ({
   padding: `0 ${theme.spacing.md}`,
   border: 0,
   borderRadius: theme.radius.sm,
-  backgroundColor: theme.color.bg.brand,
+  backgroundColor: theme.color.bg['brand-primary'],
   color: theme.color.text.inverse,
   cursor: "pointer",
   touchAction: "manipulation",

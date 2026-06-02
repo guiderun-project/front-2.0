@@ -16,6 +16,7 @@ export const Input = ({
   onClear,
   trailing,
   className,
+  describedById,
   placeholder,
   value,
   defaultValue,
@@ -28,6 +29,7 @@ export const Input = ({
       clearLabel={clearLabel}
       clearable={clearable}
       defaultValue={defaultValue}
+      describedById={describedById}
       errorText={errorText}
       helperText={helperText}
       label={label}

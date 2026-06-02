@@ -19,6 +19,7 @@ export type InputProps = InputFieldOwnProps &
     onClear?: () => void;
     trailing?: ReactNode;
     className?: string;
+    describedById?: string;
   };
 
 type NativeTextareaProps = Omit<

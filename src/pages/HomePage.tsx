@@ -1454,10 +1454,12 @@ const TextList = styled.div`
 
 const TextRow = styled.div`
   display: grid;
-  grid-template-columns: minmax(
+  grid-template-columns:
+    minmax(
       ${({ theme }) => theme.pxToRem(140)},
       ${({ theme }) => theme.pxToRem(200)}
-    ) 1fr;
+    )
+    1fr;
   align-items: baseline;
   gap: ${({ theme }) => theme.spacing.xl};
   min-height: ${({ theme }) => theme.pxToRem(32)};
@@ -1603,6 +1605,8 @@ const PaginationSampleRow = styled.div`
 
 const FieldList = styled.div`
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
   gap: ${({ theme }) => theme.spacing["3xl"]};
   max-width: ${({ theme }) => theme.pxToRem(335)};
 `;

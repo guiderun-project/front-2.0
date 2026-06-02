@@ -47,13 +47,13 @@ export const fieldControlStyles = (theme: Theme, multiline = false) =>
     },
     ...typographyStyle(theme, multiline ? MULTILINE_VALUE_TYPOGRAPHY : LABEL_TYPOGRAPHY),
 
-    ...(multiline
-      ? {}
-      : {
-          '&:focus:placeholder-shown': {
-            textIndent: theme.pxToRem(CARET_BAR_OFFSET),
-          },
-        }),
+    // Offset the placeholder so it does not sit flush against the focus caret
+    // bar. Applies to both single-line and multiline: the bar only shows while
+    // the field is empty and focused, which is exactly the placeholder-shown
+    // state, and on a textarea text-indent only shifts that first line.
+    '&:focus:placeholder-shown': {
+      textIndent: theme.pxToRem(CARET_BAR_OFFSET),
+    },
 
     ...(multiline
       ? ({
