@@ -19,6 +19,7 @@ Keep `AGENTS.md` and `CLAUDE.md` aligned when changing agent instructions.
 - `src/api/types`: API request and response types.
 - `src/api/constants`: Shared API constants.
 - `src/components`: Shared app-wide components.
+- `src/contexts`: App-wide React contexts.
 - `src/pages`: Route-level pages.
 - `src/router`: Route definitions and path constants.
 - `src/styles`: Theme, global styles, and design tokens.
@@ -95,6 +96,16 @@ Keep `AGENTS.md` and `CLAUDE.md` aligned when changing agent instructions.
 - Keep API method names consistent with the existing service style.
 - When an API contract changes, update related service methods, types, mocks, and fixtures together.
 - Keep authentication and token refresh behavior inside `src/api/core`.
+
+## Authentication & Session
+
+- Store accessToken only in the memory-backed `src/api/core/tokenStorage`.
+- Do not store accessToken in `localStorage` or `sessionStorage`.
+- Treat refreshToken as a backend-managed HttpOnly Cookie; frontend code should not read or write it directly.
+- UI components must use `useAuth()` for auth state and must not read accessToken directly.
+- Use TanStack Query `['auth', 'user']` as the source of truth for global user information.
+- Keep 401 accessToken reissue and request retry behavior centralized in `src/api/core/client.ts`.
+- Do not add public-only auth page guards until authentication page routes are finalized.
 
 ## Mocking
 

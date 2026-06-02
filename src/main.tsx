@@ -6,6 +6,7 @@ import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 
 import { baseURL } from '@/api/core/client';
+import { AuthProvider } from '@/contexts';
 import { router } from '@/router/router';
 import { globalStyles } from '@/styles/globalStyles';
 import { theme } from '@/styles/theme';
@@ -45,10 +46,12 @@ const bootstrap = async () => {
   createRoot(rootElement).render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider theme={theme}>
-          <Global styles={globalStyles} />
-          <RouterProvider router={router} />
-        </ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider theme={theme}>
+            <Global styles={globalStyles} />
+            <RouterProvider router={router} />
+          </ThemeProvider>
+        </AuthProvider>
       </QueryClientProvider>
     </StrictMode>,
   );

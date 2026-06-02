@@ -10,11 +10,15 @@ import type {
 } from '@/api/types/auth';
 import { mockDb } from '@/mocks/fixtures';
 import {
+  activateMockRefreshSession,
   apiUrl,
   badRequest,
+  deactivateMockRefreshSession,
   expiredRefreshTokenCookie,
+  isMockRefreshSessionActive,
   noContent,
   refreshTokenCookie,
+  unauthorized,
 } from '@/mocks/http';
 
 const createVerificationResponse = (
@@ -46,6 +50,8 @@ export const authHandlers: HttpHandler[] = [
       });
     }
 
+    activateMockRefreshSession();
+
     return HttpResponse.json(
       {
         status: 'LOGIN_SUCCESS',
@@ -74,6 +80,8 @@ export const authHandlers: HttpHandler[] = [
       return badRequest('Invalid accountId or password.');
     }
 
+    activateMockRefreshSession();
+
     return HttpResponse.json(
       { accessToken: 'mock-access-token' },
       {
@@ -85,6 +93,12 @@ export const authHandlers: HttpHandler[] = [
   }),
 
   http.post(apiUrl('/oauth/login/reissue'), () => {
+    if (!isMockRefreshSessionActive()) {
+      return unauthorized('Mock refresh session is missing or expired.');
+    }
+
+    activateMockRefreshSession();
+
     return HttpResponse.json(
       { accessToken: 'mock-rotated-access-token' },
       {
@@ -96,6 +110,8 @@ export const authHandlers: HttpHandler[] = [
   }),
 
   http.post(apiUrl('/logout'), () => {
+    deactivateMockRefreshSession();
+
     return new HttpResponse(null, {
       status: 204,
       headers: {
@@ -132,6 +148,8 @@ export const authHandlers: HttpHandler[] = [
       hopePrefs: runningInfo.hopePrefs,
       firstParticipation: true,
     });
+
+    activateMockRefreshSession();
 
     return HttpResponse.json(
       {

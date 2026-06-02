@@ -30,6 +30,7 @@ import {
   getSearchNumber,
   getSearchString,
   noContent,
+  requireAuthorization,
 } from '@/mocks/http';
 
 const toActivityEventItem = (event: MockEvent) => {
@@ -63,7 +64,13 @@ const deduplicateEvents = (events: MockEvent[]) => {
 };
 
 export const userHandlers: HttpHandler[] = [
-  http.get(apiUrl('/user/personal'), () => {
+  http.get(apiUrl('/user/personal'), ({ request }) => {
+    const authError = requireAuthorization(request);
+
+    if (authError) {
+      return authError;
+    }
+
     const user = getCurrentUser();
 
     return HttpResponse.json({
@@ -81,6 +88,12 @@ export const userHandlers: HttpHandler[] = [
   }),
 
   http.patch(apiUrl('/user/personal/birth-date'), async ({ request }) => {
+    const authError = requireAuthorization(request);
+
+    if (authError) {
+      return authError;
+    }
+
     const body = (await request.json()) as UserBirthDatePatchRequest;
     const user = getCurrentUser();
 
@@ -89,7 +102,13 @@ export const userHandlers: HttpHandler[] = [
     return HttpResponse.json({ birthDate: user.birthDate });
   }),
 
-  http.get(apiUrl('/user/mypage'), () => {
+  http.get(apiUrl('/user/mypage'), ({ request }) => {
+    const authError = requireAuthorization(request);
+
+    if (authError) {
+      return authError;
+    }
+
     const user = getCurrentUser();
     const myForms = mockDb.forms.filter(
       (form) => form.userId === user.userId && form.status === 'APPLIED',
@@ -131,6 +150,12 @@ export const userHandlers: HttpHandler[] = [
   }),
 
   http.get(apiUrl('/user/activity/events'), ({ request }) => {
+    const authError = requireAuthorization(request);
+
+    if (authError) {
+      return authError;
+    }
+
     const user = getCurrentUser();
     const type = getSearchString(
       request,
@@ -168,6 +193,12 @@ export const userHandlers: HttpHandler[] = [
   }),
 
   http.get(apiUrl('/user/activity/partners'), ({ request }) => {
+    const authError = requireAuthorization(request);
+
+    if (authError) {
+      return authError;
+    }
+
     const user = getCurrentUser();
     const sort = getSearchString(
       request,
@@ -263,6 +294,12 @@ export const userHandlers: HttpHandler[] = [
   }),
 
   http.patch(apiUrl('/user/personal'), async ({ request }) => {
+    const authError = requireAuthorization(request);
+
+    if (authError) {
+      return authError;
+    }
+
     const body = (await request.json()) as UpdatePersonalInfoRequest;
     const user = getCurrentUser();
 
@@ -284,6 +321,12 @@ export const userHandlers: HttpHandler[] = [
   }),
 
   http.patch(apiUrl('/user/running'), async ({ request }) => {
+    const authError = requireAuthorization(request);
+
+    if (authError) {
+      return authError;
+    }
+
     const body = (await request.json()) as UpdateRunningInfoRequest;
     const user = getCurrentUser();
 
@@ -300,6 +343,12 @@ export const userHandlers: HttpHandler[] = [
   }),
 
   http.post(apiUrl('/user/account'), async ({ request }) => {
+    const authError = requireAuthorization(request);
+
+    if (authError) {
+      return authError;
+    }
+
     const body = (await request.json()) as SetAccountRequest;
     const user = getCurrentUser();
 
@@ -318,6 +367,12 @@ export const userHandlers: HttpHandler[] = [
   }),
 
   http.post(apiUrl('/user/account/duplicated'), async ({ request }) => {
+    const authError = requireAuthorization(request);
+
+    if (authError) {
+      return authError;
+    }
+
     const body = (await request.json()) as CheckAccountDuplicatedRequest;
 
     return HttpResponse.json({
@@ -326,6 +381,12 @@ export const userHandlers: HttpHandler[] = [
   }),
 
   http.delete(apiUrl('/user'), async ({ request }) => {
+    const authError = requireAuthorization(request);
+
+    if (authError) {
+      return authError;
+    }
+
     const body = (await request.json()) as UserWithdrawalDeleteRequest;
     const user = getCurrentUser();
 
