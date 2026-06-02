@@ -80,7 +80,7 @@ const StyledIconButton = styled.button<IconButtonStyleProps>(
 
     '@media (hover: hover)': {
       '&:hover:not(:disabled)': {
-        backgroundColor: $background ? resolveColorToken($background) : theme.color.bg.weak,
+        backgroundColor: $background ? resolveColorToken($background) : theme.color.bg.overlay,
         opacity: $background ? 0.88 : 1,
       },
     },
