@@ -10,16 +10,8 @@ const DEFAULT_ICON_COLOR = 'icon.primary' satisfies ColorToken;
 export type IconProps = {
   icon: IconName;
   size?: number;
-  color?: ColorToken | 'currentColor';
+  color?: ColorToken;
 } & Omit<SVGProps<SVGSVGElement>, 'children' | 'color' | 'height' | 'width'>;
-
-const resolveIconColorValue = (color: ColorToken | 'currentColor'): string => {
-  if (color === 'currentColor') {
-    return color;
-  }
-
-  return resolveColorToken(color);
-};
 
 export const Icon = ({
   'aria-hidden': ariaHidden,
@@ -42,7 +34,7 @@ export const Icon = ({
       role={isDecorative ? role : (role ?? 'img')}
       style={{
         ...style,
-        color: resolveIconColorValue(color),
+        color: resolveColorToken(color),
         display: 'inline-block',
         flexShrink: 0,
         height: size,

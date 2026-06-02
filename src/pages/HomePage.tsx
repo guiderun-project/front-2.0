@@ -86,7 +86,7 @@ const BUTTON_CODE_EXAMPLES = [
     code: `<Button
   level="secondary"
   size="s"
-  leftIcon={<Icon icon="plus-lined" size={16} />}
+  leftIcon={{ icon: 'plus-lined' }}
 >
   추가
 </Button>`,

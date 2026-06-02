@@ -4,8 +4,9 @@ import styled from '@emotion/styled';
 
 import { resolveColorToken } from '@/styles/tokens';
 
+import { Icon } from '../Icon';
 import { Text } from '../Text';
-import { BUTTON_COLOR_TOKENS, BUTTON_SIZE_STYLES } from './Button.constants';
+import { BUTTON_COLOR_TOKENS, BUTTON_ICON_SIZE, BUTTON_SIZE_STYLES } from './Button.constants';
 import type { ButtonLevel, ButtonProps, ButtonSize, ButtonStatus } from './Button.types';
 
 type ButtonStyleProps = {
@@ -27,6 +28,7 @@ export const Button = ({
 }: ButtonProps): ReactElement => {
   const resolvedStatus = disabled ? 'disabled' : status;
   const isDisabled = disabled || resolvedStatus === 'disabled';
+  const defaultIconColor = BUTTON_COLOR_TOKENS[level][resolvedStatus].content;
   const labelFont = BUTTON_SIZE_STYLES[size].typography;
 
   return (
@@ -38,11 +40,29 @@ export const Button = ({
       type={type}
       {...props}
     >
-      {leftIcon ? <IconSlot>{leftIcon}</IconSlot> : null}
+      {leftIcon ? (
+        <IconSlot>
+          <Icon
+            {...leftIcon}
+            aria-hidden={true}
+            color={leftIcon.color ?? defaultIconColor}
+            size={BUTTON_ICON_SIZE}
+          />
+        </IconSlot>
+      ) : null}
       <ButtonLabel align="center" font={labelFont}>
         {children}
       </ButtonLabel>
-      {rightIcon ? <IconSlot>{rightIcon}</IconSlot> : null}
+      {rightIcon ? (
+        <IconSlot>
+          <Icon
+            {...rightIcon}
+            aria-hidden={true}
+            color={rightIcon.color ?? defaultIconColor}
+            size={BUTTON_ICON_SIZE}
+          />
+        </IconSlot>
+      ) : null}
     </StyledButton>
   );
 };

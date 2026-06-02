@@ -48,6 +48,8 @@ export const BUTTON_SIZE_STYLES = {
   },
 } as const satisfies Record<ButtonSize, ButtonSizeStyle>;
 
+export const BUTTON_ICON_SIZE = 14;
+
 export const BUTTON_COLOR_TOKENS: Record<ButtonLevel, Record<ButtonStatus, ButtonColorTokens>> = {
   primary: {
     default: {
