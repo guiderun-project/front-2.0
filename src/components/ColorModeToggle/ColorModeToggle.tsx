@@ -33,18 +33,21 @@ const COLOR_MODE_OPTIONS: ReadonlyArray<{
   },
 ];
 
-export type ColorModeToggleProps = {
+type ColorModeToggleProps = {
   disabled?: boolean;
   'aria-label'?: string;
 } & Omit<ComponentPropsWithoutRef<'div'>, 'children' | 'onChange' | 'role'>;
 
-const getInactiveColor = (value: ColorMode): ColorToken => {
-  return value === 'dark' ? 'text.secondary' : 'text.tertiary';
-};
-
-const getInactiveIconColor = (value: ColorMode): ColorToken => {
-  return value === 'dark' ? 'icon.secondary' : 'icon.teritary';
-};
+const INACTIVE_COLOR_BY_MODE = {
+  light: {
+    icon: 'icon.teritary',
+    text: 'text.tertiary',
+  },
+  dark: {
+    icon: 'icon.secondary',
+    text: 'text.secondary',
+  },
+} as const satisfies Record<ColorMode, { icon: ColorToken; text: ColorToken }>;
 
 export const ColorModeToggle = ({
   'aria-label': ariaLabel = '색상 모드',
@@ -70,7 +73,7 @@ export const ColorModeToggle = ({
         return (
           <ToggleOption
             key={mode}
-            $color={isSelected ? 'text.primary' : getInactiveColor(colorMode)}
+            $color={isSelected ? 'text.primary' : INACTIVE_COLOR_BY_MODE[colorMode].text}
             aria-label={`${label} 모드`}
             aria-pressed={isSelected}
             disabled={disabled}
@@ -78,7 +81,7 @@ export const ColorModeToggle = ({
             onClick={() => handleSelectColorMode(mode)}
           >
             <Icon
-              color={isSelected ? 'icon.primary' : getInactiveIconColor(colorMode)}
+              color={isSelected ? 'icon.primary' : INACTIVE_COLOR_BY_MODE[colorMode].icon}
               icon={isSelected ? icon.selected : icon.default}
               size={16}
             />

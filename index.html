@@ -4,9 +4,14 @@
     <meta charset="UTF-8" />
     <script>
       try {
-        const colorMode = window.localStorage.getItem("guiderun-color-mode");
+        const COLOR_MODE_STORAGE_KEY = "guiderun-color-mode";
+        const COLOR_MODE = {
+          LIGHT: "light",
+          DARK: "dark",
+        };
+        const colorMode = window.localStorage.getItem(COLOR_MODE_STORAGE_KEY);
 
-        if (colorMode === "light" || colorMode === "dark") {
+        if (colorMode === COLOR_MODE.LIGHT || colorMode === COLOR_MODE.DARK) {
           document.documentElement.dataset.colorMode = colorMode;
         }
       } catch {
