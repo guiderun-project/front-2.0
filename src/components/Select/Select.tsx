@@ -146,7 +146,7 @@ const SelectCheckList = <TValue extends string>({
   value,
 }: SelectCheckListProps<TValue>): ReactElement => {
   return (
-    <SelectCheckListRoot aria-label={ariaLabel}>
+    <SelectCheckListRoot aria-label={ariaLabel} role="listbox">
       {options.map((option) => {
         const isSelected = option.value === value;
 
@@ -154,8 +154,10 @@ const SelectCheckList = <TValue extends string>({
           <SelectOptionButton
             key={option.value}
             $selected={isSelected}
-            aria-pressed={isSelected}
+            aria-disabled={option.disabled || undefined}
+            aria-selected={isSelected}
             disabled={option.disabled}
+            role="option"
             type="button"
             onClick={() => onChange(option.value)}
           >
