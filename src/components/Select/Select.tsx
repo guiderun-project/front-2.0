@@ -85,6 +85,7 @@ export const Select = <TValue extends string = string>({
       {renderTrigger ? (
         renderTrigger({
           open: handleOpen,
+          isOpen: open,
           selectedOption,
           value,
           disabled,

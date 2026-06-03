@@ -25,6 +25,7 @@ import PlusLinedIcon from "@/assets/icons/plus-lined.svg?react";
 import SearchLinedIcon from "@/assets/icons/search-lined.svg?react";
 import ShareLinedIcon from "@/assets/icons/share-lined.svg?react";
 import ShuffleLinedIcon from "@/assets/icons/shuffle-lined.svg?react";
+import SortLinedIcon from "@/assets/icons/sort-lined.svg?react";
 import SunFilledIcon from "@/assets/icons/sun-filled.svg?react";
 import SunLinedIcon from "@/assets/icons/sun-lined.svg?react";
 import TrashLinedIcon from "@/assets/icons/trash-lined.svg?react";
@@ -60,6 +61,7 @@ export const iconRegistry = {
   "search-lined": SearchLinedIcon,
   "share-lined": ShareLinedIcon,
   "shuffle-lined": ShuffleLinedIcon,
+  "sort-lined": SortLinedIcon,
   "sun-filled": SunFilledIcon,
   "sun-lined": SunLinedIcon,
   "trash-lined": TrashLinedIcon,

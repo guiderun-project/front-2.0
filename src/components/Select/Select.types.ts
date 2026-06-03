@@ -11,6 +11,7 @@ export type SelectOptions<TValue extends string = string> = readonly SelectOptio
 
 export type SelectRenderTriggerArgs<TValue extends string = string> = {
   open: () => void;
+  isOpen: boolean;
   selectedOption?: SelectOption<TValue>;
   value?: TValue;
   disabled: boolean;
