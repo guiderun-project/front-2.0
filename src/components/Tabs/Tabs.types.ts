@@ -22,8 +22,6 @@ export type TabsListProps = {
 } & Omit<AriaTabListProps<object>, 'children' | 'dependencies' | 'items'>;
 
 export type TabsTabProps = {
-  'aria-posinset'?: number;
-  'aria-setsize'?: number;
   children: ReactNode;
   id: Key;
 } & Omit<AriaTabProps, 'children' | 'id'>;

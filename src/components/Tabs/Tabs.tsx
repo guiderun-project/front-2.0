@@ -1,15 +1,5 @@
-import type { ReactElement, ReactNode } from 'react';
-import {
-  Children,
-  Fragment,
-  cloneElement,
-  createContext,
-  isValidElement,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-} from 'react';
+import type { ReactElement } from 'react';
+import { createContext, useContext, useEffect, useMemo, useRef } from 'react';
 
 import styled from '@emotion/styled';
 import {
@@ -70,21 +60,15 @@ const TabsRoot = ({
 
 const TabsList = ({ children, ...props }: TabsListProps): ReactElement => {
   const { layout } = useTabsStyle();
-  const childrenWithSetMetadata = useMemo(() => addTabSetMetadata(children), [children]);
 
   return (
     <StyledTabList $layout={layout} {...props}>
-      {childrenWithSetMetadata}
+      {children}
     </StyledTabList>
   );
 };
 
-const TabsTab = ({
-  'aria-posinset': positionInSet,
-  'aria-setsize': setSize,
-  children,
-  ...props
-}: TabsTabProps): ReactElement => {
+const TabsTab = ({ children, ...props }: TabsTabProps): ReactElement => {
   const { layout } = useTabsStyle();
   const tabRef = useRef<HTMLDivElement>(null);
 
@@ -117,13 +101,7 @@ const TabsTab = ({
   }, [layout]);
 
   return (
-    <StyledTab
-      ref={tabRef}
-      $layout={layout}
-      aria-posinset={positionInSet}
-      aria-setsize={setSize}
-      {...props}
-    >
+    <StyledTab ref={tabRef} $layout={layout} {...props}>
       <TabLabel>{children}</TabLabel>
       <ActiveIndicator />
     </StyledTab>
@@ -148,52 +126,6 @@ export const Tabs = Object.assign(TabsRoot, {
   Panels: TabsPanels,
   Panel: TabsPanel,
 }) satisfies TabsComponent;
-
-const addTabSetMetadata = (children: ReactNode): ReactNode => {
-  const setSize = countTabChildren(children);
-  let position = 0;
-
-  const addMetadata = (node: ReactNode): ReactNode =>
-    Children.map(node, (child) => {
-      if (!isValidElement(child)) {
-        return child;
-      }
-
-      if (child.type === Fragment) {
-        return cloneElement(
-          child as ReactElement<{ children?: ReactNode }>,
-          undefined,
-          addMetadata((child.props as { children?: ReactNode }).children),
-        );
-      }
-
-      if (child.type !== TabsTab) {
-        return child;
-      }
-
-      position += 1;
-
-      return cloneElement(child as ReactElement<TabsTabProps>, {
-        'aria-posinset': position,
-        'aria-setsize': setSize,
-      });
-    });
-
-  return addMetadata(children);
-};
-
-const countTabChildren = (children: ReactNode): number =>
-  Children.toArray(children).reduce<number>((count, child) => {
-    if (!isValidElement(child)) {
-      return count;
-    }
-
-    if (child.type === Fragment) {
-      return count + countTabChildren((child.props as { children?: ReactNode }).children);
-    }
-
-    return child.type === TabsTab ? count + 1 : count;
-  }, 0);
 
 const StyledTabs = styled(AriaTabs)<{ $fullWidth: boolean; $layout: TabsLayout }>(
   ({ $fullWidth }) => ({
