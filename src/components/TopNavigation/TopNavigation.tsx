@@ -6,14 +6,14 @@ import { IconButton, type IconName } from '../Icon';
 
 export type TopNavigationIconButtonProps = {
   icon: IconName;
-  label: string;
+  ariaLabel: string;
 } & Omit<ComponentPropsWithoutRef<'button'>, 'aria-label' | 'children' | 'color'>;
 
 export type TopNavigationProps = {
   className?: string;
-  left?: ReactNode;
+  left?: TopNavigationIconButtonProps;
   title: ReactNode;
-  right?: ReactNode;
+  right?: TopNavigationIconButtonProps[];
   'aria-label'?: string;
 };
 
@@ -27,23 +27,32 @@ export const TopNavigation = ({
   return (
     <Navigation aria-label={ariaLabel} className={className}>
       <NavigationBar>
-        <LeftSlot>{left}</LeftSlot>
+        <LeftSlot>
+          {left ? <TopNavigationIconButton {...left} /> : null}
+        </LeftSlot>
         <Title>{title}</Title>
-        <RightSlot>{right}</RightSlot>
+        <RightSlot>
+          {right?.map((iconButton, index) => (
+            <TopNavigationIconButton
+              key={`${iconButton.icon}-${iconButton.ariaLabel}-${index}`}
+              {...iconButton}
+            />
+          ))}
+        </RightSlot>
       </NavigationBar>
     </Navigation>
   );
 };
 
-export const TopNavigationIconButton = ({
+const TopNavigationIconButton = ({
+  ariaLabel,
   icon,
-  label,
   type = 'button',
   ...buttonProps
 }: TopNavigationIconButtonProps): ReactElement => {
   return (
     <StyledIconButton
-      aria-label={label}
+      aria-label={ariaLabel}
       icon={icon}
       iconSize={24}
       shape="square"

@@ -31,7 +31,6 @@ import {
   TimeInput,
   TimerInput,
   TopNavigation,
-  TopNavigationIconButton,
   type IconButtonShape,
   type IconName,
   type PageLayoutBackground,
@@ -119,15 +118,13 @@ const TOP_NAVIGATION_CODE_EXAMPLES = [
   {
     label: 'left / title / right',
     code: `<TopNavigation
-  left={<TopNavigationIconButton icon="chevron-left-lined" label="뒤로가기" />}
+  left={{ icon: 'chevron-left-lined', ariaLabel: '뒤로가기' }}
   title="제목"
-  right={
-    <>
-      <TopNavigationIconButton icon="delete-lined" label="닫기" />
-      <TopNavigationIconButton icon="share-lined" label="공유하기" />
-      <TopNavigationIconButton icon="more-vertical-lined" label="더보기" />
-    </>
-  }
+  right={[
+    { icon: 'delete-lined', ariaLabel: '닫기' },
+    { icon: 'share-lined', ariaLabel: '공유하기' },
+    { icon: 'more-vertical-lined', ariaLabel: '더보기' },
+  ]}
 />`,
   },
 ] as const;
@@ -1158,22 +1155,12 @@ export const HomePage = () => {
           </Text>
         </SectionTitle>
         <TopNavigation
-          left={
-            <TopNavigationIconButton
-              icon="chevron-left-lined"
-              label="뒤로가기"
-            />
-          }
-          right={
-            <>
-              <TopNavigationIconButton icon="delete-lined" label="닫기" />
-              <TopNavigationIconButton icon="share-lined" label="공유하기" />
-              <TopNavigationIconButton
-                icon="more-vertical-lined"
-                label="더보기"
-              />
-            </>
-          }
+          left={{ icon: 'chevron-left-lined', ariaLabel: '뒤로가기' }}
+          right={[
+            { icon: 'delete-lined', ariaLabel: '닫기' },
+            { icon: 'share-lined', ariaLabel: '공유하기' },
+            { icon: 'more-vertical-lined', ariaLabel: '더보기' },
+          ]}
           title="제목"
         />
         <CodeExamples examples={TOP_NAVIGATION_CODE_EXAMPLES} />

@@ -1,4 +1,4 @@
-export { TopNavigation, TopNavigationIconButton } from './TopNavigation';
+export { TopNavigation } from './TopNavigation';
 export type {
   TopNavigationIconButtonProps,
   TopNavigationProps,
