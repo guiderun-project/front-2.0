@@ -11,4 +11,5 @@ export * from "./Pagination";
 export * from "./Popup";
 export * from "./RunnerTypeAvatar";
 export * from "./Select";
+export * from "./Tabs";
 export * from "./Text";
