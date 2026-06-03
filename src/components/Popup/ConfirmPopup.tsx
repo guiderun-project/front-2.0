@@ -183,7 +183,7 @@ const getButtonColors = (
 
   if (variant === 'primary') {
     return {
-      backgroundColor: 'bg.brand' as const,
+      backgroundColor: 'bg.brand-primary' as const,
       borderColor: 'border.brand' as const,
       color: 'text.inverse' as const,
     };

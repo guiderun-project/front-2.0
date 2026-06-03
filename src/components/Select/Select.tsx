@@ -330,7 +330,7 @@ const ConfirmButton = styled.button`
   border-radius: ${({ theme }) => theme.radius.md};
   color: ${({ theme }) => theme.color.text.inverse};
   background: ${({ disabled, theme }) =>
-    disabled ? theme.color.bg['brand-soft2'] : theme.color.bg.brand};
+    disabled ? theme.color.bg['brand-soft2'] : theme.color.bg['brand-primary']};
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   ${({ theme }) => theme.typography['body-l-b']}
   transition:
