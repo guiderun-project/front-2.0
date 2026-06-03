@@ -4,35 +4,36 @@ import styled from '@emotion/styled';
 
 import { Icon } from '@/components/Icon';
 
-const CHECKBOX_SIZE = 24;
-const CHECKBOX_ICON_SIZE = 16;
+const RADIO_HIT_AREA_SIZE = 24;
+const RADIO_VISUAL_SIZE = 22;
+const RADIO_ICON_SIZE = 16;
 
-type CheckBoxProps = Omit<ComponentPropsWithoutRef<'input'>, 'children' | 'type'>;
+type RadioProps = Omit<ComponentPropsWithoutRef<'input'>, 'children' | 'type'>;
 
-export const CheckBox = ({ className, disabled, ...props }: CheckBoxProps): ReactElement => {
+export const Radio = ({ className, disabled, ...props }: RadioProps): ReactElement => {
   return (
-    <CheckBoxRoot className={className}>
-      <CheckBoxInput disabled={disabled} type="checkbox" {...props} />
-      <CheckBoxVisual aria-hidden="true">
-        <CheckIconWrap>
-          <Icon aria-hidden={true} color="icon.inverse" icon="check-thick-lined" size={CHECKBOX_ICON_SIZE} />
-        </CheckIconWrap>
-      </CheckBoxVisual>
-    </CheckBoxRoot>
+    <RadioRoot className={className}>
+      <RadioInput disabled={disabled} type="radio" {...props} />
+      <RadioVisual aria-hidden="true">
+        <RadioIconWrap>
+          <Icon aria-hidden={true} color="icon.inverse" icon="check-thick-lined" size={RADIO_ICON_SIZE} />
+        </RadioIconWrap>
+      </RadioVisual>
+    </RadioRoot>
   );
 };
 
-const CheckBoxRoot = styled.span`
+const RadioRoot = styled.span`
   position: relative;
   display: inline-grid;
   flex: 0 0 auto;
-  width: ${({ theme }) => theme.pxToRem(CHECKBOX_SIZE)};
-  height: ${({ theme }) => theme.pxToRem(CHECKBOX_SIZE)};
+  width: ${({ theme }) => theme.pxToRem(RADIO_HIT_AREA_SIZE)};
+  height: ${({ theme }) => theme.pxToRem(RADIO_HIT_AREA_SIZE)};
   place-items: center;
   vertical-align: middle;
 `;
 
-const CheckBoxInput = styled.input`
+const RadioInput = styled.input`
   position: absolute;
   inset: 0;
   z-index: ${({ theme }) => theme.zIndex.control};
@@ -44,8 +45,8 @@ const CheckBoxInput = styled.input`
   touch-action: manipulation;
 
   &:checked + span {
-    --checkbox-icon-opacity: 1;
-    --checkbox-icon-scale: 1;
+    --radio-icon-opacity: 1;
+    --radio-icon-scale: 1;
 
     border-color: ${({ theme }) => theme.color.bg['brand-primary']};
     background-color: ${({ theme }) => theme.color.bg['brand-primary']};
@@ -76,16 +77,16 @@ const CheckBoxInput = styled.input`
   }
 `;
 
-const CheckBoxVisual = styled.span`
-  --checkbox-icon-opacity: 0;
-  --checkbox-icon-scale: 0.65;
+const RadioVisual = styled.span`
+  --radio-icon-opacity: 0;
+  --radio-icon-scale: 0.65;
 
   display: grid;
-  width: 100%;
-  height: 100%;
+  width: ${({ theme }) => theme.pxToRem(RADIO_VISUAL_SIZE)};
+  height: ${({ theme }) => theme.pxToRem(RADIO_VISUAL_SIZE)};
   place-items: center;
-  border: 1.2px solid ${({ theme }) => theme.color.border.default};
-  border-radius: ${({ theme }) => theme.radius.sm};
+  border: 1.32px solid ${({ theme }) => theme.color.border.default};
+  border-radius: ${({ theme }) => theme.radius.full};
   background-color: transparent;
   pointer-events: none;
   transition:
@@ -102,11 +103,11 @@ const CheckBoxVisual = styled.span`
   }
 `;
 
-const CheckIconWrap = styled.span`
+const RadioIconWrap = styled.span`
   display: grid;
   place-items: center;
-  opacity: var(--checkbox-icon-opacity);
-  transform: scale(var(--checkbox-icon-scale));
+  opacity: var(--radio-icon-opacity);
+  transform: scale(var(--radio-icon-scale));
   transition:
     opacity 100ms ease-out,
     transform 120ms ease-out;

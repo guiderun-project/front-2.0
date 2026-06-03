@@ -9,6 +9,7 @@ export * from "./Input";
 export * from "./PageLayout";
 export * from "./Pagination";
 export * from "./Popup";
+export * from "./Radio";
 export * from "./RunnerTypeAvatar";
 export * from "./Select";
 export * from "./Tabs";

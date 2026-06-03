@@ -1,3 +1,4 @@
+import type { ChangeEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
 import { css } from '@emotion/react';
@@ -11,11 +12,13 @@ import {
   CheckBox,
   CONFIRM_POPUP_VARIANT,
   ConfirmPopup,
+  HiddenText,
   Icon,
   IconButton,
   Input,
   PageLayout,
   Pagination,
+  Radio,
   RunnerTypeAvatar,
   Select,
   Tabs,
@@ -495,6 +498,55 @@ const CHECKBOX_CODE_EXAMPLES = [
   },
 ] as const;
 
+const RADIO_EXAMPLES: ReadonlyArray<{
+  defaultChecked?: boolean;
+  disabled?: boolean;
+  label: string;
+  value: string;
+}> = [
+  { label: 'Unchecked', value: 'unchecked' },
+  { defaultChecked: true, label: 'Checked', value: 'checked' },
+  { disabled: true, label: 'Disabled unchecked', value: 'disabled-unchecked' },
+  { defaultChecked: true, disabled: true, label: 'Disabled checked', value: 'disabled-checked' },
+];
+
+const RADIO_SAMPLE_OPTIONS = [
+  { label: '오전 러닝', value: 'morning' },
+  { label: '저녁 러닝', value: 'evening' },
+] as const;
+
+type RadioSampleValue = (typeof RADIO_SAMPLE_OPTIONS)[number]['value'];
+
+const ignoreRadioExampleChange = () => undefined;
+
+const RADIO_CODE_EXAMPLES = [
+  {
+    label: 'Radio group',
+    code: `<fieldset>
+  <legend>러닝 시간</legend>
+  <label>
+    <Radio
+      name="runningTime"
+      value="morning"
+      checked={selectedValue === 'morning'}
+      onChange={handleChange}
+    />
+    <Text>오전 러닝</Text>
+  </label>
+</fieldset>`,
+  },
+  {
+    label: 'Standalone',
+    code: `<Radio
+  aria-label="오전 러닝 선택"
+  name="runningTime"
+  value="morning"
+  checked={selectedValue === 'morning'}
+  onChange={handleChange}
+/>`,
+  },
+] as const;
+
 const TABS_EQUAL_ITEMS = [
   {
     id: 'all',
@@ -901,11 +953,25 @@ const PAGINATION_CODE_EXAMPLES = [
   },
 ] as const;
 
+const useRadioSampleSelection = (initialValue: RadioSampleValue = RADIO_SAMPLE_OPTIONS[0].value) => {
+  const [selectedValue, setSelectedValue] = useState<RadioSampleValue>(initialValue);
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setSelectedValue(event.target.value as RadioSampleValue);
+  };
+
+  return { handleChange, selectedValue };
+};
+
 export const HomePage = () => {
   const [colorMode, setColorMode] = useState<ColorMode>('light');
   const [pageBackground, setPageBackground] =
     useState<PageLayoutBackground>('bg.subtle');
   const [isCheckBoxSelected, setIsCheckBoxSelected] = useState(false);
+  const {
+    handleChange: handleRadioChange,
+    selectedValue: selectedRadioValue,
+  } = useRadioSampleSelection();
   const [equalTabKey, setEqualTabKey] = useState('all');
   const [scrollableTabKey, setScrollableTabKey] = useState('week-4');
   const [compactTabKey, setCompactTabKey] = useState('summary');
@@ -1489,6 +1555,54 @@ export const HomePage = () => {
           <Text font="body-s-r">Interactive sample</Text>
         </InteractiveCheckBoxSample>
         <CodeExamples examples={CHECKBOX_CODE_EXAMPLES} />
+      </ShowcaseSection>
+
+      <ShowcaseSection>
+        <SectionTitle>
+          <Text as="h2" font="heading-s-m">
+            Radio
+          </Text>
+          <Text color="text.tertiary" font="detail-m-r">
+            Unchecked, checked, disabled, single selection
+          </Text>
+        </SectionTitle>
+        <RadioGrid>
+          {RADIO_EXAMPLES.map(({ defaultChecked, disabled, label, value }) => (
+            <RadioSample key={value} $disabled={disabled}>
+              <Radio
+                checked={Boolean(defaultChecked)}
+                disabled={disabled}
+                name={`radio-state-${value}`}
+                onChange={ignoreRadioExampleChange}
+                value={value}
+              />
+              <Text color={disabled ? 'text.disabled' : 'text.secondary'} font="detail-m-r">
+                {label}
+              </Text>
+            </RadioSample>
+          ))}
+        </RadioGrid>
+        <InteractiveRadioFieldset>
+          <legend>
+            <HiddenText>러닝 시간 선택 예시</HiddenText>
+          </legend>
+          <RadioOptionList>
+            {RADIO_SAMPLE_OPTIONS.map(({ label, value }) => (
+              <InteractiveRadioOption key={value}>
+                <Radio
+                  checked={selectedRadioValue === value}
+                  name="radio-interactive-sample"
+                  value={value}
+                  onChange={handleRadioChange}
+                />
+                <Text color={selectedRadioValue === value ? 'text.primary' : 'text.secondary'} font="body-s-r">
+                  {label}
+                </Text>
+              </InteractiveRadioOption>
+            ))}
+          </RadioOptionList>
+        </InteractiveRadioFieldset>
+        <CodeExamples examples={RADIO_CODE_EXAMPLES} />
       </ShowcaseSection>
 
       <ShowcaseSection>
@@ -2312,6 +2426,43 @@ const CheckBoxSample = styled.label<{ $disabled?: boolean }>`
 `;
 
 const InteractiveCheckBoxSample = styled.label`
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: ${({ theme }) => theme.pxToRem(32)};
+  gap: ${({ theme }) => theme.spacing.md};
+  cursor: pointer;
+`;
+
+const RadioGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, ${({ theme }) => theme.pxToRem(180)}), 1fr));
+  gap: ${({ theme }) => theme.spacing.md};
+`;
+
+const RadioSample = styled.label<{ $disabled?: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: ${({ theme }) => theme.pxToRem(32)};
+  gap: ${({ theme }) => theme.spacing.md};
+  cursor: ${({ $disabled }) => ($disabled ? 'not-allowed' : 'pointer')};
+`;
+
+const InteractiveRadioFieldset = styled.fieldset`
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+`;
+
+const RadioOptionList = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: ${({ theme }) => theme.spacing.lg};
+`;
+
+const InteractiveRadioOption = styled.label`
   display: inline-flex;
   align-items: center;
   width: fit-content;
