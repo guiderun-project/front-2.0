@@ -1,0 +1,56 @@
+name: PR Assignment
+
+on:
+  pull_request_target:
+    types: [opened]
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  assign-author-and-reviewers:
+    name: Assign author and request reviewers
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Assign PR author and request reviewers
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          REVIEWER_CANDIDATES: dbwjd5864,hyrmzz1,Pridesd
+        run: |
+          set -euo pipefail
+
+          gh api "repos/${REPOSITORY}/issues/${PR_NUMBER}/assignees" \
+            --method POST \
+            --field "assignees[]=${PR_AUTHOR}"
+
+          IFS=',' read -ra candidates <<< "${REVIEWER_CANDIDATES}"
+          author_lower="$(printf '%s' "${PR_AUTHOR}" | tr '[:upper:]' '[:lower:]')"
+          reviewers=()
+
+          for candidate in "${candidates[@]}"; do
+            candidate_lower="$(printf '%s' "${candidate}" | tr '[:upper:]' '[:lower:]')"
+
+            if [ "${candidate_lower}" != "${author_lower}" ]; then
+              reviewers+=("${candidate}")
+            fi
+          done
+
+          if [ "${#reviewers[@]}" -eq 0 ]; then
+            echo "No reviewers to request."
+            exit 0
+          fi
+
+          reviewer_fields=()
+
+          for reviewer in "${reviewers[@]}"; do
+            reviewer_fields+=(--field "reviewers[]=${reviewer}")
+          done
+
+          gh api "repos/${REPOSITORY}/pulls/${PR_NUMBER}/requested_reviewers" \
+            --method POST \
+            "${reviewer_fields[@]}"
