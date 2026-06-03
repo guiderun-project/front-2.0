@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router-dom';
 
 import App from '@/App';
 import { BottomNavigationLayout } from '@/router/BottomNavigationLayout';
+import { ProtectedRoute } from '@/router/ProtectedRoute';
 import { AuthPlaceholderPage } from '@/pages/AuthPlaceholderPage';
 import { EventPage } from '@/pages/EventPage';
 import { HomePage } from '@/pages/HomePage';
@@ -28,7 +29,11 @@ export const router = createBrowserRouter([
           },
           {
             path: 'my',
-            element: <MyPage />,
+            element: (
+              <ProtectedRoute>
+                <MyPage />
+              </ProtectedRoute>
+            ),
           },
         ],
       },

@@ -1,6 +1,7 @@
 import axios, {
   AxiosError,
   AxiosHeaders,
+  type AxiosInstance,
   type InternalAxiosRequestConfig,
 } from 'axios';
 
@@ -45,6 +46,10 @@ const isRefreshRequest = (url?: string) => {
   return url?.includes('/oauth/login/reissue') ?? false;
 };
 
+const hasAuthorizationHeader = (config: InternalAxiosRequestConfig) => {
+  return Boolean(AxiosHeaders.from(config.headers).get('Authorization'));
+};
+
 const setAuthorizationHeader = (
   config: InternalAxiosRequestConfig,
   accessToken: string,
@@ -77,52 +82,67 @@ const refreshAccessToken = async () => {
   }
 };
 
-privateApi.interceptors.request.use((config) => {
-  const accessToken = getAccessToken();
+const applyAuthorizationRequestInterceptor = (apiClient: AxiosInstance) => {
+  apiClient.interceptors.request.use((config) => {
+    const accessToken = getAccessToken();
 
-  if (accessToken) {
-    setAuthorizationHeader(config, accessToken);
-  }
+    if (accessToken) {
+      setAuthorizationHeader(config, accessToken);
+    }
 
-  return config;
+    return config;
+  });
+};
+
+const applyTokenRefreshResponseInterceptor = (
+  apiClient: AxiosInstance,
+  options: { refreshWithoutAuthorizationHeader: boolean },
+) => {
+  apiClient.interceptors.response.use(
+    (response) => response,
+    async (error: AxiosError) => {
+      const originalRequest = error.config as RetryableRequestConfig | undefined;
+
+      if (!originalRequest || !isUnauthorizedError(error)) {
+        return Promise.reject(error);
+      }
+
+      const shouldRefresh =
+        options.refreshWithoutAuthorizationHeader ||
+        hasAuthorizationHeader(originalRequest);
+
+      if (
+        !shouldRefresh ||
+        originalRequest._retry ||
+        isRefreshRequest(originalRequest.url)
+      ) {
+        clearAccessToken();
+        return Promise.reject(error);
+      }
+
+      originalRequest._retry = true;
+
+      try {
+        refreshPromise ??= refreshAccessToken();
+
+        const nextAccessToken = await refreshPromise;
+        setAuthorizationHeader(originalRequest, nextAccessToken);
+
+        return apiClient(originalRequest);
+      } catch (refreshError) {
+        clearAccessToken();
+        return Promise.reject(refreshError);
+      }
+    },
+  );
+};
+
+applyAuthorizationRequestInterceptor(privateApi);
+applyAuthorizationRequestInterceptor(optionalAuthApi);
+
+applyTokenRefreshResponseInterceptor(privateApi, {
+  refreshWithoutAuthorizationHeader: true,
 });
-
-optionalAuthApi.interceptors.request.use((config) => {
-  const accessToken = getAccessToken();
-
-  if (accessToken) {
-    setAuthorizationHeader(config, accessToken);
-  }
-
-  return config;
+applyTokenRefreshResponseInterceptor(optionalAuthApi, {
+  refreshWithoutAuthorizationHeader: false,
 });
-
-privateApi.interceptors.response.use(
-  (response) => response,
-  async (error: AxiosError) => {
-    const originalRequest = error.config as RetryableRequestConfig | undefined;
-
-    if (!originalRequest || !isUnauthorizedError(error)) {
-      return Promise.reject(error);
-    }
-
-    if (originalRequest._retry || isRefreshRequest(originalRequest.url)) {
-      clearAccessToken();
-      return Promise.reject(error);
-    }
-
-    originalRequest._retry = true;
-
-    try {
-      refreshPromise ??= refreshAccessToken();
-
-      const nextAccessToken = await refreshPromise;
-      setAuthorizationHeader(originalRequest, nextAccessToken);
-
-      return privateApi(originalRequest);
-    } catch (refreshError) {
-      clearAccessToken();
-      return Promise.reject(refreshError);
-    }
-  },
-);
