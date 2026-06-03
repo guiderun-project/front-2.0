@@ -24,7 +24,7 @@ export const BOTTOM_NAVIGATION_ITEMS = [
   },
   {
     label: '홈화면',
-    to: APP_PATH.HOME,
+    to: APP_PATH.DESIGN,
     end: true,
     activeIcon: 'home-filled',
     inactiveIcon: 'home-lined',

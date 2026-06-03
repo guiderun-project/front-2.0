@@ -1,11 +1,12 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { Navigate, createBrowserRouter } from 'react-router-dom';
 
 import App from '@/App';
 import { BottomNavigationLayout } from '@/router/BottomNavigationLayout';
 import { ProtectedRoute } from '@/router/ProtectedRoute';
+import { APP_PATH } from '@/router/path';
 import { AuthPlaceholderPage } from '@/pages/AuthPlaceholderPage';
+import { DesignPage } from '@/pages/DesignPage';
 import { EventPage } from '@/pages/EventPage';
-import { HomePage } from '@/pages/HomePage';
 import { MyPage } from '@/pages/MyPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 import { RouteErrorPage } from '@/pages/RouteErrorPage';
@@ -21,7 +22,11 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <HomePage />,
+            element: <Navigate replace to={APP_PATH.DESIGN} />,
+          },
+          {
+            path: 'design',
+            element: <DesignPage />,
           },
           {
             path: 'event',

@@ -969,7 +969,7 @@ const useRadioSampleSelection = (initialValue: RadioSampleValue = RADIO_SAMPLE_O
   return { handleChange, selectedValue };
 };
 
-export const HomePage = () => {
+export const DesignPage = () => {
   const [pageBackground, setPageBackground] = useState<PageLayoutBackground>('bg.subtle');
   const [isCheckBoxSelected, setIsCheckBoxSelected] = useState(false);
   const {
