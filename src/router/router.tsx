@@ -151,14 +151,14 @@ export const router = createBrowserRouter([
             element: createLazyRouteElement(EventSearchPage),
           },
           {
+            path: 'design',
+            element: createLazyRouteElement(DesignPage),
+          },
+          {
             path: 'my',
             element: createLazyRouteElement(MyPage, 'authenticated'),
           },
         ],
-      },
-      {
-        path: 'design',
-        element: createLazyRouteElement(DesignPage),
       },
       {
         path: 'intro',
