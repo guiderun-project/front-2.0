@@ -1,32 +1,133 @@
+import type { ComponentType, ReactElement } from 'react';
+import { lazy, Suspense } from 'react';
+
 import { createBrowserRouter } from 'react-router-dom';
 
 import App from '@/App';
 import { BottomNavigationLayout } from '@/router/BottomNavigationLayout';
 import { GuestOnlyRoute } from '@/router/GuestOnlyRoute';
 import { ProtectedRoute } from '@/router/ProtectedRoute';
-import { AccountDeletePage } from '@/pages/account-delete';
-import { AccountFindPage } from '@/pages/account-find';
-import { DesignPage } from '@/pages/design';
-import { EventApplyPage } from '@/pages/events/[eventId]/apply';
-import { EventAttendancePage } from '@/pages/events/[eventId]/attendance';
-import { EventEditPage } from '@/pages/events/[eventId]/edit';
-import { EventDetailPage } from '@/pages/events/[eventId]';
-import { EventMatchPage } from '@/pages/events/[eventId]/match';
-import { EventSupportPage } from '@/pages/events/[eventId]/support';
-import { EventNewPage } from '@/pages/events/new';
-import { EventSearchPage } from '@/pages/events/search';
-import { EventsPage } from '@/pages/events';
-import { IntroPage } from '@/pages/intro';
-import { LoginPage } from '@/pages/login';
-import { MainPage } from '@/pages';
-import { MyEditPage } from '@/pages/my/edit';
-import { MyEventsPage } from '@/pages/my/events';
-import { MyPage } from '@/pages/my';
 import { NotFoundPage } from '@/pages/NotFoundPage';
-import { KakaoOAuthPage } from '@/pages/oauth/kakao';
 import { RouteErrorPage } from '@/pages/RouteErrorPage';
-import { SignupPage } from '@/pages/signup';
-import { TermsPage } from '@/pages/terms';
+
+type LazyRouteAccess = 'public' | 'guest-only' | 'authenticated' | 'approved';
+
+const MainPage = lazy(() =>
+  import('@/pages').then(({ MainPage }) => ({ default: MainPage })),
+);
+const DesignPage = lazy(() =>
+  import('@/pages/design').then(({ DesignPage }) => ({ default: DesignPage })),
+);
+const IntroPage = lazy(() =>
+  import('@/pages/intro').then(({ IntroPage }) => ({ default: IntroPage })),
+);
+const KakaoOAuthPage = lazy(() =>
+  import('@/pages/oauth/kakao').then(({ KakaoOAuthPage }) => ({
+    default: KakaoOAuthPage,
+  })),
+);
+const LoginPage = lazy(() =>
+  import('@/pages/login').then(({ LoginPage }) => ({ default: LoginPage })),
+);
+const SignupPage = lazy(() =>
+  import('@/pages/signup').then(({ SignupPage }) => ({ default: SignupPage })),
+);
+const AccountFindPage = lazy(() =>
+  import('@/pages/account-find').then(({ AccountFindPage }) => ({
+    default: AccountFindPage,
+  })),
+);
+const TermsPage = lazy(() =>
+  import('@/pages/terms').then(({ TermsPage }) => ({ default: TermsPage })),
+);
+const EventsPage = lazy(() =>
+  import('@/pages/events').then(({ EventsPage }) => ({ default: EventsPage })),
+);
+const EventSearchPage = lazy(() =>
+  import('@/pages/events/search').then(({ EventSearchPage }) => ({
+    default: EventSearchPage,
+  })),
+);
+const EventNewPage = lazy(() =>
+  import('@/pages/events/new').then(({ EventNewPage }) => ({
+    default: EventNewPage,
+  })),
+);
+const EventDetailPage = lazy(() =>
+  import('@/pages/events/[eventId]').then(({ EventDetailPage }) => ({
+    default: EventDetailPage,
+  })),
+);
+const EventApplyPage = lazy(() =>
+  import('@/pages/events/[eventId]/apply').then(({ EventApplyPage }) => ({
+    default: EventApplyPage,
+  })),
+);
+const EventEditPage = lazy(() =>
+  import('@/pages/events/[eventId]/edit').then(({ EventEditPage }) => ({
+    default: EventEditPage,
+  })),
+);
+const EventMatchPage = lazy(() =>
+  import('@/pages/events/[eventId]/match').then(({ EventMatchPage }) => ({
+    default: EventMatchPage,
+  })),
+);
+const EventAttendancePage = lazy(() =>
+  import('@/pages/events/[eventId]/attendance').then(
+    ({ EventAttendancePage }) => ({
+      default: EventAttendancePage,
+    }),
+  ),
+);
+const EventSupportPage = lazy(() =>
+  import('@/pages/events/[eventId]/support').then(({ EventSupportPage }) => ({
+    default: EventSupportPage,
+  })),
+);
+const MyPage = lazy(() =>
+  import('@/pages/my').then(({ MyPage }) => ({ default: MyPage })),
+);
+const MyEventsPage = lazy(() =>
+  import('@/pages/my/events').then(({ MyEventsPage }) => ({
+    default: MyEventsPage,
+  })),
+);
+const MyEditPage = lazy(() =>
+  import('@/pages/my/edit').then(({ MyEditPage }) => ({
+    default: MyEditPage,
+  })),
+);
+const AccountDeletePage = lazy(() =>
+  import('@/pages/account-delete').then(({ AccountDeletePage }) => ({
+    default: AccountDeletePage,
+  })),
+);
+
+const createLazyRouteElement = (
+  Page: ComponentType,
+  access: LazyRouteAccess = 'public',
+): ReactElement => {
+  const pageElement = (
+    <Suspense fallback={null}>
+      <Page />
+    </Suspense>
+  );
+
+  if (access === 'guest-only') {
+    return <GuestOnlyRoute>{pageElement}</GuestOnlyRoute>;
+  }
+
+  if (access === 'authenticated') {
+    return <ProtectedRoute>{pageElement}</ProtectedRoute>;
+  }
+
+  if (access === 'approved') {
+    return <ProtectedRoute access="approved">{pageElement}</ProtectedRoute>;
+  }
+
+  return pageElement;
+};
 
 export const router = createBrowserRouter([
   {
@@ -39,137 +140,89 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <MainPage />,
+            element: createLazyRouteElement(MainPage),
           },
           {
             path: 'events',
-            element: <EventsPage />,
+            element: createLazyRouteElement(EventsPage),
           },
           {
             path: 'events/search',
-            element: <EventSearchPage />,
+            element: createLazyRouteElement(EventSearchPage),
           },
           {
             path: 'my',
-            element: (
-              <ProtectedRoute>
-                <MyPage />
-              </ProtectedRoute>
-            ),
+            element: createLazyRouteElement(MyPage, 'authenticated'),
           },
         ],
       },
       {
         path: 'design',
-        element: <DesignPage />,
+        element: createLazyRouteElement(DesignPage),
       },
       {
         path: 'intro',
-        element: <IntroPage />,
+        element: createLazyRouteElement(IntroPage),
       },
       {
         path: 'oauth/kakao',
-        element: <KakaoOAuthPage />,
+        element: createLazyRouteElement(KakaoOAuthPage),
       },
       {
         path: 'login',
-        element: (
-          <GuestOnlyRoute>
-            <LoginPage />
-          </GuestOnlyRoute>
-        ),
+        element: createLazyRouteElement(LoginPage, 'guest-only'),
       },
       {
         path: 'signup',
-        element: (
-          <GuestOnlyRoute>
-            <SignupPage />
-          </GuestOnlyRoute>
-        ),
+        element: createLazyRouteElement(SignupPage, 'guest-only'),
       },
       {
         path: 'account-find',
-        element: (
-          <GuestOnlyRoute>
-            <AccountFindPage />
-          </GuestOnlyRoute>
-        ),
+        element: createLazyRouteElement(AccountFindPage, 'guest-only'),
       },
       {
         path: 'terms',
-        element: <TermsPage />,
+        element: createLazyRouteElement(TermsPage),
       },
       {
         path: 'events/new',
-        element: (
-          <ProtectedRoute access="approved">
-            <EventNewPage />
-          </ProtectedRoute>
-        ),
+        element: createLazyRouteElement(EventNewPage, 'approved'),
       },
       {
         path: 'events/:eventId',
-        element: <EventDetailPage />,
+        element: createLazyRouteElement(EventDetailPage),
       },
       {
         path: 'events/:eventId/apply',
-        element: (
-          <ProtectedRoute access="approved">
-            <EventApplyPage />
-          </ProtectedRoute>
-        ),
+        element: createLazyRouteElement(EventApplyPage, 'approved'),
       },
       {
         path: 'events/:eventId/edit',
-        element: (
-          <ProtectedRoute access="approved">
-            <EventEditPage />
-          </ProtectedRoute>
-        ),
+        element: createLazyRouteElement(EventEditPage, 'approved'),
       },
       {
         path: 'events/:eventId/match',
-        element: (
-          <ProtectedRoute access="approved">
-            <EventMatchPage />
-          </ProtectedRoute>
-        ),
+        element: createLazyRouteElement(EventMatchPage, 'approved'),
       },
       {
         path: 'events/:eventId/attendance',
-        element: (
-          <ProtectedRoute access="approved">
-            <EventAttendancePage />
-          </ProtectedRoute>
-        ),
+        element: createLazyRouteElement(EventAttendancePage, 'approved'),
       },
       {
         path: 'events/:eventId/support',
-        element: <EventSupportPage />,
+        element: createLazyRouteElement(EventSupportPage),
       },
       {
         path: 'my/events',
-        element: (
-          <ProtectedRoute>
-            <MyEventsPage />
-          </ProtectedRoute>
-        ),
+        element: createLazyRouteElement(MyEventsPage, 'authenticated'),
       },
       {
         path: 'my/edit',
-        element: (
-          <ProtectedRoute>
-            <MyEditPage />
-          </ProtectedRoute>
-        ),
+        element: createLazyRouteElement(MyEditPage, 'authenticated'),
       },
       {
         path: 'account-delete',
-        element: (
-          <ProtectedRoute>
-            <AccountDeletePage />
-          </ProtectedRoute>
-        ),
+        element: createLazyRouteElement(AccountDeletePage, 'authenticated'),
       },
       {
         path: '*',

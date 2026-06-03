@@ -2,8 +2,9 @@ import type { ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
-import { Text } from '@/components';
+import { Text } from '@/components/Text';
 
+// TODO: Remove this scaffold component as each route is replaced with its real page UI.
 type RoutePlaceholderProps = {
   description: string;
   title: string;

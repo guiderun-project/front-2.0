@@ -50,11 +50,5 @@ export const ProtectedRoute = ({
     return <>{children}</>;
   }
 
-  return (
-    <Navigate
-      replace
-      state={{ from: location }}
-      to={user ? APP_PATH.HOME : APP_PATH.LOGIN}
-    />
-  );
+  return <Navigate replace state={{ from: location }} to={APP_PATH.INTRO} />;
 };

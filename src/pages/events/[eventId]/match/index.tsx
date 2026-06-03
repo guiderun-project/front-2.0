@@ -1,6 +1,6 @@
 import type { ReactElement } from 'react';
 
-import { PageLayout } from '@/components';
+import { PageLayout } from '@/components/PageLayout';
 import { RoutePlaceholder } from '@/pages/_shared/RoutePlaceholder';
 
 export const EventMatchPage = (): ReactElement => {
