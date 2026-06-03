@@ -19,44 +19,16 @@ import {
   TabPanel as AriaTabPanel,
   TabPanels as AriaTabPanels,
   Tabs as AriaTabs,
-  type Key,
-  type TabListProps as AriaTabListProps,
-  type TabPanelProps as AriaTabPanelProps,
-  type TabPanelsProps as AriaTabPanelsProps,
-  type TabProps as AriaTabProps,
-  type TabsProps as AriaTabsProps,
 } from 'react-aria-components';
 
-import { HiddenText } from '@/components/HiddenText';
-
-export type TabsLayout = 'equal' | 'hug' | 'scrollable';
-
-export type TabsProps = {
-  children: ReactNode;
-  fullWidth?: boolean;
-  layout?: TabsLayout;
-} & Omit<AriaTabsProps, 'children' | 'orientation'>;
-
-export type TabsListProps = {
-  children: ReactNode;
-} & Omit<AriaTabListProps<object>, 'children' | 'dependencies' | 'items'>;
-
-export type TabsTabProps = {
-  'aria-posinset'?: number;
-  'aria-setsize'?: number;
-  children: ReactNode;
-  id: Key;
-} & Omit<AriaTabProps, 'children' | 'id'>;
-
-export type TabsPanelsProps = {
-  children: ReactNode;
-} & Omit<AriaTabPanelsProps<object>, 'children' | 'dependencies' | 'items'>;
-
-export type TabsPanelProps = {
-  children: ReactNode;
-  id: Key;
-  keepMounted?: boolean;
-} & Omit<AriaTabPanelProps, 'children' | 'id' | 'shouldForceMount'>;
+import type {
+  TabsLayout,
+  TabsListProps,
+  TabsPanelProps,
+  TabsPanelsProps,
+  TabsProps,
+  TabsTabProps,
+} from './Tabs.types';
 
 type TabsContextValue = {
   layout: TabsLayout;
@@ -152,12 +124,7 @@ const TabsTab = ({
       aria-setsize={setSize}
       {...props}
     >
-      <TabLabel>
-        {children}
-        {positionInSet && setSize ? (
-          <HiddenText>{`, ${setSize}개 중 ${positionInSet}번째`}</HiddenText>
-        ) : null}
-      </TabLabel>
+      <TabLabel>{children}</TabLabel>
       <ActiveIndicator />
     </StyledTab>
   );
@@ -344,7 +311,7 @@ const TabLabel = styled.span(({ theme }) => {
 
 const ActiveIndicator = styled(SelectionIndicator)(({ theme }) => ({
   position: 'absolute',
-  bottom: '-1px',
+  bottom: theme.pxToRem(-1),
   left: 0,
   width: '100%',
   height: theme.pxToRem(2),
