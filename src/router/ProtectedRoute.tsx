@@ -50,6 +50,11 @@ export const ProtectedRoute = ({
     return <>{children}</>;
   }
 
-  // TODO: 인증 화면 경로가 확정되면 next 파라미터 기반 redirect로 변경한다.
-  return <Navigate replace state={{ from: location }} to={APP_PATH.HOME} />;
+  return (
+    <Navigate
+      replace
+      state={{ from: location }}
+      to={user ? APP_PATH.HOME : APP_PATH.LOGIN}
+    />
+  );
 };
