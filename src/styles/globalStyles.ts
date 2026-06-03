@@ -23,18 +23,21 @@ export const globalStyles = css`
   :root[data-color-mode='light'] {
     ${colorModeCssVariables.light}
     ${gradientModeCssVariables.light}
+    color-scheme: light;
   }
 
   @media (prefers-color-scheme: dark) {
     :root:not([data-color-mode='light']) {
       ${colorModeCssVariables.dark}
       ${gradientModeCssVariables.dark}
+      color-scheme: dark;
     }
   }
 
   :root[data-color-mode='dark'] {
     ${colorModeCssVariables.dark}
     ${gradientModeCssVariables.dark}
+    color-scheme: dark;
   }
 
   :root {
