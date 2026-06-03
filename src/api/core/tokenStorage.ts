@@ -1,22 +1,34 @@
-export const ACCESS_TOKEN_STORAGE_KEY = 'guiderun.accessToken';
+type AccessTokenChangeListener = (accessToken: string | null) => void;
 
-const getStorage = () => {
-  if (typeof window === 'undefined') {
-    return null;
-  }
+let accessTokenMemory: string | null = null;
+const accessTokenChangeListeners = new Set<AccessTokenChangeListener>();
 
-  return window.localStorage;
+const notifyAccessTokenChange = () => {
+  accessTokenChangeListeners.forEach((listener) => {
+    listener(accessTokenMemory);
+  });
 };
 
 export const getAccessToken = () => {
-  return getStorage()?.getItem(ACCESS_TOKEN_STORAGE_KEY) ?? null;
+  return accessTokenMemory;
 };
 
 export const setAccessToken = (accessToken: string) => {
-  // TODO: Temporary localStorage storage. Replace with an in-memory/httpOnly cookie strategy once auth policy is finalized.
-  getStorage()?.setItem(ACCESS_TOKEN_STORAGE_KEY, accessToken);
+  accessTokenMemory = accessToken;
+  notifyAccessTokenChange();
 };
 
 export const clearAccessToken = () => {
-  getStorage()?.removeItem(ACCESS_TOKEN_STORAGE_KEY);
+  accessTokenMemory = null;
+  notifyAccessTokenChange();
+};
+
+export const subscribeAccessTokenChange = (
+  listener: AccessTokenChangeListener,
+) => {
+  accessTokenChangeListeners.add(listener);
+
+  return () => {
+    accessTokenChangeListeners.delete(listener);
+  };
 };
