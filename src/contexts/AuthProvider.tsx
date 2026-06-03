@@ -26,15 +26,29 @@ const isUnauthorizedError = (error: unknown) => {
   return isAxiosError(error) && error.response?.status === 401;
 };
 
-const fetchAuthenticatedUser = async (): Promise<UserInfoGetResponse | null> => {
+const shouldRetryAuthUserQuery = (failureCount: number, error: unknown) => {
+  return !isUnauthorizedError(error) && failureCount < 2;
+};
+
+const fetchAuthenticatedUser = async (
+  previousUser: UserInfoGetResponse | null,
+): Promise<UserInfoGetResponse | null> => {
   if (!getAccessToken()) {
     try {
       const { accessToken } = await api.auth.accessTokenReissuePost();
 
       setAccessToken(accessToken);
-    } catch {
-      clearAccessToken();
-      return null;
+    } catch (error) {
+      if (isUnauthorizedError(error)) {
+        clearAccessToken();
+        return null;
+      }
+
+      if (previousUser) {
+        return previousUser;
+      }
+
+      throw error;
     }
   }
 
@@ -46,29 +60,43 @@ const fetchAuthenticatedUser = async (): Promise<UserInfoGetResponse | null> => 
       return null;
     }
 
+    if (previousUser) {
+      return previousUser;
+    }
+
     throw error;
   }
 };
 
 export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
   const queryClient = useQueryClient();
+  const getCachedAuthUser = useCallback(() => {
+    return (
+      queryClient.getQueryData<UserInfoGetResponse | null>(
+        AUTH_USER_QUERY_KEY,
+      ) ?? null
+    );
+  }, [queryClient]);
+  const fetchAuthUser = useCallback(() => {
+    return fetchAuthenticatedUser(getCachedAuthUser());
+  }, [getCachedAuthUser]);
   const authUserQuery = useQuery({
     queryKey: AUTH_USER_QUERY_KEY,
-    queryFn: fetchAuthenticatedUser,
+    queryFn: fetchAuthUser,
     gcTime: Infinity,
-    retry: false,
+    retry: shouldRetryAuthUserQuery,
     staleTime: Infinity,
   });
 
   const refreshUser = useCallback(async () => {
     return queryClient.fetchQuery({
       queryKey: AUTH_USER_QUERY_KEY,
-      queryFn: fetchAuthenticatedUser,
+      queryFn: fetchAuthUser,
       gcTime: Infinity,
-      retry: false,
+      retry: shouldRetryAuthUserQuery,
       staleTime: 0,
     });
-  }, [queryClient]);
+  }, [fetchAuthUser, queryClient]);
 
   const clearSession = useCallback(() => {
     clearAccessToken();

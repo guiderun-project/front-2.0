@@ -42,6 +42,7 @@ export const ProtectedRoute = ({
   const location = useLocation();
 
   if (!isAuthReady) {
+    // TODO: 인증 로딩 UI가 확정되면 직접 진입/새로고침 중 빈 화면 대신 표시한다.
     return null;
   }
 
