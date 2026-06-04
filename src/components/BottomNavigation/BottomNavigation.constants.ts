@@ -13,11 +13,10 @@ type BottomNavigationItem = {
   inactiveIcon: IconName;
 };
 
-// TODO: Confirm these destination endpoints once the route contract is finalized.
 export const BOTTOM_NAVIGATION_ITEMS = [
   {
     label: '전체 모임',
-    to: APP_PATH.EVENT,
+    to: APP_PATH.EVENTS,
     end: false,
     activeIcon: 'list-filled',
     inactiveIcon: 'list-lined',
