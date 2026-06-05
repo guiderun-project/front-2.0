@@ -120,6 +120,7 @@ const TOP_NAVIGATION_CODE_EXAMPLES = [
     code: `<TopNavigation
   left={{ icon: 'chevron-left-lined', ariaLabel: '뒤로가기' }}
   title="제목"
+  titleAs="h2"
   right={[
     { icon: 'delete-lined', ariaLabel: '닫기' },
     { icon: 'share-lined', ariaLabel: '공유하기' },
@@ -993,9 +994,8 @@ const useRadioSampleSelection = (
   return { handleChange, selectedValue };
 };
 
-export const HomePage = () => {
-  const [pageBackground, setPageBackground] =
-    useState<PageLayoutBackground>('bg.subtle');
+export const DesignPage = () => {
+  const [pageBackground, setPageBackground] = useState<PageLayoutBackground>('bg.subtle');
   const [isCheckBoxSelected, setIsCheckBoxSelected] = useState(false);
   const { handleChange: handleRadioChange, selectedValue: selectedRadioValue } =
     useRadioSampleSelection();
@@ -1162,6 +1162,7 @@ export const HomePage = () => {
             { icon: 'more-vertical-lined', ariaLabel: '더보기' },
           ]}
           title="제목"
+          titleAs="h2"
         />
         <CodeExamples examples={TOP_NAVIGATION_CODE_EXAMPLES} />
       </ShowcaseSection>

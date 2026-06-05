@@ -3,16 +3,20 @@ import type { ComponentPropsWithoutRef, ReactElement, ReactNode } from 'react';
 import styled from '@emotion/styled';
 
 import { IconButton, type IconName } from '../Icon';
+import { Text } from '../Text';
 
 export type TopNavigationIconButtonProps = {
   icon: IconName;
   ariaLabel: string;
 } & Omit<ComponentPropsWithoutRef<'button'>, 'aria-label' | 'children' | 'color'>;
 
+type TopNavigationTitleTag = 'h1' | 'h2';
+
 export type TopNavigationProps = {
   className?: string;
   left?: TopNavigationIconButtonProps;
   title: ReactNode;
+  titleAs?: TopNavigationTitleTag;
   right?: TopNavigationIconButtonProps[];
   'aria-label'?: string;
 };
@@ -23,6 +27,7 @@ export const TopNavigation = ({
   left,
   right,
   title,
+  titleAs = 'h1',
 }: TopNavigationProps): ReactElement => {
   return (
     <Navigation aria-label={ariaLabel} className={className}>
@@ -30,7 +35,9 @@ export const TopNavigation = ({
         <LeftSlot>
           {left ? <TopNavigationIconButton {...left} /> : null}
         </LeftSlot>
-        <Title>{title}</Title>
+        <Title as={titleAs} color="text.primary" font="body-l-sb">
+          {title}
+        </Title>
         <RightSlot>
           {right?.map((iconButton, index) => (
             <TopNavigationIconButton
@@ -92,25 +99,14 @@ const RightSlot = styled.div`
   min-height: ${({ theme }) => theme.pxToRem(24)};
 `;
 
-const Title = styled.span(({ theme }) => {
-  const typography = theme.typography['body-l-sb'];
-
-  return {
-    display: 'block',
-    flex: '1 1 0',
-    minWidth: 0,
-    margin: 0,
-    overflow: 'hidden',
-    color: theme.color.text.primary,
-    fontFamily: typography.fontFamily,
-    fontSize: typography.fontSize,
-    fontWeight: typography.fontWeight,
-    letterSpacing: 0,
-    lineHeight: typography.lineHeight,
-    textAlign: 'center',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-  };
+const Title = styled(Text)({
+  display: 'block',
+  flex: '1 1 0',
+  minWidth: 0,
+  overflow: 'hidden',
+  textAlign: 'center',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
 });
 
 const StyledIconButton = styled(IconButton)`
