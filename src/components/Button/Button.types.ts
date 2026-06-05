@@ -12,6 +12,7 @@ export type ButtonProps = {
   level?: ButtonLevel;
   size?: ButtonSize;
   status?: ButtonStatus;
+  fullWidth?: boolean;
   leftIcon?: ButtonIconProps;
   rightIcon?: ButtonIconProps;
 } & Omit<ComponentPropsWithoutRef<'button'>, 'color'>;

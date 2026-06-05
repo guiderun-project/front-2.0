@@ -112,6 +112,12 @@ const BUTTON_CODE_EXAMPLES = [
   확인
 </Button>`,
   },
+  {
+    label: 'Full width',
+    code: `<Button fullWidth size="l">
+  신청하기
+</Button>`,
+  },
 ] as const;
 
 const TOP_NAVIGATION_CODE_EXAMPLES = [
@@ -178,6 +184,35 @@ const BUTTON_GROUP_CODE_EXAMPLES = [
   <ButtonGroup.Button level="secondary" size="m">아니요</ButtonGroup.Button>
   <ButtonGroup.Button size="m">로그인하기</ButtonGroup.Button>
 </ButtonGroup>`,
+  },
+] as const;
+
+const FIXED_BOTTOM_CTA_CODE_EXAMPLES = [
+  {
+    label: 'Single button',
+    code: `<FixedBottomCta>
+  <ButtonGroup>
+    <ButtonGroup.Button size="l">신청하기</ButtonGroup.Button>
+  </ButtonGroup>
+</FixedBottomCta>`,
+  },
+  {
+    label: 'Two columns',
+    code: `<FixedBottomCta>
+  <ButtonGroup ratio="50:50">
+    <ButtonGroup.Button level="secondary" size="l">취소</ButtonGroup.Button>
+    <ButtonGroup.Button size="l">신청하기</ButtonGroup.Button>
+  </ButtonGroup>
+</FixedBottomCta>`,
+  },
+  {
+    label: 'Two rows',
+    code: `<FixedBottomCta>
+  <ButtonGroup ratio="100:100">
+    <ButtonGroup.Button level="secondary" size="l">장바구니</ButtonGroup.Button>
+    <ButtonGroup.Button size="l">바로 신청</ButtonGroup.Button>
+  </ButtonGroup>
+</FixedBottomCta>`,
   },
 ] as const;
 
@@ -1230,6 +1265,14 @@ export const DesignPage = () => {
             </ButtonMatrixBlock>
           ))}
         </ButtonMatrixList>
+        <ButtonFullWidthPreview>
+          <Text color="text.tertiary" font="detail-m-m">
+            Full width
+          </Text>
+          <Button fullWidth size="l">
+            신청하기
+          </Button>
+        </ButtonFullWidthPreview>
         <CodeExamples examples={BUTTON_CODE_EXAMPLES} />
       </ShowcaseSection>
 
@@ -1270,6 +1313,18 @@ export const DesignPage = () => {
           )}
         </ButtonGroupPreviewList>
         <CodeExamples examples={BUTTON_GROUP_CODE_EXAMPLES} />
+      </ShowcaseSection>
+
+      <ShowcaseSection>
+        <SectionTitle>
+          <Text as="h2" font="heading-s-m">
+            FixedBottomCta
+          </Text>
+          <Text color="text.tertiary" font="detail-m-r">
+            Fixed bottom action shell
+          </Text>
+        </SectionTitle>
+        <CodeExamples examples={FIXED_BOTTOM_CTA_CODE_EXAMPLES} />
       </ShowcaseSection>
 
       <ShowcaseSection>
@@ -2304,6 +2359,12 @@ const ButtonMatrixButtonCell = styled.div`
   align-items: center;
   justify-content: center;
   min-height: ${({ theme }) => theme.pxToRem(58)};
+`;
+
+const ButtonFullWidthPreview = styled.div`
+  display: grid;
+  gap: ${({ theme }) => theme.spacing.md};
+  width: 100%;
 `;
 
 const ButtonGroupPreviewList = styled.div`
