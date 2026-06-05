@@ -16,3 +16,4 @@ export * from "./RunnerTypeAvatar";
 export * from "./Select";
 export * from "./Tabs";
 export * from "./Text";
+export * from "./TopNavigation";

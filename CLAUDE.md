@@ -47,6 +47,8 @@ Keep `CLAUDE.md` and `AGENTS.md` aligned when changing agent instructions.
 ## Styling Guide
 
 - Use Emotion `styled` APIs for component styles unless an existing local pattern uses another approach.
+- Prefer object/function style for new Emotion styled components, such as `styled.div(({ theme }) => ({ ... }))`.
+- Follow the existing local pattern when editing a file that strongly uses template literal styles.
 - Prefer Emotion `theme` tokens before writing raw CSS values.
 - Use `theme.spacing` for spacing values that exist in the design system.
 - Use `theme.radius` for border radius values that exist in the design system.
@@ -60,6 +62,9 @@ Keep `CLAUDE.md` and `AGENTS.md` aligned when changing agent instructions.
 - If primitive colors are used directly, leave a short reason because primitive values may change.
 - Use CSS variables and `data-color-mode` for light/dark behavior instead of hardcoding mode branches in components.
 - Keep styles close to the component they belong to. Extract styling helpers only when they remove real duplication.
+- Keep styled declarations used by only one component near that component, usually at the bottom of the component file.
+- Do not create a separate `styles.ts` file only to separate JSX from styles.
+- Extract page-local style helpers only when sibling components share them or they reduce meaningful duplication.
 - Avoid creating broad layout primitives or design-system components before real repeated page use cases exist.
 
 ## Current Token Policy
@@ -119,7 +124,13 @@ Keep `CLAUDE.md` and `AGENTS.md` aligned when changing agent instructions.
 Page-level conventions are still intentionally light because full page development has not started yet.
 
 - Prefer page-local components, hooks, and helpers first.
+- Treat each route folder as the ownership boundary for page-only code.
+- Keep route `index.tsx` thin and focused on route composition, state branching, and page assembly.
+- Co-locate components, hooks, constants, types, utils, and assets used only by a page under that route folder.
+- Create folders such as `components/`, `hooks/`, and `assets/` only after enough local code exists to justify them. Do not create speculative folders.
 - Promote code to shared locations only when reuse across pages is clear.
+- Keep API service methods, API types, mocks, and fixtures in `src/api` and `src/mocks`.
+- Page-specific query composition or UI data shaping can live in the route folder.
 - When introducing the first pattern for forms, data fetching, layouts, loading states, empty states, or error states, keep the implementation small.
 - Update these guidelines only after a pattern proves reusable.
 - Avoid broad abstractions before at least one real page use case exists.
