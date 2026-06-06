@@ -12,6 +12,7 @@ import {
   ColorModeToggle,
   CONFIRM_POPUP_VARIANT,
   ConfirmPopup,
+  Filter,
   HiddenText,
   Icon,
   IconButton,
@@ -341,6 +342,7 @@ const ICON_EXAMPLES: ReadonlyArray<{ icon: IconName; color?: ColorToken }> = [
   { icon: 'search-lined' },
   { icon: 'share-lined', color: 'icon.secondary' },
   { icon: 'shuffle-lined', color: 'icon.secondary' },
+  { icon: 'sort-lined', color: 'icon.secondary' },
   { icon: 'trash-lined', color: 'text.danger' },
   { icon: 'user-filled' },
   { icon: 'user-lined' },
@@ -775,6 +777,21 @@ const RECRUITMENT_STATUS_OPTIONS: SelectOptions<RecruitmentStatus> = [
   { value: 'closed', label: '모집마감' },
 ];
 
+type FilterSort = 'recent' | 'deadline' | 'popular';
+
+const FILTER_SORT_OPTIONS: SelectOptions<FilterSort> = [
+  { value: 'recent', label: '최근순' },
+  { value: 'deadline', label: '마감임박순' },
+  { value: 'popular', label: '인기순' },
+];
+
+type FilterCycleSort = 'latest' | 'oldest';
+
+const FILTER_CYCLE_SORT_OPTIONS: SelectOptions<FilterCycleSort> = [
+  { value: 'latest', label: '최신순' },
+  { value: 'oldest', label: '오래된 순' },
+];
+
 const SELECT_CODE_EXAMPLES = [
   {
     label: 'Field trigger',
@@ -820,6 +837,51 @@ const operationOptions: SelectOptions<OperationType> = [
       {selectedOption?.label ?? '모집중'}
     </StatusChip>
   )}
+/>`,
+  },
+] as const;
+
+const FILTER_CODE_EXAMPLES = [
+  {
+    label: 'Line',
+    code: `<Filter
+  icon="sort-lined"
+  options={sortOptions}
+  sheetTitle="정렬"
+  value={sort}
+  onChange={setSort}
+/>`,
+  },
+  {
+    label: 'Solid',
+    code: `<Filter
+  icon="sort-lined"
+  variant="solid"
+  options={sortOptions}
+  sheetTitle="정렬"
+  value={sort}
+  onChange={setSort}
+/>`,
+  },
+  {
+    label: 'Cycle',
+    code: `<Filter
+  icon="sort-lined"
+  mode="cycle"
+  options={sortOptions}
+  value={sort}
+  onChange={setSort}
+/>`,
+  },
+  {
+    label: 'Disabled',
+    code: `<Filter
+  disabled
+  icon="sort-lined"
+  options={sortOptions}
+  sheetTitle="정렬"
+  value={sort}
+  onChange={setSort}
 />`,
   },
 ] as const;
@@ -1042,6 +1104,9 @@ export const DesignPage = () => {
   const [trainingType, setTrainingType] = useState<OperationType>();
   const [recruitmentStatus, setRecruitmentStatus] =
     useState<RecruitmentStatus>('open');
+  const [lineFilterSort, setLineFilterSort] = useState<FilterSort>('recent');
+  const [solidFilterSort, setSolidFilterSort] = useState<FilterSort>('recent');
+  const [cycleFilterSort, setCycleFilterSort] = useState<FilterCycleSort>('latest');
   const [paginationPage, setPaginationPage] = useState(1);
   const [activeConfirmPopup, setActiveConfirmPopup] =
     useState<ConfirmPopupExample | null>(null);
@@ -1481,6 +1546,70 @@ export const DesignPage = () => {
           </SelectSampleItem>
         </SelectSampleGrid>
         <CodeExamples examples={SELECT_CODE_EXAMPLES} />
+      </ShowcaseSection>
+
+      <ShowcaseSection>
+        <SectionTitle>
+          <Text as="h2" font="heading-s-m">
+            Filter
+          </Text>
+          <Text color="text.tertiary" font="detail-m-r">
+            Line, solid, cycle, disabled
+          </Text>
+        </SectionTitle>
+        <FilterSampleGrid>
+          <FilterSampleItem>
+            <Text color="text.secondary" font="detail-m-r">
+              Line
+            </Text>
+            <Filter
+              icon="sort-lined"
+              options={FILTER_SORT_OPTIONS}
+              sheetTitle="정렬"
+              value={lineFilterSort}
+              onChange={setLineFilterSort}
+            />
+          </FilterSampleItem>
+          <FilterSampleItem>
+            <Text color="text.secondary" font="detail-m-r">
+              Solid
+            </Text>
+            <Filter
+              icon="sort-lined"
+              options={FILTER_SORT_OPTIONS}
+              sheetTitle="정렬"
+              value={solidFilterSort}
+              variant="solid"
+              onChange={setSolidFilterSort}
+            />
+          </FilterSampleItem>
+          <FilterSampleItem>
+            <Text color="text.secondary" font="detail-m-r">
+              Cycle
+            </Text>
+            <Filter
+              icon="sort-lined"
+              mode="cycle"
+              options={FILTER_CYCLE_SORT_OPTIONS}
+              value={cycleFilterSort}
+              onChange={setCycleFilterSort}
+            />
+          </FilterSampleItem>
+          <FilterSampleItem>
+            <Text color="text.secondary" font="detail-m-r">
+              Disabled
+            </Text>
+            <Filter
+              disabled
+              icon="sort-lined"
+              options={FILTER_SORT_OPTIONS}
+              sheetTitle="정렬"
+              value="popular"
+              onChange={setLineFilterSort}
+            />
+          </FilterSampleItem>
+        </FilterSampleGrid>
+        <CodeExamples examples={FILTER_CODE_EXAMPLES} />
       </ShowcaseSection>
 
       <ShowcaseSection>
@@ -2667,6 +2796,19 @@ const SelectSampleItem = styled.div`
   justify-items: start;
   gap: ${({ theme }) => theme.spacing.sm};
   width: 100%;
+`;
+
+const FilterSampleGrid = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: ${({ theme }) => theme.spacing.xl};
+`;
+
+const FilterSampleItem = styled.div`
+  display: grid;
+  justify-items: start;
+  gap: ${({ theme }) => theme.spacing.sm};
 `;
 
 const StatusChip = styled.button`

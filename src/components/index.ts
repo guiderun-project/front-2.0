@@ -4,6 +4,7 @@ export * from "./BottomSheet";
 export * from "./Button";
 export * from "./CheckBox";
 export * from "./ColorModeToggle";
+export * from "./Filter";
 export * from "./FixedBottomCta";
 export * from "./HiddenText";
 export * from "./Icon";
