@@ -197,7 +197,7 @@ export const mockDb: MockDb = {
       eventCategory: 'GENERAL',
       recruitStatus: 'RECRUIT_OPEN',
       isPrivate: false,
-      organizerId: 'user-guide-1',
+      organizerId: currentUserId,
       schedule: {
         date: '2026-06-01',
         startTime: '09:00',

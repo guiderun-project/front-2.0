@@ -209,7 +209,7 @@ export const router = createBrowserRouter([
         element: createLazyRouteElement(EventAttendancePage, 'approved'),
       },
       {
-        path: 'events/:eventId/support',
+        path: 'events/supports',
         element: createLazyRouteElement(EventSupportPage),
       },
       {
