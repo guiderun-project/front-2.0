@@ -11,8 +11,8 @@ import { APP_PATH } from '@/router/path';
 import {
   getEventDetailCtaButtonConfigs,
   type EventDetailCtaButtonConfig,
-} from './eventDetailCtaButtonConfigs';
-import { eventDetailQueryKeys } from './queryKeys';
+} from '../eventDetailCtaButtonConfigs';
+import { eventDetailQueryKeys } from '../queryKeys';
 
 type UseEventDetailCtaParams = {
   canAccessProtectedTabs: boolean;

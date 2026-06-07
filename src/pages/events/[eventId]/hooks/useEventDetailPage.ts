@@ -7,9 +7,9 @@ import { api } from '@/api/services';
 import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
 
-import { eventDetailQueryKeys, getEventDetailViewerKey } from './queryKeys';
-import type { EventDetailTab } from './types';
-import { isApprovedUser, isEventDetailTab } from './utils';
+import { eventDetailQueryKeys, getEventDetailViewerKey } from '../queryKeys';
+import type { EventDetailTab } from '../types';
+import { isApprovedUser, isEventDetailTab } from '../utils';
 
 const copyTextToClipboard = async (text: string): Promise<boolean> => {
   if (navigator.clipboard?.writeText) {

@@ -4,7 +4,7 @@ import styled from '@emotion/styled';
 
 import { Button, IconButton, Text } from '@/components';
 
-import { useEventComments } from '../useEventComments';
+import { useEventComments } from '../hooks/useEventComments';
 import { formatRelativeTime } from '../utils';
 import { PanelState } from './PanelState';
 import { ProfileAvatar } from './ProfileAvatar';

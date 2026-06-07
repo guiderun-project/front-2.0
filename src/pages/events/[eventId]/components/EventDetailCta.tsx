@@ -3,7 +3,7 @@ import type { ReactElement } from 'react';
 import type { EventDetailResponse } from '@/api/types';
 import { ButtonGroup, FixedBottomCta } from '@/components';
 
-import { useEventDetailCta } from '../useEventDetailCta';
+import { useEventDetailCta } from '../hooks/useEventDetailCta';
 
 type EventDetailCtaProps = {
   canAccessProtectedTabs: boolean;

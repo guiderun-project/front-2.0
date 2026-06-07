@@ -4,8 +4,8 @@ import { useParams } from 'react-router-dom';
 import { api } from '@/api/services';
 import { useAuth } from '@/contexts';
 
-import { eventDetailQueryKeys } from './queryKeys';
-import { isApprovedUser } from './utils';
+import { eventDetailQueryKeys } from '../queryKeys';
+import { isApprovedUser } from '../utils';
 
 export const useEventComments = () => {
   const { eventId: eventIdParam } = useParams();

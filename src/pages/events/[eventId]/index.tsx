@@ -8,7 +8,7 @@ import {
 } from '@/components';
 
 import { EVENT_DETAIL_TABS } from './constants';
-import { useEventDetailPage } from './useEventDetailPage';
+import { useEventDetailPage } from './hooks/useEventDetailPage';
 import { ApplicantsPanel } from './components/ApplicantsPanel';
 import { DetailPanel } from './components/DetailPanel';
 import { EventDetailCta } from './components/EventDetailCta';
