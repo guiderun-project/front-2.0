@@ -3,7 +3,7 @@ import type { ReactElement } from 'react';
 import styled from '@emotion/styled';
 
 import type { EventDetailResponse } from '@/api/types';
-import { Badge, Text } from '@/components';
+import { Badge, Icon, Text } from '@/components';
 
 import { getEventTypeLabel, getRecruitStatusLabel } from '../utils';
 
@@ -21,6 +21,17 @@ export const EventHero = ({ event }: EventHeroProps): ReactElement => {
         <Badge size="m" tone="cyan2">
           {getRecruitStatusLabel(event.recruitStatus)}
         </Badge>
+        {event.isPrivate ? (
+          <Badge size="m" tone="gray">
+            비공개
+            <Icon
+              aria-hidden={true}
+              color="badge.text.gray"
+              icon="lock-lined"
+              size={14}
+            />
+          </Badge>
+        ) : null}
       </BadgeGroup>
       <HeroTitle as="h1" font="heading-m-b">
         {event.name}
@@ -43,7 +54,7 @@ const BadgeGroup = styled.div(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  gap: theme.spacing.md,
+  gap: theme.spacing.s,
 }));
 
 const HeroTitle = styled(Text)(({ theme }) => ({
