@@ -12,6 +12,8 @@ export const eventDetailQueryKeys = {
     [...eventDetailQueryKeys.detailRoot(eventId), viewerKey] as const,
   applicants: (eventId: number) =>
     [...eventDetailQueryKeys.root, 'applicants', eventId] as const,
+  applicantForm: (eventId: number, userId: string) =>
+    [...eventDetailQueryKeys.applicants(eventId), 'form', userId] as const,
   matchingStatus: (eventId: number) =>
     [...eventDetailQueryKeys.root, 'matching', 'status', eventId] as const,
   comments: (eventId: number) =>
