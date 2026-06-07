@@ -22,7 +22,7 @@ const AppWrapper = styled.div`
 `;
 
 const MobileViewport = styled.div`
-  --app-mobile-viewport-width: ${({ theme }) => theme.pxToRem(430)};
+  --app-mobile-viewport-width: ${({ theme }) => theme.layout.mobileViewportMaxWidth};
 
   width: 100%;
   max-width: var(--app-mobile-viewport-width);
