@@ -15,7 +15,7 @@ type TopNavigationTitleTag = 'h1' | 'h2';
 export type TopNavigationProps = {
   className?: string;
   left?: TopNavigationIconButtonProps;
-  title: ReactNode;
+  title?: ReactNode;
   titleAs?: TopNavigationTitleTag;
   right?: TopNavigationIconButtonProps[];
   'aria-label'?: string;
@@ -29,15 +29,21 @@ export const TopNavigation = ({
   title,
   titleAs = 'h1',
 }: TopNavigationProps): ReactElement => {
+  const hasTitle = isRenderable(title);
+
   return (
     <Navigation aria-label={ariaLabel} className={className}>
       <NavigationBar>
         <LeftSlot>
           {left ? <TopNavigationIconButton {...left} /> : null}
         </LeftSlot>
-        <Title as={titleAs} color="text.primary" font="body-l-sb">
-          {title}
-        </Title>
+        {hasTitle ? (
+          <Title as={titleAs} color="text.primary" font="body-l-sb">
+            {title}
+          </Title>
+        ) : (
+          <TitleSpacer aria-hidden={true} />
+        )}
         <RightSlot>
           {right?.map((iconButton, index) => (
             <TopNavigationIconButton
@@ -50,6 +56,9 @@ export const TopNavigation = ({
     </Navigation>
   );
 };
+
+const isRenderable = (value: ReactNode): boolean =>
+  value !== undefined && value !== null && value !== false && value !== '';
 
 const TopNavigationIconButton = ({
   ariaLabel,
@@ -107,6 +116,11 @@ const Title = styled(Text)({
   textAlign: 'center',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
+});
+
+const TitleSpacer = styled.div({
+  flex: '1 1 0',
+  minWidth: 0,
 });
 
 const StyledIconButton = styled(IconButton)`

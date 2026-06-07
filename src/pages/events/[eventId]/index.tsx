@@ -72,7 +72,6 @@ export const EventDetailPage = (): ReactElement => {
           aria-label="이벤트 상세 상단 메뉴"
           left={navigationLeftAction}
           right={navigationRightActions}
-          title=""
         />
         <PageState>이벤트 주소가 올바르지 않습니다.</PageState>
       </PageLayout>
@@ -86,7 +85,6 @@ export const EventDetailPage = (): ReactElement => {
           aria-label="이벤트 상세 상단 메뉴"
           left={navigationLeftAction}
           right={navigationRightActions}
-          title=""
         />
         <PageState>이벤트 정보를 불러오는 중입니다.</PageState>
       </PageLayout>
@@ -100,7 +98,6 @@ export const EventDetailPage = (): ReactElement => {
           aria-label="이벤트 상세 상단 메뉴"
           left={navigationLeftAction}
           right={navigationRightActions}
-          title=""
         />
         <PageState>이벤트를 찾을 수 없습니다.</PageState>
       </PageLayout>
@@ -113,7 +110,6 @@ export const EventDetailPage = (): ReactElement => {
         aria-label="이벤트 상세 상단 메뉴"
         left={navigationLeftAction}
         right={navigationRightActions}
-        title=""
       />
       <EventHero event={event} />
 
