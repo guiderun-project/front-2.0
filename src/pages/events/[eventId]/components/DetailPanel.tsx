@@ -9,7 +9,6 @@ import { APP_PATH } from '@/router/path';
 
 import {
   formatKoreanDate,
-  formatRunningDistance,
   formatTimeRange,
 } from '../utils';
 import { CommentsSection } from './CommentsSection';
@@ -32,6 +31,8 @@ export const DetailPanel = ({
   const handleSupportClick = () => {
     navigate(APP_PATH.EVENT_SUPPORT);
   };
+  const hasExpectedRunningDistance =
+    event.expectedRunningDistanceKm !== null;
 
   return (
     <>
@@ -73,11 +74,13 @@ export const DetailPanel = ({
               </SupportButton>
             </PlaceValue>
           </DetailInfoRow>
-          <DetailInfoRow label="예상 러닝거리">
-            <Text color="text.primary" font="body-m-m">
-              {formatRunningDistance(event.expectedRunningDistanceKm)}
-            </Text>
-          </DetailInfoRow>
+          {hasExpectedRunningDistance ? (
+            <DetailInfoRow label="예상 러닝거리">
+              <Text color="text.primary" font="body-m-m">
+                {event.expectedRunningDistanceKm}KM
+              </Text>
+            </DetailInfoRow>
+          ) : null}
           <Divider />
           <ContentText color="text.primary" font="body-m-m">
             {event.content}

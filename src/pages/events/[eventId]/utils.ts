@@ -64,10 +64,6 @@ export const formatTimeRange = (startTime: string, endTime: string) => {
   return `${formatKoreanTime(startTime)} ~ ${formatKoreanTime(endTime)}`;
 };
 
-export const formatRunningDistance = (distanceKm: number | null) => {
-  return distanceKm === null ? '미정' : `${distanceKm}KM`;
-};
-
 export const formatRelativeTime = (value: string) => {
   const createdAt = new Date(value).getTime();
 
