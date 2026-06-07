@@ -9,19 +9,16 @@ import {
 
 import { EVENT_DETAIL_TABS } from './constants';
 import { useEventDetailPage } from './hooks/useEventDetailPage';
-import { ApplicantsPanel } from './components/ApplicantsPanel';
 import { DetailPanel } from './components/DetailPanel';
 import { EventDetailCta } from './components/EventDetailCta';
 import { EventHero } from './components/EventHero';
 import { ManagementMenuSheet } from './components/ManagementMenuSheet';
-import { MatchingPanel } from './components/MatchingPanel';
 import { PageState } from './components/PanelState';
 import { RestrictedAccessSheet } from './components/RestrictedAccessSheet';
 
 export const EventDetailPage = (): ReactElement => {
   const {
     activeTab,
-    applicantsQuery,
     canAccessProtectedTabs,
     canManageEvent,
     closeManagementSheet,
@@ -38,7 +35,6 @@ export const EventDetailPage = (): ReactElement => {
     isManagementSheetOpen,
     isRestrictedSheetOpen,
     isValidEventId,
-    matchingQuery,
     openManagementSheet,
     openRestrictedSheet,
   } = useEventDetailPage();
@@ -138,20 +134,8 @@ export const EventDetailPage = (): ReactElement => {
               onKakaoShare={handleKakaoShare}
             />
           </Tabs.Panel>
-          <Tabs.Panel id="applicants">
-            <ApplicantsPanel
-              data={applicantsQuery.data}
-              isError={applicantsQuery.isError}
-              isPending={applicantsQuery.isPending}
-            />
-          </Tabs.Panel>
-          <Tabs.Panel id="matching">
-            <MatchingPanel
-              data={matchingQuery.data}
-              isError={matchingQuery.isError}
-              isPending={matchingQuery.isPending}
-            />
-          </Tabs.Panel>
+          <Tabs.Panel id="applicants">{null}</Tabs.Panel>
+          <Tabs.Panel id="matching">{null}</Tabs.Panel>
         </Tabs.Panels>
       </Tabs>
 

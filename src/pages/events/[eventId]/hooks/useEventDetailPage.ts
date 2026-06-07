@@ -62,20 +62,6 @@ export const useEventDetailPage = () => {
     queryFn: () => api.event.detailGet({ eventId }),
     enabled: isValidEventId && isAuthReady,
   });
-  const applicantsQuery = useQuery({
-    queryKey: eventDetailQueryKeys.applicants(eventId),
-    queryFn: () => api.application.applicantsGet({ eventId }),
-    enabled:
-      isValidEventId &&
-      canAccessProtectedTabs &&
-      activeTab === 'applicants',
-  });
-  const matchingQuery = useQuery({
-    queryKey: eventDetailQueryKeys.matchingStatus(eventId),
-    queryFn: () => api.matching.statusGet({ eventId }),
-    enabled:
-      isValidEventId && canAccessProtectedTabs && activeTab === 'matching',
-  });
 
   const event = eventDetailQuery.data ?? null;
   const canManageEvent =
@@ -140,7 +126,6 @@ export const useEventDetailPage = () => {
 
   return {
     activeTab,
-    applicantsQuery,
     canAccessProtectedTabs,
     canManageEvent,
     closeManagementSheet,
@@ -157,7 +142,6 @@ export const useEventDetailPage = () => {
     isManagementSheetOpen,
     isRestrictedSheetOpen,
     isValidEventId,
-    matchingQuery,
     openManagementSheet,
     openRestrictedSheet,
   };
