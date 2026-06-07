@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react';
+import { forwardRef, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
@@ -16,7 +16,7 @@ type ButtonStyleProps = {
   $status: ButtonStatus;
 };
 
-export const Button = ({
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
   children,
   disabled,
   fullWidth = false,
@@ -27,7 +27,7 @@ export const Button = ({
   status = 'default',
   type = 'button',
   ...props
-}: ButtonProps): ReactElement => {
+}, ref): ReactElement => {
   const resolvedStatus = disabled ? 'disabled' : status;
   const isDisabled = disabled || resolvedStatus === 'disabled';
   const defaultIconColor = BUTTON_COLOR_TOKENS[level][resolvedStatus].content;
@@ -35,6 +35,7 @@ export const Button = ({
 
   return (
     <StyledButton
+      ref={ref}
       $fullWidth={fullWidth}
       $level={level}
       $size={size}
@@ -68,7 +69,9 @@ export const Button = ({
       ) : null}
     </StyledButton>
   );
-};
+});
+
+Button.displayName = 'Button';
 
 const StyledButton = styled.button<ButtonStyleProps>(
   ({ $fullWidth, $level, $size, $status, theme }) => {
