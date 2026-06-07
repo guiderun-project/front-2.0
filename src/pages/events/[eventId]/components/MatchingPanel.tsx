@@ -381,7 +381,10 @@ const ParticipantSlot = styled.div<{ $variant: ParticipantSlotVariant }>(
       ? `${theme.pxToRem(1.2)} dashed ${theme.color.border.strong}`
       : `${theme.pxToRem(1.2)} solid transparent`,
     borderRadius: theme.radius.lg,
-    backgroundColor: theme.color.bg.surface,
+    backgroundColor:
+      $variant === 'unmatched'
+        ? theme.color.bg.surface
+        : theme.color.bg.subtle,
     boxSizing: 'border-box',
   }),
 );
