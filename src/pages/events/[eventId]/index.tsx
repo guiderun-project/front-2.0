@@ -149,7 +149,9 @@ export const EventDetailPage = (): ReactElement => {
         onLogin={handleLogin}
       />
       <ManagementMenuSheet
+        eventDate={event.schedule.date}
         eventId={eventId}
+        eventName={event.name}
         open={isManagementSheetOpen}
         onClose={closeManagementSheet}
       />

@@ -14,16 +14,25 @@ import {
 import { api } from '@/api/services';
 import { APP_PATH } from '@/router/path';
 
+import {
+  buildAttendanceGuideCsvFilename,
+  buildAttendedGuideRunnerCsv,
+  downloadCsvFile,
+} from '../attendanceCsv';
 import { eventDetailQueryKeys } from '../queryKeys';
 
 type ManagementMenuSheetProps = {
+  eventDate: string;
   eventId: number;
+  eventName: string;
   open: boolean;
   onClose: () => void;
 };
 
 export const ManagementMenuSheet = ({
+  eventDate,
   eventId,
+  eventName,
   onClose,
   open,
 }: ManagementMenuSheetProps): ReactElement => {
@@ -55,8 +64,31 @@ export const ManagementMenuSheet = ({
       window.alert('모집 게시글 삭제에 실패했어요.');
     },
   });
+  const downloadAttendanceCsvMutation = useMutation({
+    mutationFn: () => api.attendance.attendedGuidesGet({ eventId }),
+    onSuccess: ({ items }) => {
+      try {
+        const content = buildAttendedGuideRunnerCsv(items);
+        const filename = buildAttendanceGuideCsvFilename({
+          eventDate,
+          eventId,
+          eventName,
+        });
+
+        downloadCsvFile({ content, filename });
+        onClose();
+      } catch {
+        window.alert('출석 인원 명단 추출에 실패했어요.');
+      }
+    },
+    onError: () => {
+      window.alert('출석 인원 명단 추출에 실패했어요.');
+    },
+  });
   const isManagementMutating =
-    closeRecruitmentMutation.isPending || deleteEventMutation.isPending;
+    closeRecruitmentMutation.isPending ||
+    deleteEventMutation.isPending ||
+    downloadAttendanceCsvMutation.isPending;
 
   const handleEdit = () => {
     onClose();
@@ -64,8 +96,7 @@ export const ManagementMenuSheet = ({
   };
 
   const handleAttendance = () => {
-    onClose();
-    navigate(APP_PATH.EVENT_ATTENDANCE(eventId));
+    downloadAttendanceCsvMutation.mutate();
   };
 
   const handleCloseRecruitment = () => {
