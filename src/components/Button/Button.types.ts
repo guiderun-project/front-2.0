@@ -1,4 +1,4 @@
-import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+import type { ComponentPropsWithRef, ComponentPropsWithoutRef, ReactNode } from 'react';
 
 import type { IconProps } from '../Icon';
 
@@ -15,7 +15,7 @@ export type ButtonProps = {
   fullWidth?: boolean;
   leftIcon?: ButtonIconProps;
   rightIcon?: ButtonIconProps;
-} & Omit<ComponentPropsWithoutRef<'button'>, 'color'>;
+} & Omit<ComponentPropsWithRef<'button'>, 'color'>;
 
 export type ButtonGroupProps = {
   children: ReactNode;
