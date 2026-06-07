@@ -197,37 +197,44 @@ const MatchingCriteriaAccordion = ({
         </ChevronIcon>
       </CriteriaHeaderButton>
 
-      {isOpen ? (
-        <CriteriaContent id={contentId}>
-          <CriteriaCard aria-label="러너 유형별 매칭 기준">
-            {MATCHING_CRITERIA_COLUMNS.map((column) => (
-              <CriteriaColumn key={column.type}>
-                <CriteriaColumnHeader color="text.primary" font="detail-m-sb">
-                  {column.title}
-                </CriteriaColumnHeader>
-                <CriteriaList aria-label={`${column.title} 매칭 기준`}>
-                  {column.items.map((criterion) => (
-                    <CriteriaItem key={criterion.group}>
-                      <CriteriaGroupLetter $group={criterion.group}>
-                        {criterion.group}
-                      </CriteriaGroupLetter>
-                      <CriteriaValue color="text.secondary" font="detail-m-r">
-                        {criterion.value}
-                      </CriteriaValue>
-                    </CriteriaItem>
-                  ))}
-                </CriteriaList>
-              </CriteriaColumn>
-            ))}
-          </CriteriaCard>
+      <CriteriaPanel
+        aria-hidden={!isOpen}
+        data-state={isOpen ? 'open' : 'closed'}
+        id={contentId}
+        inert={!isOpen ? true : undefined}
+      >
+        <CriteriaPanelInner>
+          <CriteriaContent>
+            <CriteriaCard aria-label="러너 유형별 매칭 기준">
+              {MATCHING_CRITERIA_COLUMNS.map((column) => (
+                <CriteriaColumn key={column.type}>
+                  <CriteriaColumnHeader color="text.primary" font="detail-m-sb">
+                    {column.title}
+                  </CriteriaColumnHeader>
+                  <CriteriaList aria-label={`${column.title} 매칭 기준`}>
+                    {column.items.map((criterion) => (
+                      <CriteriaItem key={criterion.group}>
+                        <CriteriaGroupLetter $group={criterion.group}>
+                          {criterion.group}
+                        </CriteriaGroupLetter>
+                        <CriteriaValue color="text.secondary" font="detail-m-r">
+                          {criterion.value}
+                        </CriteriaValue>
+                      </CriteriaItem>
+                    ))}
+                  </CriteriaList>
+                </CriteriaColumn>
+              ))}
+            </CriteriaCard>
 
-          <CriteriaNotes>
-            {MATCHING_CRITERIA_NOTES.map((note) => (
-              <li key={note}>{note}</li>
-            ))}
-          </CriteriaNotes>
-        </CriteriaContent>
-      ) : null}
+            <CriteriaNotes>
+              {MATCHING_CRITERIA_NOTES.map((note) => (
+                <li key={note}>{note}</li>
+              ))}
+            </CriteriaNotes>
+          </CriteriaContent>
+        </CriteriaPanelInner>
+      </CriteriaPanel>
     </CriteriaSection>
   );
 };
@@ -465,13 +472,40 @@ const CriteriaHeaderButton = styled.button(({ theme }) => ({
 
 const ChevronIcon = styled.span<{ $isOpen: boolean }>(({ $isOpen }) => ({
   display: 'inline-flex',
-  transition: 'transform 160ms ease-out',
+  transition: 'transform 180ms ease-out',
   transform: $isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
 
   '@media (prefers-reduced-motion: reduce)': {
     transition: 'none',
   },
 }));
+
+const CriteriaPanel = styled.div({
+  display: 'grid',
+  gridTemplateRows: '0fr',
+  opacity: 0,
+  overflow: 'hidden',
+  visibility: 'hidden',
+  transition:
+    'grid-template-rows 180ms ease-out, opacity 180ms ease-out, visibility 0ms linear 180ms',
+
+  '&[data-state="open"]': {
+    gridTemplateRows: '1fr',
+    opacity: 1,
+    visibility: 'visible',
+    transition:
+      'grid-template-rows 180ms ease-out, opacity 180ms ease-out, visibility 0ms linear 0ms',
+  },
+
+  '@media (prefers-reduced-motion: reduce)': {
+    transition: 'none',
+  },
+});
+
+const CriteriaPanelInner = styled.div({
+  minHeight: 0,
+  overflow: 'hidden',
+});
 
 const CriteriaContent = styled.div(({ theme }) => ({
   display: 'flex',
