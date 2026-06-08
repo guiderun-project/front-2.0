@@ -249,7 +249,7 @@ const Overlay = styled(AriaModalOverlay)(({ theme }) => ({
 }));
 
 const Positioner = styled(AriaModal)(({ theme }) => ({
-  width: `min(100%, ${theme.pxToRem(430)})`,
+  width: `min(100%, ${theme.layout.mobileViewportMaxWidth})`,
   outline: 'none',
   willChange: 'transform',
 

@@ -67,7 +67,7 @@ const FixedArea = styled.footer(({ theme }) => ({
   zIndex: theme.zIndex.control,
   display: 'grid',
   boxSizing: 'border-box',
-  width: `min(100%, var(--app-mobile-viewport-width, ${theme.pxToRem(430)}))`,
+  width: `min(100%, var(--app-mobile-viewport-width, ${theme.layout.mobileViewportMaxWidth}))`,
   padding: `${theme.spacing.lg} ${theme.spacing.none} calc(${theme.spacing.lg} + env(safe-area-inset-bottom))`,
   gap: theme.spacing.md,
   transform: 'translateX(50%)',

@@ -60,11 +60,6 @@ export const EventDetailPage = (): ReactElement => {
   };
   const navigationRightActions: TopNavigationIconButtonProps[] = [
     {
-      icon: 'delete-lined',
-      ariaLabel: '닫기',
-      onClick: handleBack,
-    },
-    {
       icon: 'share-lined',
       ariaLabel: '카카오톡 공유하기 새창 열림',
       onClick: handleKakaoShare,

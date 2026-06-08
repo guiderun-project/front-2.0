@@ -26,11 +26,23 @@ export const getRecruitStatusLabel = (recruitStatus: RecruitStatus) => {
   const labels = {
     RECRUIT_UPCOMING: '모집예정',
     RECRUIT_OPEN: '모집중',
-    RECRUIT_CLOSE: '모집마감',
+    RECRUIT_CLOSE: '모집완료',
     RECRUIT_END: '종료',
   } satisfies Record<RecruitStatus, string>;
 
   return labels[recruitStatus];
+};
+
+export const getRecruitStatusBadgeTone = (recruitStatus: RecruitStatus) => {
+  const tones = {
+    RECRUIT_UPCOMING: 'orange',
+    RECRUIT_OPEN: 'cyan2',
+    RECRUIT_CLOSE: 'gray',
+    // TODO: 종료 상태 Badge 디자인 대응 필요.
+    RECRUIT_END: 'gray',
+  } satisfies Record<RecruitStatus, 'cyan2' | 'gray' | 'orange'>;
+
+  return tones[recruitStatus];
 };
 
 export const formatKoreanDate = (value: string) => {
