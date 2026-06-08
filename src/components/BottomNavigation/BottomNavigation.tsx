@@ -85,7 +85,7 @@ const Navigation = styled.nav`
   width: 100%;
   max-width: var(
     --app-mobile-viewport-width,
-    ${({ theme }) => theme.pxToRem(430)}
+    ${({ theme }) => theme.layout.mobileViewportMaxWidth}
   );
   min-height: calc(
     ${({ theme }) => theme.pxToRem(BOTTOM_NAVIGATION_OFFSET_PX)} +

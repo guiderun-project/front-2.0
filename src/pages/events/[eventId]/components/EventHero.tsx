@@ -5,7 +5,11 @@ import styled from '@emotion/styled';
 import type { EventDetailResponse } from '@/api/types';
 import { Badge, Icon, Text } from '@/components';
 
-import { getEventTypeLabel, getRecruitStatusLabel } from '../utils';
+import {
+  getEventTypeLabel,
+  getRecruitStatusBadgeTone,
+  getRecruitStatusLabel,
+} from '../utils';
 
 type EventHeroProps = {
   event: EventDetailResponse;
@@ -18,7 +22,7 @@ export const EventHero = ({ event }: EventHeroProps): ReactElement => {
         <Badge size="m" tone="gray" variant="solid">
           {getEventTypeLabel(event.eventType)}
         </Badge>
-        <Badge size="m" tone="cyan2">
+        <Badge size="m" tone={getRecruitStatusBadgeTone(event.recruitStatus)}>
           {getRecruitStatusLabel(event.recruitStatus)}
         </Badge>
         {event.isPrivate ? (

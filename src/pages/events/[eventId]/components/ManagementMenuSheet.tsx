@@ -189,9 +189,9 @@ export const ManagementMenuSheet = ({
       <ConfirmPopup
         confirmLoading={deleteEventMutation.isPending}
         confirmText="삭제하기"
-        description="삭제한 모집 게시글은 다시 복구할 수 없어요."
+        description="삭제한 모임은 다시 복구할 수 없어요."
         open={isDeleteConfirmOpen}
-        title="모집 게시글을 삭제할까요?"
+        title="이 모임을 삭제할까요?"
         variant={CONFIRM_POPUP_VARIANT.DANGER}
         onCancel={handleCancelDelete}
         onConfirm={handleConfirmDelete}

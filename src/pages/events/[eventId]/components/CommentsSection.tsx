@@ -136,12 +136,22 @@ export const CommentsSection = (): ReactElement => {
   );
 };
 
-const CommentSectionRoot = styled.section(({ theme }) => ({
-  width: '100%',
-  padding: `${theme.spacing['4xl']} ${theme.spacing['2xl']}`,
-  boxSizing: 'border-box',
-  backgroundColor: theme.color.bg.default,
-}));
+const CommentSectionRoot = styled.section(({ theme }) => {
+  const desktopViewportQuery = `@media (min-width: calc(${theme.layout.mobileViewportMaxWidth} + ${theme.pxToRem(1)}))`;
+
+  return {
+    width: '100%',
+    padding: `${theme.spacing['4xl']} ${theme.spacing['2xl']}`,
+    boxSizing: 'border-box',
+    backgroundColor: theme.color.bg.default,
+
+    [desktopViewportQuery]: {
+      width: 'auto',
+      marginInline: theme.spacing['2xl'],
+      borderRadius: theme.pxToRem(20),
+    },
+  };
+});
 
 const CommentSectionInner = styled.div(({ theme }) => ({
   display: 'flex',

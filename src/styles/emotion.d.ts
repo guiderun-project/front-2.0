@@ -11,6 +11,7 @@ declare module '@emotion/react' {
     fontWeight: AppTheme['fontWeight'];
     gradient: AppTheme['gradient'];
     gradientBaseColor: AppTheme['gradientBaseColor'];
+    layout: AppTheme['layout'];
     pxToRem: AppTheme['pxToRem'];
     radius: AppTheme['radius'];
     spacing: AppTheme['spacing'];
