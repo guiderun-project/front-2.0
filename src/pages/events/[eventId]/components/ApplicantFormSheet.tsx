@@ -5,6 +5,7 @@ import styled from '@emotion/styled';
 import type { EventApplicantFormResponse, EventType } from '@/api/types';
 import { BottomSheet, ButtonGroup, Text } from '@/components';
 
+import { copyTextToClipboard } from '../utils';
 import { PanelState } from './PanelState';
 
 const EMPTY_VALUE = '미입력';
@@ -163,38 +164,6 @@ const getDisplayValue = (value: string | null | undefined): string => {
 
 const formatRowsForCopy = (rows: ApplicantFormRow[]): string => {
   return rows.map((row) => `${row.label}: ${row.value}`).join('\n');
-};
-
-const copyTextToClipboard = async (text: string): Promise<boolean> => {
-  if (navigator.clipboard?.writeText) {
-    try {
-      await navigator.clipboard.writeText(text);
-      return true;
-    } catch {
-      // Fall through to the textarea fallback for browsers that block Clipboard API.
-    }
-  }
-
-  const textarea = document.createElement('textarea');
-
-  textarea.value = text;
-  textarea.setAttribute('readonly', '');
-  textarea.style.position = 'fixed';
-  textarea.style.top = '0';
-  textarea.style.left = '-9999px';
-
-  document.body.appendChild(textarea);
-  textarea.focus();
-  textarea.select();
-  textarea.setSelectionRange(0, text.length);
-
-  try {
-    return document.execCommand('copy');
-  } catch {
-    return false;
-  } finally {
-    document.body.removeChild(textarea);
-  }
 };
 
 const SheetContent = styled.div(({ theme }) => ({
