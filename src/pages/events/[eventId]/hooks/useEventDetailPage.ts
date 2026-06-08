@@ -22,6 +22,7 @@ export const useEventDetailPage = () => {
   const eventId = Number(eventIdParam);
   const isValidEventId = Number.isInteger(eventId) && eventId > 0;
   const canAccessProtectedTabs = isApprovedUser(user);
+  const isApprovalPending = user?.role === 'ROLE_WAIT';
   const activeTab = canAccessProtectedTabs ? selectedTab : 'detail';
   const viewerKey = getEventDetailViewerKey(user?.userId);
 
@@ -106,6 +107,7 @@ export const useEventDetailPage = () => {
     handleKakaoShare,
     handleLogin,
     handleTabSelectionChange,
+    isApprovalPending,
     isAuthenticated,
     isManagementSheetOpen,
     isRestrictedSheetOpen,

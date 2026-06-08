@@ -2,7 +2,7 @@ import { useState, type FormEvent, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
-import { Button, IconButton, Text } from '@/components';
+import { Button, Icon, IconButton, Text } from '@/components';
 
 import { useEventComments } from '../hooks/useEventComments';
 import { formatRelativeTime } from '../utils';
@@ -68,7 +68,7 @@ export const CommentsSection = (): ReactElement => {
           <CommentInput
             aria-label="댓글 입력"
             disabled={isCommentMutating}
-            placeholder="해당 러닝 이벤트 관련된 이야기를 해주세요!"
+            placeholder="해당 모임에 관련한 이야기를 해주세요!"
             value={commentFormValue}
             onChange={(event) => {
               setCommentFormValue(event.target.value);
@@ -129,29 +129,31 @@ export const CommentsSection = (): ReactElement => {
             })}
           </CommentList>
         ) : (
-          <CommentEmptyState>아직 댓글이 없어요</CommentEmptyState>
+          <CommentEmptyState>
+            <Icon
+              aria-hidden={true}
+              color="icon.teritary"
+              icon="alert-circle-filled"
+              size={48}
+            />
+            <Text align="center" color="text.tertiary" font="body-m-m">
+              아직 댓글이 없어요
+            </Text>
+          </CommentEmptyState>
         )}
       </CommentSectionInner>
     </CommentSectionRoot>
   );
 };
 
-const CommentSectionRoot = styled.section(({ theme }) => {
-  const desktopViewportQuery = `@media (min-width: calc(${theme.layout.mobileViewportMaxWidth} + ${theme.pxToRem(1)}))`;
-
-  return {
-    width: '100%',
-    padding: `${theme.spacing['4xl']} ${theme.spacing['2xl']}`,
-    boxSizing: 'border-box',
-    backgroundColor: theme.color.bg.default,
-
-    [desktopViewportQuery]: {
-      width: 'auto',
-      marginInline: theme.spacing['2xl'],
-      borderRadius: theme.pxToRem(20),
-    },
-  };
-});
+const CommentSectionRoot = styled.section(({ theme }) => ({
+  width: 'auto',
+  marginInline: theme.spacing['2xl'],
+  padding: theme.spacing['2xl'],
+  borderRadius: theme.pxToRem(20),
+  boxSizing: 'border-box',
+  backgroundColor: theme.color.bg.elevated,
+}));
 
 const CommentSectionInner = styled.div(({ theme }) => ({
   display: 'flex',
@@ -174,6 +176,7 @@ const CommentAuthor = styled.div({
 const CommentInput = styled.textarea(({ theme }) => ({
   width: '100%',
   minHeight: theme.pxToRem(74),
+  height: theme.pxToRem(74),
   padding: theme.spacing.lg,
   border: `1px solid ${theme.color.border.default}`,
   borderRadius: theme.radius.md,
@@ -185,7 +188,7 @@ const CommentInput = styled.textarea(({ theme }) => ({
   fontWeight: theme.typography['detail-m-m'].fontWeight,
   letterSpacing: theme.typography['detail-m-m'].letterSpacing,
   lineHeight: theme.typography['detail-m-m'].lineHeight,
-  resize: 'vertical',
+  resize: 'none',
 
   '&::placeholder': {
     color: theme.color.text.tertiary,
@@ -209,18 +212,14 @@ const CommentList = styled.div(({ theme }) => ({
 }));
 
 const CommentEmptyState = styled.div(({ theme }) => ({
-  display: 'grid',
-  placeItems: 'center',
-  minHeight: theme.pxToRem(72),
-  padding: `${theme.spacing.lg} ${theme.spacing['2xl']}`,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: theme.spacing.lg,
+  width: '100%',
+  padding: `${theme.spacing['5xl']} ${theme.spacing['2xl']}`,
   boxSizing: 'border-box',
-  color: theme.color.text.tertiary,
-  fontFamily: theme.typography['body-m-m'].fontFamily,
-  fontSize: theme.typography['body-m-m'].fontSize,
-  fontWeight: theme.typography['body-m-m'].fontWeight,
-  letterSpacing: theme.typography['body-m-m'].letterSpacing,
-  lineHeight: theme.typography['body-m-m'].lineHeight,
-  textAlign: 'center',
 }));
 
 const CommentItem = styled.article(({ theme }) => ({

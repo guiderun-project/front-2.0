@@ -36,6 +36,7 @@ export const EventDetailPage = (): ReactElement => {
     handleKakaoShare,
     handleLogin,
     handleTabSelectionChange,
+    isApprovalPending,
     isAuthenticated,
     isManagementSheetOpen,
     isRestrictedSheetOpen,
@@ -174,6 +175,7 @@ export const EventDetailPage = (): ReactElement => {
       />
 
       <RestrictedAccessSheet
+        isApprovalPending={isApprovalPending}
         isAuthenticated={isAuthenticated}
         open={isRestrictedSheetOpen}
         onClose={closeRestrictedSheet}
