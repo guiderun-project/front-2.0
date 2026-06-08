@@ -7,14 +7,19 @@ import {
   type TopNavigationIconButtonProps,
 } from '@/components';
 
-import { EVENT_DETAIL_TABS } from './constants';
-import { useEventDetailPage } from './hooks/useEventDetailPage';
+import { ApplicantFormSheet } from './components/ApplicantFormSheet';
+import { ApplicantsPanel } from './components/ApplicantsPanel';
 import { DetailPanel } from './components/DetailPanel';
 import { EventDetailCta } from './components/EventDetailCta';
 import { EventHero } from './components/EventHero';
 import { ManagementMenuSheet } from './components/ManagementMenuSheet';
+import { MatchingPanel } from './components/MatchingPanel';
 import { PageState } from './components/PanelState';
 import { RestrictedAccessSheet } from './components/RestrictedAccessSheet';
+import { EVENT_DETAIL_TABS } from './constants';
+import { useEventApplicants } from './hooks/useEventApplicants';
+import { useEventDetailPage } from './hooks/useEventDetailPage';
+import { useEventMatchingStatus } from './hooks/useEventMatchingStatus';
 
 export const EventDetailPage = (): ReactElement => {
   const {
@@ -38,17 +43,29 @@ export const EventDetailPage = (): ReactElement => {
     openManagementSheet,
     openRestrictedSheet,
   } = useEventDetailPage();
+  const matchingStatus = useEventMatchingStatus({
+    eventId,
+    enabled:
+      isValidEventId && canAccessProtectedTabs && activeTab === 'matching',
+  });
+  const {
+    applicantFormQuery,
+    applicantsQuery,
+    closeApplicantForm,
+    openApplicantForm,
+    selectedApplicantId,
+  } = useEventApplicants({
+    activeTab,
+    canViewApplicantForm: canManageEvent,
+    canViewApplicants: canAccessProtectedTabs,
+    eventId,
+  });
   const navigationLeftAction: TopNavigationIconButtonProps = {
     icon: 'chevron-left-lined',
     ariaLabel: '뒤로가기',
     onClick: handleBack,
   };
   const navigationRightActions: TopNavigationIconButtonProps[] = [
-    {
-      icon: 'delete-lined',
-      ariaLabel: '닫기',
-      onClick: handleBack,
-    },
     {
       icon: 'share-lined',
       ariaLabel: '카카오톡 공유하기 새창 열림',
@@ -130,8 +147,22 @@ export const EventDetailPage = (): ReactElement => {
               onKakaoShare={handleKakaoShare}
             />
           </Tabs.Panel>
-          <Tabs.Panel id="applicants">{null}</Tabs.Panel>
-          <Tabs.Panel id="matching">{null}</Tabs.Panel>
+          <Tabs.Panel id="applicants">
+            <ApplicantsPanel
+              data={applicantsQuery.data}
+              isError={applicantsQuery.isError}
+              isPending={applicantsQuery.isPending}
+              onApplicantClick={canManageEvent ? openApplicantForm : undefined}
+            />
+          </Tabs.Panel>
+          <Tabs.Panel id="matching">
+            <MatchingPanel
+              data={matchingStatus.data}
+              isError={matchingStatus.isError}
+              isPending={matchingStatus.isPending}
+              showMyPartnerSummary={event.viewer?.isApplied === true}
+            />
+          </Tabs.Panel>
         </Tabs.Panels>
       </Tabs>
 
@@ -154,6 +185,14 @@ export const EventDetailPage = (): ReactElement => {
         eventName={event.name}
         open={isManagementSheetOpen}
         onClose={closeManagementSheet}
+      />
+      <ApplicantFormSheet
+        data={applicantFormQuery.data}
+        eventType={event.eventType}
+        isError={applicantFormQuery.isError}
+        isPending={applicantFormQuery.isPending}
+        open={selectedApplicantId !== null}
+        onClose={closeApplicantForm}
       />
     </PageLayout>
   );

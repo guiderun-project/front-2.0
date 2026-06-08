@@ -346,6 +346,19 @@ export const mockDb: MockDb = {
       attended: false,
     },
     {
+      requestId: 1004,
+      eventId: 1,
+      userId: 'user-guide-1',
+      status: 'APPLIED',
+      canceledAt: null,
+      group: 'A',
+      partner: null,
+      detail: 'Can support as an additional guide',
+      competitionInfo: null,
+      additionalAnswers: [],
+      attended: false,
+    },
+    {
       requestId: 2001,
       eventId: 2,
       userId: 'user-vi-1',
@@ -395,7 +408,7 @@ export const mockDb: MockDb = {
     {
       eventId: 1,
       viId: 'user-vi-1',
-      guideIds: ['user-guide-2'],
+      guideIds: ['user-guide-2', 'user-guide-1'],
     },
   ],
   comments: [
