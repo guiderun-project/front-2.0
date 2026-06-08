@@ -7,8 +7,8 @@ import type {
 } from '@/api/types';
 import { APPROVED_ROLES } from '@/constants';
 
-import { EVENT_DETAIL_TABS } from './constants';
-import type { EventDetailTab } from './types';
+import { EVENT_DETAIL_TABS } from '../constants';
+import type { EventDetailTab } from '../types';
 
 export const isEventDetailTab = (key: Key): key is EventDetailTab => {
   return EVENT_DETAIL_TABS.some((tab) => tab.id === key);
