@@ -1,7 +1,6 @@
 import { useState, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
 import {
@@ -11,15 +10,9 @@ import {
   Icon,
   Text,
 } from '@/components';
-import { api } from '@/api/services';
 import { APP_PATH } from '@/router/path';
 
-import {
-  buildAttendanceGuideCsvFilename,
-  buildAttendedGuideRunnerCsv,
-  downloadCsvFile,
-} from '../attendanceCsv';
-import { eventDetailQueryKeys } from '../queryKeys';
+import { useEventManagementActions } from '../hooks/useEventManagementActions';
 
 type ManagementMenuSheetProps = {
   eventDate: string;
@@ -37,58 +30,22 @@ export const ManagementMenuSheet = ({
   open,
 }: ManagementMenuSheetProps): ReactElement => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
-
-  const closeRecruitmentMutation = useMutation({
-    mutationFn: () => api.event.closePatch({ eventId }),
-    onSuccess: () => {
-      onClose();
-      void queryClient.invalidateQueries({
-        queryKey: eventDetailQueryKeys.detailRoot(eventId),
-      });
-    },
-    onError: () => {
-      window.alert('모집 마감에 실패했어요.');
-    },
-  });
-  const deleteEventMutation = useMutation({
-    mutationFn: () => api.event.delete({ eventId }),
-    onSuccess: () => {
+  const {
+    closeRecruitment,
+    deleteEvent,
+    downloadAttendanceCsv,
+    isDeleteEventPending,
+    isManagementMutating,
+  } = useEventManagementActions({
+    eventDate,
+    eventId,
+    eventName,
+    onClose,
+    onDeleteSuccess: () => {
       setIsDeleteConfirmOpen(false);
-      onClose();
-      void queryClient.invalidateQueries({ queryKey: eventDetailQueryKeys.root });
-      navigate(APP_PATH.EVENTS);
-    },
-    onError: () => {
-      window.alert('모집 게시글 삭제에 실패했어요.');
     },
   });
-  const downloadAttendanceCsvMutation = useMutation({
-    mutationFn: () => api.attendance.attendedGuidesGet({ eventId }),
-    onSuccess: ({ items }) => {
-      try {
-        const content = buildAttendedGuideRunnerCsv(items);
-        const filename = buildAttendanceGuideCsvFilename({
-          eventDate,
-          eventId,
-          eventName,
-        });
-
-        downloadCsvFile({ content, filename });
-        onClose();
-      } catch {
-        window.alert('출석 인원 명단 추출에 실패했어요.');
-      }
-    },
-    onError: () => {
-      window.alert('출석 인원 명단 추출에 실패했어요.');
-    },
-  });
-  const isManagementMutating =
-    closeRecruitmentMutation.isPending ||
-    deleteEventMutation.isPending ||
-    downloadAttendanceCsvMutation.isPending;
 
   const handleEdit = () => {
     onClose();
@@ -96,11 +53,11 @@ export const ManagementMenuSheet = ({
   };
 
   const handleAttendance = () => {
-    downloadAttendanceCsvMutation.mutate();
+    downloadAttendanceCsv();
   };
 
   const handleCloseRecruitment = () => {
-    closeRecruitmentMutation.mutate();
+    closeRecruitment();
   };
 
   const handleDelete = () => {
@@ -109,7 +66,7 @@ export const ManagementMenuSheet = ({
   };
 
   const handleCancelDelete = () => {
-    if (deleteEventMutation.isPending) {
+    if (isDeleteEventPending) {
       return;
     }
 
@@ -117,7 +74,7 @@ export const ManagementMenuSheet = ({
   };
 
   const handleConfirmDelete = () => {
-    deleteEventMutation.mutate();
+    deleteEvent();
   };
 
   return (
@@ -187,7 +144,7 @@ export const ManagementMenuSheet = ({
         </ManagementMenuList>
       </BottomSheet>
       <ConfirmPopup
-        confirmLoading={deleteEventMutation.isPending}
+        confirmLoading={isDeleteEventPending}
         confirmText="삭제하기"
         description="삭제한 모임은 다시 복구할 수 없어요."
         open={isDeleteConfirmOpen}

@@ -47,24 +47,7 @@ export const MatchingPanel = ({
 
         <GroupList>
           {data.groups.map((group) => (
-            <GroupCard key={group.runningGroup}>
-              <GroupHeader>
-                <Text as="h2" color="text.primary" font="heading-s-sb">
-                  {group.runningGroup}그룹
-                </Text>
-                <Text color="text.tertiary" font="body-m-m">
-                  {group.totalCount}명
-                </Text>
-              </GroupHeader>
-              <MatchingRows
-                aria-label={`${group.runningGroup}그룹 매칭 결과`}
-                role="list"
-              >
-                {group.rows.map((row) => (
-                  <MatchingResultRow key={row.id} row={row} />
-                ))}
-              </MatchingRows>
-            </GroupCard>
+            <MatchingGroupCard key={group.runningGroup} group={group} />
           ))}
         </GroupList>
       </ResultsSection>
@@ -72,6 +55,35 @@ export const MatchingPanel = ({
       <SectionDivider aria-hidden={true} />
       <MatchingCriteriaAccordion defaultOpen={true} />
     </PanelRoot>
+  );
+};
+
+type MatchingGroupCardProps = {
+  group: MatchingStatusViewModel['groups'][number];
+};
+
+const MatchingGroupCard = ({
+  group,
+}: MatchingGroupCardProps): ReactElement => {
+  return (
+    <GroupCard>
+      <GroupHeader>
+        <Text as="h2" color="text.primary" font="heading-s-sb">
+          {group.runningGroup}그룹
+        </Text>
+        <Text color="text.tertiary" font="body-m-m">
+          {group.totalCount}명
+        </Text>
+      </GroupHeader>
+      <MatchingRows
+        aria-label={`${group.runningGroup}그룹 매칭 결과`}
+        role="list"
+      >
+        {group.rows.map((row) => (
+          <MatchingResultRow key={row.id} row={row} />
+        ))}
+      </MatchingRows>
+    </GroupCard>
   );
 };
 

@@ -1,18 +1,13 @@
 import { useMemo } from 'react';
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
-
 import type { EventDetailResponse } from '@/api/types';
-import { api } from '@/api/services';
 import type { ButtonGroupRatio } from '@/components';
-import { APP_PATH } from '@/router/path';
 
+import { useEventDetailCtaActionProps } from './useEventDetailCtaActionProps';
 import {
   getEventDetailCtaButtonConfigs,
   type EventDetailCtaButtonConfig,
-} from '../eventDetailCtaButtonConfigs';
-import { eventDetailQueryKeys } from '../queryKeys';
+} from '../utils/eventDetailCtaButtonConfigs';
 
 type UseEventDetailCtaParams = {
   canAccessProtectedTabs: boolean;
@@ -21,7 +16,7 @@ type UseEventDetailCtaParams = {
   onRestrictedAccess: () => void;
 };
 
-export type EventDetailCtaButton = EventDetailCtaButtonConfig & {
+type EventDetailCtaButton = EventDetailCtaButtonConfig & {
   onClick?: () => void;
 };
 
@@ -36,28 +31,11 @@ export const useEventDetailCta = ({
   event,
   onRestrictedAccess,
 }: UseEventDetailCtaParams): UseEventDetailCtaResult => {
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const eventId = event.eventId;
-
-  const cancelApplicationMutation = useMutation({
-    mutationFn: () => api.application.cancelDelete({ eventId }),
-    onSuccess: () => {
-      void Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: eventDetailQueryKeys.detailRoot(eventId),
-        }),
-        queryClient.invalidateQueries({
-          queryKey: eventDetailQueryKeys.applicants(eventId),
-        }),
-        queryClient.invalidateQueries({
-          queryKey: eventDetailQueryKeys.matchingStatus(eventId),
-        }),
-      ]);
-    },
-    onError: () => {
-      window.alert('신청 취소에 실패했어요.');
-    },
+  const { getEventDetailCtaActionProps } = useEventDetailCtaActionProps({
+    canAccessProtectedTabs,
+    eventId,
+    onRestrictedAccess,
   });
 
   const buttonConfigs = useMemo(
@@ -70,53 +48,10 @@ export const useEventDetailCta = ({
     [canManageEvent, event.recruitStatus, event.viewer?.isApplied],
   );
 
-  const buttons = buttonConfigs.map<EventDetailCtaButton>((button) => {
-    switch (button.action) {
-      case 'apply':
-        return {
-          ...button,
-          onClick: () => {
-            if (!canAccessProtectedTabs) {
-              onRestrictedAccess();
-              return;
-            }
-
-            navigate(APP_PATH.EVENT_APPLY(eventId));
-          },
-        };
-      case 'editApplication':
-        return {
-          ...button,
-          onClick: () => {
-            navigate(APP_PATH.EVENT_APPLY(eventId));
-          },
-        };
-      case 'cancelApplication':
-        return {
-          ...button,
-          disabled: button.disabled || cancelApplicationMutation.isPending,
-          onClick: () => {
-            cancelApplicationMutation.mutate();
-          },
-        };
-      case 'match':
-        return {
-          ...button,
-          onClick: () => {
-            navigate(APP_PATH.EVENT_MATCH(eventId));
-          },
-        };
-      case 'attendance':
-        return {
-          ...button,
-          onClick: () => {
-            navigate(APP_PATH.EVENT_ATTENDANCE(eventId));
-          },
-        };
-      case 'disabled':
-        return button;
-    }
-  });
+  const buttons = buttonConfigs.map<EventDetailCtaButton>((button) => ({
+    ...button,
+    ...getEventDetailCtaActionProps(button),
+  }));
 
   return {
     buttons,
