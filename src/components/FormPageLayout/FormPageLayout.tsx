@@ -25,6 +25,7 @@ export type FormPageLayoutProps = {
 } & Omit<ComponentPropsWithoutRef<'div'>, 'children' | 'title'>;
 
 const HEADING_PROGRESS_VARIABLE = '--form-page-heading-progress';
+const CONTENT_SURFACE_RADIUS_VARIABLE = '--form-page-content-surface-radius';
 const HEADING_OPACITY_PROGRESS_MULTIPLIER = 1.75;
 const MAX_HEADING_SCALE_OFFSET = 0.12;
 const HEADING_TRANSLATE_Y_PX = -12;
@@ -47,22 +48,26 @@ export const FormPageLayout = ({
   useLayoutEffect(() => {
     if (scrollAreaRef.current) {
       scrollAreaRef.current.scrollTop = 0;
+      scrollAreaRef.current.style.setProperty(HEADING_PROGRESS_VARIABLE, '0');
     }
 
     if (contentSurfaceRef.current) {
       contentSurfaceRef.current.scrollTop = 0;
+      contentSurfaceRef.current.style.removeProperty(CONTENT_SURFACE_RADIUS_VARIABLE);
     }
-
-    headingRef.current?.style.setProperty(HEADING_PROGRESS_VARIABLE, '0');
   }, []);
 
   useEffect(() => {
     const heading = headingRef.current;
     const scrollArea = scrollAreaRef.current;
-    if (!heading || !scrollArea) {
+    const contentSurface = contentSurfaceRef.current;
+    if (!heading || !scrollArea || !contentSurface) {
       return;
     }
 
+    const initialContentRadius = Number.parseFloat(
+      window.getComputedStyle(contentSurface).borderTopLeftRadius,
+    );
     let frameId: number | null = null;
 
     const updateProgress = () => {
@@ -72,8 +77,15 @@ export const FormPageLayout = ({
         0,
         1,
       );
+      const nextRadius = Number.isFinite(initialContentRadius)
+        ? initialContentRadius * (1 - nextProgress)
+        : 0;
 
-      heading.style.setProperty(HEADING_PROGRESS_VARIABLE, String(nextProgress));
+      scrollArea.style.setProperty(HEADING_PROGRESS_VARIABLE, String(nextProgress));
+      contentSurface.style.setProperty(
+        CONTENT_SURFACE_RADIUS_VARIABLE,
+        `${nextRadius}px`,
+      );
     };
 
     const requestUpdate = () => {
@@ -256,6 +268,7 @@ const TopNavigationArea = styled.div(({ theme }) => ({
 }));
 
 const ScrollArea = styled.div({
+  [HEADING_PROGRESS_VARIABLE]: 0,
   flex: '1 1 auto',
   minHeight: 0,
   overflowY: 'auto',
@@ -264,7 +277,6 @@ const ScrollArea = styled.div({
 });
 
 const Heading = styled.header(({ theme }) => ({
-  [HEADING_PROGRESS_VARIABLE]: 0,
   padding: `${theme.spacing.none} ${theme.spacing['2xl']} ${theme.spacing['4xl']}`,
 }));
 
@@ -305,8 +317,9 @@ const ContentSurface = styled.div<{ $contentBottomInsetPx: number }>(
       overflowY: 'auto',
       paddingBottom: contentBottomInset,
       scrollPaddingBottom: contentBottomInset,
-      borderTopLeftRadius: theme.radius.xl,
-      borderTopRightRadius: theme.radius.xl,
+      [CONTENT_SURFACE_RADIUS_VARIABLE]: theme.radius.xl,
+      borderTopLeftRadius: `var(${CONTENT_SURFACE_RADIUS_VARIABLE}, ${theme.radius.none})`,
+      borderTopRightRadius: `var(${CONTENT_SURFACE_RADIUS_VARIABLE}, ${theme.radius.none})`,
       background: theme.color.bg.default,
       overscrollBehavior: 'contain',
       ...hiddenScrollbarStyles,
