@@ -1,10 +1,6 @@
 import type { Key } from 'react';
 
-import type {
-  EventType,
-  RecruitStatus,
-  UserInfoGetResponse,
-} from '@/api/types';
+import type { UserInfoGetResponse } from '@/api/types';
 import { APPROVED_ROLES } from '@/constants';
 
 import { EVENT_DETAIL_TABS } from '../constants';
@@ -16,33 +12,6 @@ export const isEventDetailTab = (key: Key): key is EventDetailTab => {
 
 export const isApprovedUser = (user: UserInfoGetResponse | null) => {
   return user ? APPROVED_ROLES.has(user.role) : false;
-};
-
-export const getEventTypeLabel = (eventType: EventType) => {
-  return eventType === 'TRAINING' ? '훈련' : '대회';
-};
-
-export const getRecruitStatusLabel = (recruitStatus: RecruitStatus) => {
-  const labels = {
-    RECRUIT_UPCOMING: '모집예정',
-    RECRUIT_OPEN: '모집중',
-    RECRUIT_CLOSE: '모집완료',
-    RECRUIT_END: '종료',
-  } satisfies Record<RecruitStatus, string>;
-
-  return labels[recruitStatus];
-};
-
-export const getRecruitStatusBadgeTone = (recruitStatus: RecruitStatus) => {
-  const tones = {
-    RECRUIT_UPCOMING: 'orange',
-    RECRUIT_OPEN: 'cyan2',
-    RECRUIT_CLOSE: 'gray',
-    // TODO: 종료 상태 Badge 디자인 대응 필요.
-    RECRUIT_END: 'gray',
-  } satisfies Record<RecruitStatus, 'cyan2' | 'gray' | 'orange'>;
-
-  return tones[recruitStatus];
 };
 
 export const formatKoreanDate = (value: string) => {
