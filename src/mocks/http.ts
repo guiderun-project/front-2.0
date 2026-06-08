@@ -4,7 +4,7 @@ import { baseURL } from '@/api/core/client';
 
 const MOCK_REFRESH_SESSION_STORAGE_KEY = 'guiderun.mockRefreshSession';
 
-let mockRefreshSessionMemory = false;
+let mockRefreshSessionMemory = true;
 
 // MSW-only session flag. This is not an accessToken storage path.
 const getMockRefreshSessionStorage = () => {

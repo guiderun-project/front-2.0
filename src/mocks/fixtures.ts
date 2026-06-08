@@ -197,7 +197,7 @@ export const mockDb: MockDb = {
       eventCategory: 'GENERAL',
       recruitStatus: 'RECRUIT_OPEN',
       isPrivate: false,
-      organizerId: 'user-guide-1',
+      organizerId: currentUserId,
       schedule: {
         date: '2026-06-01',
         startTime: '09:00',
@@ -363,6 +363,19 @@ export const mockDb: MockDb = {
         { questionId: 2, type: 'SELECT', selectedOptionId: 22 },
       ],
       attended: false,
+    },
+    {
+      requestId: 3001,
+      eventId: 3,
+      userId: 'user-guide-2',
+      status: 'APPLIED',
+      canceledAt: null,
+      group: 'A',
+      partner: null,
+      detail: 'Private pace check guide',
+      competitionInfo: null,
+      additionalAnswers: [],
+      attended: true,
     },
     {
       requestId: 4001,

@@ -22,6 +22,7 @@ export const Button = ({
   fullWidth = false,
   leftIcon,
   level = 'primary',
+  ref,
   rightIcon,
   size = 'm',
   status = 'default',
@@ -35,6 +36,7 @@ export const Button = ({
 
   return (
     <StyledButton
+      ref={ref}
       $fullWidth={fullWidth}
       $level={level}
       $size={size}

@@ -10,6 +10,13 @@ export const APP_PATH = {
   EVENTS: '/events',
   EVENT_SEARCH: '/events/search',
   EVENT_NEW: '/events/new',
+  EVENT_DETAIL: (eventId: number | string) => `/events/${eventId}`,
+  EVENT_APPLY: (eventId: number | string) => `/events/${eventId}/apply`,
+  EVENT_EDIT: (eventId: number | string) => `/events/${eventId}/edit`,
+  EVENT_MATCH: (eventId: number | string) => `/events/${eventId}/match`,
+  EVENT_ATTENDANCE: (eventId: number | string) =>
+    `/events/${eventId}/attendance`,
+  EVENT_SUPPORT: '/events/supports',
   MY: '/my',
   MY_EVENTS: '/my/events',
   MY_EDIT: '/my/edit',

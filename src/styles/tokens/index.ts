@@ -20,6 +20,7 @@ export {
   resolveGradientToken,
 } from './gradient';
 export type { GradientToken } from './gradient';
+export { layout } from './layout';
 export { pxToRem, radius, spacing } from './size';
 export { typography } from './typography';
 export type { TypographyToken } from './typography';
