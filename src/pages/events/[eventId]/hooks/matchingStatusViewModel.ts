@@ -15,7 +15,7 @@ export type MatchingStatusViewRow = {
   vi: MatchingUser | null;
 };
 
-export type MatchingStatusViewGroup = Omit<MatchingGroup, 'rows'> & {
+type MatchingStatusViewGroup = Omit<MatchingGroup, 'rows'> & {
   rows: MatchingStatusViewRow[];
 };
 
