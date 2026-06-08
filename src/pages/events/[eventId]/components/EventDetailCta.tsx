@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 
 import type { EventDetailResponse } from '@/api/types';
-import { ButtonGroup, FixedBottomCta } from '@/components';
+import { FooterButton } from '@/components';
 
 import { useEventDetailCta } from '../hooks/useEventDetailCta';
 
@@ -26,20 +26,18 @@ export const EventDetailCta = ({
   });
 
   return (
-    <FixedBottomCta>
-      <ButtonGroup ratio={ratio}>
-        {buttons.map(({ action, label, level, onClick, disabled }) => (
-          <ButtonGroup.Button
-            key={`${action}-${label}`}
-            disabled={disabled}
-            level={level}
-            size="l"
-            onClick={onClick}
-          >
-            {label}
-          </ButtonGroup.Button>
-        ))}
-      </ButtonGroup>
-    </FixedBottomCta>
+    <FooterButton ratio={ratio}>
+      {buttons.map(({ action, label, level, onClick, disabled }) => (
+        <FooterButton.Button
+          key={`${action}-${label}`}
+          disabled={disabled}
+          level={level}
+          size="l"
+          onClick={onClick}
+        >
+          {label}
+        </FooterButton.Button>
+      ))}
+    </FooterButton>
   );
 };

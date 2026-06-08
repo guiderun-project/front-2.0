@@ -188,32 +188,26 @@ const BUTTON_GROUP_CODE_EXAMPLES = [
   },
 ] as const;
 
-const FIXED_BOTTOM_CTA_CODE_EXAMPLES = [
+const FOOTER_BUTTON_CODE_EXAMPLES = [
   {
     label: "Single button",
-    code: `<FixedBottomCta>
-  <ButtonGroup>
-    <ButtonGroup.Button size="l">신청하기</ButtonGroup.Button>
-  </ButtonGroup>
-</FixedBottomCta>`,
+    code: `<FooterButton>
+  <FooterButton.Button size="l">신청하기</FooterButton.Button>
+</FooterButton>`,
   },
   {
     label: "Two columns",
-    code: `<FixedBottomCta>
-  <ButtonGroup ratio="50:50">
-    <ButtonGroup.Button level="secondary" size="l">취소</ButtonGroup.Button>
-    <ButtonGroup.Button size="l">신청하기</ButtonGroup.Button>
-  </ButtonGroup>
-</FixedBottomCta>`,
+    code: `<FooterButton ratio="50:50">
+  <FooterButton.Button level="secondary" size="l">취소</FooterButton.Button>
+  <FooterButton.Button size="l">신청하기</FooterButton.Button>
+</FooterButton>`,
   },
   {
     label: "Two rows",
-    code: `<FixedBottomCta>
-  <ButtonGroup ratio="100:100">
-    <ButtonGroup.Button level="secondary" size="l">장바구니</ButtonGroup.Button>
-    <ButtonGroup.Button size="l">바로 신청</ButtonGroup.Button>
-  </ButtonGroup>
-</FixedBottomCta>`,
+    code: `<FooterButton ratio="100:100">
+  <FooterButton.Button level="secondary" size="l">장바구니</FooterButton.Button>
+  <FooterButton.Button size="l">바로 신청</FooterButton.Button>
+</FooterButton>`,
   },
 ] as const;
 
@@ -1386,13 +1380,13 @@ export const DesignPage = () => {
       <ShowcaseSection>
         <SectionTitle>
           <Text as="h2" font="heading-s-m">
-            FixedBottomCta
+            FooterButton
           </Text>
           <Text color="text.tertiary" font="detail-m-r">
-            Fixed bottom action shell
+            Fixed bottom button actions
           </Text>
         </SectionTitle>
-        <CodeExamples examples={FIXED_BOTTOM_CTA_CODE_EXAMPLES} />
+        <CodeExamples examples={FOOTER_BUTTON_CODE_EXAMPLES} />
       </ShowcaseSection>
 
       <ShowcaseSection>

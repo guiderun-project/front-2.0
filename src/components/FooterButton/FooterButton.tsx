@@ -1,18 +1,32 @@
-import { useEffect, useRef, type ReactElement } from 'react';
+import {
+  Children,
+  isValidElement,
+  useEffect,
+  useRef,
+  type ReactElement,
+  type ReactNode,
+} from 'react';
 
 import styled from '@emotion/styled';
 
-import type { FixedBottomCtaProps } from './FixedBottomCta.types';
+import { Button, ButtonGroup } from '../Button';
+import type { FooterButtonProps } from './FooterButton.types';
 
 const DEFAULT_RESERVE_SPACE = true;
 
-export const FixedBottomCta = ({
+const isFooterButtonElement = (child: ReactNode): child is ReactElement =>
+  isValidElement(child) && child.type === Button;
+
+const FooterButtonRoot = ({
   children,
+  ratio,
   reserveSpace = DEFAULT_RESERVE_SPACE,
   ...props
-}: FixedBottomCtaProps): ReactElement => {
+}: FooterButtonProps): ReactElement | null => {
   const footerRef = useRef<HTMLElement>(null);
   const spacerRef = useRef<HTMLDivElement>(null);
+  const buttons = Children.toArray(children).filter(isFooterButtonElement);
+  const buttonCount = buttons.length;
 
   useEffect(() => {
     if (!reserveSpace) {
@@ -45,11 +59,15 @@ export const FixedBottomCta = ({
     };
   }, [reserveSpace]);
 
+  if (buttonCount < 1 || buttonCount > 2) {
+    return null;
+  }
+
   return (
     <>
       {reserveSpace ? <Spacer ref={spacerRef} aria-hidden="true" /> : null}
       <FixedArea ref={footerRef} {...props}>
-        {children}
+        <ButtonGroup ratio={ratio}>{buttons}</ButtonGroup>
       </FixedArea>
     </>
   );
@@ -64,11 +82,14 @@ const FixedArea = styled.footer(({ theme }) => ({
   position: 'fixed',
   right: '50%',
   bottom: 0,
-  zIndex: theme.zIndex.control,
+  zIndex: theme.zIndex.footer,
   display: 'grid',
   boxSizing: 'border-box',
   width: `min(100%, var(--app-mobile-viewport-width, ${theme.layout.mobileViewportMaxWidth}))`,
+  background: theme.gradient.bg.footer,
   padding: `${theme.spacing.lg} ${theme.spacing.none} calc(${theme.spacing.lg} + env(safe-area-inset-bottom))`,
   gap: theme.spacing.md,
   transform: 'translateX(50%)',
 }));
+
+export const FooterButton = Object.assign(FooterButtonRoot, { Button });

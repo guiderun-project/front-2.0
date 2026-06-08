@@ -18,6 +18,8 @@ const gradientModes = {
         'linear-gradient(180.00000000000182deg, #B2DCFF 1%, #C7F1FC 15%, #D8EDED 45%, #EEF2F6 100%)',
       'brand-event-overlay':
         'linear-gradient(180.00000000000182deg, #0F2342 1%, rgba(15, 35, 66, 0) 28%)',
+      footer:
+        'linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, var(--color-bg-default) 17.308%)',
     },
   },
   dark: {
@@ -28,6 +30,8 @@ const gradientModes = {
       'brand-event': `linear-gradient(180deg, #0F2342 -1.42%, rgba(15, 35, 66, 0) 22.74%), ${gradientBaseColor.bg['brand-event-overlay']}`,
       'brand-event-overlay':
         'linear-gradient(180.00000000000182deg, #0F2342 1%, rgba(15, 35, 66, 0) 28%)',
+      footer:
+        'linear-gradient(180deg, rgba(14, 19, 25, 0) 0%, var(--color-bg-default) 17.308%)',
     },
   },
 } as const satisfies Record<ColorMode, Record<string, unknown>>;
@@ -38,6 +42,7 @@ export const gradient = {
     'brand-main': 'var(--gradient-bg-brand-main)',
     'brand-event': 'var(--gradient-bg-brand-event)',
     'brand-event-overlay': 'var(--gradient-bg-brand-event-overlay)',
+    footer: 'var(--gradient-bg-footer)',
   },
 } as const;
 
@@ -46,6 +51,7 @@ export const gradientTokenMap = {
   'bg.brand-main': 'var(--gradient-bg-brand-main)',
   'bg.brand-event': 'var(--gradient-bg-brand-event)',
   'bg.brand-event-overlay': 'var(--gradient-bg-brand-event-overlay)',
+  'bg.footer': 'var(--gradient-bg-footer)',
 } as const;
 
 export type GradientToken = keyof typeof gradientTokenMap;
