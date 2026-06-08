@@ -18,6 +18,11 @@ const MainPage = lazy(() =>
 const DesignPage = lazy(() =>
   import('@/pages/design').then(({ DesignPage }) => ({ default: DesignPage })),
 );
+const FormDesignPage = lazy(() =>
+  import('@/pages/design/form').then(({ FormDesignPage }) => ({
+    default: FormDesignPage,
+  })),
+);
 const IntroPage = lazy(() =>
   import('@/pages/intro').then(({ IntroPage }) => ({ default: IntroPage })),
 );
@@ -159,6 +164,10 @@ export const router = createBrowserRouter([
             element: createLazyRouteElement(MyPage, 'authenticated'),
           },
         ],
+      },
+      {
+        path: 'design/form',
+        element: createLazyRouteElement(FormDesignPage),
       },
       {
         path: 'intro',
