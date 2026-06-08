@@ -320,6 +320,7 @@ const BADGE_CODE_EXAMPLES = [
 ] as const;
 
 const ICON_EXAMPLES: ReadonlyArray<{ icon: IconName; color?: ColorToken }> = [
+  { icon: "alert-circle-filled", color: "icon.secondary" },
   { icon: "calendar-lined", color: "icon.secondary" },
   { icon: "check-lined", color: "text.brand" },
   { icon: "chevron-down-lined" },

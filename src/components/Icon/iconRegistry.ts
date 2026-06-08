@@ -1,5 +1,6 @@
 import type { ComponentType, SVGProps } from "react";
 
+import AlertCircleFilledIcon from "@/assets/icons/alert-circle-filled.svg?react";
 import CalendarLinedIcon from "@/assets/icons/calendar-lined.svg?react";
 import ChevronDownLinedIcon from "@/assets/icons/chevron-down-lined.svg?react";
 import ChevronLeftLinedIcon from "@/assets/icons/chevron-left-lined.svg?react";
@@ -37,6 +38,7 @@ import UserXLinedIcon from "@/assets/icons/user-x-lined.svg?react";
 type SvgIconComponent = ComponentType<SVGProps<SVGSVGElement>>;
 
 export const iconRegistry = {
+  "alert-circle-filled": AlertCircleFilledIcon,
   "calendar-lined": CalendarLinedIcon,
   "chevron-down-lined": ChevronDownLinedIcon,
   "chevron-left-lined": ChevronLeftLinedIcon,
