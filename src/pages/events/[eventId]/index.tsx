@@ -8,7 +8,10 @@ import {
 } from '@/components';
 
 import { EVENT_DETAIL_TABS } from './constants';
+import { useEventApplicants } from './hooks/useEventApplicants';
 import { useEventDetailPage } from './hooks/useEventDetailPage';
+import { ApplicantFormSheet } from './components/ApplicantFormSheet';
+import { ApplicantsPanel } from './components/ApplicantsPanel';
 import { DetailPanel } from './components/DetailPanel';
 import { EventDetailCta } from './components/EventDetailCta';
 import { EventHero } from './components/EventHero';
@@ -38,6 +41,18 @@ export const EventDetailPage = (): ReactElement => {
     openManagementSheet,
     openRestrictedSheet,
   } = useEventDetailPage();
+  const {
+    applicantFormQuery,
+    applicantsQuery,
+    closeApplicantForm,
+    openApplicantForm,
+    selectedApplicantId,
+  } = useEventApplicants({
+    activeTab,
+    canViewApplicantForm: canManageEvent,
+    canViewApplicants: canAccessProtectedTabs,
+    eventId,
+  });
   const navigationLeftAction: TopNavigationIconButtonProps = {
     icon: 'chevron-left-lined',
     ariaLabel: '뒤로가기',
@@ -125,7 +140,14 @@ export const EventDetailPage = (): ReactElement => {
               onKakaoShare={handleKakaoShare}
             />
           </Tabs.Panel>
-          <Tabs.Panel id="applicants">{null}</Tabs.Panel>
+          <Tabs.Panel id="applicants">
+            <ApplicantsPanel
+              data={applicantsQuery.data}
+              isError={applicantsQuery.isError}
+              isPending={applicantsQuery.isPending}
+              onApplicantClick={canManageEvent ? openApplicantForm : undefined}
+            />
+          </Tabs.Panel>
           <Tabs.Panel id="matching">{null}</Tabs.Panel>
         </Tabs.Panels>
       </Tabs>
@@ -149,6 +171,14 @@ export const EventDetailPage = (): ReactElement => {
         eventName={event.name}
         open={isManagementSheetOpen}
         onClose={closeManagementSheet}
+      />
+      <ApplicantFormSheet
+        data={applicantFormQuery.data}
+        eventType={event.eventType}
+        isError={applicantFormQuery.isError}
+        isPending={applicantFormQuery.isPending}
+        open={selectedApplicantId !== null}
+        onClose={closeApplicantForm}
       />
     </PageLayout>
   );
