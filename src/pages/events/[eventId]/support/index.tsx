@@ -8,7 +8,6 @@ import { APP_PATH } from '@/router/path';
 
 import {
   TRANSPORT_SUPPORT_DATA,
-  type TransportContact,
   type TransportSupportRegion,
 } from './transportSupportData';
 
@@ -73,6 +72,8 @@ type SupportContactSheetProps = {
   region: TransportSupportRegion | null;
   onClose: () => void;
 };
+
+type TransportContact = TransportSupportRegion['mobilityCenter']['contacts'][number];
 
 const SupportContactSheet = ({
   onClose,

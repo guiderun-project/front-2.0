@@ -1,9 +1,9 @@
-export type TransportContact = {
+type TransportContact = {
   number: string;
   desc?: string;
 };
 
-export type KtxContact = {
+type KtxContact = {
   name: string;
   number: string;
 };
