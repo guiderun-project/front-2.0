@@ -7,17 +7,19 @@ import {
   type TopNavigationIconButtonProps,
 } from '@/components';
 
-import { EVENT_DETAIL_TABS } from './constants';
-import { useEventApplicants } from './hooks/useEventApplicants';
-import { useEventDetailPage } from './hooks/useEventDetailPage';
 import { ApplicantFormSheet } from './components/ApplicantFormSheet';
 import { ApplicantsPanel } from './components/ApplicantsPanel';
 import { DetailPanel } from './components/DetailPanel';
 import { EventDetailCta } from './components/EventDetailCta';
 import { EventHero } from './components/EventHero';
 import { ManagementMenuSheet } from './components/ManagementMenuSheet';
+import { MatchingPanel } from './components/MatchingPanel';
 import { PageState } from './components/PanelState';
 import { RestrictedAccessSheet } from './components/RestrictedAccessSheet';
+import { EVENT_DETAIL_TABS } from './constants';
+import { useEventApplicants } from './hooks/useEventApplicants';
+import { useEventDetailPage } from './hooks/useEventDetailPage';
+import { useEventMatchingStatus } from './hooks/useEventMatchingStatus';
 
 export const EventDetailPage = (): ReactElement => {
   const {
@@ -41,6 +43,11 @@ export const EventDetailPage = (): ReactElement => {
     openManagementSheet,
     openRestrictedSheet,
   } = useEventDetailPage();
+  const matchingStatus = useEventMatchingStatus({
+    eventId,
+    enabled:
+      isValidEventId && canAccessProtectedTabs && activeTab === 'matching',
+  });
   const {
     applicantFormQuery,
     applicantsQuery,
@@ -148,7 +155,14 @@ export const EventDetailPage = (): ReactElement => {
               onApplicantClick={canManageEvent ? openApplicantForm : undefined}
             />
           </Tabs.Panel>
-          <Tabs.Panel id="matching">{null}</Tabs.Panel>
+          <Tabs.Panel id="matching">
+            <MatchingPanel
+              data={matchingStatus.data}
+              isError={matchingStatus.isError}
+              isPending={matchingStatus.isPending}
+              showMyPartnerSummary={event.viewer?.isApplied === true}
+            />
+          </Tabs.Panel>
         </Tabs.Panels>
       </Tabs>
 
