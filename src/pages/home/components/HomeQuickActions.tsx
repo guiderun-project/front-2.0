@@ -12,7 +12,11 @@ type ActionTone = 'teal' | 'cyan';
 export const HomeQuickActions = (): ReactElement => {
   return (
     <Section aria-label="회원 활동 바로가기">
-      <ActionLink $tone="teal" to={APP_PATH.MY_EVENTS}>
+      <ActionLink
+        $tone="teal"
+        aria-label="나의 활동 보기, 활동 기록 모아보기"
+        to={APP_PATH.MY_EVENTS}
+      >
         <ActionLabel>
           <Text color="text.primary" font="body-l-sb">
             나의 활동 보기
@@ -23,7 +27,11 @@ export const HomeQuickActions = (): ReactElement => {
         </ActionLabel>
       </ActionLink>
 
-      <ActionLink $tone="cyan" to={APP_PATH.EVENT_NEW}>
+      <ActionLink
+        $tone="cyan"
+        aria-label="이벤트 만들기, 러닝 모임 만들어보기"
+        to={APP_PATH.EVENT_NEW}
+      >
         <ActionLabel>
           <Text color="text.primary" font="body-l-sb">
             이벤트 만들기
