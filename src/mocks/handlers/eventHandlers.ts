@@ -35,6 +35,18 @@ import {
 
 const today = '2026-05-22';
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+const toLocalDate = (date: string) => {
+  const [year, month, day] = date.split('-').map(Number);
+
+  return new Date(year, month - 1, day).getTime();
+};
+
+// 시작일까지 남은 일수(당일 0, 내일 1). 음수는 0으로 보정한다.
+const getDday = (date: string) =>
+  Math.max(0, Math.round((toLocalDate(date) - toLocalDate(today)) / DAY_MS));
+
 const getVisibleEvents = () => {
   return mockDb.events.filter((event) => !event.deleted && !event.isPrivate);
 };
@@ -171,7 +183,7 @@ export const eventHandlers: HttpHandler[] = [
           .map((event) => ({
             id: event.eventId,
             name: event.name,
-            dDay: 10,
+            dDay: getDday(event.schedule.date),
             date: event.schedule.date,
           })),
       });
@@ -191,7 +203,7 @@ export const eventHandlers: HttpHandler[] = [
         .map((event) => ({
           id: event.eventId,
           name: event.name,
-          dDay: 10,
+          dDay: getDday(event.schedule.date),
           place: event.place,
           scheduleText: event.schedule.dateText,
           myPartner: null,
