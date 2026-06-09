@@ -5,6 +5,7 @@ import styled from '@emotion/styled';
 import { PageLayout, TopNavigation } from '@/components';
 
 import { ActivitySummary } from './components/ActivitySummary';
+import { UpcomingEventList } from './components/UpcomingEventList';
 
 export const MainPage = (): ReactElement => {
   return (
@@ -13,7 +14,7 @@ export const MainPage = (): ReactElement => {
       <Content>
         {/* C4: 이벤트 검색 진입 바 */}
         <ActivitySummary />
-        {/* C3: 다가오는 러닝 모임 섹션 */}
+        <UpcomingEventList />
       </Content>
     </PageLayout>
   );
