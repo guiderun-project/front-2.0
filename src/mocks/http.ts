@@ -6,8 +6,16 @@ const MOCK_REFRESH_SESSION_STORAGE_KEY = 'guiderun.mockRefreshSession';
 
 // 부팅 시 mock 인증 상태. 미설정이면 기존과 동일하게 자동 로그인(true).
 // 로컬 .env에서 VITE_MOCK_AUTHENTICATED=false 로 두면 비로그인(게스트)으로 시작한다.
-let mockRefreshSessionMemory =
+const mockAuthenticatedByEnv =
   import.meta.env.VITE_MOCK_AUTHENTICATED !== 'false';
+
+let mockRefreshSessionMemory = mockAuthenticatedByEnv;
+
+// env로 비로그인을 강제한 경우, 이전 세션에 persisted 된 로그인 플래그까지 제거해
+// sessionStorage 값이 env를 덮어쓰지 않도록(항상 게스트로 부팅되도록) 보장한다.
+if (!mockAuthenticatedByEnv && typeof window !== 'undefined') {
+  window.sessionStorage.removeItem(MOCK_REFRESH_SESSION_STORAGE_KEY);
+}
 
 // MSW-only session flag. This is not an accessToken storage path.
 const getMockRefreshSessionStorage = () => {
