@@ -4,6 +4,7 @@ import styled from '@emotion/styled';
 import { Link } from 'react-router-dom';
 
 import { Badge, Icon, RunnerTypeAvatar, Text } from '@/components';
+import { RUNNER_TYPE_AVATAR_TYPE_BY_USER_TYPE } from '@/constants';
 import { APP_PATH } from '@/router/path';
 
 import { formatDday, formatDdayLabel, type UpcomingMemberEvent } from '../utils';
@@ -12,7 +13,6 @@ type MemberUpcomingEventCardProps = {
   event: UpcomingMemberEvent;
 };
 
-const AVATAR_TYPE = { VI: 'vi', GUIDE: 'guide' } as const;
 const PARTNER_TYPE_LABEL = { VI: '시각장애러너', GUIDE: '가이드러너' } as const;
 
 export const MemberUpcomingEventCard = ({
@@ -70,7 +70,10 @@ export const MemberUpcomingEventCard = ({
             <PartnerChips>
               {partners.map((partner, index) => (
                 <PartnerChip key={`${partner.type}-${partner.name}-${index}`}>
-                  <RunnerTypeAvatar size="s" type={AVATAR_TYPE[partner.type]} />
+                  <RunnerTypeAvatar
+                    size="s"
+                    type={RUNNER_TYPE_AVATAR_TYPE_BY_USER_TYPE[partner.type]}
+                  />
                   <Text color="text.primary" font="detail-m-sb">
                     {partner.name}
                   </Text>
