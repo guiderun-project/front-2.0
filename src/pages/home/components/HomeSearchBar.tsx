@@ -3,12 +3,15 @@ import { useState, type FormEvent, type ReactElement } from 'react';
 import styled from '@emotion/styled';
 import { createSearchParams, useNavigate } from 'react-router-dom';
 
-import { Icon, Text } from '@/components';
+import { Icon } from '@/components';
 import { APP_PATH } from '@/router/path';
+
+const SEARCH_PLACEHOLDER = '관심있는 모임을 찾아보세요';
 
 /**
  * 메인 상단 검색 바.
  * 입력한 키워드를 이벤트 검색 페이지로 전달하며 이동한다(빈 값이면 키워드 없이 이동).
+ * 디자인상 별도 버튼 없이 좌측 아이콘 + 입력으로 구성하며, 제출은 Enter로 처리한다.
  */
 export const HomeSearchBar = (): ReactElement => {
   const navigate = useNavigate();
@@ -27,27 +30,24 @@ export const HomeSearchBar = (): ReactElement => {
 
   return (
     <SearchForm role="search" onSubmit={handleSubmit}>
+      <Icon
+        aria-hidden={true}
+        color="icon.secondary"
+        icon="search-lined"
+        size={20}
+      />
       <SearchInput
         aria-label="이벤트 검색"
         enterKeyHint="search"
-        placeholder="이벤트를 검색해보세요"
+        placeholder={SEARCH_PLACEHOLDER}
         type="search"
         value={keyword}
         onChange={(event) => {
           setKeyword(event.target.value);
         }}
       />
-      <SearchSubmit type="submit">
-        <Icon
-          aria-hidden={true}
-          color="icon.inverse"
-          icon="search-lined"
-          size={16}
-        />
-        <Text as="span" color="text.inverse" font="body-s-sb">
-          검색
-        </Text>
-      </SearchSubmit>
+      {/* 시각적으로 숨긴 제출 버튼: Enter 제출과 스크린리더 명시적 제출을 보장 */}
+      <VisuallyHiddenSubmit type="submit">검색</VisuallyHiddenSubmit>
     </SearchForm>
   );
 };
@@ -57,10 +57,10 @@ const SearchForm = styled.form(({ theme }) => ({
   alignItems: 'center',
   gap: theme.spacing.md,
   width: '100%',
-  padding: `${theme.spacing.s} ${theme.spacing.s} ${theme.spacing.s} ${theme.spacing.lg}`,
+  padding: `${theme.spacing.lg} ${theme.spacing.xl}`,
   border: `1px solid ${theme.color.border.subtle}`,
   borderRadius: theme.radius.full,
-  backgroundColor: theme.color.bg.default,
+  backgroundColor: theme.color.bg.elevated,
   boxSizing: 'border-box',
 
   '&:focus-within': {
@@ -92,20 +92,14 @@ const SearchInput = styled.input(({ theme }) => ({
   },
 }));
 
-const SearchSubmit = styled.button(({ theme }) => ({
-  display: 'inline-flex',
-  flexShrink: 0,
-  alignItems: 'center',
-  gap: theme.spacing.xs,
-  padding: `${theme.spacing.sm} ${theme.spacing.lg}`,
-  border: 'none',
-  borderRadius: theme.radius.full,
-  backgroundColor: theme.color.bg.inverse,
-  cursor: 'pointer',
-  touchAction: 'manipulation',
-
-  '&:focus-visible': {
-    outline: `2px solid ${theme.color.border.focused}`,
-    outlineOffset: theme.spacing.xs,
-  },
-}));
+const VisuallyHiddenSubmit = styled.button({
+  position: 'absolute',
+  width: '1px',
+  height: '1px',
+  margin: '-1px',
+  padding: 0,
+  border: 0,
+  overflow: 'hidden',
+  clipPath: 'inset(50%)',
+  whiteSpace: 'nowrap',
+});
