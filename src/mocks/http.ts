@@ -4,7 +4,10 @@ import { baseURL } from '@/api/core/client';
 
 const MOCK_REFRESH_SESSION_STORAGE_KEY = 'guiderun.mockRefreshSession';
 
-let mockRefreshSessionMemory = true;
+// 부팅 시 mock 인증 상태. 미설정이면 기존과 동일하게 자동 로그인(true).
+// 로컬 .env에서 VITE_MOCK_AUTHENTICATED=false 로 두면 비로그인(게스트)으로 시작한다.
+let mockRefreshSessionMemory =
+  import.meta.env.VITE_MOCK_AUTHENTICATED !== 'false';
 
 // MSW-only session flag. This is not an accessToken storage path.
 const getMockRefreshSessionStorage = () => {
