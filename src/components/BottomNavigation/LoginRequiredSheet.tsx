@@ -23,7 +23,7 @@ export const LoginRequiredSheet = ({
     <BottomSheet
       heading={{
         title: '지금 로그인하고 계속할까요?',
-        description: '마이페이지는 로그인 후 이용할 수 있어요.',
+        description: '이 기능은 로그인 후 이용할 수 있어요.',
       }}
       open={open}
       onClose={onClose}
