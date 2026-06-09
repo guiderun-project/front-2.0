@@ -26,7 +26,8 @@ export const ActivitySummary = (): ReactElement => {
   return (
     <Section aria-labelledby={headingId}>
       <HeadlineRow>
-        <Headline id={headingId}>
+        {/* span 분리로 인해 접근명이 붙어 읽히지 않도록 자연스러운 문장을 명시한다. */}
+        <Headline aria-label="올해도 러너들은 열심히 달리고 있어요" id={headingId}>
           <TitleLine>
             <Text as="span" color="text.primary" font="heading-m-r">
               올해도
