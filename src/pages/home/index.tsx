@@ -2,10 +2,11 @@ import type { ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
-import { PageLayout, TopNavigation } from '@/components';
+import { PageLayout } from '@/components';
 import { useAuth } from '@/contexts';
 
 import { ActivitySummary } from './components/ActivitySummary';
+import { HomeHeader } from './components/HomeHeader';
 import { HomeSearchBar } from './components/HomeSearchBar';
 import { HomeSectionBoundary } from './components/HomeSectionBoundary';
 import { HomeSectionMessage } from './components/HomeSectionMessage';
@@ -21,7 +22,7 @@ export const MainPage = (): ReactElement => {
 
   return (
     <PageLayout background="gradient.bg.brand-main">
-      <TopNavigation aria-label="홈 상단 메뉴" title="홈화면" />
+      <HomeHeader />
       <Content>
         <HomeSearchBar />
 
