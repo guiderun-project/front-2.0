@@ -35,11 +35,11 @@ export const UpcomingEventCard = ({
             <Badge size="s" tone="cyan" variant="solid">
               {formatDday(event.dDay)}
             </Badge>
-            <RowName color="text.primary" font="body-m-sb">
+            <RowName color="text.primary" font="body-l-sb">
               {event.name}
             </RowName>
           </TitleLine>
-          <Text color="text.tertiary" font="detail-m-r">
+          <Text color="text.secondary" font="detail-m-r">
             {dateText}
           </Text>
         </RowMain>
@@ -54,26 +54,21 @@ export const UpcomingEventCard = ({
   );
 };
 
-const RowItem = styled.li(({ theme }) => ({
+const RowItem = styled.li({
   listStyle: 'none',
-
-  '&:not(:last-of-type)': {
-    borderBottom: `1px solid ${theme.color.border.subtle}`,
-  },
-}));
+});
 
 const RowLink = styled(Link)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  gap: theme.spacing.md,
+  gap: theme.spacing.xl,
   width: '100%',
-  padding: `${theme.spacing.lg} ${theme.spacing.xl}`,
   boxSizing: 'border-box',
   textDecoration: 'none',
 
   '&:focus-visible': {
     outline: `2px solid ${theme.color.border.focused}`,
-    outlineOffset: `-${theme.spacing.xs}`,
+    outlineOffset: theme.spacing.xs,
   },
 }));
 
@@ -81,7 +76,7 @@ const RowMain = styled.div(({ theme }) => ({
   display: 'flex',
   flex: '1 1 auto',
   flexDirection: 'column',
-  gap: theme.spacing.s,
+  gap: theme.spacing.md,
   minWidth: 0,
 }));
 

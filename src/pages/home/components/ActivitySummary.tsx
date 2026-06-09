@@ -78,6 +78,11 @@ const RunnerImage = styled.img(({ theme }) => ({
   flexShrink: 0,
   width: theme.pxToRem(120),
   height: 'auto',
+
+  // 라이트 모드는 원본 색, 다크 모드에서는 흰색으로 보이도록 반전한다.
+  ":root:not([data-color-mode='light']) &": {
+    filter: 'brightness(0) invert(1)',
+  },
 }));
 
 const Metrics = styled.div({
