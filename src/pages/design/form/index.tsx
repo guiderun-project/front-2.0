@@ -11,13 +11,10 @@ import {
   Textarea,
 } from '@/components';
 
-const FOOTER_BUTTON_OVERLAY_HEIGHT_PX = 78;
-
 export const FormDesignPage = (): ReactElement => {
   return (
     <PageLayout background="bg.subtle">
       <FormPageLayout
-        contentBottomInsetPx={FOOTER_BUTTON_OVERLAY_HEIGHT_PX}
         topNavigation={{
           left: {
             icon: 'chevron-left-lined',
@@ -92,12 +89,12 @@ export const FormDesignPage = (): ReactElement => {
             </FieldStack>
           </FormSection>
         </FormExample>
+        <FooterButton>
+          <FooterButton.Button fullWidth size="l">
+            저장하기
+          </FooterButton.Button>
+        </FooterButton>
       </FormPageLayout>
-      <FooterButton reserveSpace={false}>
-        <FooterButton.Button fullWidth size="l">
-          저장하기
-        </FooterButton.Button>
-      </FooterButton>
     </PageLayout>
   );
 };

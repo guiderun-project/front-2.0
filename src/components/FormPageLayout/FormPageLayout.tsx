@@ -18,7 +18,6 @@ type FormPageNavigationProps = Omit<TopNavigationProps, 'className'>;
 export type FormPageLayoutProps = {
   title: ReactNode;
   children: ReactNode;
-  contentBottomInsetPx?: number;
   description?: ReactNode;
   topNavigation?: FormPageNavigationProps;
   titleAs?: FormPageTitleTag;
@@ -33,13 +32,13 @@ const TOP_NAVIGATION_HEIGHT_PX = 56;
 
 export const FormPageLayout = ({
   children,
-  contentBottomInsetPx = 0,
   description,
   title,
   topNavigation,
   titleAs = 'h1',
   ...props
 }: FormPageLayoutProps): ReactElement => {
+  const hasTopNavigation = isTopNavigationRenderable(topNavigation);
   const headingRef = useRef<HTMLElement>(null);
   const headingHeightRef = useRef(0);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -52,7 +51,6 @@ export const FormPageLayout = ({
     }
 
     if (contentSurfaceRef.current) {
-      contentSurfaceRef.current.scrollTop = 0;
       contentSurfaceRef.current.style.removeProperty(CONTENT_SURFACE_RADIUS_VARIABLE);
     }
   }, []);
@@ -129,86 +127,16 @@ export const FormPageLayout = ({
     };
   }, []);
 
-  useEffect(() => {
-    const scrollArea = scrollAreaRef.current;
-    const contentSurface = contentSurfaceRef.current;
-    if (!scrollArea || !contentSurface) {
-      return;
-    }
-
-    const consumeHeadingScroll = (deltaY: number) => {
-      const headingHeight = headingHeightRef.current;
-      if (headingHeight <= 0 || deltaY === 0) {
-        return false;
-      }
-
-      const shouldConsume =
-        deltaY > 0
-          ? scrollArea.scrollTop < headingHeight
-          : contentSurface.scrollTop <= 0 && scrollArea.scrollTop > 0;
-
-      if (!shouldConsume) {
-        return false;
-      }
-
-      const currentScrollTop = scrollArea.scrollTop;
-      const nextScrollTop = clamp(currentScrollTop + deltaY, 0, headingHeight);
-      if (nextScrollTop === currentScrollTop) {
-        return false;
-      }
-
-      scrollArea.scrollTop = nextScrollTop;
-      return true;
-    };
-
-    const preventIfConsumed = (event: WheelEvent | TouchEvent, deltaY: number) => {
-      if (consumeHeadingScroll(deltaY) && event.cancelable) {
-        event.preventDefault();
-      }
-    };
-
-    const handleWheel = (event: WheelEvent) => {
-      preventIfConsumed(event, event.deltaY);
-    };
-
-    let previousTouchY = 0;
-
-    const handleTouchStart = (event: TouchEvent) => {
-      if (event.touches.length !== 1) {
-        return;
-      }
-
-      previousTouchY = event.touches[0]?.clientY ?? 0;
-    };
-
-    const handleTouchMove = (event: TouchEvent) => {
-      if (event.touches.length !== 1) {
-        return;
-      }
-
-      const currentTouchY = event.touches[0]?.clientY ?? previousTouchY;
-      const deltaY = previousTouchY - currentTouchY;
-
-      preventIfConsumed(event, deltaY);
-      previousTouchY = currentTouchY;
-    };
-
-    contentSurface.addEventListener('wheel', handleWheel, { passive: false });
-    contentSurface.addEventListener('touchstart', handleTouchStart, { passive: true });
-    contentSurface.addEventListener('touchmove', handleTouchMove, { passive: false });
-
-    return () => {
-      contentSurface.removeEventListener('wheel', handleWheel);
-      contentSurface.removeEventListener('touchstart', handleTouchStart);
-      contentSurface.removeEventListener('touchmove', handleTouchMove);
-    };
-  }, []);
-
   return (
     <Layout {...props}>
-      <TopNavigationArea>
-        <TopNavigation {...topNavigation} />
-      </TopNavigationArea>
+      {hasTopNavigation ? (
+        <TopNavigationArea>
+          <TopNavigation
+            {...topNavigation}
+            titleAs={topNavigation.titleAs ?? 'h2'}
+          />
+        </TopNavigationArea>
+      ) : null}
       <ScrollArea ref={scrollAreaRef}>
         <Heading ref={headingRef}>
           <HeadingContent>
@@ -226,10 +154,7 @@ export const FormPageLayout = ({
             ) : null}
           </HeadingContent>
         </Heading>
-        <ContentSurface
-          ref={contentSurfaceRef}
-          $contentBottomInsetPx={contentBottomInsetPx}
-        >
+        <ContentSurface ref={contentSurfaceRef}>
           {children}
         </ContentSurface>
       </ScrollArea>
@@ -239,6 +164,16 @@ export const FormPageLayout = ({
 
 const isRenderable = (value: ReactNode): boolean =>
   value !== undefined && value !== null && value !== false && value !== '';
+
+const isTopNavigationRenderable = (
+  topNavigation: FormPageNavigationProps | undefined,
+): topNavigation is FormPageNavigationProps =>
+  Boolean(
+    topNavigation &&
+      (topNavigation.left ||
+        isRenderable(topNavigation.title) ||
+        (topNavigation.right && topNavigation.right.length > 0)),
+  );
 
 const clamp = (value: number, min: number, max: number): number =>
   Math.min(Math.max(value, min), max);
@@ -301,28 +236,13 @@ const Title = styled(Text)({
   whiteSpace: 'pre-line',
 });
 
-const ContentSurface = styled.div<{ $contentBottomInsetPx: number }>(
-  ({ $contentBottomInsetPx, theme }) => {
-    const contentBottomInset =
-      $contentBottomInsetPx > 0
-        ? `calc(${theme.pxToRem($contentBottomInsetPx)} + env(safe-area-inset-bottom))`
-        : theme.spacing.none;
-
-    return {
-      position: 'sticky',
-      top: 0,
-      boxSizing: 'border-box',
-      height: '100%',
-      minHeight: '100%',
-      overflowY: 'auto',
-      paddingBottom: contentBottomInset,
-      scrollPaddingBottom: contentBottomInset,
-      [CONTENT_SURFACE_RADIUS_VARIABLE]: theme.radius.xl,
-      borderTopLeftRadius: `var(${CONTENT_SURFACE_RADIUS_VARIABLE}, ${theme.radius.none})`,
-      borderTopRightRadius: `var(${CONTENT_SURFACE_RADIUS_VARIABLE}, ${theme.radius.none})`,
-      background: theme.color.bg.default,
-      overscrollBehavior: 'contain',
-      ...hiddenScrollbarStyles,
-    };
-  },
-);
+const ContentSurface = styled.div(({ theme }) => ({
+  [CONTENT_SURFACE_RADIUS_VARIABLE]: theme.radius.xl,
+  position: 'sticky',
+  top: 0,
+  boxSizing: 'border-box',
+  minHeight: '100%',
+  borderTopLeftRadius: `var(${CONTENT_SURFACE_RADIUS_VARIABLE}, ${theme.radius.none})`,
+  borderTopRightRadius: `var(${CONTENT_SURFACE_RADIUS_VARIABLE}, ${theme.radius.none})`,
+  background: theme.color.bg.default,
+}));
