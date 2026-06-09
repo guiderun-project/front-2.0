@@ -59,7 +59,5 @@ const SearchAction = styled.span(({ theme }) => ({
   gap: theme.spacing.xs,
   padding: `${theme.spacing.sm} ${theme.spacing.lg}`,
   borderRadius: theme.radius.full,
-  // 디자인의 검은 검색 버튼에 대응하는 solid dark semantic 토큰이 없어
-  // 임시로 primitive(neutral.900)를 사용한다. 토큰 정리 시 semantic 토큰으로 교체 예정.
-  backgroundColor: theme.colorPrimitive.neutral[900],
+  backgroundColor: theme.color.bg.inverse,
 }));
