@@ -6,8 +6,6 @@ import { HiddenText, Text } from '@/components';
 
 import { useHomeSummary } from '../hooks/useHomeSummary';
 
-const HEADLINE = '올해도 러너들은 열심히 달리고 있어요';
-
 const formatNumber = (value: number) => value.toLocaleString('ko-KR');
 
 /**
@@ -24,19 +22,24 @@ export const ActivitySummary = (): ReactElement => {
 
   return (
     <Section aria-labelledby={headingId}>
-      <Text id={headingId} as="h2" color="text.primary" font="heading-m-sb">
-        {HEADLINE}
+      <Text id={headingId} as="h2" color="text.primary" font="heading-m-r">
+        올해도{' '}
+        <Text as="strong" color="text.primary" font="heading-m-sb">
+          러너들은
+        </Text>
+        <br />
+        열심히 달리고 있어요
       </Text>
 
       {/* TODO: 러너 일러스트 에셋 추가 시 장식용(aria-hidden)으로 배치 */}
 
       <Metrics>
         <span aria-hidden="true">
-          <Text as="span" color="text.primary" font="heading-l-b">
+          <Text as="span" color="text.primary" font="display-l">
             총 {formatNumber(publicSummary.totalEventCount)}회
           </Text>
           <Dot> · </Dot>
-          <Text as="span" color="text.brand" font="heading-l-b">
+          <Text as="span" color="text.brand" font="display-l">
             {formatNumber(publicSummary.totalRunningDistanceKm)}KM
           </Text>
         </span>
@@ -61,6 +64,8 @@ const Metrics = styled.div({
 });
 
 const Dot = styled.span(({ theme }) => ({
-  margin: `0 ${theme.spacing.xs}`,
-  color: theme.color.text.brand,
+  margin: `0 ${theme.spacing.s}`,
+  color: theme.color.text.tertiary,
+  fontSize: theme.typography['heading-m-sb'].fontSize,
+  verticalAlign: 'middle',
 }));
