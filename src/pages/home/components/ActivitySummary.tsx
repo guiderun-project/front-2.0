@@ -4,6 +4,8 @@ import styled from '@emotion/styled';
 
 import { HiddenText, Text } from '@/components';
 
+import runnerImageUrl from '@/assets/images/home-summary-runner.png';
+
 import { useHomeSummary } from '../hooks/useHomeSummary';
 
 const formatNumber = (value: number) => value.toLocaleString('ko-KR');
@@ -22,16 +24,17 @@ export const ActivitySummary = (): ReactElement => {
 
   return (
     <Section aria-labelledby={headingId}>
-      <Text id={headingId} as="h2" color="text.primary" font="heading-m-r">
-        올해도{' '}
-        <Text as="strong" color="text.primary" font="heading-m-sb">
-          러너들은
-        </Text>
-        <br />
-        열심히 달리고 있어요
-      </Text>
-
-      {/* TODO: 러너 일러스트 에셋 추가 시 장식용(aria-hidden)으로 배치 */}
+      <HeadlineRow>
+        <Headline id={headingId} as="h2" color="text.primary" font="heading-m-r">
+          올해도{' '}
+          <Text as="strong" color="text.primary" font="heading-m-sb">
+            러너들은
+          </Text>
+          <br />
+          열심히 달리고 있어요
+        </Headline>
+        <RunnerImage alt="" aria-hidden={true} src={runnerImageUrl} />
+      </HeadlineRow>
 
       <Metrics>
         <span aria-hidden="true">
@@ -57,6 +60,24 @@ const Section = styled.section(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   gap: theme.spacing.lg,
+}));
+
+const HeadlineRow = styled.div(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: theme.spacing.lg,
+}));
+
+const Headline = styled(Text)({
+  flex: '1 1 auto',
+  minWidth: 0,
+});
+
+const RunnerImage = styled.img(({ theme }) => ({
+  flexShrink: 0,
+  width: theme.pxToRem(120),
+  height: 'auto',
 }));
 
 const Metrics = styled.div({
