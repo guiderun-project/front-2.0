@@ -6,6 +6,7 @@ export * from "./CheckBox";
 export * from "./ColorModeToggle";
 export * from "./Filter";
 export * from "./FooterButton";
+export * from "./FormPageLayout";
 export * from "./HiddenText";
 export * from "./Icon";
 export * from "./Input";
