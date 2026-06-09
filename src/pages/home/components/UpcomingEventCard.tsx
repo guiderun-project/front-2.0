@@ -45,7 +45,7 @@ export const UpcomingEventCard = ({
         </RowMain>
         <Icon
           aria-hidden={true}
-          color="icon.teritary"
+          color="icon.tertiary"
           icon="chevron-right-lined"
           size={20}
         />

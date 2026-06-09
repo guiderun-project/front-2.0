@@ -225,7 +225,7 @@ export const semanticColorAliases = {
     icon: {
       primary: 'primitive.neutral.900',
       secondary: 'primitive.neutral.500',
-      teritary: 'primitive.neutral.400',
+      tertiary: 'primitive.neutral.400',
       inverse: 'primitive.neutral.50',
       brand: 'primitive.cyan.500',
       disabled: 'primitive.neutral.300',
@@ -303,7 +303,7 @@ export const semanticColorAliases = {
     icon: {
       primary: 'primitive.neutral.100',
       secondary: 'primitive.neutral.500',
-      teritary: 'primitive.neutral.600',
+      tertiary: 'primitive.neutral.600',
       inverse: 'primitive.neutral.850',
       brand: 'primitive.cyan.400',
       disabled: 'primitive.neutral.700',
@@ -406,7 +406,7 @@ export const color = {
   icon: {
     primary: 'var(--color-icon-primary)',
     secondary: 'var(--color-icon-secondary)',
-    teritary: 'var(--color-icon-teritary)',
+    tertiary: 'var(--color-icon-tertiary)',
     inverse: 'var(--color-icon-inverse)',
     brand: 'var(--color-icon-brand)',
     disabled: 'var(--color-icon-disabled)',
@@ -476,7 +476,7 @@ export const colorTokenMap = {
   'profile.guide': 'var(--color-profile-guide)',
   'icon.primary': 'var(--color-icon-primary)',
   'icon.secondary': 'var(--color-icon-secondary)',
-  'icon.teritary': 'var(--color-icon-teritary)',
+  'icon.tertiary': 'var(--color-icon-tertiary)',
   'icon.inverse': 'var(--color-icon-inverse)',
   'icon.brand': 'var(--color-icon-brand)',
   'icon.disabled': 'var(--color-icon-disabled)',

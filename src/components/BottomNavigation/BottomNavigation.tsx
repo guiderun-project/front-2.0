@@ -63,7 +63,7 @@ export const BottomNavigation = ({
                 >
                   <Icon
                     aria-hidden="true"
-                    color="icon.teritary"
+                    color="icon.tertiary"
                     icon={item.inactiveIcon}
                     size={24}
                   />
@@ -78,7 +78,7 @@ export const BottomNavigation = ({
               <NavigationLink end={item.end} key={item.to} to={item.to}>
                 <Icon
                   aria-hidden="true"
-                  color={isActive ? "icon.primary" : "icon.teritary"}
+                  color={isActive ? "icon.primary" : "icon.tertiary"}
                   icon={isActive ? item.activeIcon : item.inactiveIcon}
                   size={24}
                 />
