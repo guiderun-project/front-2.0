@@ -3,18 +3,66 @@ import { useId, type ReactElement } from 'react';
 import styled from '@emotion/styled';
 
 import { HiddenText, Text } from '@/components';
+import { useAuth } from '@/contexts';
 
 import runnerImageUrl from '@/assets/images/home-summary-runner.png';
 
 import { useHomeSummary } from '../hooks/useHomeSummary';
 
+// TODO: 회원 헤드라인 2번째 줄 실제 카피 확정 후 반영
+const MEMBER_HEADLINE_SUBTITLE = '오늘도 함께 달릴 준비됐어요';
+
 const formatNumber = (value: number) => value.toLocaleString('ko-KR');
 
 export const ActivitySummary = (): ReactElement => {
   const headingId = useId();
+  const { user } = useAuth();
   const {
-    data: { publicSummary },
+    data: { mySummary, publicSummary },
   } = useHomeSummary();
+
+  if (mySummary && user) {
+    return (
+      <Section aria-labelledby={headingId}>
+        <HeadlineRow>
+          <Headline
+            aria-label={`${user.name}님은 ${MEMBER_HEADLINE_SUBTITLE}`}
+            id={headingId}
+          >
+            <NameLine>
+              <Text as="span" color="text.primary" font="heading-m-sb">
+                {user.name}님
+              </Text>
+              <Text as="span" color="text.primary" font="heading-m-r">
+                은
+              </Text>
+            </NameLine>
+            <Text as="span" color="text.primary" font="heading-m-r">
+              {MEMBER_HEADLINE_SUBTITLE}
+            </Text>
+          </Headline>
+          <RunnerImageBox aria-hidden={true}>
+            <RunnerImage alt="" src={runnerImageUrl} />
+          </RunnerImageBox>
+        </HeadlineRow>
+
+        <Metrics>
+          <Text aria-hidden={true} as="span" color="text.primary" font="display-l">
+            총 {formatNumber(mySummary.totalParticipationCount)}회
+          </Text>
+          <MetricDot aria-hidden={true} />
+          <Text aria-hidden={true} as="span" color="text.brand" font="display-l">
+            {formatNumber(mySummary.totalRunningDistanceKm)}KM
+          </Text>
+          <HiddenText>
+            지금까지 함께한 모임 총{' '}
+            {formatNumber(mySummary.totalParticipationCount)}회, 누적{' '}
+            {formatNumber(mySummary.totalRunningDistanceKm)}킬로미터
+          </HiddenText>
+        </Metrics>
+      </Section>
+    );
+  }
 
   return (
     <Section aria-labelledby={headingId}>
@@ -83,6 +131,11 @@ const TitleLine = styled.span(({ theme }) => ({
   alignItems: 'flex-end',
   gap: theme.spacing.s,
 }));
+
+const NameLine = styled.span({
+  display: 'flex',
+  alignItems: 'flex-end',
+});
 
 const RunnerImageBox = styled.span(({ theme }) => ({
   position: 'relative',
