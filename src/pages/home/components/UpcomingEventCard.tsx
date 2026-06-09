@@ -17,6 +17,10 @@ type UpcomingEventCardProps = {
   event: UpcomingGuestEvent;
 };
 
+/**
+ * 다가오는 모임 패널의 한 행.
+ * 이벤트 상세로 이동하는 Link이며, D-day는 색이 아닌 텍스트(뱃지)로 전달한다.
+ */
 export const UpcomingEventCard = ({
   event,
 }: UpcomingEventCardProps): ReactElement => {
@@ -24,60 +28,71 @@ export const UpcomingEventCard = ({
   const ariaLabel = `${event.name}, ${formatDdayLabel(event.dDay)}, ${dateText}`;
 
   return (
-    <CardItem>
-      <CardLink aria-label={ariaLabel} to={APP_PATH.EVENT_DETAIL(event.id)}>
-        <Badge size="s" tone="cyan" variant="solid">
-          {formatDday(event.dDay)}
-        </Badge>
-        <CardBody>
-          <CardName color="text.primary" font="body-m-sb">
-            {event.name}
-          </CardName>
-          <Text color="text.tertiary" font="detail-m-m">
+    <RowItem>
+      <RowLink aria-label={ariaLabel} to={APP_PATH.EVENT_DETAIL(event.id)}>
+        <RowMain>
+          <TitleLine>
+            <Badge size="s" tone="cyan" variant="solid">
+              {formatDday(event.dDay)}
+            </Badge>
+            <RowName color="text.primary" font="body-m-sb">
+              {event.name}
+            </RowName>
+          </TitleLine>
+          <Text color="text.tertiary" font="detail-m-r">
             {dateText}
           </Text>
-        </CardBody>
+        </RowMain>
         <Icon
           aria-hidden={true}
-          color="icon.secondary"
+          color="icon.teritary"
           icon="chevron-right-lined"
           size={20}
         />
-      </CardLink>
-    </CardItem>
+      </RowLink>
+    </RowItem>
   );
 };
 
-const CardItem = styled.li({
+const RowItem = styled.li(({ theme }) => ({
   listStyle: 'none',
-});
 
-const CardLink = styled(Link)(({ theme }) => ({
+  '&:not(:last-of-type)': {
+    borderBottom: `1px solid ${theme.color.border.subtle}`,
+  },
+}));
+
+const RowLink = styled(Link)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  gap: theme.spacing.lg,
+  gap: theme.spacing.md,
   width: '100%',
-  padding: theme.spacing.lg,
-  borderRadius: theme.radius.md,
-  backgroundColor: theme.color.bg.default,
+  padding: `${theme.spacing.lg} ${theme.spacing.xl}`,
   boxSizing: 'border-box',
   textDecoration: 'none',
 
   '&:focus-visible': {
     outline: `2px solid ${theme.color.border.focused}`,
-    outlineOffset: theme.spacing.xs,
+    outlineOffset: `-${theme.spacing.xs}`,
   },
 }));
 
-const CardBody = styled.div(({ theme }) => ({
+const RowMain = styled.div(({ theme }) => ({
   display: 'flex',
   flex: '1 1 auto',
   flexDirection: 'column',
-  gap: theme.spacing.xs,
+  gap: theme.spacing.s,
   minWidth: 0,
 }));
 
-const CardName = styled(Text)({
+const TitleLine = styled.div(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  gap: theme.spacing.md,
+  minWidth: 0,
+}));
+
+const RowName = styled(Text)({
   display: 'block',
   overflow: 'hidden',
   whiteSpace: 'nowrap',

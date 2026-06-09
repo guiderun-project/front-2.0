@@ -26,11 +26,13 @@ export const UpcomingEventList = (): ReactElement => {
       </Text>
 
       {guestItems.length > 0 ? (
-        <List>
-          {guestItems.map((event) => (
-            <UpcomingEventCard key={event.id} event={event} />
-          ))}
-        </List>
+        <Panel>
+          <List>
+            {guestItems.map((event) => (
+              <UpcomingEventCard key={event.id} event={event} />
+            ))}
+          </List>
+        </Panel>
       ) : (
         <HomeSectionMessage>아직 다가오는 모임이 없어요.</HomeSectionMessage>
       )}
@@ -46,10 +48,16 @@ const Section = styled.section(({ theme }) => ({
   gap: theme.spacing.lg,
 }));
 
-const List = styled.ul(({ theme }) => ({
+const Panel = styled.div(({ theme }) => ({
+  overflow: 'hidden',
+  borderRadius: theme.radius.lg,
+  backgroundColor: theme.color.bg.elevated,
+  boxShadow: `0 ${theme.pxToRem(4)} ${theme.pxToRem(24)} ${theme.color.bg.overlay}`,
+}));
+
+const List = styled.ul({
   display: 'flex',
   flexDirection: 'column',
-  gap: theme.spacing.md,
   margin: 0,
   padding: 0,
-}));
+});
