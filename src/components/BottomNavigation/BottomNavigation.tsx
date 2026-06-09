@@ -1,9 +1,11 @@
-import type { ReactElement } from "react";
+import { useState, type ReactElement } from "react";
 
+import { css, type Theme } from "@emotion/react";
 import styled from "@emotion/styled";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 
 import { APP_PATH } from "@/router/path";
+import { useAuth } from "@/contexts";
 
 import { Icon } from "../Icon";
 import {
@@ -11,6 +13,7 @@ import {
   BOTTOM_NAVIGATION_ITEMS,
   BOTTOM_NAVIGATION_OFFSET_PX,
 } from "./BottomNavigation.constants";
+import { LoginRequiredSheet } from "./LoginRequiredSheet";
 
 type BottomNavigationItem = (typeof BOTTOM_NAVIGATION_ITEMS)[number];
 
@@ -21,35 +24,78 @@ type BottomNavigationProps = {
 export const BottomNavigation = ({
   className,
 }: BottomNavigationProps): ReactElement => {
-  const { pathname } = useLocation();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const [isLoginSheetOpen, setIsLoginSheetOpen] = useState(false);
   const activeIndex = BOTTOM_NAVIGATION_ITEMS.findIndex((item) =>
-    isNavigationItemActive(pathname, item),
+    isNavigationItemActive(location.pathname, item),
   );
   const hasActiveItem = activeIndex >= 0;
 
-  return (
-    <Navigation aria-label={BOTTOM_NAVIGATION_ARIA_LABEL} className={className}>
-      <NavigationTrack $activeIndex={activeIndex}>
-        <ActivePill $isVisible={hasActiveItem} aria-hidden="true" />
-        {BOTTOM_NAVIGATION_ITEMS.map((item, index) => {
-          const isActive = index === activeIndex;
+  const handleCloseLoginSheet = () => {
+    setIsLoginSheetOpen(false);
+  };
 
-          return (
-            <NavigationLink end={item.end} key={item.to} to={item.to}>
-              <Icon
-                aria-hidden="true"
-                color={isActive ? "icon.primary" : "icon.teritary"}
-                icon={isActive ? item.activeIcon : item.inactiveIcon}
-                size={24}
-              />
-              <NavigationLabel $isActive={isActive}>
-                {item.label}
-              </NavigationLabel>
-            </NavigationLink>
-          );
-        })}
-      </NavigationTrack>
-    </Navigation>
+  const handleLogin = () => {
+    setIsLoginSheetOpen(false);
+    navigate(APP_PATH.LOGIN, { state: { from: location } });
+  };
+
+  return (
+    <>
+      <Navigation aria-label={BOTTOM_NAVIGATION_ARIA_LABEL} className={className}>
+        <NavigationTrack $activeIndex={activeIndex}>
+          <ActivePill $isVisible={hasActiveItem} aria-hidden="true" />
+          {BOTTOM_NAVIGATION_ITEMS.map((item, index) => {
+            const isActive = index === activeIndex;
+            const isGuestRestricted =
+              item.to === APP_PATH.MY && !isAuthenticated;
+
+            if (isGuestRestricted) {
+              return (
+                <NavigationButton
+                  key={item.to}
+                  type="button"
+                  onClick={() => {
+                    setIsLoginSheetOpen(true);
+                  }}
+                >
+                  <Icon
+                    aria-hidden="true"
+                    color="icon.teritary"
+                    icon={item.inactiveIcon}
+                    size={24}
+                  />
+                  <NavigationLabel $isActive={false}>
+                    {item.label}
+                  </NavigationLabel>
+                </NavigationButton>
+              );
+            }
+
+            return (
+              <NavigationLink end={item.end} key={item.to} to={item.to}>
+                <Icon
+                  aria-hidden="true"
+                  color={isActive ? "icon.primary" : "icon.teritary"}
+                  icon={isActive ? item.activeIcon : item.inactiveIcon}
+                  size={24}
+                />
+                <NavigationLabel $isActive={isActive}>
+                  {item.label}
+                </NavigationLabel>
+              </NavigationLink>
+            );
+          })}
+        </NavigationTrack>
+      </Navigation>
+      <LoginRequiredSheet
+        open={isLoginSheetOpen}
+        onClose={handleCloseLoginSheet}
+        onLogin={handleLogin}
+      />
+    </>
   );
 };
 
@@ -143,19 +189,19 @@ const NavigationTrack = styled.div<{ $activeIndex: number }>`
   padding: 0 ${({ theme }) => theme.spacing.xl};
 `;
 
-const NavigationLink = styled(NavLink)`
+const navigationItemStyles = (theme: Theme) => css`
   position: relative;
-  z-index: ${({ theme }) => theme.zIndex.control};
+  z-index: ${theme.zIndex.control};
   display: flex;
   min-width: 0;
-  min-height: ${({ theme }) => theme.pxToRem(56)};
+  min-height: ${theme.pxToRem(56)};
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: ${({ theme }) => theme.spacing.s};
-  padding: ${({ theme }) => `${theme.spacing.sm} ${theme.spacing.lg}`};
-  border-radius: ${({ theme }) => theme.radius.full};
-  color: ${({ theme }) => theme.color.text.tertiary};
+  gap: ${theme.spacing.s};
+  padding: ${theme.spacing.sm} ${theme.spacing.lg};
+  border-radius: ${theme.radius.full};
+  color: ${theme.color.text.tertiary};
   -webkit-tap-highlight-color: transparent;
   transition:
     color 160ms ease-out,
@@ -172,8 +218,8 @@ const NavigationLink = styled(NavLink)`
   }
 
   &:focus-visible {
-    outline: 2px solid ${({ theme }) => theme.color.border.focused};
-    outline-offset: ${({ theme }) => theme.spacing.xs};
+    outline: 2px solid ${theme.color.border.focused};
+    outline-offset: ${theme.spacing.xs};
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -184,6 +230,21 @@ const NavigationLink = styled(NavLink)`
     }
   }
 `;
+
+const NavigationLink = styled(NavLink)(({ theme }) =>
+  navigationItemStyles(theme),
+);
+
+// 비로그인 마이페이지처럼 이동 대신 동작(시트 열기)을 하는 항목용. 링크와 동일한 외형.
+const NavigationButton = styled.button(
+  ({ theme }) => css`
+    ${navigationItemStyles(theme)};
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font: inherit;
+  `,
+);
 
 const NavigationLabel = styled.span<{ $isActive: boolean }>(
   ({ $isActive, theme }) => {
