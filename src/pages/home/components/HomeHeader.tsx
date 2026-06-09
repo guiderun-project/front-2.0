@@ -4,10 +4,6 @@ import styled from '@emotion/styled';
 
 import { ColorModeToggle, Text } from '@/components';
 
-/**
- * 메인 상단 헤더.
- * 좌측에 페이지 제목(h1), 우측에 색상 모드 토글을 배치한다.
- */
 export const HomeHeader = (): ReactElement => {
   return (
     <Header>

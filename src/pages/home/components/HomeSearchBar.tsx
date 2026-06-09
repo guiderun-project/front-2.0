@@ -8,11 +8,6 @@ import { APP_PATH } from '@/router/path';
 
 const SEARCH_PLACEHOLDER = '관심있는 모임을 찾아보세요';
 
-/**
- * 메인 상단 검색 바.
- * 입력한 키워드를 이벤트 검색 페이지로 전달하며 이동한다(빈 값이면 키워드 없이 이동).
- * 디자인상 별도 버튼 없이 좌측 아이콘 + 입력으로 구성하며, 제출은 Enter로 처리한다.
- */
 export const HomeSearchBar = (): ReactElement => {
   const navigate = useNavigate();
   const [keyword, setKeyword] = useState('');
@@ -46,7 +41,6 @@ export const HomeSearchBar = (): ReactElement => {
           setKeyword(event.target.value);
         }}
       />
-      {/* 시각적으로 숨긴 제출 버튼: Enter 제출과 스크린리더 명시적 제출을 보장 */}
       <VisuallyHiddenSubmit type="submit">검색</VisuallyHiddenSubmit>
     </SearchForm>
   );
@@ -86,7 +80,6 @@ const SearchInput = styled.input(({ theme }) => ({
     color: theme.color.text.tertiary,
   },
 
-  // 포커스 표시는 폼의 :focus-within으로 통일한다.
   '&:focus': {
     outline: 'none',
   },

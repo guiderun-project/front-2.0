@@ -8,12 +8,6 @@ import { useUpcomingEvents } from '../hooks/useUpcomingEvents';
 import { HomeSectionMessage } from './HomeSectionMessage';
 import { UpcomingEventCard } from './UpcomingEventCard';
 
-/**
- * 다가오는 러닝 모임(비로그인) 섹션.
- * GUEST 응답(시작 임박 공개 모임, 최대 5개)을 그림자 패널 안의 행 + 구분선으로 노출한다.
- * 로딩/에러는 상위 Suspense + ErrorBoundary에서 처리한다.
- * 회원(MEMBER) 응답 카드는 회원 단계에서 별도 구현한다.
- */
 export const UpcomingEventList = (): ReactElement => {
   const headingId = useId();
   const { data } = useUpcomingEvents();

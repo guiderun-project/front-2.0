@@ -61,6 +61,5 @@ const Content = styled.div(({ theme }) => ({
   flexDirection: 'column',
   gap: theme.spacing['3xl'],
   paddingInline: theme.spacing['2xl'],
-  // 하단 바텀 네비게이션과의 최소 간격
   paddingBottom: theme.spacing.md,
 }));

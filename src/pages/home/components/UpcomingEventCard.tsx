@@ -17,10 +17,6 @@ type UpcomingEventCardProps = {
   event: UpcomingGuestEvent;
 };
 
-/**
- * 다가오는 모임 패널의 한 행.
- * 이벤트 상세로 이동하는 Link이며, D-day는 색이 아닌 텍스트(뱃지)로 전달한다.
- */
 export const UpcomingEventCard = ({
   event,
 }: UpcomingEventCardProps): ReactElement => {

@@ -10,13 +10,6 @@ import { useHomeSummary } from '../hooks/useHomeSummary';
 
 const formatNumber = (value: number) => value.toLocaleString('ko-KR');
 
-/**
- * 메인 활동 요약(비로그인) 섹션.
- * publicSummary의 올해 전체 이벤트 수와 누적 거리를 노출한다.
- * 헤드라인은 두 줄 고정(각 줄 nowrap), 수치는 색이 아닌 텍스트로 전달하고
- * 스크린리더에는 자연스러운 문장을 별도로 제공한다.
- * 로딩/에러는 상위 Suspense + ErrorBoundary에서 처리한다.
- */
 export const ActivitySummary = (): ReactElement => {
   const headingId = useId();
   const {
@@ -26,7 +19,6 @@ export const ActivitySummary = (): ReactElement => {
   return (
     <Section aria-labelledby={headingId}>
       <HeadlineRow>
-        {/* span 분리로 인해 접근명이 붙어 읽히지 않도록 자연스러운 문장을 명시한다. */}
         <Headline aria-label="올해도 러너들은 열심히 달리고 있어요" id={headingId}>
           <TitleLine>
             <Text as="span" color="text.primary" font="heading-m-r">
@@ -108,8 +100,6 @@ const RunnerImage = styled.img(({ theme }) => ({
   height: theme.pxToRem(140),
   transform: 'translate(-50%, -50%)',
 
-  // 라이트 모드는 원본 색, 다크 모드에서는 흰색으로 보이도록 반전한다.
-  // (명시적 다크 토글 + 시스템 다크 둘 다 대응)
   filter: 'none',
 
   "html[data-color-mode='dark'] &": {
