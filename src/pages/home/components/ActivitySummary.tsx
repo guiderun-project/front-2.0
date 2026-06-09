@@ -13,7 +13,8 @@ const formatNumber = (value: number) => value.toLocaleString('ko-KR');
 /**
  * 메인 활동 요약(비로그인) 섹션.
  * publicSummary의 올해 전체 이벤트 수와 누적 거리를 노출한다.
- * 수치는 색이 아닌 텍스트로 전달하고, 스크린리더에는 자연스러운 문장을 별도로 제공한다.
+ * 헤드라인은 두 줄 고정(각 줄 nowrap), 수치는 색이 아닌 텍스트로 전달하고
+ * 스크린리더에는 자연스러운 문장을 별도로 제공한다.
  * 로딩/에러는 상위 Suspense + ErrorBoundary에서 처리한다.
  */
 export const ActivitySummary = (): ReactElement => {
@@ -25,27 +26,32 @@ export const ActivitySummary = (): ReactElement => {
   return (
     <Section aria-labelledby={headingId}>
       <HeadlineRow>
-        <Headline id={headingId} as="h2" color="text.primary" font="heading-m-r">
-          올해도{' '}
-          <Text as="strong" color="text.primary" font="heading-m-sb">
-            러너들은
+        <Headline id={headingId}>
+          <TitleLine>
+            <Text as="span" color="text.primary" font="heading-m-r">
+              올해도
+            </Text>
+            <Text as="span" color="text.primary" font="heading-m-sb">
+              러너들은
+            </Text>
+          </TitleLine>
+          <Text as="span" color="text.primary" font="heading-m-r">
+            열심히 달리고 있어요
           </Text>
-          <br />
-          열심히 달리고 있어요
         </Headline>
-        <RunnerImage alt="" aria-hidden={true} src={runnerImageUrl} />
+        <RunnerImageBox aria-hidden={true}>
+          <RunnerImage alt="" src={runnerImageUrl} />
+        </RunnerImageBox>
       </HeadlineRow>
 
       <Metrics>
-        <span aria-hidden="true">
-          <Text as="span" color="text.primary" font="display-l">
-            총 {formatNumber(publicSummary.totalEventCount)}회
-          </Text>
-          <Dot> · </Dot>
-          <Text as="span" color="text.brand" font="display-l">
-            {formatNumber(publicSummary.totalRunningDistanceKm)}KM
-          </Text>
-        </span>
+        <Text aria-hidden={true} as="span" color="text.primary" font="display-l">
+          총 {formatNumber(publicSummary.totalEventCount)}회
+        </Text>
+        <MetricDot aria-hidden={true} />
+        <Text aria-hidden={true} as="span" color="text.brand" font="display-l">
+          {formatNumber(publicSummary.totalRunningDistanceKm)}KM
+        </Text>
         <HiddenText>
           올해 러너들이 함께한 모임 총{' '}
           {formatNumber(publicSummary.totalEventCount)}회, 누적{' '}
@@ -59,25 +65,47 @@ export const ActivitySummary = (): ReactElement => {
 const Section = styled.section(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
-  gap: theme.spacing.lg,
+  gap: theme.spacing['2xl'],
 }));
 
 const HeadlineRow = styled.div(({ theme }) => ({
   display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: theme.spacing.lg,
+  alignItems: 'flex-end',
+  gap: theme.spacing.xl,
+  width: '100%',
 }));
 
-const Headline = styled(Text)({
-  flex: '1 1 auto',
+const Headline = styled.h2(({ theme }) => ({
+  display: 'flex',
+  flex: '1 1 0',
+  flexDirection: 'column',
+  gap: theme.spacing.xs,
+  margin: 0,
   minWidth: 0,
-});
+  whiteSpace: 'nowrap',
+}));
+
+const TitleLine = styled.span(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'flex-end',
+  gap: theme.spacing.s,
+}));
+
+const RunnerImageBox = styled.span(({ theme }) => ({
+  position: 'relative',
+  flexShrink: 0,
+  width: theme.pxToRem(94),
+  height: theme.pxToRem(64),
+  overflow: 'hidden',
+}));
 
 const RunnerImage = styled.img(({ theme }) => ({
-  flexShrink: 0,
-  width: theme.pxToRem(120),
-  height: 'auto',
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  width: theme.pxToRem(140),
+  height: theme.pxToRem(140),
+  transform: 'translate(-50%, -50%)',
 
   // 라이트 모드는 원본 색, 다크 모드에서는 흰색으로 보이도록 반전한다.
   ":root:not([data-color-mode='light']) &": {
@@ -85,13 +113,18 @@ const RunnerImage = styled.img(({ theme }) => ({
   },
 }));
 
-const Metrics = styled.div({
-  textAlign: 'right',
-});
+const Metrics = styled.div(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'flex-end',
+  gap: theme.spacing.md,
+  width: '100%',
+}));
 
-const Dot = styled.span(({ theme }) => ({
-  margin: `0 ${theme.spacing.s}`,
-  color: theme.color.text.tertiary,
-  fontSize: theme.typography['heading-m-sb'].fontSize,
-  verticalAlign: 'middle',
+const MetricDot = styled.span(({ theme }) => ({
+  flexShrink: 0,
+  width: theme.pxToRem(4),
+  height: theme.pxToRem(4),
+  borderRadius: theme.pxToRem(1),
+  backgroundColor: theme.color.text.primary,
 }));
