@@ -108,8 +108,17 @@ const RunnerImage = styled.img(({ theme }) => ({
   transform: 'translate(-50%, -50%)',
 
   // 라이트 모드는 원본 색, 다크 모드에서는 흰색으로 보이도록 반전한다.
-  ":root:not([data-color-mode='light']) &": {
+  // (명시적 다크 토글 + 시스템 다크 둘 다 대응)
+  filter: 'none',
+
+  "html[data-color-mode='dark'] &": {
     filter: 'brightness(0) invert(1)',
+  },
+
+  '@media (prefers-color-scheme: dark)': {
+    "html:not([data-color-mode='light']) &": {
+      filter: 'brightness(0) invert(1)',
+    },
   },
 }));
 
