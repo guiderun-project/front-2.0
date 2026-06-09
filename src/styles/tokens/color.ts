@@ -192,7 +192,6 @@ export const semanticColorAliases = {
       'light-soft': 'primitive.neutral.0-a16',
       'dim-soft': 'primitive.neutral.800-a10',
       overlay: 'primitive.neutral.800-a10',
-      inverse: 'primitive.neutral.950',
     },
     text: {
       primary: 'primitive.neutral.950',
@@ -271,7 +270,6 @@ export const semanticColorAliases = {
       'light-soft': 'primitive.neutral.0-a8',
       'dim-soft': 'primitive.neutral.950-a42',
       overlay: 'primitive.neutral.0-a8',
-      inverse: 'primitive.neutral.50',
     },
     text: {
       primary: 'primitive.neutral.50',
@@ -375,7 +373,6 @@ export const color = {
     'light-soft': 'var(--color-bg-light-soft)',
     'dim-soft': 'var(--color-bg-dim-soft)',
     overlay: 'var(--color-bg-overlay)',
-    inverse: 'var(--color-bg-inverse)',
   },
   text: {
     primary: 'var(--color-text-primary)',
@@ -454,7 +451,6 @@ export const colorTokenMap = {
   'bg.light-soft': 'var(--color-bg-light-soft)',
   'bg.dim-soft': 'var(--color-bg-dim-soft)',
   'bg.overlay': 'var(--color-bg-overlay)',
-  'bg.inverse': 'var(--color-bg-inverse)',
   'text.primary': 'var(--color-text-primary)',
   'text.secondary': 'var(--color-text-secondary)',
   'text.tertiary': 'var(--color-text-tertiary)',
