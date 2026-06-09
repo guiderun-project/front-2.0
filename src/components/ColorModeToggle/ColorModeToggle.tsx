@@ -101,7 +101,7 @@ const ToggleRoot = styled.div<{ $disabled: boolean }>`
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: center;
-  width: ${({ theme }) => theme.pxToRem(160)};
+  width: fit-content;
   height: ${({ theme }) => theme.pxToRem(38)};
   padding: ${({ theme }) => theme.spacing.s};
   gap: ${({ theme }) => theme.spacing.s};
@@ -174,8 +174,15 @@ const ToggleOption = styled.button<{ $color: ColorToken }>`
   }
 `;
 
+// 라벨은 시각적으로 숨기고 아이콘만 노출한다(접근성용 텍스트는 유지).
 const ToggleOptionLabel = styled(Text)`
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
   overflow: hidden;
-  text-overflow: ellipsis;
+  clip-path: inset(50%);
   white-space: nowrap;
 `;
