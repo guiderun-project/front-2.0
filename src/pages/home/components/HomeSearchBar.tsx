@@ -1,35 +1,60 @@
-import type { ReactElement } from 'react';
+import { useState, type FormEvent, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
-import { Link } from 'react-router-dom';
+import { createSearchParams, useNavigate } from 'react-router-dom';
 
 import { Icon, Text } from '@/components';
 import { APP_PATH } from '@/router/path';
 
 /**
- * 메인 상단 검색 진입 바.
- * 인라인 검색이 아니라 이벤트 검색 페이지로 이동하는 진입점이다.
+ * 메인 상단 검색 바.
+ * 입력한 키워드를 이벤트 검색 페이지로 전달하며 이동한다(빈 값이면 키워드 없이 이동).
  */
 export const HomeSearchBar = (): ReactElement => {
+  const navigate = useNavigate();
+  const [keyword, setKeyword] = useState('');
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const trimmedKeyword = keyword.trim();
+    const search = trimmedKeyword
+      ? `?${createSearchParams({ keyword: trimmedKeyword }).toString()}`
+      : '';
+
+    navigate(`${APP_PATH.EVENT_SEARCH}${search}`);
+  };
+
   return (
-    <SearchBar aria-label="이벤트 검색" to={APP_PATH.EVENT_SEARCH}>
-      <Placeholder aria-hidden={true} color="text.tertiary" font="body-m-m">
-        이벤트를 검색해보세요
-      </Placeholder>
-      <SearchAction aria-hidden={true}>
-        <Icon color="icon.inverse" icon="search-lined" size={16} />
-        <Text color="text.inverse" font="body-s-sb">
+    <SearchForm role="search" onSubmit={handleSubmit}>
+      <SearchInput
+        aria-label="이벤트 검색"
+        enterKeyHint="search"
+        placeholder="이벤트를 검색해보세요"
+        type="search"
+        value={keyword}
+        onChange={(event) => {
+          setKeyword(event.target.value);
+        }}
+      />
+      <SearchSubmit type="submit">
+        <Icon
+          aria-hidden={true}
+          color="icon.inverse"
+          icon="search-lined"
+          size={16}
+        />
+        <Text as="span" color="text.inverse" font="body-s-sb">
           검색
         </Text>
-      </SearchAction>
-    </SearchBar>
+      </SearchSubmit>
+    </SearchForm>
   );
 };
 
-const SearchBar = styled(Link)(({ theme }) => ({
+const SearchForm = styled.form(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'space-between',
   gap: theme.spacing.md,
   width: '100%',
   padding: `${theme.spacing.s} ${theme.spacing.s} ${theme.spacing.s} ${theme.spacing.lg}`,
@@ -37,27 +62,50 @@ const SearchBar = styled(Link)(({ theme }) => ({
   borderRadius: theme.radius.full,
   backgroundColor: theme.color.bg.default,
   boxSizing: 'border-box',
-  textDecoration: 'none',
 
-  '&:focus-visible': {
+  '&:focus-within': {
     outline: `2px solid ${theme.color.border.focused}`,
     outlineOffset: theme.spacing.xs,
   },
 }));
 
-const Placeholder = styled(Text)({
+const SearchInput = styled.input(({ theme }) => ({
+  flex: '1 1 auto',
   minWidth: 0,
-  overflow: 'hidden',
-  whiteSpace: 'nowrap',
-  textOverflow: 'ellipsis',
-});
+  border: 'none',
+  padding: 0,
+  backgroundColor: 'transparent',
+  color: theme.color.text.primary,
+  fontFamily: theme.typography['body-m-m'].fontFamily,
+  fontSize: theme.typography['body-m-m'].fontSize,
+  fontWeight: theme.typography['body-m-m'].fontWeight,
+  letterSpacing: theme.typography['body-m-m'].letterSpacing,
+  lineHeight: theme.typography['body-m-m'].lineHeight,
 
-const SearchAction = styled.span(({ theme }) => ({
+  '&::placeholder': {
+    color: theme.color.text.tertiary,
+  },
+
+  // 포커스 표시는 폼의 :focus-within으로 통일한다.
+  '&:focus': {
+    outline: 'none',
+  },
+}));
+
+const SearchSubmit = styled.button(({ theme }) => ({
   display: 'inline-flex',
   flexShrink: 0,
   alignItems: 'center',
   gap: theme.spacing.xs,
   padding: `${theme.spacing.sm} ${theme.spacing.lg}`,
+  border: 'none',
   borderRadius: theme.radius.full,
   backgroundColor: theme.color.bg.inverse,
+  cursor: 'pointer',
+  touchAction: 'manipulation',
+
+  '&:focus-visible': {
+    outline: `2px solid ${theme.color.border.focused}`,
+    outlineOffset: theme.spacing.xs,
+  },
 }));
