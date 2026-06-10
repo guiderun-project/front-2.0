@@ -30,18 +30,14 @@ export const AttendanceLeadDescription = ({
   const leadCount = pageState.attendance.summary.waitingCount;
 
   return (
-    <LeadText aria-label={`현재 ${leadCount}명이 출석 대기중이에요`}>
-      <span>현재</span>
-      <LeadCount>{leadCount}명</LeadCount>
-      <span>이 출석 대기중이에요</span>
+    <LeadText>
+      현재 <LeadCount>{leadCount}명</LeadCount>이 출석 대기중이에요
     </LeadText>
   );
 };
 
 const LeadText = styled.span(({ theme }) => ({
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: theme.spacing.s,
+  display: 'inline',
   color: theme.color.text.tertiary,
   fontWeight: theme.fontWeight.semibold,
   whiteSpace: 'normal',
