@@ -7,13 +7,13 @@ import { AttendancePageBoundary } from './AttendancePageBoundary';
 import { AttendanceReadyPage } from './AttendanceReadyPage';
 
 const ATTENDANCE_LOADING_STATE: AttendanceMessageState = {
-  message: '출석 정보를 불러오고 있어요',
+  message: '출석 정보를 가지고 오고 있어요',
   role: 'status',
   status: 'message',
 };
 
 const ATTENDANCE_ERROR_STATE: AttendanceMessageState = {
-  message: '출석 정보를 확인할 수 없어요',
+  message: '출석 정보를 가지고 오지 못했어요',
   role: 'alert',
   status: 'message',
 };

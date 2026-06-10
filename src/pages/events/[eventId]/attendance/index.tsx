@@ -9,13 +9,13 @@ import { AttendancePermissionGate } from './components/AttendancePermissionGate'
 import { useEventAttendanceRoute } from './useEventAttendancePage';
 
 const EVENT_CHECKING_STATE: AttendanceMessageState = {
-  message: '이벤트 정보를 확인하고 있어요',
+  message: '이벤트 정보를 가지고 오고 있어요',
   role: 'status',
   status: 'message',
 };
 
 const EVENT_ERROR_STATE: AttendanceMessageState = {
-  message: '이벤트 정보를 확인할 수 없어요',
+  message: '이벤트 정보를 가지고 오지 못했어요',
   role: 'alert',
   status: 'message',
 };
