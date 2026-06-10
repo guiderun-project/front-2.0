@@ -3,7 +3,7 @@ import type { ReactElement } from 'react';
 import styled from '@emotion/styled';
 
 import { BottomSheet } from '../BottomSheet';
-import { Button } from '../Button';
+import { ButtonGroup } from '../Button';
 
 type LoginRequiredSheetProps = {
   open: boolean;
@@ -28,22 +28,20 @@ export const LoginRequiredSheet = ({
       open={open}
       onClose={onClose}
       footer={
-        <Actions>
-          <Button fullWidth level="secondary" size="l" onClick={onClose}>
+        <SheetButtonGroup ratio="35:65">
+          <ButtonGroup.Button level="secondary" size="l" onClick={onClose}>
             아니요
-          </Button>
-          <Button fullWidth size="l" onClick={onLogin}>
+          </ButtonGroup.Button>
+          <ButtonGroup.Button size="l" onClick={onLogin}>
             로그인하기
-          </Button>
-        </Actions>
+          </ButtonGroup.Button>
+        </SheetButtonGroup>
       }
     />
   );
 };
 
-const Actions = styled.div(({ theme }) => ({
-  display: 'grid',
-  gridTemplateColumns: `${theme.pxToRem(112)} minmax(0, 1fr)`,
-  gap: theme.spacing.md,
-  width: '100%',
-}));
+// BottomSheet Footer가 이미 좌우 패딩을 주므로 ButtonGroup 자체 패딩은 제거한다.
+const SheetButtonGroup = styled(ButtonGroup)({
+  paddingInline: 0,
+});

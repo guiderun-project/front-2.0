@@ -14,9 +14,9 @@ import { HomeSectionBoundary } from "./components/HomeSectionBoundary";
 import { HomeSectionMessage } from "./components/HomeSectionMessage";
 import { UpcomingEventList } from "./components/UpcomingEventList";
 
-const SUMMARY_LOADING_MESSAGE = "활동 요약을 불러오는 중입니다.";
+const SUMMARY_LOADING_MESSAGE = "활동 요약을 불러오는 중이에요.";
 const SUMMARY_ERROR_MESSAGE = "활동 요약을 불러오지 못했어요.";
-const UPCOMING_LOADING_MESSAGE = "다가오는 모임을 불러오는 중입니다.";
+const UPCOMING_LOADING_MESSAGE = "다가오는 모임을 불러오는 중이에요.";
 const UPCOMING_ERROR_MESSAGE = "다가오는 모임을 불러오지 못했어요.";
 
 export const MainPage = (): ReactElement => {

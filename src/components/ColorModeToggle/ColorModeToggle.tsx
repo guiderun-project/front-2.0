@@ -2,8 +2,8 @@ import type { ComponentPropsWithoutRef, ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
+import { HiddenText } from '@/components/HiddenText';
 import { Icon, type IconName } from '@/components/Icon';
-import { Text } from '@/components/Text';
 import { useColorMode } from '@/styles/useColorMode';
 import { resolveColorToken, type ColorMode, type ColorToken } from '@/styles/tokens';
 
@@ -85,9 +85,7 @@ export const ColorModeToggle = ({
               icon={isSelected ? icon.selected : icon.default}
               size={16}
             />
-            <ToggleOptionLabel as="span" font="body-s-sb">
-              {label}
-            </ToggleOptionLabel>
+            <HiddenText>{label}</HiddenText>
           </ToggleOption>
         );
       })}
@@ -172,17 +170,4 @@ const ToggleOption = styled.button<{ $color: ColorToken }>`
       transform: none;
     }
   }
-`;
-
-// 라벨은 시각적으로 숨기고 아이콘만 노출한다(접근성용 텍스트는 유지).
-const ToggleOptionLabel = styled(Text)`
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  border: 0;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
 `;
