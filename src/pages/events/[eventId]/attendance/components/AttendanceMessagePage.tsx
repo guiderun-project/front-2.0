@@ -14,7 +14,7 @@ export const AttendanceMessagePage = ({
   pageState,
 }: AttendanceMessagePageProps): ReactElement => {
   return (
-    <AttendancePageShell onBack={onBack} pageState={pageState}>
+    <AttendancePageShell onBack={onBack}>
       <AttendancePageContent pageState={pageState} />
     </AttendancePageShell>
   );

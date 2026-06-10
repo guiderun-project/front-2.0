@@ -2,24 +2,21 @@ import type { ReactElement, ReactNode } from 'react';
 
 import { FormPageLayout, PageLayout } from '@/components';
 
-import type { AttendancePageState } from '../attendancePageState';
-import { AttendanceLeadDescription } from './AttendanceLeadDescription';
-
 type AttendancePageShellProps = {
   children: ReactNode;
+  description?: ReactNode;
   onBack: () => void;
-  pageState: AttendancePageState;
 };
 
 export const AttendancePageShell = ({
   children,
+  description,
   onBack,
-  pageState,
 }: AttendancePageShellProps): ReactElement => {
   return (
     <PageLayout background="bg.subtle">
       <FormPageLayout
-        description={<AttendanceLeadDescription pageState={pageState} />}
+        description={description}
         title={'출석할 참가자를\n선택해주세요'}
         topNavigation={{
           left: {
