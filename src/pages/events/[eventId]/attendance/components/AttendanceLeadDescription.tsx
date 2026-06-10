@@ -11,20 +11,8 @@ type AttendanceLeadDescriptionProps = {
 export const AttendanceLeadDescription = ({
   pageState,
 }: AttendanceLeadDescriptionProps): ReactNode => {
-  switch (pageState.status) {
-    case 'invalid-event':
-    case 'permission-error':
-      return '이벤트 정보를 확인할 수 없어요';
-    case 'permission-pending':
-      return '이벤트 정보를 확인하고 있어요';
-    case 'forbidden':
-      return '출석 관리는 주최자 또는 관리자만 가능해요';
-    case 'attendance-pending':
-      return '출석 정보를 불러오고 있어요';
-    case 'attendance-error':
-      return '출석 정보를 확인할 수 없어요';
-    case 'ready':
-      break;
+  if (pageState.status === 'message') {
+    return pageState.message;
   }
 
   const leadCount = pageState.attendance.summary.waitingCount;

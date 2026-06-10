@@ -1,23 +1,19 @@
 import type { EventAttendanceResponse } from '@/api/types';
 import type { EventCanceledApplicantListResponse } from '@/api/types/application';
 
-type CanceledAttendanceParticipants =
+export type CanceledAttendanceParticipants =
   EventCanceledApplicantListResponse['canceledApplicants'];
 
-export type CanceledAttendanceParticipantsState =
-  | { status: 'pending' }
-  | { status: 'error' }
-  | { status: 'ready'; participants: CanceledAttendanceParticipants };
+export type AttendanceMessageState = {
+  message: string;
+  role: 'alert' | 'status';
+  status: 'message';
+};
 
-export type AttendancePageState =
-  | { status: 'invalid-event' }
-  | { status: 'permission-pending' }
-  | { status: 'permission-error' }
-  | { status: 'forbidden' }
-  | { status: 'attendance-pending' }
-  | { status: 'attendance-error' }
-  | {
-      attendance: EventAttendanceResponse;
-      canceledParticipants: CanceledAttendanceParticipantsState;
-      status: 'ready';
-    };
+export type AttendanceReadyState = {
+  attendance: EventAttendanceResponse;
+  canceledParticipants: CanceledAttendanceParticipants;
+  status: 'ready';
+};
+
+export type AttendancePageState = AttendanceMessageState | AttendanceReadyState;

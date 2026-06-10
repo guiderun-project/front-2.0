@@ -1,46 +1,60 @@
 import type { ReactElement } from 'react';
 
-import { FormPageLayout, HiddenText, PageLayout } from '@/components';
+import { useAuth } from '@/contexts';
 
-import { AttendanceLeadDescription } from './components/AttendanceLeadDescription';
-import { AttendancePageContent } from './components/AttendancePageContent';
-import { useEventAttendancePage } from './useEventAttendancePage';
+import type { AttendanceMessageState } from './attendancePageState';
+import { AttendanceMessagePage } from './components/AttendanceMessagePage';
+import { AttendancePageBoundary } from './components/AttendancePageBoundary';
+import { AttendancePermissionGate } from './components/AttendancePermissionGate';
+import { useEventAttendanceRoute } from './useEventAttendancePage';
+
+const EVENT_CHECKING_STATE: AttendanceMessageState = {
+  message: '이벤트 정보를 확인하고 있어요',
+  role: 'status',
+  status: 'message',
+};
+
+const EVENT_ERROR_STATE: AttendanceMessageState = {
+  message: '이벤트 정보를 확인할 수 없어요',
+  role: 'alert',
+  status: 'message',
+};
+
+const INVALID_EVENT_STATE: AttendanceMessageState = {
+  message: '잘못된 이벤트 주소예요',
+  role: 'alert',
+  status: 'message',
+};
 
 export const EventAttendancePage = (): ReactElement => {
-  const {
-    announcement,
-    attendancePageState,
-    attendParticipant,
-    cancelAttendance,
-    handleBack,
-    isUpdatingAttendance,
-  } = useEventAttendancePage();
+  const { eventId, handleBack } = useEventAttendanceRoute();
+  const { isAuthReady } = useAuth();
+
+  if (eventId === null) {
+    return (
+      <AttendanceMessagePage
+        handleBack={handleBack}
+        pageState={INVALID_EVENT_STATE}
+      />
+    );
+  }
+
+  if (!isAuthReady) {
+    return (
+      <AttendanceMessagePage
+        handleBack={handleBack}
+        pageState={EVENT_CHECKING_STATE}
+      />
+    );
+  }
 
   return (
-    <PageLayout background="bg.subtle">
-      <FormPageLayout
-        description={
-          <AttendanceLeadDescription pageState={attendancePageState} />
-        }
-        title={'출석할 참가자를\n선택해주세요'}
-        topNavigation={{
-          left: {
-            ariaLabel: '이전 페이지로 이동',
-            icon: 'chevron-left-lined',
-            onClick: handleBack,
-          },
-        }}
-      >
-        <HiddenText aria-live="polite" role="status">
-          {announcement}
-        </HiddenText>
-        <AttendancePageContent
-          isUpdatingAttendance={isUpdatingAttendance}
-          onAttend={attendParticipant}
-          onCancelAttendance={cancelAttendance}
-          pageState={attendancePageState}
-        />
-      </FormPageLayout>
-    </PageLayout>
+    <AttendancePageBoundary
+      errorState={EVENT_ERROR_STATE}
+      handleBack={handleBack}
+      loadingState={EVENT_CHECKING_STATE}
+    >
+      <AttendancePermissionGate eventId={eventId} handleBack={handleBack} />
+    </AttendancePageBoundary>
   );
 };
