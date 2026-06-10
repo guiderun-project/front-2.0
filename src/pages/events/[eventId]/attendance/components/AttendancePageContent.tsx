@@ -18,28 +18,19 @@ type AttendancePageContentProps = {
   pageState: AttendancePageState;
 };
 
-type ParticipantWithRunnerType = {
-  type: AttendanceParticipant['type'];
-};
-
-const PARTICIPANT_TYPE_ORDER: Record<AttendanceParticipant['type'], number> = {
-  VI: 0,
-  GUIDE: 1,
-};
-
 const ATTENDANCE_EMPTY_TEXT = {
   attended: '출석 완료된 참가자가 없어요',
   canceled: '취소한 참가자가 없어요',
   waiting: '출석 대기 중인 참가자가 없어요',
 } as const;
 
-const sortParticipantsByRunnerType = <TParticipant extends ParticipantWithRunnerType>(
+const sortViFirst = <TParticipant extends { type: AttendanceParticipant['type'] }>(
   participants: TParticipant[],
 ): TParticipant[] => {
   return [...participants].sort(
     (firstParticipant, secondParticipant) =>
-      PARTICIPANT_TYPE_ORDER[firstParticipant.type] -
-      PARTICIPANT_TYPE_ORDER[secondParticipant.type],
+      Number(secondParticipant.type === 'VI') -
+      Number(firstParticipant.type === 'VI'),
   );
 };
 
@@ -97,11 +88,11 @@ export const AttendancePageContent = ({
   }
 
   const { attendance, canceledParticipants } = pageState;
-  const waitingParticipants = sortParticipantsByRunnerType(attendance.waiting);
-  const attendedParticipants = sortParticipantsByRunnerType(attendance.attended);
+  const waitingParticipants = sortViFirst(attendance.waiting);
+  const attendedParticipants = sortViFirst(attendance.attended);
   const canceledParticipantItems =
     canceledParticipants.status === 'ready'
-      ? sortParticipantsByRunnerType(canceledParticipants.participants)
+      ? sortViFirst(canceledParticipants.participants)
       : [];
 
   return (
