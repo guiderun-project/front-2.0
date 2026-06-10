@@ -1196,10 +1196,10 @@ export const DesignPage = () => {
       <Header>
         <HeaderCopy>
           <Text as="h1" font="heading-l-b">
-            Components
+            컴포넌트
           </Text>
           <Text color="text.secondary" font="body-s-r">
-            Shared UI primitives currently available in the app.
+            앱에서 현재 사용 가능한 공유 UI 기본 요소
           </Text>
         </HeaderCopy>
         <HeaderControls>
