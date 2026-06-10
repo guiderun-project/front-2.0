@@ -2,17 +2,19 @@ import type { ReactElement, ReactNode } from 'react';
 
 import { FormPageLayout, PageLayout } from '@/components';
 
+import { useEventAttendanceRoute } from '../useEventAttendancePage';
+
 type AttendancePageShellProps = {
   children: ReactNode;
   description?: ReactNode;
-  onBack: () => void;
 };
 
 export const AttendancePageShell = ({
   children,
   description,
-  onBack,
 }: AttendancePageShellProps): ReactElement => {
+  const { onBack } = useEventAttendanceRoute();
+
   return (
     <PageLayout background="bg.subtle">
       <FormPageLayout

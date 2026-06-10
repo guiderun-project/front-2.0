@@ -27,34 +27,23 @@ const INVALID_EVENT_STATE: AttendanceMessageState = {
 };
 
 export const EventAttendancePage = (): ReactElement => {
-  const { eventId, onBack } = useEventAttendanceRoute();
+  const { eventId } = useEventAttendanceRoute();
   const { isAuthReady } = useAuth();
 
   if (eventId === null) {
-    return (
-      <AttendanceMessagePage
-        pageState={INVALID_EVENT_STATE}
-        onBack={onBack}
-      />
-    );
+    return <AttendanceMessagePage pageState={INVALID_EVENT_STATE} />;
   }
 
   if (!isAuthReady) {
-    return (
-      <AttendanceMessagePage
-        pageState={EVENT_CHECKING_STATE}
-        onBack={onBack}
-      />
-    );
+    return <AttendanceMessagePage pageState={EVENT_CHECKING_STATE} />;
   }
 
   return (
     <AttendancePageBoundary
       errorState={EVENT_ERROR_STATE}
       loadingState={EVENT_CHECKING_STATE}
-      onBack={onBack}
     >
-      <AttendancePermissionGate eventId={eventId} onBack={onBack} />
+      <AttendancePermissionGate eventId={eventId} />
     </AttendancePageBoundary>
   );
 };

@@ -9,12 +9,10 @@ import { AttendancePageShell } from './AttendancePageShell';
 
 type AttendanceReadyPageProps = {
   eventId: number;
-  onBack: () => void;
 };
 
 export const AttendanceReadyPage = ({
   eventId,
-  onBack,
 }: AttendanceReadyPageProps): ReactElement => {
   const {
     announcement,
@@ -28,7 +26,6 @@ export const AttendanceReadyPage = ({
   return (
     <AttendancePageShell
       description={<AttendanceLeadDescription waitingCount={waitingCount} />}
-      onBack={onBack}
     >
       <HiddenText aria-live="polite" role="status">
         {announcement}

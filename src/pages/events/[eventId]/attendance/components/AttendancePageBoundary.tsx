@@ -11,33 +11,25 @@ type AttendancePageBoundaryProps = {
   children: ReactNode;
   errorState: AttendanceMessageState;
   loadingState: AttendanceMessageState;
-  onBack: () => void;
 };
 
 export const AttendancePageBoundary = ({
   children,
   errorState,
   loadingState,
-  onBack,
 }: AttendancePageBoundaryProps): ReactElement => {
   return (
     <QueryErrorResetBoundary>
       {({ reset }) => (
         <ErrorBoundary
           fallback={
-            <AttendanceMessagePage
-              pageState={errorState}
-              onBack={onBack}
-            />
+            <AttendanceMessagePage pageState={errorState} />
           }
           onReset={reset}
         >
           <Suspense
             fallback={
-              <AttendanceMessagePage
-                pageState={loadingState}
-                onBack={onBack}
-              />
+              <AttendanceMessagePage pageState={loadingState} />
             }
           >
             {children}

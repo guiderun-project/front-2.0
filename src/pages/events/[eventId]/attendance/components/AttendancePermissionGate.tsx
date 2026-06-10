@@ -26,31 +26,23 @@ const FORBIDDEN_STATE: AttendanceMessageState = {
 
 type AttendancePermissionGateProps = {
   eventId: number;
-  onBack: () => void;
 };
 
 export const AttendancePermissionGate = ({
   eventId,
-  onBack,
 }: AttendancePermissionGateProps): ReactElement => {
   const { canManageAttendance } = useEventAttendancePermission(eventId);
 
   if (!canManageAttendance) {
-    return (
-      <AttendanceMessagePage
-        pageState={FORBIDDEN_STATE}
-        onBack={onBack}
-      />
-    );
+    return <AttendanceMessagePage pageState={FORBIDDEN_STATE} />;
   }
 
   return (
     <AttendancePageBoundary
       errorState={ATTENDANCE_ERROR_STATE}
       loadingState={ATTENDANCE_LOADING_STATE}
-      onBack={onBack}
     >
-      <AttendanceReadyPage eventId={eventId} onBack={onBack} />
+      <AttendanceReadyPage eventId={eventId} />
     </AttendancePageBoundary>
   );
 };

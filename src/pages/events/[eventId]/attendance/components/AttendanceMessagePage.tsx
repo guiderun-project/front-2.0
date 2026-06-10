@@ -6,15 +6,13 @@ import { AttendancePageShell } from './AttendancePageShell';
 
 type AttendanceMessagePageProps = {
   pageState: AttendanceMessageState;
-  onBack: () => void;
 };
 
 export const AttendanceMessagePage = ({
   pageState,
-  onBack,
 }: AttendanceMessagePageProps): ReactElement => {
   return (
-    <AttendancePageShell onBack={onBack}>
+    <AttendancePageShell>
       <AttendancePageContent pageState={pageState} />
     </AttendancePageShell>
   );
