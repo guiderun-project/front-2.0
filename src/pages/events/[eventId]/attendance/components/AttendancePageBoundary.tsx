@@ -10,15 +10,15 @@ import { AttendanceMessagePage } from './AttendanceMessagePage';
 type AttendancePageBoundaryProps = {
   children: ReactNode;
   errorState: AttendanceMessageState;
-  handleBack: () => void;
   loadingState: AttendanceMessageState;
+  onBack: () => void;
 };
 
 export const AttendancePageBoundary = ({
   children,
   errorState,
-  handleBack,
   loadingState,
+  onBack,
 }: AttendancePageBoundaryProps): ReactElement => {
   return (
     <QueryErrorResetBoundary>
@@ -26,7 +26,7 @@ export const AttendancePageBoundary = ({
         <ErrorBoundary
           fallback={
             <AttendanceMessagePage
-              handleBack={handleBack}
+              onBack={onBack}
               pageState={errorState}
             />
           }
@@ -35,7 +35,7 @@ export const AttendancePageBoundary = ({
           <Suspense
             fallback={
               <AttendanceMessagePage
-                handleBack={handleBack}
+                onBack={onBack}
                 pageState={loadingState}
               />
             }

@@ -27,13 +27,13 @@ const INVALID_EVENT_STATE: AttendanceMessageState = {
 };
 
 export const EventAttendancePage = (): ReactElement => {
-  const { eventId, handleBack } = useEventAttendanceRoute();
+  const { eventId, onBack } = useEventAttendanceRoute();
   const { isAuthReady } = useAuth();
 
   if (eventId === null) {
     return (
       <AttendanceMessagePage
-        handleBack={handleBack}
+        onBack={onBack}
         pageState={INVALID_EVENT_STATE}
       />
     );
@@ -42,7 +42,7 @@ export const EventAttendancePage = (): ReactElement => {
   if (!isAuthReady) {
     return (
       <AttendanceMessagePage
-        handleBack={handleBack}
+        onBack={onBack}
         pageState={EVENT_CHECKING_STATE}
       />
     );
@@ -51,10 +51,10 @@ export const EventAttendancePage = (): ReactElement => {
   return (
     <AttendancePageBoundary
       errorState={EVENT_ERROR_STATE}
-      handleBack={handleBack}
       loadingState={EVENT_CHECKING_STATE}
+      onBack={onBack}
     >
-      <AttendancePermissionGate eventId={eventId} handleBack={handleBack} />
+      <AttendancePermissionGate eventId={eventId} onBack={onBack} />
     </AttendancePageBoundary>
   );
 };

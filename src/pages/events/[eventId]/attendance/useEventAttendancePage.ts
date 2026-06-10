@@ -51,7 +51,7 @@ export const useEventAttendanceRoute = () => {
 
   return {
     eventId,
-    handleBack,
+    onBack: handleBack,
   };
 };
 

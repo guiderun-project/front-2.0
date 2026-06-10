@@ -7,13 +7,13 @@ import { AttendanceLeadDescription } from './AttendanceLeadDescription';
 
 type AttendancePageShellProps = {
   children: ReactNode;
-  handleBack: () => void;
+  onBack: () => void;
   pageState: AttendancePageState;
 };
 
 export const AttendancePageShell = ({
   children,
-  handleBack,
+  onBack,
   pageState,
 }: AttendancePageShellProps): ReactElement => {
   return (
@@ -25,7 +25,7 @@ export const AttendancePageShell = ({
           left: {
             ariaLabel: '이전 페이지로 이동',
             icon: 'chevron-left-lined',
-            onClick: handleBack,
+            onClick: onBack,
           },
         }}
       >
