@@ -3,7 +3,7 @@ import { useId, type ReactElement } from 'react';
 import styled from '@emotion/styled';
 
 import type { AttendanceParticipant } from '@/api/types';
-import { Button, HiddenText } from '@/components';
+import { Button } from '@/components';
 
 import { ParticipantInfo } from './ParticipantInfo';
 
@@ -16,16 +16,6 @@ type ParticipantActionCardProps = {
   status: AttendanceActionStatus;
 };
 
-const ATTENDANCE_ACTION_LABEL = {
-  waiting: '출석하기',
-  attended: '출석취소',
-} as const satisfies Record<AttendanceActionStatus, string>;
-
-const PARTICIPANT_STATUS_LABEL = {
-  waiting: '출석 대기 상태',
-  attended: '출석 완료 상태',
-} as const satisfies Record<AttendanceActionStatus, string>;
-
 export const ParticipantActionCard = ({
   disabled,
   onAction,
@@ -33,6 +23,7 @@ export const ParticipantActionCard = ({
   status,
 }: ParticipantActionCardProps): ReactElement => {
   const participantInfoId = useId();
+  const actionLabel = status === 'waiting' ? '출석하기' : '출석취소';
 
   return (
     <ParticipantCard>
@@ -46,8 +37,7 @@ export const ParticipantActionCard = ({
           onAction(participant);
         }}
       >
-        <HiddenText>{PARTICIPANT_STATUS_LABEL[status]}. </HiddenText>
-        {ATTENDANCE_ACTION_LABEL[status]}
+        {actionLabel}
       </Button>
     </ParticipantCard>
   );
