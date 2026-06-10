@@ -23,11 +23,11 @@ export const AttendanceReadyPage = ({
     cancelAttendance,
     isUpdatingAttendance,
   } = useEventAttendancePage(eventId);
-  const waitingCount = attendancePageState.attendance.summary.waitingCount;
+  const leadCount = attendancePageState.attendance.summary.waitingCount;
 
   return (
     <AttendancePageShell
-      description={<AttendanceLeadDescription waitingCount={waitingCount} />}
+      description={<AttendanceLeadDescription leadCount={leadCount} />}
       onBack={onBack}
     >
       <HiddenText aria-live="polite" role="status">
