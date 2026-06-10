@@ -2,9 +2,9 @@ import type { ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
-import type { AttendanceParticipant, EventAttendanceResponse } from '@/api/types';
-import type { EventCanceledApplicantListResponse } from '@/api/types/application';
+import type { AttendanceParticipant } from '@/api/types';
 
+import type { AttendancePageState } from '../attendancePageState';
 import { AttendanceSection } from './AttendanceSection';
 import { PanelState, SectionState } from './AttendanceStates';
 import { getAttendanceEmptyText } from './attendanceLabels';
@@ -13,19 +13,10 @@ import { ParticipantActionCard } from './ParticipantActionCard';
 import { ParticipantList } from './ParticipantList';
 
 type AttendancePageContentProps = {
-  attendanceData?: EventAttendanceResponse;
-  canFetchEventAttendance: boolean;
-  canManageAttendance: boolean;
-  canceledApplicantsData?: EventCanceledApplicantListResponse;
-  isAttendanceError: boolean;
-  isAttendancePending: boolean;
-  isPermissionError: boolean;
-  isPermissionPending: boolean;
-  isCanceledApplicantsError: boolean;
-  isCanceledApplicantsPending: boolean;
   isUpdatingAttendance: boolean;
   onAttend: (participant: AttendanceParticipant) => void;
   onCancelAttendance: (participant: AttendanceParticipant) => void;
+  pageState: AttendancePageState;
 };
 
 type ParticipantWithRunnerType = {
@@ -48,87 +39,71 @@ const sortParticipantsByRunnerType = <TParticipant extends ParticipantWithRunner
 };
 
 export const AttendancePageContent = ({
-  attendanceData,
-  canFetchEventAttendance,
-  canManageAttendance,
-  canceledApplicantsData,
-  isAttendanceError,
-  isAttendancePending,
-  isPermissionError,
-  isPermissionPending,
-  isCanceledApplicantsError,
-  isCanceledApplicantsPending,
   isUpdatingAttendance,
   onAttend,
   onCancelAttendance,
+  pageState,
 }: AttendancePageContentProps): ReactElement => {
-  const waitingParticipants = sortParticipantsByRunnerType(
-    attendanceData?.waiting ?? [],
-  );
-  const attendedParticipants = sortParticipantsByRunnerType(
-    attendanceData?.attended ?? [],
-  );
-  const canceledParticipants = sortParticipantsByRunnerType(
-    canceledApplicantsData?.canceledApplicants ?? [],
-  );
-
-  if (!canFetchEventAttendance) {
-    return (
-      <Content>
-        <PanelState role="alert">잘못된 이벤트 주소입니다.</PanelState>
-      </Content>
-    );
+  switch (pageState.status) {
+    case 'invalid-event':
+      return (
+        <Content>
+          <PanelState role="alert">잘못된 이벤트 주소입니다.</PanelState>
+        </Content>
+      );
+    case 'permission-pending':
+      return (
+        <Content>
+          <PanelState role="status">이벤트 정보를 확인하는 중입니다.</PanelState>
+        </Content>
+      );
+    case 'permission-error':
+      return (
+        <Content>
+          <PanelState role="alert">
+            이벤트 정보를 불러오지 못했습니다.
+          </PanelState>
+        </Content>
+      );
+    case 'forbidden':
+      return (
+        <Content>
+          <PanelState role="alert">
+            출석 관리는 이벤트 주최자 또는 관리자만 접근할 수 있어요.
+          </PanelState>
+        </Content>
+      );
+    case 'attendance-pending':
+      return (
+        <Content>
+          <PanelState role="status">출석 정보를 불러오는 중입니다.</PanelState>
+        </Content>
+      );
+    case 'attendance-error':
+      return (
+        <Content>
+          <PanelState role="alert">
+            출석 정보를 불러오지 못했습니다.
+          </PanelState>
+        </Content>
+      );
+    case 'ready':
+      break;
   }
 
-  if (isPermissionPending) {
-    return (
-      <Content>
-        <PanelState role="status">이벤트 정보를 확인하는 중입니다.</PanelState>
-      </Content>
-    );
-  }
-
-  if (isPermissionError) {
-    return (
-      <Content>
-        <PanelState role="alert">
-          이벤트 정보를 불러오지 못했습니다.
-        </PanelState>
-      </Content>
-    );
-  }
-
-  if (!canManageAttendance) {
-    return (
-      <Content>
-        <PanelState role="alert">
-          출석 관리는 이벤트 주최자 또는 관리자만 접근할 수 있어요.
-        </PanelState>
-      </Content>
-    );
-  }
-
-  if (isAttendancePending) {
-    return (
-      <Content>
-        <PanelState role="status">출석 정보를 불러오는 중입니다.</PanelState>
-      </Content>
-    );
-  }
-
-  if (isAttendanceError || !attendanceData) {
-    return (
-      <Content>
-        <PanelState role="alert">출석 정보를 불러오지 못했습니다.</PanelState>
-      </Content>
-    );
-  }
+  const { attendance, canceledParticipants } = pageState;
+  const waitingParticipants = sortParticipantsByRunnerType(attendance.waiting);
+  const attendedParticipants = sortParticipantsByRunnerType(attendance.attended);
+  const canceledParticipantItems =
+    canceledParticipants.status === 'ready'
+      ? sortParticipantsByRunnerType(canceledParticipants.participants)
+      : [];
 
   return (
     <Content>
       <SectionStack>
         <AttendanceSection
-          count={attendanceData.summary.waitingCount}
+          count={attendance.summary.waitingCount}
           title="출석 대기"
         >
           <ParticipantList
@@ -146,7 +121,7 @@ export const AttendancePageContent = ({
         </AttendanceSection>
 
         <AttendanceSection
-          count={attendanceData.summary.attendedCount}
+          count={attendance.summary.attendedCount}
           hasDivider={true}
           title="출석 완료"
         >
@@ -165,24 +140,24 @@ export const AttendancePageContent = ({
         </AttendanceSection>
 
         <AttendanceSection
-          count={canceledParticipants.length}
+          count={canceledParticipantItems.length}
           hasDivider={true}
           title="취소한 참가자"
         >
-          {isCanceledApplicantsPending ? (
+          {canceledParticipants.status === 'pending' ? (
             <SectionState role="status">
               취소한 참가자를 불러오는 중입니다.
             </SectionState>
           ) : null}
-          {isCanceledApplicantsError ? (
+          {canceledParticipants.status === 'error' ? (
             <SectionState role="alert">
               취소한 참가자 명단을 불러오지 못했습니다.
             </SectionState>
           ) : null}
-          {!isCanceledApplicantsPending && !isCanceledApplicantsError ? (
+          {canceledParticipants.status === 'ready' ? (
             <ParticipantList
               emptyText={getAttendanceEmptyText('canceled')}
-              participants={canceledParticipants}
+              participants={canceledParticipantItems}
               renderParticipant={(participant) => (
                 <CanceledParticipantCard participant={participant} />
               )}

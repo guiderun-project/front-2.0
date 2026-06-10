@@ -10,15 +10,10 @@ import { useEventAttendancePage } from './useEventAttendancePage';
 export const EventAttendancePage = (): ReactElement => {
   const {
     announcement,
-    attendanceQuery,
+    attendancePageState,
     attendParticipant,
-    canFetchEventAttendance,
-    canManageAttendance,
     cancelAttendance,
-    canceledApplicantsQuery,
     handleBack,
-    isAttendancePermissionError,
-    isAttendancePermissionPending,
     isUpdatingAttendance,
   } = useEventAttendancePage();
 
@@ -26,14 +21,7 @@ export const EventAttendancePage = (): ReactElement => {
     <PageLayout background="bg.subtle">
       <FormPageLayout
         description={
-          <AttendanceLeadDescription
-            canFetchEventAttendance={canFetchEventAttendance}
-            canManageAttendance={canManageAttendance}
-            isAttendancePending={attendanceQuery.isPending}
-            isPermissionError={isAttendancePermissionError}
-            isPermissionPending={isAttendancePermissionPending}
-            summary={attendanceQuery.data?.summary}
-          />
+          <AttendanceLeadDescription pageState={attendancePageState} />
         }
         title={'출석할 참가자를\n선택해주세요'}
         topNavigation={{
@@ -46,19 +34,10 @@ export const EventAttendancePage = (): ReactElement => {
       >
         <AttendanceLiveRegion>{announcement}</AttendanceLiveRegion>
         <AttendancePageContent
-          attendanceData={attendanceQuery.data}
-          canFetchEventAttendance={canFetchEventAttendance}
-          canManageAttendance={canManageAttendance}
-          canceledApplicantsData={canceledApplicantsQuery.data}
-          isAttendanceError={attendanceQuery.isError}
-          isAttendancePending={attendanceQuery.isPending}
-          isPermissionError={isAttendancePermissionError}
-          isPermissionPending={isAttendancePermissionPending}
-          isCanceledApplicantsError={canceledApplicantsQuery.isError}
-          isCanceledApplicantsPending={canceledApplicantsQuery.isPending}
           isUpdatingAttendance={isUpdatingAttendance}
           onAttend={attendParticipant}
           onCancelAttendance={cancelAttendance}
+          pageState={attendancePageState}
         />
       </FormPageLayout>
     </PageLayout>

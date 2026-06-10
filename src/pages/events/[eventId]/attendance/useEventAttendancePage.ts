@@ -8,6 +8,10 @@ import { api } from '@/api/services';
 import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
 
+import type {
+  AttendancePageState,
+  CanceledAttendanceParticipantsState,
+} from './attendancePageState';
 import { eventDetailQueryKeys, getEventDetailViewerKey } from '../queryKeys';
 
 const attendanceQueryKeys = {
@@ -165,18 +169,60 @@ export const useEventAttendancePage = () => {
   const isUpdatingAttendance =
     attendMutation.isPending || cancelAttendanceMutation.isPending;
 
+  const canceledParticipantsState: CanceledAttendanceParticipantsState =
+    (() => {
+      if (canceledApplicantsQuery.isPending) {
+        return { status: 'pending' };
+      }
+
+      if (canceledApplicantsQuery.isError) {
+        return { status: 'error' };
+      }
+
+      return {
+        participants: canceledApplicantsQuery.data?.canceledApplicants ?? [],
+        status: 'ready',
+      };
+    })();
+
+  const attendancePageState: AttendancePageState = (() => {
+    if (!canFetchEventAttendance) {
+      return { status: 'invalid-event' };
+    }
+
+    if (isAttendancePermissionPending) {
+      return { status: 'permission-pending' };
+    }
+
+    if (isAttendancePermissionError) {
+      return { status: 'permission-error' };
+    }
+
+    if (!canManageAttendance) {
+      return { status: 'forbidden' };
+    }
+
+    if (attendanceQuery.isPending) {
+      return { status: 'attendance-pending' };
+    }
+
+    if (attendanceQuery.isError || !attendanceQuery.data) {
+      return { status: 'attendance-error' };
+    }
+
+    return {
+      attendance: attendanceQuery.data,
+      canceledParticipants: canceledParticipantsState,
+      status: 'ready',
+    };
+  })();
+
   return {
     announcement,
-    attendanceQuery,
+    attendancePageState,
     attendParticipant,
-    canFetchEventAttendance,
-    canManageAttendance,
     cancelAttendance,
-    canceledApplicantsQuery,
-    eventId,
     handleBack,
-    isAttendancePermissionError,
-    isAttendancePermissionPending,
     isUpdatingAttendance,
   };
 };
