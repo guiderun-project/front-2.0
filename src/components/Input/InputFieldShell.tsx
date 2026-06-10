@@ -168,7 +168,7 @@ export const InputFieldShell = <
         {clearable && hasValue && (
           <ClearButton
             aria-label={clearLabel}
-            color="icon.teritary"
+            color="icon.tertiary"
             icon="delete-filled"
             iconSize={CLEAR_ICON_SIZE}
             onClick={handleClear}

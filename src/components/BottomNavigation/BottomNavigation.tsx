@@ -44,7 +44,10 @@ export const BottomNavigation = ({
 
   return (
     <>
-      <Navigation aria-label={BOTTOM_NAVIGATION_ARIA_LABEL} className={className}>
+      <Navigation
+        aria-label={BOTTOM_NAVIGATION_ARIA_LABEL}
+        className={className}
+      >
         <NavigationTrack $activeIndex={activeIndex}>
           <ActivePill $isVisible={hasActiveItem} aria-hidden="true" />
           {BOTTOM_NAVIGATION_ITEMS.map((item, index) => {
@@ -63,7 +66,7 @@ export const BottomNavigation = ({
                 >
                   <Icon
                     aria-hidden="true"
-                    color="icon.teritary"
+                    color="icon.tertiary"
                     icon={item.inactiveIcon}
                     size={24}
                   />
@@ -78,7 +81,7 @@ export const BottomNavigation = ({
               <NavigationLink end={item.end} key={item.to} to={item.to}>
                 <Icon
                   aria-hidden="true"
-                  color={isActive ? "icon.primary" : "icon.teritary"}
+                  color={isActive ? "icon.primary" : "icon.tertiary"}
                   icon={isActive ? item.activeIcon : item.inactiveIcon}
                   size={24}
                 />

@@ -1,10 +1,10 @@
-import { Suspense, type ReactElement, type ReactNode } from 'react';
+import { Suspense, type ReactElement, type ReactNode } from "react";
 
-import { QueryErrorResetBoundary } from '@tanstack/react-query';
+import { QueryErrorResetBoundary } from "@tanstack/react-query";
 
-import { Button, ErrorBoundary } from '@/components';
+import { Button, ErrorBoundary } from "@/components";
 
-import { HomeSectionMessage } from './HomeSectionMessage';
+import { HomeSectionMessage } from "./HomeSectionMessage";
 
 type HomeSectionBoundaryProps = {
   loadingMessage: string;
@@ -12,11 +12,6 @@ type HomeSectionBoundaryProps = {
   children: ReactNode;
 };
 
-/**
- * 홈 섹션을 Suspense + ErrorBoundary로 감싸는 경계.
- * 로딩은 Suspense fallback, 에러는 ErrorBoundary fallback으로 처리하고,
- * react-query의 reset과 연결해 재시도를 지원한다.
- */
 export const HomeSectionBoundary = ({
   children,
   errorMessage,

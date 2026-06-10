@@ -1,21 +1,16 @@
-import { useState, type FormEvent, type ReactElement } from 'react';
+import { useState, type FormEvent, type ReactElement } from "react";
 
-import styled from '@emotion/styled';
-import { createSearchParams, useNavigate } from 'react-router-dom';
+import styled from "@emotion/styled";
+import { createSearchParams, useNavigate } from "react-router-dom";
 
-import { Icon } from '@/components';
-import { APP_PATH } from '@/router/path';
+import { Icon } from "@/components";
+import { APP_PATH } from "@/router/path";
 
-const SEARCH_PLACEHOLDER = '관심있는 모임을 찾아보세요';
+const SEARCH_PLACEHOLDER = "관심있는 모임을 찾아보세요";
 
-/**
- * 메인 상단 검색 바.
- * 입력한 키워드를 이벤트 검색 페이지로 전달하며 이동한다(빈 값이면 키워드 없이 이동).
- * 디자인상 별도 버튼 없이 좌측 아이콘 + 입력으로 구성하며, 제출은 Enter로 처리한다.
- */
 export const HomeSearchBar = (): ReactElement => {
   const navigate = useNavigate();
-  const [keyword, setKeyword] = useState('');
+  const [keyword, setKeyword] = useState("");
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -23,7 +18,7 @@ export const HomeSearchBar = (): ReactElement => {
     const trimmedKeyword = keyword.trim();
     const search = trimmedKeyword
       ? `?${createSearchParams({ keyword: trimmedKeyword }).toString()}`
-      : '';
+      : "";
 
     navigate(`${APP_PATH.EVENT_SEARCH}${search}`);
   };
@@ -46,60 +41,58 @@ export const HomeSearchBar = (): ReactElement => {
           setKeyword(event.target.value);
         }}
       />
-      {/* 시각적으로 숨긴 제출 버튼: Enter 제출과 스크린리더 명시적 제출을 보장 */}
       <VisuallyHiddenSubmit type="submit">검색</VisuallyHiddenSubmit>
     </SearchForm>
   );
 };
 
 const SearchForm = styled.form(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
+  display: "flex",
+  alignItems: "center",
   gap: theme.spacing.md,
-  width: '100%',
+  width: "100%",
   padding: `${theme.spacing.lg} ${theme.spacing.xl}`,
   border: `1px solid ${theme.color.border.subtle}`,
   borderRadius: theme.radius.full,
   backgroundColor: theme.color.bg.elevated,
-  boxSizing: 'border-box',
+  boxSizing: "border-box",
 
-  '&:focus-within': {
+  "&:focus-within": {
     outline: `2px solid ${theme.color.border.focused}`,
     outlineOffset: theme.spacing.xs,
   },
 }));
 
 const SearchInput = styled.input(({ theme }) => ({
-  flex: '1 1 auto',
+  flex: "1 1 auto",
   minWidth: 0,
-  border: 'none',
+  border: "none",
   padding: 0,
-  backgroundColor: 'transparent',
+  backgroundColor: "transparent",
   color: theme.color.text.primary,
-  fontFamily: theme.typography['body-m-m'].fontFamily,
-  fontSize: theme.typography['body-m-m'].fontSize,
-  fontWeight: theme.typography['body-m-m'].fontWeight,
-  letterSpacing: theme.typography['body-m-m'].letterSpacing,
-  lineHeight: theme.typography['body-m-m'].lineHeight,
+  fontFamily: theme.typography["body-m-m"].fontFamily,
+  fontSize: theme.typography["body-m-m"].fontSize,
+  fontWeight: theme.typography["body-m-m"].fontWeight,
+  letterSpacing: theme.typography["body-m-m"].letterSpacing,
+  lineHeight: theme.typography["body-m-m"].lineHeight,
 
-  '&::placeholder': {
+  "&::placeholder": {
     color: theme.color.text.tertiary,
   },
 
-  // 포커스 표시는 폼의 :focus-within으로 통일한다.
-  '&:focus': {
-    outline: 'none',
+  "&:focus": {
+    outline: "none",
   },
 }));
 
 const VisuallyHiddenSubmit = styled.button({
-  position: 'absolute',
-  width: '1px',
-  height: '1px',
-  margin: '-1px',
+  position: "absolute",
+  width: "1px",
+  height: "1px",
+  margin: "-1px",
   padding: 0,
   border: 0,
-  overflow: 'hidden',
-  clipPath: 'inset(50%)',
-  whiteSpace: 'nowrap',
+  overflow: "hidden",
+  clipPath: "inset(50%)",
+  whiteSpace: "nowrap",
 });
