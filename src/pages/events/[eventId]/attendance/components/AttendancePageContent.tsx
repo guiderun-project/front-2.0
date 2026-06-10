@@ -20,9 +20,9 @@ type AttendanceMessageContentProps = {
 
 type AttendanceReadyContentProps = {
   isUpdatingAttendance: boolean;
+  pageState: AttendanceReadyState;
   onAttend: (participant: AttendanceParticipant) => void;
   onCancelAttendance: (participant: AttendanceParticipant) => void;
-  pageState: AttendanceReadyState;
 };
 
 type AttendancePageContentProps =
@@ -87,17 +87,17 @@ export const AttendancePageContent = (
             renderParticipant={(participant) => (
               <ParticipantActionCard
                 disabled={isUpdatingAttendance}
-                onAction={onAttend}
                 participant={participant}
                 status="waiting"
+                onAction={onAttend}
               />
             )}
           />
         </AttendanceSection>
 
         <AttendanceSection
-          count={attendance.summary.attendedCount}
           hasDivider={true}
+          count={attendance.summary.attendedCount}
           title="출석 완료"
         >
           <ParticipantList
@@ -106,17 +106,17 @@ export const AttendancePageContent = (
             renderParticipant={(participant) => (
               <ParticipantActionCard
                 disabled={isUpdatingAttendance}
-                onAction={onCancelAttendance}
                 participant={participant}
                 status="attended"
+                onAction={onCancelAttendance}
               />
             )}
           />
         </AttendanceSection>
 
         <AttendanceSection
-          count={canceledParticipantItems.length}
           hasDivider={true}
+          count={canceledParticipantItems.length}
           title="취소한 참가자"
         >
           <ParticipantList

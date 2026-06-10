@@ -33,8 +33,8 @@ export const EventAttendancePage = (): ReactElement => {
   if (eventId === null) {
     return (
       <AttendanceMessagePage
-        onBack={onBack}
         pageState={INVALID_EVENT_STATE}
+        onBack={onBack}
       />
     );
   }
@@ -42,8 +42,8 @@ export const EventAttendancePage = (): ReactElement => {
   if (!isAuthReady) {
     return (
       <AttendanceMessagePage
-        onBack={onBack}
         pageState={EVENT_CHECKING_STATE}
+        onBack={onBack}
       />
     );
   }

@@ -38,8 +38,8 @@ export const AttendancePermissionGate = ({
   if (!canManageAttendance) {
     return (
       <AttendanceMessagePage
-        onBack={onBack}
         pageState={FORBIDDEN_STATE}
+        onBack={onBack}
       />
     );
   }

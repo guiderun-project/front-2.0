@@ -11,16 +11,16 @@ type AttendanceActionStatus = 'waiting' | 'attended';
 
 type ParticipantActionCardProps = {
   disabled: boolean;
-  onAction: (participant: AttendanceParticipant) => void;
   participant: AttendanceParticipant;
   status: AttendanceActionStatus;
+  onAction: (participant: AttendanceParticipant) => void;
 };
 
 export const ParticipantActionCard = ({
   disabled,
-  onAction,
   participant,
   status,
+  onAction,
 }: ParticipantActionCardProps): ReactElement => {
   const participantInfoId = useId();
   const actionLabel = status === 'waiting' ? '출석하기' : '출석취소';
@@ -29,8 +29,8 @@ export const ParticipantActionCard = ({
     <ParticipantCard>
       <ParticipantInfo id={participantInfoId} participant={participant} />
       <Button
-        aria-describedby={participantInfoId}
         disabled={disabled}
+        aria-describedby={participantInfoId}
         level={status === 'waiting' ? 'primary' : 'quaternary'}
         size="s"
         onClick={() => {

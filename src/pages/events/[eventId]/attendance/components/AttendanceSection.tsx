@@ -5,16 +5,16 @@ import styled from '@emotion/styled';
 import { Text } from '@/components';
 
 type AttendanceSectionProps = {
+  hasDivider?: boolean;
   children: ReactNode;
   count: number;
-  hasDivider?: boolean;
   title: string;
 };
 
 export const AttendanceSection = ({
+  hasDivider = false,
   children,
   count,
-  hasDivider = false,
   title,
 }: AttendanceSectionProps): ReactElement => {
   const titleId = useId();

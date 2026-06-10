@@ -35,9 +35,9 @@ export const AttendanceReadyPage = ({
       </HiddenText>
       <AttendancePageContent
         isUpdatingAttendance={isUpdatingAttendance}
+        pageState={attendancePageState}
         onAttend={attendParticipant}
         onCancelAttendance={cancelAttendance}
-        pageState={attendancePageState}
       />
     </AttendancePageShell>
   );

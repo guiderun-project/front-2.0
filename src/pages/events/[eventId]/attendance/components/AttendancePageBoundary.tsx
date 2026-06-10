@@ -26,8 +26,8 @@ export const AttendancePageBoundary = ({
         <ErrorBoundary
           fallback={
             <AttendanceMessagePage
-              onBack={onBack}
               pageState={errorState}
+              onBack={onBack}
             />
           }
           onReset={reset}
@@ -35,8 +35,8 @@ export const AttendancePageBoundary = ({
           <Suspense
             fallback={
               <AttendanceMessagePage
-                onBack={onBack}
                 pageState={loadingState}
+                onBack={onBack}
               />
             }
           >
