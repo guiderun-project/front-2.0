@@ -7,7 +7,6 @@ import type { AttendanceParticipant } from '@/api/types';
 import type { AttendancePageState } from '../attendancePageState';
 import { AttendanceSection } from './AttendanceSection';
 import { PanelState, SectionState } from './AttendanceStates';
-import { getAttendanceEmptyText } from './attendanceLabels';
 import { CanceledParticipantCard } from './CanceledParticipantCard';
 import { ParticipantActionCard } from './ParticipantActionCard';
 import { ParticipantList } from './ParticipantList';
@@ -27,6 +26,12 @@ const PARTICIPANT_TYPE_ORDER: Record<AttendanceParticipant['type'], number> = {
   VI: 0,
   GUIDE: 1,
 };
+
+const ATTENDANCE_EMPTY_TEXT = {
+  attended: '출석 완료된 참가자가 없어요',
+  canceled: '취소한 참가자가 없어요',
+  waiting: '출석 대기 중인 참가자가 없어요',
+} as const;
 
 const sortParticipantsByRunnerType = <TParticipant extends ParticipantWithRunnerType>(
   participants: TParticipant[],
@@ -107,7 +112,7 @@ export const AttendancePageContent = ({
           title="출석 대기"
         >
           <ParticipantList
-            emptyText={getAttendanceEmptyText('waiting')}
+            emptyText={ATTENDANCE_EMPTY_TEXT.waiting}
             participants={waitingParticipants}
             renderParticipant={(participant) => (
               <ParticipantActionCard
@@ -126,7 +131,7 @@ export const AttendancePageContent = ({
           title="출석 완료"
         >
           <ParticipantList
-            emptyText={getAttendanceEmptyText('attended')}
+            emptyText={ATTENDANCE_EMPTY_TEXT.attended}
             participants={attendedParticipants}
             renderParticipant={(participant) => (
               <ParticipantActionCard
@@ -156,7 +161,7 @@ export const AttendancePageContent = ({
           ) : null}
           {canceledParticipants.status === 'ready' ? (
             <ParticipantList
-              emptyText={getAttendanceEmptyText('canceled')}
+              emptyText={ATTENDANCE_EMPTY_TEXT.canceled}
               participants={canceledParticipantItems}
               renderParticipant={(participant) => (
                 <CanceledParticipantCard participant={participant} />

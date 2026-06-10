@@ -5,8 +5,6 @@ import styled from '@emotion/styled';
 import type { AttendanceParticipant } from '@/api/types';
 import { Badge, HiddenText, RunnerTypeAvatar, Text } from '@/components';
 
-import { RUNNER_TYPE_LABEL } from './attendanceLabels';
-
 type ParticipantInfoData = Pick<AttendanceParticipant, 'name' | 'type'> & {
   isFirstParticipation?: boolean;
 };
@@ -15,6 +13,11 @@ type ParticipantInfoProps = {
   id?: string;
   participant: ParticipantInfoData;
 };
+
+const RUNNER_TYPE_LABEL = {
+  VI: '시각장애러너',
+  GUIDE: '가이드러너',
+} as const satisfies Record<ParticipantInfoData['type'], string>;
 
 export const ParticipantInfo = ({
   id,

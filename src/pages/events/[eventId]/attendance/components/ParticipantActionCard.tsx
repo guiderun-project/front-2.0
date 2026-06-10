@@ -5,18 +5,26 @@ import styled from '@emotion/styled';
 import type { AttendanceParticipant } from '@/api/types';
 import { Button, HiddenText } from '@/components';
 
-import {
-  ATTENDANCE_ACTION_LABEL,
-  PARTICIPANT_STATUS_LABEL,
-} from './attendanceLabels';
 import { ParticipantInfo } from './ParticipantInfo';
+
+type AttendanceActionStatus = 'waiting' | 'attended';
 
 type ParticipantActionCardProps = {
   disabled: boolean;
   onAction: (participant: AttendanceParticipant) => void;
   participant: AttendanceParticipant;
-  status: keyof typeof ATTENDANCE_ACTION_LABEL;
+  status: AttendanceActionStatus;
 };
+
+const ATTENDANCE_ACTION_LABEL = {
+  waiting: '출석하기',
+  attended: '출석취소',
+} as const satisfies Record<AttendanceActionStatus, string>;
+
+const PARTICIPANT_STATUS_LABEL = {
+  waiting: '출석 대기 상태',
+  attended: '출석 완료 상태',
+} as const satisfies Record<AttendanceActionStatus, string>;
 
 export const ParticipantActionCard = ({
   disabled,
