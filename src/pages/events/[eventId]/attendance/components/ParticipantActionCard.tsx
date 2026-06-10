@@ -1,14 +1,12 @@
-import type { ReactElement } from 'react';
+import { useId, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
 import type { AttendanceParticipant } from '@/api/types';
-import { Button } from '@/components';
+import { Button, HiddenText } from '@/components';
 
 import {
   ATTENDANCE_ACTION_LABEL,
-  getAttendanceParticipantSummaryLabel,
-  PARTICIPANT_ACTION_LABEL,
   PARTICIPANT_STATUS_LABEL,
 } from './attendanceLabels';
 import { ParticipantInfo } from './ParticipantInfo';
@@ -20,23 +18,19 @@ type ParticipantActionCardProps = {
   status: keyof typeof ATTENDANCE_ACTION_LABEL;
 };
 
-const getAttendanceActionLabel = (
-  participant: AttendanceParticipant,
-  status: keyof typeof ATTENDANCE_ACTION_LABEL,
-): string =>
-  `${getAttendanceParticipantSummaryLabel(participant)}, ${PARTICIPANT_STATUS_LABEL[status]}. ${PARTICIPANT_ACTION_LABEL[status]}`;
-
 export const ParticipantActionCard = ({
   disabled,
   onAction,
   participant,
   status,
 }: ParticipantActionCardProps): ReactElement => {
+  const participantInfoId = useId();
+
   return (
     <ParticipantCard>
-      <ParticipantInfo participant={participant} />
+      <ParticipantInfo id={participantInfoId} participant={participant} />
       <Button
-        aria-label={getAttendanceActionLabel(participant, status)}
+        aria-describedby={participantInfoId}
         disabled={disabled}
         level={status === 'waiting' ? 'primary' : 'quaternary'}
         size="s"
@@ -44,6 +38,7 @@ export const ParticipantActionCard = ({
           onAction(participant);
         }}
       >
+        <HiddenText>{PARTICIPANT_STATUS_LABEL[status]}. </HiddenText>
         {ATTENDANCE_ACTION_LABEL[status]}
       </Button>
     </ParticipantCard>

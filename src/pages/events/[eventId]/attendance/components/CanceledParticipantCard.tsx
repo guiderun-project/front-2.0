@@ -4,7 +4,6 @@ import styled from '@emotion/styled';
 
 import type { CanceledApplicant } from '@/api/types/application';
 
-import { getAttendanceParticipantSummaryLabel } from './attendanceLabels';
 import { ParticipantInfo } from './ParticipantInfo';
 
 type CanceledParticipantCardProps = {
@@ -15,7 +14,7 @@ export const CanceledParticipantCard = ({
   participant,
 }: CanceledParticipantCardProps): ReactElement => {
   return (
-    <CanceledCard aria-label={getAttendanceParticipantSummaryLabel(participant)}>
+    <CanceledCard>
       <ParticipantInfo participant={participant} />
     </CanceledCard>
   );

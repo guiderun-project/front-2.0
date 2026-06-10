@@ -3,21 +3,25 @@ import type { ReactElement } from 'react';
 import styled from '@emotion/styled';
 
 import type { AttendanceParticipant } from '@/api/types';
-import { Badge, RunnerTypeAvatar, Text } from '@/components';
+import { Badge, HiddenText, RunnerTypeAvatar, Text } from '@/components';
+
+import { RUNNER_TYPE_LABEL } from './attendanceLabels';
 
 type ParticipantInfoData = Pick<AttendanceParticipant, 'name' | 'type'> & {
   isFirstParticipation?: boolean;
 };
 
 type ParticipantInfoProps = {
+  id?: string;
   participant: ParticipantInfoData;
 };
 
 export const ParticipantInfo = ({
+  id,
   participant,
 }: ParticipantInfoProps): ReactElement => {
   return (
-    <ParticipantInfoRoot>
+    <ParticipantInfoRoot id={id}>
       <AvatarSlot aria-hidden={true}>
         <RunnerTypeAvatar
           size="m"
@@ -27,6 +31,7 @@ export const ParticipantInfo = ({
       <ParticipantName color="text.primary" font="body-m-sb">
         {participant.name}
       </ParticipantName>
+      <HiddenText>{RUNNER_TYPE_LABEL[participant.type]}</HiddenText>
       {participant.isFirstParticipation ? (
         <Badge size="s" tone="cyan">
           첫참여
