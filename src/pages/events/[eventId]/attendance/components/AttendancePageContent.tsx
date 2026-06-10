@@ -15,9 +15,12 @@ import { ParticipantList } from './ParticipantList';
 type AttendancePageContentProps = {
   attendanceData?: EventAttendanceResponse;
   canFetchEventAttendance: boolean;
+  canManageAttendance: boolean;
   canceledApplicantsData?: EventCanceledApplicantListResponse;
   isAttendanceError: boolean;
   isAttendancePending: boolean;
+  isPermissionError: boolean;
+  isPermissionPending: boolean;
   isCanceledApplicantsError: boolean;
   isCanceledApplicantsPending: boolean;
   isUpdatingAttendance: boolean;
@@ -47,9 +50,12 @@ const sortParticipantsByRunnerType = <TParticipant extends ParticipantWithRunner
 export const AttendancePageContent = ({
   attendanceData,
   canFetchEventAttendance,
+  canManageAttendance,
   canceledApplicantsData,
   isAttendanceError,
   isAttendancePending,
+  isPermissionError,
+  isPermissionPending,
   isCanceledApplicantsError,
   isCanceledApplicantsPending,
   isUpdatingAttendance,
@@ -70,6 +76,34 @@ export const AttendancePageContent = ({
     return (
       <Content>
         <PanelState role="alert">잘못된 이벤트 주소입니다.</PanelState>
+      </Content>
+    );
+  }
+
+  if (isPermissionPending) {
+    return (
+      <Content>
+        <PanelState role="status">이벤트 정보를 확인하는 중입니다.</PanelState>
+      </Content>
+    );
+  }
+
+  if (isPermissionError) {
+    return (
+      <Content>
+        <PanelState role="alert">
+          이벤트 정보를 불러오지 못했습니다.
+        </PanelState>
+      </Content>
+    );
+  }
+
+  if (!canManageAttendance) {
+    return (
+      <Content>
+        <PanelState role="alert">
+          출석 관리는 이벤트 주최자 또는 관리자만 접근할 수 있어요.
+        </PanelState>
       </Content>
     );
   }

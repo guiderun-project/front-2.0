@@ -5,7 +5,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import type { AttendanceParticipant } from '@/api/types';
 import { api } from '@/api/services';
+import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
+
+import { eventDetailQueryKeys, getEventDetailViewerKey } from '../queryKeys';
 
 const attendanceQueryKeys = {
   root: ['event', 'attendance'] as const,
@@ -30,9 +33,33 @@ export const useEventAttendancePage = () => {
   const { eventId: eventIdParam } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { isAuthReady, user } = useAuth();
   const eventId = getValidEventId(eventIdParam);
   const canFetchEventAttendance = eventId !== null;
+  const viewerKey = getEventDetailViewerKey(user?.userId);
   const [announcement, setAnnouncement] = useState('');
+
+  const eventDetailQuery = useQuery({
+    queryKey: eventDetailQueryKeys.detail(eventId ?? 0, viewerKey),
+    queryFn: () => {
+      if (eventId === null) {
+        throw new Error('Event ID is invalid.');
+      }
+
+      return api.event.detailGet({ eventId });
+    },
+    enabled: canFetchEventAttendance && isAuthReady,
+  });
+
+  const event = eventDetailQuery.data ?? null;
+  const canManageAttendance =
+    event !== null &&
+    user !== null &&
+    (event.viewer?.isOrganizer === true || user.role === 'ROLE_ADMIN');
+  const isAttendancePermissionPending =
+    canFetchEventAttendance && (!isAuthReady || eventDetailQuery.isPending);
+  const isAttendancePermissionError =
+    canFetchEventAttendance && eventDetailQuery.isError;
 
   const attendanceQuery = useQuery({
     queryKey: attendanceQueryKeys.status(eventId ?? 0),
@@ -43,7 +70,7 @@ export const useEventAttendancePage = () => {
 
       return api.attendance.statusGet({ eventId });
     },
-    enabled: canFetchEventAttendance,
+    enabled: canManageAttendance,
   });
 
   const canceledApplicantsQuery = useQuery({
@@ -55,7 +82,7 @@ export const useEventAttendancePage = () => {
 
       return api.application.canceledApplicantsGet({ eventId });
     },
-    enabled: canFetchEventAttendance,
+    enabled: canManageAttendance,
   });
 
   const invalidateAttendanceStatus = async () => {
@@ -70,8 +97,8 @@ export const useEventAttendancePage = () => {
 
   const attendMutation = useMutation({
     mutationFn: ({ userId }: AttendanceMutationInput) => {
-      if (eventId === null) {
-        throw new Error('Event ID is invalid.');
+      if (eventId === null || !canManageAttendance) {
+        throw new Error('Attendance permission is required.');
       }
 
       return api.attendance.attendPost({ eventId, userId });
@@ -87,8 +114,8 @@ export const useEventAttendancePage = () => {
 
   const cancelAttendanceMutation = useMutation({
     mutationFn: ({ userId }: AttendanceMutationInput) => {
-      if (eventId === null) {
-        throw new Error('Event ID is invalid.');
+      if (eventId === null || !canManageAttendance) {
+        throw new Error('Attendance permission is required.');
       }
 
       return api.attendance.attendDelete({ eventId, userId });
@@ -112,6 +139,11 @@ export const useEventAttendancePage = () => {
   };
 
   const attendParticipant = (participant: AttendanceParticipant) => {
+    if (!canManageAttendance) {
+      setAnnouncement('출석 관리는 이벤트 주최자 또는 관리자만 가능해요.');
+      return;
+    }
+
     attendMutation.mutate({
       participantName: participant.name,
       userId: participant.userId,
@@ -119,6 +151,11 @@ export const useEventAttendancePage = () => {
   };
 
   const cancelAttendance = (participant: AttendanceParticipant) => {
+    if (!canManageAttendance) {
+      setAnnouncement('출석 관리는 이벤트 주최자 또는 관리자만 가능해요.');
+      return;
+    }
+
     cancelAttendanceMutation.mutate({
       participantName: participant.name,
       userId: participant.userId,
@@ -133,10 +170,13 @@ export const useEventAttendancePage = () => {
     attendanceQuery,
     attendParticipant,
     canFetchEventAttendance,
+    canManageAttendance,
     cancelAttendance,
     canceledApplicantsQuery,
     eventId,
     handleBack,
+    isAttendancePermissionError,
+    isAttendancePermissionPending,
     isUpdatingAttendance,
   };
 };

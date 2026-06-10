@@ -13,9 +13,12 @@ export const EventAttendancePage = (): ReactElement => {
     attendanceQuery,
     attendParticipant,
     canFetchEventAttendance,
+    canManageAttendance,
     cancelAttendance,
     canceledApplicantsQuery,
     handleBack,
+    isAttendancePermissionError,
+    isAttendancePermissionPending,
     isUpdatingAttendance,
   } = useEventAttendancePage();
 
@@ -25,7 +28,10 @@ export const EventAttendancePage = (): ReactElement => {
         description={
           <AttendanceLeadDescription
             canFetchEventAttendance={canFetchEventAttendance}
-            isPending={attendanceQuery.isPending}
+            canManageAttendance={canManageAttendance}
+            isAttendancePending={attendanceQuery.isPending}
+            isPermissionError={isAttendancePermissionError}
+            isPermissionPending={isAttendancePermissionPending}
             summary={attendanceQuery.data?.summary}
           />
         }
@@ -42,9 +48,12 @@ export const EventAttendancePage = (): ReactElement => {
         <AttendancePageContent
           attendanceData={attendanceQuery.data}
           canFetchEventAttendance={canFetchEventAttendance}
+          canManageAttendance={canManageAttendance}
           canceledApplicantsData={canceledApplicantsQuery.data}
           isAttendanceError={attendanceQuery.isError}
           isAttendancePending={attendanceQuery.isPending}
+          isPermissionError={isAttendancePermissionError}
+          isPermissionPending={isAttendancePermissionPending}
           isCanceledApplicantsError={canceledApplicantsQuery.isError}
           isCanceledApplicantsPending={canceledApplicantsQuery.isPending}
           isUpdatingAttendance={isUpdatingAttendance}

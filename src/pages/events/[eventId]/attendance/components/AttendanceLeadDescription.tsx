@@ -4,7 +4,10 @@ import styled from '@emotion/styled';
 
 type AttendanceLeadDescriptionProps = {
   canFetchEventAttendance: boolean;
-  isPending: boolean;
+  canManageAttendance: boolean;
+  isAttendancePending: boolean;
+  isPermissionError: boolean;
+  isPermissionPending: boolean;
   summary?: {
     attendedCount: number;
     waitingCount: number;
@@ -13,14 +16,29 @@ type AttendanceLeadDescriptionProps = {
 
 export const AttendanceLeadDescription = ({
   canFetchEventAttendance,
-  isPending,
+  canManageAttendance,
+  isAttendancePending,
+  isPermissionError,
+  isPermissionPending,
   summary,
 }: AttendanceLeadDescriptionProps): ReactNode => {
   if (!canFetchEventAttendance) {
     return '이벤트 정보를 확인할 수 없어요';
   }
 
-  if (isPending || !summary) {
+  if (isPermissionPending) {
+    return '이벤트 정보를 확인하는 중입니다';
+  }
+
+  if (isPermissionError) {
+    return '이벤트 정보를 확인할 수 없어요';
+  }
+
+  if (!canManageAttendance) {
+    return '출석 관리는 주최자 또는 관리자만 가능해요';
+  }
+
+  if (isAttendancePending || !summary) {
     return '출석 정보를 불러오는 중입니다';
   }
 
