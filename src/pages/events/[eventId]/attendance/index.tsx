@@ -1,9 +1,8 @@
 import type { ReactElement } from 'react';
 
-import { FormPageLayout, PageLayout } from '@/components';
+import { FormPageLayout, HiddenText, PageLayout } from '@/components';
 
 import { AttendanceLeadDescription } from './components/AttendanceLeadDescription';
-import { AttendanceLiveRegion } from './components/AttendanceLiveRegion';
 import { AttendancePageContent } from './components/AttendancePageContent';
 import { useEventAttendancePage } from './useEventAttendancePage';
 
@@ -32,7 +31,9 @@ export const EventAttendancePage = (): ReactElement => {
           },
         }}
       >
-        <AttendanceLiveRegion>{announcement}</AttendanceLiveRegion>
+        <HiddenText aria-live="polite" role="status">
+          {announcement}
+        </HiddenText>
         <AttendancePageContent
           isUpdatingAttendance={isUpdatingAttendance}
           onAttend={attendParticipant}
