@@ -17,8 +17,10 @@ import {
   createEventFromRequest,
   createPage,
   findEvent,
+  findUser,
   getCurrentUser,
   type MockEvent,
+  type MockUser,
   mockDb,
   toEventDetail,
   toEventListItem,
@@ -35,8 +37,62 @@ import {
 
 const today = '2026-05-22';
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+const toLocalDate = (date: string) => {
+  const [year, month, day] = date.split('-').map(Number);
+
+  return new Date(year, month - 1, day).getTime();
+};
+
+// 시작일까지 남은 일수(당일 0, 내일 1). 음수는 0으로 보정한다.
+const getDday = (date: string) =>
+  Math.max(0, Math.round((toLocalDate(date) - toLocalDate(today)) / DAY_MS));
+
 const getVisibleEvents = () => {
   return mockDb.events.filter((event) => !event.deleted && !event.isPrivate);
+};
+
+const getMyPartners = (
+  eventId: number,
+  user: MockUser,
+): Array<{ type: MockUser['type']; name: string }> | null => {
+  const matching = mockDb.matchings.find(
+    (item) =>
+      item.eventId === eventId &&
+      (item.viId === user.userId || item.guideIds.includes(user.userId)),
+  );
+
+  if (!matching) {
+    return null;
+  }
+
+  const partnerIds = user.type === 'VI' ? matching.guideIds : [matching.viId];
+  const partners = partnerIds
+    .map((id) => findUser(id))
+    .filter((partner): partner is MockUser => partner !== undefined)
+    .map((partner) => ({ type: partner.type, name: partner.name }));
+
+  return partners.length > 0 ? partners : null;
+};
+
+const WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
+
+const formatKoreanTime = (time: string) => {
+  const [hour, minute] = time.split(':').map(Number);
+  const period = hour < 12 ? '오전' : '오후';
+  const hour12 = hour % 12 === 0 ? 12 : hour % 12;
+
+  return minute === 0
+    ? `${period} ${hour12}시`
+    : `${period} ${hour12}시 ${minute}분`;
+};
+
+const formatScheduleText = (schedule: MockEvent['schedule']) => {
+  const [year, month, day] = schedule.date.split('-').map(Number);
+  const weekday = WEEKDAY_LABELS[new Date(year, month - 1, day).getDay()];
+
+  return `${year}년 ${month}월 ${day}일 (${weekday}) ${formatKoreanTime(schedule.startTime)} ~ ${formatKoreanTime(schedule.endTime)}`;
 };
 
 const filterEventList = (query: EventListGetRequest) => {
@@ -171,7 +227,7 @@ export const eventHandlers: HttpHandler[] = [
           .map((event) => ({
             id: event.eventId,
             name: event.name,
-            dDay: 10,
+            dDay: getDday(event.schedule.date),
             date: event.schedule.date,
           })),
       });
@@ -191,10 +247,10 @@ export const eventHandlers: HttpHandler[] = [
         .map((event) => ({
           id: event.eventId,
           name: event.name,
-          dDay: 10,
+          dDay: getDday(event.schedule.date),
           place: event.place,
-          scheduleText: event.schedule.dateText,
-          myPartner: null,
+          scheduleText: formatScheduleText(event.schedule),
+          myPartner: getMyPartners(event.eventId, currentUser),
         })),
     });
   }),

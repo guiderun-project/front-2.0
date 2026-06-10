@@ -132,7 +132,7 @@ export const CommentsSection = (): ReactElement => {
           <CommentEmptyState>
             <Icon
               aria-hidden={true}
-              color="icon.teritary"
+              color="icon.tertiary"
               icon="alert-circle-filled"
               size={48}
             />

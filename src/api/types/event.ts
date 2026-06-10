@@ -39,10 +39,10 @@ export type UpcomingEventsGetResponse =
         dDay: number;
         place: string;
         scheduleText: string;
-        myPartner: {
+        myPartner: Array<{
           type: UserType;
           name: string;
-        } | null;
+        }> | null;
       }>;
     };
 
