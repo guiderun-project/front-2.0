@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import styled from '@emotion/styled';
+import { Text } from '@/components';
 
 import type { AttendancePageState } from '../attendancePageState';
 
@@ -30,19 +30,12 @@ export const AttendanceLeadDescription = ({
   const leadCount = pageState.attendance.summary.waitingCount;
 
   return (
-    <LeadText>
-      현재 <LeadCount>{leadCount}명</LeadCount>이 출석 대기중이에요
-    </LeadText>
+    <Text as="span" color="text.tertiary" font="body-m-sb">
+      현재{' '}
+      <Text as="span" color="text.brand" font="body-m-sb">
+        {leadCount}명
+      </Text>
+      이 출석 대기중이에요
+    </Text>
   );
 };
-
-const LeadText = styled.span(({ theme }) => ({
-  display: 'inline',
-  color: theme.color.text.tertiary,
-  fontWeight: theme.fontWeight.semibold,
-  whiteSpace: 'normal',
-}));
-
-const LeadCount = styled.span(({ theme }) => ({
-  color: theme.color.text.brand,
-}));

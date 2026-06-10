@@ -1,24 +1,45 @@
-import type { ReactElement, ReactNode } from 'react';
+import type { ComponentPropsWithoutRef, ReactElement, ReactNode } from 'react';
 
 import styled from '@emotion/styled';
 
 import { Icon, Text } from '@/components';
 
-export const PanelState = styled.p(({ theme }) => ({
+type StateTextProps = Omit<
+  ComponentPropsWithoutRef<'p'>,
+  'align' | 'as' | 'color' | 'font'
+>;
+
+export const PanelState = (props: StateTextProps): ReactElement => {
+  return (
+    <PanelStateText
+      align="center"
+      as="p"
+      color="text.tertiary"
+      font="body-m-m"
+      {...props}
+    />
+  );
+};
+
+export const SectionState = (props: StateTextProps): ReactElement => {
+  return (
+    <SectionStateText
+      as="p"
+      color="text.tertiary"
+      font="body-m-m"
+      {...props}
+    />
+  );
+};
+
+const PanelStateText = styled(Text)(({ theme }) => ({
   display: 'grid',
   minHeight: theme.pxToRem(160),
   placeItems: 'center',
-  margin: 0,
-  color: theme.color.text.tertiary,
-  textAlign: 'center',
-  ...theme.typography['body-m-m'],
 }));
 
-export const SectionState = styled.p(({ theme }) => ({
-  margin: 0,
+const SectionStateText = styled(Text)(({ theme }) => ({
   padding: `${theme.spacing.lg} ${theme.spacing.none}`,
-  color: theme.color.text.tertiary,
-  ...theme.typography['body-m-m'],
 }));
 
 type SectionEmptyStateProps = {
