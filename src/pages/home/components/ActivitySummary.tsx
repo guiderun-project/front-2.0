@@ -25,10 +25,7 @@ export const ActivitySummary = (): ReactElement => {
     return (
       <Section aria-labelledby={headingId}>
         <HeadlineRow>
-          <Headline
-            aria-label={`${user.name}님은 ${MEMBER_HEADLINE_SUBTITLE}`}
-            id={headingId}
-          >
+          <Headline id={headingId}>
             <NameLine>
               <Text as="span" color="text.primary" font="heading-m-sb">
                 {user.name}님
@@ -67,7 +64,7 @@ export const ActivitySummary = (): ReactElement => {
   return (
     <Section aria-labelledby={headingId}>
       <HeadlineRow>
-        <Headline aria-label="올해도 러너들은 열심히 달리고 있어요" id={headingId}>
+        <Headline id={headingId}>
           <TitleLine>
             <Text as="span" color="text.primary" font="heading-m-r">
               올해도
