@@ -5,6 +5,11 @@ export type UpcomingGuestEvent = Extract<
   { viewerType: 'GUEST' }
 >['items'][number];
 
+export type UpcomingMemberEvent = Extract<
+  UpcomingEventsGetResponse,
+  { viewerType: 'MEMBER' }
+>['items'][number];
+
 const WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'] as const;
 
 const pad2 = (value: number) => String(value).padStart(2, '0');
