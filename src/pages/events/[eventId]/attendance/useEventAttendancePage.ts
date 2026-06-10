@@ -108,11 +108,11 @@ export const useEventAttendancePage = () => {
       return api.attendance.attendPost({ eventId, userId });
     },
     onSuccess: async (_, participant) => {
-      setAnnouncement(`${participant.participantName}님을 출석 처리했습니다.`);
+      setAnnouncement(`${participant.participantName}님을 출석 처리했어요.`);
       await invalidateAttendanceStatus();
     },
     onError: (_, participant) => {
-      setAnnouncement(`${participant.participantName}님 출석 처리에 실패했습니다.`);
+      setAnnouncement(`${participant.participantName}님 출석 처리에 실패했어요.`);
     },
   });
 
@@ -125,11 +125,11 @@ export const useEventAttendancePage = () => {
       return api.attendance.attendDelete({ eventId, userId });
     },
     onSuccess: async (_, participant) => {
-      setAnnouncement(`${participant.participantName}님 출석을 취소했습니다.`);
+      setAnnouncement(`${participant.participantName}님 출석을 취소했어요.`);
       await invalidateAttendanceStatus();
     },
     onError: (_, participant) => {
-      setAnnouncement(`${participant.participantName}님 출석 취소에 실패했습니다.`);
+      setAnnouncement(`${participant.participantName}님 출석 취소에 실패했어요.`);
     },
   });
 

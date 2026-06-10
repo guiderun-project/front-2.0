@@ -48,20 +48,20 @@ export const AttendancePageContent = ({
     case 'invalid-event':
       return (
         <Content>
-          <PanelState role="alert">잘못된 이벤트 주소입니다.</PanelState>
+          <PanelState role="alert">잘못된 이벤트 주소예요.</PanelState>
         </Content>
       );
     case 'permission-pending':
       return (
         <Content>
-          <PanelState role="status">이벤트 정보를 확인하는 중입니다.</PanelState>
+          <PanelState role="status">이벤트 정보를 확인하고 있어요.</PanelState>
         </Content>
       );
     case 'permission-error':
       return (
         <Content>
           <PanelState role="alert">
-            이벤트 정보를 불러오지 못했습니다.
+            이벤트 정보를 불러오지 못했어요.
           </PanelState>
         </Content>
       );
@@ -76,14 +76,14 @@ export const AttendancePageContent = ({
     case 'attendance-pending':
       return (
         <Content>
-          <PanelState role="status">출석 정보를 불러오는 중입니다.</PanelState>
+          <PanelState role="status">출석 정보를 불러오고 있어요.</PanelState>
         </Content>
       );
     case 'attendance-error':
       return (
         <Content>
           <PanelState role="alert">
-            출석 정보를 불러오지 못했습니다.
+            출석 정보를 불러오지 못했어요.
           </PanelState>
         </Content>
       );
@@ -146,12 +146,12 @@ export const AttendancePageContent = ({
         >
           {canceledParticipants.status === 'pending' ? (
             <SectionState role="status">
-              취소한 참가자를 불러오는 중입니다.
+              취소한 참가자를 불러오고 있어요.
             </SectionState>
           ) : null}
           {canceledParticipants.status === 'error' ? (
             <SectionState role="alert">
-              취소한 참가자 명단을 불러오지 못했습니다.
+              취소한 참가자 명단을 불러오지 못했어요.
             </SectionState>
           ) : null}
           {canceledParticipants.status === 'ready' ? (
