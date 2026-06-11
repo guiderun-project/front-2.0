@@ -25,10 +25,6 @@ type BirthDateSheetProps = {
   userName: string;
 };
 
-/**
- * 생년월일이 없는 기존 회원에게 생년월일을 보충받는 시트.
- * 등록 전까지 닫을 수 없도록 X/배경/ESC 닫기를 모두 비활성화한다.
- */
 export const BirthDateSheet = ({
   userName,
 }: BirthDateSheetProps): ReactElement => {
