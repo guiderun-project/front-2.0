@@ -1,13 +1,14 @@
-import type { ReactElement, ReactNode } from 'react';
+import type { ComponentPropsWithoutRef, ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
-type HiddenTextProps = {
-  children: ReactNode;
-};
+type HiddenTextProps = ComponentPropsWithoutRef<'span'>;
 
-export const HiddenText = ({ children }: HiddenTextProps): ReactElement => {
-  return <StyledHiddenText>{children}</StyledHiddenText>;
+export const HiddenText = ({
+  children,
+  ...props
+}: HiddenTextProps): ReactElement => {
+  return <StyledHiddenText {...props}>{children}</StyledHiddenText>;
 };
 
 const StyledHiddenText = styled.span({
