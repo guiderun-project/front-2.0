@@ -5,6 +5,7 @@ import { useMutation } from '@tanstack/react-query';
 
 import { api } from '@/api/services';
 import { useAuth } from '@/contexts';
+import { getTodayISODate } from '@/utils';
 
 import { BottomSheet } from '../BottomSheet';
 import { Button } from '../Button';
@@ -12,15 +13,6 @@ import { Input } from '../Input';
 
 const BIRTH_DATE_MAX_LENGTH = 10;
 const BIRTH_DATE_HELPER_TEXT = 'YYYY.MM.DD 형식으로 입력해주세요';
-
-const getTodayISODate = (): string => {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-
-  return `${year}-${month}-${day}`;
-};
 
 const formatBirthDateInput = (raw: string): string => {
   const digits = raw.replace(/\D/g, '').slice(0, 8);
