@@ -14,15 +14,8 @@ import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
 
 import type { AttendancePageState } from './attendancePageState';
+import { attendanceQueryKeys } from './queryKeys';
 import { eventDetailQueryKeys, getEventDetailViewerKey } from '../queryKeys';
-
-const attendanceQueryKeys = {
-  root: ['event', 'attendance'] as const,
-  status: (eventId: number) =>
-    [...attendanceQueryKeys.root, 'status', eventId] as const,
-  canceledApplicants: (eventId: number) =>
-    [...attendanceQueryKeys.root, 'canceled-applicants', eventId] as const,
-};
 
 type AttendanceMutationInput = {
   participantName: string;
@@ -73,6 +66,9 @@ export const useEventAttendancePermission = (eventId: number) => {
 export const useEventAttendancePage = (eventId: number) => {
   const queryClient = useQueryClient();
   const [announcement, setAnnouncement] = useState('');
+  const [updatingParticipantIds, setUpdatingParticipantIds] = useState<
+    ReadonlySet<string>
+  >(() => new Set());
 
   const [attendanceQuery, canceledApplicantsQuery] = useSuspenseQueries({
     queries: [
@@ -93,6 +89,24 @@ export const useEventAttendancePage = (eventId: number) => {
     });
   };
 
+  const addUpdatingParticipant = (userId: string) => {
+    setUpdatingParticipantIds((previousIds) => {
+      const nextIds = new Set(previousIds);
+      nextIds.add(userId);
+
+      return nextIds;
+    });
+  };
+
+  const removeUpdatingParticipant = (userId: string) => {
+    setUpdatingParticipantIds((previousIds) => {
+      const nextIds = new Set(previousIds);
+      nextIds.delete(userId);
+
+      return nextIds;
+    });
+  };
+
   const attendMutation = useMutation({
     mutationFn: ({ userId }: AttendanceMutationInput) =>
       api.attendance.attendPost({ eventId, userId }),
@@ -102,6 +116,9 @@ export const useEventAttendancePage = (eventId: number) => {
     },
     onError: (_, participant) => {
       setAnnouncement(`${participant.participantName}님 출석 처리에 실패했어요.`);
+    },
+    onSettled: (_, __, participant) => {
+      removeUpdatingParticipant(participant.userId);
     },
   });
 
@@ -115,9 +132,17 @@ export const useEventAttendancePage = (eventId: number) => {
     onError: (_, participant) => {
       setAnnouncement(`${participant.participantName}님 출석 취소에 실패했어요.`);
     },
+    onSettled: (_, __, participant) => {
+      removeUpdatingParticipant(participant.userId);
+    },
   });
 
   const attendParticipant = (participant: AttendanceParticipant) => {
+    if (updatingParticipantIds.has(participant.userId)) {
+      return;
+    }
+
+    addUpdatingParticipant(participant.userId);
     attendMutation.mutate({
       participantName: participant.name,
       userId: participant.userId,
@@ -125,14 +150,16 @@ export const useEventAttendancePage = (eventId: number) => {
   };
 
   const cancelAttendance = (participant: AttendanceParticipant) => {
+    if (updatingParticipantIds.has(participant.userId)) {
+      return;
+    }
+
+    addUpdatingParticipant(participant.userId);
     cancelAttendanceMutation.mutate({
       participantName: participant.name,
       userId: participant.userId,
     });
   };
-
-  const isUpdatingAttendance =
-    attendMutation.isPending || cancelAttendanceMutation.isPending;
 
   const attendancePageState: AttendancePageState = {
     attendance: attendanceQuery.data,
@@ -145,6 +172,6 @@ export const useEventAttendancePage = (eventId: number) => {
     attendancePageState,
     attendParticipant,
     cancelAttendance,
-    isUpdatingAttendance,
+    updatingParticipantIds,
   };
 };

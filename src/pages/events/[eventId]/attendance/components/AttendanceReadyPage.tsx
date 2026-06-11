@@ -19,7 +19,7 @@ export const AttendanceReadyPage = ({
     attendancePageState,
     attendParticipant,
     cancelAttendance,
-    isUpdatingAttendance,
+    updatingParticipantIds,
   } = useEventAttendancePage(eventId);
   const waitingCount = attendancePageState.attendance.summary.waitingCount;
 
@@ -27,12 +27,12 @@ export const AttendanceReadyPage = ({
     <AttendancePageShell
       description={<AttendanceLeadDescription waitingCount={waitingCount} />}
     >
-      <HiddenText aria-live="polite" role="status">
+      <HiddenText role="status">
         {announcement}
       </HiddenText>
       <AttendancePageContent
-        isUpdatingAttendance={isUpdatingAttendance}
         pageState={attendancePageState}
+        updatingParticipantIds={updatingParticipantIds}
         onAttend={attendParticipant}
         onCancelAttendance={cancelAttendance}
       />
