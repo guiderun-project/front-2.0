@@ -7,19 +7,51 @@ import {
   EVENT_LIST_TYPE_FILTERS,
   RECRUIT_STATUS_FILTERS,
 } from "@/api/constants/common";
-import type { EventListTab } from "@/api/types";
-import { PageLayout, Pagination, Tabs, Text } from "@/components";
+import type {
+  EventListTab,
+  EventListTypeFilter,
+  RecruitStatusFilter,
+} from "@/api/types";
+import {
+  Filter,
+  PageLayout,
+  Pagination,
+  Tabs,
+  Text,
+  type SelectOptions,
+} from "@/components";
 
 import { useEventList } from "../hooks/useEventList";
 import { EventListCard } from "./EventListCard";
 
+const TYPE_FILTER_OPTIONS: SelectOptions<EventListTypeFilter> = [
+  { label: "전체", value: EVENT_LIST_TYPE_FILTERS.TOTAL },
+  { label: "대회", value: EVENT_LIST_TYPE_FILTERS.COMPETITION },
+  { label: "훈련", value: EVENT_LIST_TYPE_FILTERS.TRAINING },
+];
+
+const RECRUIT_FILTER_OPTIONS: SelectOptions<RecruitStatusFilter> = [
+  { label: "전체", value: RECRUIT_STATUS_FILTERS.ALL },
+  { label: "모집예정", value: RECRUIT_STATUS_FILTERS.UPCOMING },
+  { label: "모집중", value: RECRUIT_STATUS_FILTERS.OPEN },
+  { label: "모집완료", value: RECRUIT_STATUS_FILTERS.CLOSE },
+];
+
 export const EventList = (): ReactElement => {
   const [tab, setTab] = useState<EventListTab>(EVENT_LIST_TABS.UPCOMING);
+  const [typeFilter, setTypeFilter] = useState<EventListTypeFilter>(
+    EVENT_LIST_TYPE_FILTERS.TOTAL,
+  );
+  const [recruitFilter, setRecruitFilter] = useState<RecruitStatusFilter>(
+    RECRUIT_STATUS_FILTERS.ALL,
+  );
   const [page, setPage] = useState(1);
+
+  const isUpcoming = tab === EVENT_LIST_TABS.UPCOMING;
   const { data, isError, isPending } = useEventList({
     tab,
-    type: EVENT_LIST_TYPE_FILTERS.TOTAL,
-    recruitStatus: RECRUIT_STATUS_FILTERS.ALL,
+    type: isUpcoming ? typeFilter : EVENT_LIST_TYPE_FILTERS.TOTAL,
+    recruitStatus: isUpcoming ? recruitFilter : RECRUIT_STATUS_FILTERS.ALL,
     keyword: "",
     page,
   });
@@ -39,9 +71,39 @@ export const EventList = (): ReactElement => {
     <StateMessage>표시할 모임이 없어요.</StateMessage>
   ) : (
     <>
-      <Text color="text.secondary" font="body-s-m">
-        총 {data.pagination.totalCount}건
-      </Text>
+      <CountRow>
+        <Text color="text.secondary" font="body-s-m">
+          총 {data.pagination.totalCount}건
+        </Text>
+        {isUpcoming ? (
+          <Filters>
+            <Filter
+              ariaLabel="유형 필터"
+              icon="chevron-down-lined"
+              options={TYPE_FILTER_OPTIONS}
+              placeholder="유형"
+              sheetTitle="유형"
+              value={typeFilter}
+              onChange={(value) => {
+                setTypeFilter(value);
+                setPage(1);
+              }}
+            />
+            <Filter
+              ariaLabel="모집구분 필터"
+              icon="chevron-down-lined"
+              options={RECRUIT_FILTER_OPTIONS}
+              placeholder="모집구분"
+              sheetTitle="모집구분"
+              value={recruitFilter}
+              onChange={(value) => {
+                setRecruitFilter(value);
+                setPage(1);
+              }}
+            />
+          </Filters>
+        ) : null}
+      </CountRow>
       <List>
         {data.items.map((event) => (
           <EventListCard event={event} key={event.id} />
@@ -90,6 +152,17 @@ const Body = styled.div(({ theme }) => ({
   flexDirection: "column",
   gap: theme.spacing.lg,
   padding: `${theme.spacing.xl} ${theme.spacing["2xl"]}`,
+}));
+
+const CountRow = styled.div({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+});
+
+const Filters = styled.div(({ theme }) => ({
+  display: "flex",
+  gap: theme.spacing.sm,
 }));
 
 const List = styled.ul({
