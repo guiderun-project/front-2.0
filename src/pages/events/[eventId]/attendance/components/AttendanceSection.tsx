@@ -39,8 +39,7 @@ const SectionContainer = styled.section<{ $hasDivider: boolean }>(
     display: 'flex',
     flexDirection: 'column',
     gap: theme.spacing.md,
-    paddingTop: theme.spacing.lg,
-    paddingBottom: $hasDivider ? theme.spacing['2xl'] : 0,
+    paddingTop: $hasDivider ? theme.spacing['2xl'] : theme.spacing.lg,
     borderTop: $hasDivider ? `1px solid ${theme.color.border.subtle}` : 0,
   }),
 );
