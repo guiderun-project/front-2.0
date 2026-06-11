@@ -1,4 +1,4 @@
-import { useState, type ReactElement } from "react";
+import { useState, type Key, type ReactElement } from "react";
 
 import styled from "@emotion/styled";
 
@@ -7,20 +7,53 @@ import {
   EVENT_LIST_TYPE_FILTERS,
   RECRUIT_STATUS_FILTERS,
 } from "@/api/constants/common";
-import { PageLayout, Pagination, Text } from "@/components";
+import type { EventListTab } from "@/api/types";
+import { PageLayout, Pagination, Tabs, Text } from "@/components";
 
 import { useEventList } from "../hooks/useEventList";
 import { EventListCard } from "./EventListCard";
 
 export const EventList = (): ReactElement => {
+  const [tab, setTab] = useState<EventListTab>(EVENT_LIST_TABS.UPCOMING);
   const [page, setPage] = useState(1);
   const { data, isError, isPending } = useEventList({
-    tab: EVENT_LIST_TABS.UPCOMING,
+    tab,
     type: EVENT_LIST_TYPE_FILTERS.TOTAL,
     recruitStatus: RECRUIT_STATUS_FILTERS.ALL,
     keyword: "",
     page,
   });
+
+  const handleTabChange = (key: Key) => {
+    if (key === EVENT_LIST_TABS.UPCOMING || key === EVENT_LIST_TABS.PAST) {
+      setTab(key);
+      setPage(1);
+    }
+  };
+
+  const result = isPending ? (
+    <StateMessage>모임을 불러오는 중이에요.</StateMessage>
+  ) : isError ? (
+    <StateMessage>모임을 불러오지 못했어요.</StateMessage>
+  ) : data.items.length === 0 ? (
+    <StateMessage>표시할 모임이 없어요.</StateMessage>
+  ) : (
+    <>
+      <Text color="text.secondary" font="body-s-m">
+        총 {data.pagination.totalCount}건
+      </Text>
+      <List>
+        {data.items.map((event) => (
+          <EventListCard event={event} key={event.id} />
+        ))}
+      </List>
+      <Pagination
+        currentPage={page}
+        totalPages={data.pagination.totalPages}
+        onChange={setPage}
+      />
+    </>
+  );
 
   return (
     <PageLayout background="bg.subtle">
@@ -30,31 +63,20 @@ export const EventList = (): ReactElement => {
         </Text>
       </Header>
 
-      <Body>
-        {isPending ? (
-          <StateMessage>모임을 불러오는 중이에요.</StateMessage>
-        ) : isError ? (
-          <StateMessage>모임을 불러오지 못했어요.</StateMessage>
-        ) : data.items.length === 0 ? (
-          <StateMessage>표시할 모임이 없어요.</StateMessage>
-        ) : (
-          <>
-            <Text color="text.secondary" font="body-s-m">
-              총 {data.pagination.totalCount}건
-            </Text>
-            <List>
-              {data.items.map((event) => (
-                <EventListCard event={event} key={event.id} />
-              ))}
-            </List>
-            <Pagination
-              currentPage={page}
-              totalPages={data.pagination.totalPages}
-              onChange={setPage}
-            />
-          </>
-        )}
-      </Body>
+      <Tabs selectedKey={tab} onSelectionChange={handleTabChange}>
+        <Tabs.List>
+          <Tabs.Tab id={EVENT_LIST_TABS.UPCOMING}>예정 이벤트</Tabs.Tab>
+          <Tabs.Tab id={EVENT_LIST_TABS.PAST}>지난 이벤트</Tabs.Tab>
+        </Tabs.List>
+        <Tabs.Panels>
+          <Tabs.Panel id={EVENT_LIST_TABS.UPCOMING}>
+            <Body>{result}</Body>
+          </Tabs.Panel>
+          <Tabs.Panel id={EVENT_LIST_TABS.PAST}>
+            <Body>{result}</Body>
+          </Tabs.Panel>
+        </Tabs.Panels>
+      </Tabs>
     </PageLayout>
   );
 };
@@ -67,7 +89,7 @@ const Body = styled.div(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   gap: theme.spacing.lg,
-  paddingInline: theme.spacing["2xl"],
+  padding: `${theme.spacing.xl} ${theme.spacing["2xl"]}`,
 }));
 
 const List = styled.ul({
