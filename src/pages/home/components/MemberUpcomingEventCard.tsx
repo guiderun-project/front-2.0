@@ -4,7 +4,6 @@ import styled from '@emotion/styled';
 import { Link } from 'react-router-dom';
 
 import { Badge, Icon, RunnerTypeAvatar, Text } from '@/components';
-import { RUNNER_TYPE_AVATAR_TYPE_BY_USER_TYPE } from '@/constants';
 import { APP_PATH } from '@/router/path';
 
 import { formatDday, formatDdayLabel, type UpcomingMemberEvent } from '../utils';
@@ -72,7 +71,7 @@ export const MemberUpcomingEventCard = ({
                 <PartnerChip key={`${partner.type}-${partner.name}-${index}`}>
                   <RunnerTypeAvatar
                     size="s"
-                    type={RUNNER_TYPE_AVATAR_TYPE_BY_USER_TYPE[partner.type]}
+                    type={partner.type}
                   />
                   <Text color="text.primary" font="detail-m-sb">
                     {partner.name}
