@@ -2,13 +2,22 @@ import type { ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
-import type { EventApplicantFormResponse, EventType } from '@/api/types';
+import type { EventApplicantFormResponse, EventType, RunningGroup } from '@/api/types';
 import { BottomSheet, ButtonGroup, Text } from '@/components';
 
 import { copyTextToClipboard } from '../utils';
 import { PanelState } from './PanelState';
 
 const EMPTY_VALUE = '미입력';
+const COMPETITION_COURSE_LABELS = {
+  A: '풀코스',
+  B: '30km 코스',
+  C: '하프 코스',
+  D: '10km 코스',
+  E: '5km 코스',
+} as const;
+const DISPLAY_RUNNING_GROUPS = ['A', 'B', 'C', 'D', 'E'] as const;
+type DisplayRunningGroup = (typeof DISPLAY_RUNNING_GROUPS)[number];
 
 type ApplicantFormSheetProps = {
   data?: EventApplicantFormResponse;
@@ -130,8 +139,8 @@ const createApplicantFormRows = (
   rows.push(
     {
       id: 'applyGroup',
-      label: '훈련 희망팀',
-      value: `그룹 ${data.form.applyGroup}`,
+      label: eventType === 'COMPETITION' ? '참가 희망 코스' : '훈련 희망팀',
+      value: formatApplyGroup(data.form.applyGroup, eventType),
     },
     {
       id: 'hopePartner',
@@ -154,6 +163,25 @@ const createApplicantFormRows = (
   );
 
   return rows;
+};
+
+const formatApplyGroup = (
+  group: RunningGroup,
+  eventType: EventType,
+): string => {
+  if (!isDisplayRunningGroup(group)) {
+    return EMPTY_VALUE;
+  }
+
+  return eventType === 'COMPETITION'
+    ? COMPETITION_COURSE_LABELS[group]
+    : `그룹 ${group}`;
+};
+
+const isDisplayRunningGroup = (
+  group: RunningGroup,
+): group is DisplayRunningGroup => {
+  return DISPLAY_RUNNING_GROUPS.some((displayGroup) => displayGroup === group);
 };
 
 const getDisplayValue = (value: string | null | undefined): string => {
