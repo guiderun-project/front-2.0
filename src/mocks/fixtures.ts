@@ -15,6 +15,7 @@ import type {
   UserType,
 } from '@/api/types/common';
 import type {
+  AdditionalQuestionDetail,
   EventCreateRequest,
   EventDetailResponse,
   EventListGetResponse,
@@ -115,6 +116,7 @@ type MockDb = {
 
 export const currentUserId = 'user-vi-1';
 export const runningGroups: RunningGroup[] = ['A', 'B', 'C', 'D', 'E', 'P'];
+export const visibleRunningGroups: RunningGroup[] = ['A', 'B', 'C', 'D', 'E'];
 
 export const mockDb: MockDb = {
   users: [
@@ -774,6 +776,30 @@ export const buildAdditionalAnswerDetails = (
     });
 };
 
+export const buildAdditionalQuestionDetails = (
+  eventId: number,
+): AdditionalQuestionDetail[] => {
+  return mockDb.additionalQuestions
+    .filter((question) => question.eventId === eventId)
+    .sort((left, right) => left.displayOrder - right.displayOrder)
+    .map((question) => {
+      if (question.type === 'TEXT') {
+        return {
+          questionId: question.questionId,
+          type: 'TEXT',
+          question: question.title,
+        };
+      }
+
+      return {
+        questionId: question.questionId,
+        type: 'SELECT',
+        question: question.title,
+        options: question.options,
+      };
+    });
+};
+
 export const buildApplicantForm = (
   eventId: number,
   userId: string,
@@ -835,6 +861,7 @@ export const toEventDetail = (event: MockEvent): EventDetailResponse => {
     place: event.place,
     expectedRunningDistanceKm: event.expectedRunningDistanceKm,
     content: event.content,
+    additionalQuestions: buildAdditionalQuestionDetails(event.eventId),
     viewer: {
       isApplied: Boolean(appliedForm),
       isOrganizer: event.organizerId === currentUser.userId,
