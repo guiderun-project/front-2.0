@@ -241,15 +241,8 @@ export const useEventMatchPage = (eventId: number) => {
     }
 
     cancelMutation.mutate(
-      {
-        viId: row.vi.userId,
-        viName: row.vi.name,
-      },
-      options?.onSuccess
-        ? {
-            onSuccess: options.onSuccess,
-          }
-        : undefined,
+      { viId: row.vi.userId, viName: row.vi.name },
+      options,
     );
   };
 
