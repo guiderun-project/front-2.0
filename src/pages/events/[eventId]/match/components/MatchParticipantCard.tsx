@@ -2,24 +2,31 @@ import type { ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
-import type { MatchingWaitingParticipant } from '@/api/types';
+import type { MatchingWaitingParticipant, RunningGroup } from '@/api/types';
 import { Badge, Button, RunnerTypeAvatar, Text } from '@/components';
 
+import type { EventGroupLabelContext } from '../../utils';
 import { ParticipantAdditionalInfoAccordion } from './ParticipantAdditionalInfoAccordion';
 
 type MatchParticipantCardProps = {
+  applicationGroup: RunningGroup;
   disabled: boolean;
+  eventGroupLabelContext: EventGroupLabelContext;
   isSelected: boolean;
   participant: MatchingWaitingParticipant;
   onToggle: (participant: MatchingWaitingParticipant) => void;
 };
 
 const getParticipantMeta = (
+  applicationGroup: RunningGroup,
+  eventGroupLabelContext: EventGroupLabelContext,
   participant: MatchingWaitingParticipant,
 ): string => {
-  const groupText = participant.originalRunningGroup
-    ? `기존 ${participant.originalRunningGroup}그룹`
-    : '기존 그룹 없음';
+  const groupText = getOriginalRunningGroupText(
+    applicationGroup,
+    eventGroupLabelContext,
+    participant.originalRunningGroup,
+  );
   const partnerText = participant.hopePartner
     ? `희망파트너 ${participant.hopePartner}`
     : null;
@@ -27,13 +34,40 @@ const getParticipantMeta = (
   return [groupText, partnerText].filter(Boolean).join(' ・');
 };
 
+const getOriginalRunningGroupText = (
+  applicationGroup: RunningGroup,
+  {
+    eventCategory,
+    eventType,
+  }: EventGroupLabelContext,
+  originalRunningGroup: RunningGroup | null,
+): string | null => {
+  const shouldAlwaysShow =
+    eventType === 'COMPETITION' || eventCategory === 'GROUP';
+
+  if (shouldAlwaysShow) {
+    return originalRunningGroup ? `기존 ${originalRunningGroup}그룹` : null;
+  }
+
+  return originalRunningGroup && originalRunningGroup !== applicationGroup
+    ? `기존 ${originalRunningGroup}그룹`
+    : null;
+};
+
 export const MatchParticipantCard = ({
+  applicationGroup,
   disabled,
+  eventGroupLabelContext,
   isSelected,
   participant,
   onToggle,
 }: MatchParticipantCardProps): ReactElement => {
   const actionLabel = isSelected ? '취소하기' : '선택하기';
+  const participantMeta = getParticipantMeta(
+    applicationGroup,
+    eventGroupLabelContext,
+    participant,
+  );
 
   return (
     <ParticipantCard $isSelected={isSelected}>
@@ -54,9 +88,11 @@ export const MatchParticipantCard = ({
                 </Badge>
               ) : null}
             </NameRow>
-            <ParticipantMeta color="text.tertiary" font="body-s-m">
-              {getParticipantMeta(participant)}
-            </ParticipantMeta>
+            {participantMeta ? (
+              <ParticipantMeta color="text.tertiary" font="body-s-m">
+                {participantMeta}
+              </ParticipantMeta>
+            ) : null}
           </InfoTextGroup>
         </ParticipantInfo>
         <SelectButton

@@ -56,7 +56,9 @@ export const MatchWaitingPanel = ({
               {group.participants.map((participant) => (
                 <li key={participant.userId}>
                   <MatchParticipantCard
+                    applicationGroup={group.runningGroup}
                     disabled={disabledParticipantAction}
+                    eventGroupLabelContext={eventGroupLabelContext}
                     isSelected={selectedUserIds.has(participant.userId)}
                     participant={participant}
                     onToggle={onToggleParticipant}
