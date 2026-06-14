@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactElement } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useForm, useFormState, useWatch } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -22,15 +22,14 @@ import {
   addHoursToTime,
   createDefaultEventFormValues,
   createEventFormValuesFromDetail,
-  createEventUpdateRequest,
   isValidDateValue,
   isValidTimeValue,
 } from '../../form/utils';
+import { useEventEditMutations } from './useEventEditMutations';
 
 export const EventEditPage = (): ReactElement => {
   const { eventId: eventIdParam } = useParams();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const { isAuthReady, user } = useAuth();
   const [isBackConfirmOpen, setIsBackConfirmOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
@@ -69,45 +68,12 @@ export const EventEditPage = (): ReactElement => {
   const { dirtyFields, isDirty, touchedFields } = useFormState({
     control: form.control,
   });
-  const updateMutation = useMutation({
-    mutationFn: (values: EventFormValues) => {
-      if (!event) {
-        throw new Error('Event detail is required.');
-      }
-
-      return api.event.updatePatch({
-        eventId,
-        body: createEventUpdateRequest({
-          eventType: event.eventType,
-          values,
-        }),
-      });
-    },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({
-        queryKey: eventDetailQueryKeys.detailRoot(eventId),
-      });
-      void queryClient.invalidateQueries({
-        queryKey: eventDetailQueryKeys.root,
-      });
-      navigate(APP_PATH.EVENT_DETAIL(eventId));
-    },
-    onError: () => {
-      window.alert('모임 수정에 실패했어요.');
-    },
-  });
-  const deleteMutation = useMutation({
-    mutationFn: () => api.event.delete({ eventId }),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({
-        queryKey: eventDetailQueryKeys.root,
-      });
-      navigate(APP_PATH.EVENTS);
-    },
-    onError: () => {
-      window.alert('모집 게시글 삭제에 실패했어요.');
-    },
-  });
+  const {
+    deleteEvent,
+    isDeletingEvent,
+    isUpdatingEvent,
+    updateEvent,
+  } = useEventEditMutations({ event, eventId });
 
   useEffect(() => {
     if (!event || initializedEventIdRef.current === event.eventId) {
@@ -200,7 +166,7 @@ export const EventEditPage = (): ReactElement => {
   };
 
   const handleSubmit = (values: EventFormValues) => {
-    updateMutation.mutate(values);
+    updateEvent(values);
   };
 
   const handleDelete = () => {
@@ -208,7 +174,7 @@ export const EventEditPage = (): ReactElement => {
   };
 
   const handleCancelDelete = () => {
-    if (deleteMutation.isPending) {
+    if (isDeletingEvent) {
       return;
     }
 
@@ -216,7 +182,7 @@ export const EventEditPage = (): ReactElement => {
   };
 
   const handleConfirmDelete = () => {
-    deleteMutation.mutate();
+    deleteEvent();
   };
 
   if (!isValidEventId) {
@@ -257,8 +223,8 @@ export const EventEditPage = (): ReactElement => {
         confirmOpen={isBackConfirmOpen}
         eventType={event.eventType}
         form={form}
-        isDeleting={deleteMutation.isPending}
-        isSubmitting={updateMutation.isPending}
+        isDeleting={isDeletingEvent}
+        isSubmitting={isUpdatingEvent}
         mode={EVENT_FORM_MODES.EDIT}
         submitDisabled={!isFormSubmittable}
         onBack={handleBack}
@@ -268,7 +234,7 @@ export const EventEditPage = (): ReactElement => {
         onSubmit={handleSubmit}
       />
       <ConfirmPopup
-        confirmLoading={deleteMutation.isPending}
+        confirmLoading={isDeletingEvent}
         confirmText="삭제하기"
         description="삭제한 게시글은 다시 복구할 수 없어요"
         open={isDeleteConfirmOpen}

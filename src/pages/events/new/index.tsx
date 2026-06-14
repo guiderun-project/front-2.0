@@ -1,17 +1,14 @@
 import { useEffect, useMemo, useState, type ReactElement } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import styled from '@emotion/styled';
 import { useForm, useFormState, useWatch } from 'react-hook-form';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import type { EventType } from '@/api/types';
-import { api } from '@/api/services';
 import { BottomSheet, Button, PageLayout } from '@/components';
 import { APP_PATH } from '@/router/path';
 
-import { eventDetailQueryKeys } from '../[eventId]/queryKeys';
 import { EventForm } from '../form/EventForm';
 import { EVENT_FORM_MODES } from '../form/constants';
 import {
@@ -21,7 +18,6 @@ import {
 import {
   addHoursToTime,
   createDefaultEventFormValues,
-  createEventCreateRequest,
   getCurrentTimeValue,
   getEventTypeFromQueryValue,
   getQueryValueFromEventType,
@@ -29,11 +25,11 @@ import {
   isValidDateValue,
   isValidTimeValue,
 } from '../form/utils';
+import { useEventCreateMutation } from './useEventCreateMutation';
 
 export const EventNewPage = (): ReactElement => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const queryClient = useQueryClient();
   const [isBackConfirmOpen, setIsBackConfirmOpen] = useState(false);
   const [createdDate] = useState(() => getTodayDateValue());
   const [createdTime] = useState(() => getCurrentTimeValue());
@@ -63,26 +59,7 @@ export const EventNewPage = (): ReactElement => {
   const { dirtyFields, isDirty, touchedFields } = useFormState({
     control: form.control,
   });
-  const createMutation = useMutation({
-    mutationFn: (values: EventFormValues) => {
-      if (!eventType) {
-        throw new Error('Event type is required.');
-      }
-
-      return api.event.createPost(
-        createEventCreateRequest({ eventType, values }),
-      );
-    },
-    onSuccess: (response) => {
-      void queryClient.invalidateQueries({
-        queryKey: eventDetailQueryKeys.root,
-      });
-      navigate(APP_PATH.EVENT_DETAIL(response.eventId));
-    },
-    onError: () => {
-      window.alert('모임 만들기에 실패했어요.');
-    },
-  });
+  const { createEvent, isCreatingEvent } = useEventCreateMutation({ eventType });
 
   useEffect(() => {
     form.reset(createDefaultEventFormValues(fallbackEventType));
@@ -157,7 +134,7 @@ export const EventNewPage = (): ReactElement => {
   };
 
   const handleSubmit = (values: EventFormValues) => {
-    createMutation.mutate(values);
+    createEvent(values);
   };
 
   if (!eventType) {
@@ -201,7 +178,7 @@ export const EventNewPage = (): ReactElement => {
         confirmOpen={isBackConfirmOpen}
         eventType={eventType}
         form={form}
-        isSubmitting={createMutation.isPending}
+        isSubmitting={isCreatingEvent}
         mode={EVENT_FORM_MODES.CREATE}
         submitDisabled={!isFormSubmittable}
         onBack={handleBack}
