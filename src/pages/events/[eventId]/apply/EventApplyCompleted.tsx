@@ -3,7 +3,7 @@ import type { ReactElement } from 'react';
 import styled from '@emotion/styled';
 
 import fireworksImageUrl from '@/assets/images/fireworks.png';
-import { Button, PageLayout, Text, TopNavigation } from '@/components';
+import { FooterButton, PageLayout, Text, TopNavigation } from '@/components';
 
 type EventApplyCompletedProps = {
   onBack: () => void;
@@ -46,19 +46,18 @@ export const EventApplyCompleted = ({
             대략 모임 2-3일 전까지 매칭될 예정이에요.
           </Description>
         </CompletedContent>
-        <CompletedFooter>
-          <Button
-            fullWidth
+        <FooterButton ratio="100:100">
+          <FooterButton.Button
             level="secondary"
             size="l"
             onClick={handleAddGoogleCalendar}
           >
             구글 캘린더에 일정 저장
-          </Button>
-          <Button fullWidth size="l" onClick={onViewEvent}>
+          </FooterButton.Button>
+          <FooterButton.Button size="l" onClick={onViewEvent}>
             신청한 모임 보기
-          </Button>
-        </CompletedFooter>
+          </FooterButton.Button>
+        </FooterButton>
       </CompletedPage>
     </PageLayout>
   );
@@ -88,17 +87,3 @@ const CompletedImage = styled.img(({ theme }) => ({
 const Description = styled(Text)({
   whiteSpace: 'pre-line',
 });
-
-const CompletedFooter = styled.footer(({ theme }) => ({
-  position: 'fixed',
-  right: '50%',
-  bottom: 0,
-  zIndex: theme.zIndex.footer,
-  display: 'grid',
-  boxSizing: 'border-box',
-  width: `min(100%, var(--app-mobile-viewport-width, ${theme.layout.mobileViewportMaxWidth}))`,
-  gap: theme.spacing.md,
-  padding: `${theme.spacing.lg} ${theme.spacing['2xl']} calc(${theme.spacing.lg} + env(safe-area-inset-bottom))`,
-  background: theme.gradient.bg.footer,
-  transform: 'translateX(50%)',
-}));
