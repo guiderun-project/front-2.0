@@ -317,9 +317,9 @@ const createBaseEventRequest = ({
 const resolveEventCategory = ({
   eventType,
   values,
-}: EventRequestParams): TrainingOperationType | 'TEAM' => {
+}: EventRequestParams): TrainingOperationType => {
   if (eventType === 'COMPETITION') {
-    return 'TEAM';
+    return 'GENERAL';
   }
 
   if (isTrainingOperationType(values.operationType)) {
