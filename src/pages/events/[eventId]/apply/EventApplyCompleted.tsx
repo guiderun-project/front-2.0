@@ -2,7 +2,8 @@ import type { ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
-import { Button, Icon, PageLayout, Text, TopNavigation } from '@/components';
+import fireworksImageUrl from '@/assets/images/fireworks.png';
+import { Button, PageLayout, Text, TopNavigation } from '@/components';
 
 type EventApplyCompletedProps = {
   onBack: () => void;
@@ -35,9 +36,7 @@ export const EventApplyCompleted = ({
           ]}
         />
         <CompletedContent>
-          <CompletedIcon aria-hidden="true">
-            <Icon color="text.primary" icon="check-thick-lined" size={64} />
-          </CompletedIcon>
+          <CompletedImage alt="" aria-hidden="true" src={fireworksImageUrl} />
           <Text as="h1" align="center" color="text.primary" font="heading-m-sb">
             참여 신청이 완료됐어요!
           </Text>
@@ -79,14 +78,11 @@ const CompletedContent = styled.section(({ theme }) => ({
   textAlign: 'center',
 }));
 
-const CompletedIcon = styled.div(({ theme }) => ({
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  width: theme.pxToRem(120),
-  height: theme.pxToRem(120),
-  borderRadius: '999px',
-  background: theme.color.bg.subtle,
+const CompletedImage = styled.img(({ theme }) => ({
+  display: 'block',
+  width: theme.pxToRem(160),
+  height: theme.pxToRem(160),
+  objectFit: 'contain',
 }));
 
 const Description = styled(Text)({

@@ -142,6 +142,7 @@ export const EventApplyForm = ({
                 render={({ field }) => (
                   <Textarea
                     label="추가 코멘트"
+                    maxLength={500}
                     placeholder="추가로 전달하고 싶은 내용을 입력해주세요"
                     value={field.value}
                     onBlur={field.onBlur}

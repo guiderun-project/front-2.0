@@ -254,7 +254,7 @@ export const mockDb: MockDb = {
       name: 'Summer 10K Race Support',
       eventType: 'COMPETITION',
       eventCategory: 'TEAM',
-      recruitStatus: 'RECRUIT_UPCOMING',
+      recruitStatus: 'RECRUIT_OPEN',
       isPrivate: false,
       organizerId: 'user-guide-1',
       schedule: {
@@ -392,7 +392,7 @@ export const mockDb: MockDb = {
       name: 'Midsummer Night 5K',
       eventType: 'COMPETITION',
       eventCategory: 'TEAM',
-      recruitStatus: 'RECRUIT_UPCOMING',
+      recruitStatus: 'RECRUIT_OPEN',
       isPrivate: false,
       organizerId: 'user-guide-1',
       schedule: {
@@ -489,7 +489,7 @@ export const mockDb: MockDb = {
     {
       requestId: 2001,
       eventId: 2,
-      userId: 'user-vi-1',
+      userId: 'user-vi-2',
       status: 'APPLIED',
       canceledAt: null,
       group: 'A',

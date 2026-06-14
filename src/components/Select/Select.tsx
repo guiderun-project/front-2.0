@@ -99,12 +99,19 @@ export const Select = <TValue extends string = string>({
           type="button"
           onClick={handleOpen}
         >
-          <SelectTriggerText
-            color={selectedOption ? 'text.primary' : 'text.tertiary'}
-            font="heading-s-m"
-          >
-            {selectedOption?.label ?? placeholder ?? label}
-          </SelectTriggerText>
+          <SelectTriggerContent>
+            <SelectTriggerLabel
+              color="text.tertiary"
+              font={selectedOption ? 'detail-m-m' : 'heading-s-m'}
+            >
+              {selectedOption ? label : placeholder ?? label}
+            </SelectTriggerLabel>
+            {selectedOption ? (
+              <SelectTriggerValue color="text.primary" font="heading-s-m">
+                {selectedOption.label}
+              </SelectTriggerValue>
+            ) : null}
+          </SelectTriggerContent>
           <Icon
             aria-hidden={true}
             color={disabled ? 'icon.disabled' : 'icon.secondary'}
@@ -236,9 +243,27 @@ const SelectTrigger = styled.button`
   }
 `;
 
-const SelectTriggerText = styled(Text)`
+const SelectTriggerContent = styled.span`
+  display: flex;
   flex: 1 1 auto;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing.s};
   min-width: 0;
+`;
+
+const SelectTriggerLabel = styled(Text)`
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+const SelectTriggerValue = styled(Text)`
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 const SelectCheckListRoot = styled.div`

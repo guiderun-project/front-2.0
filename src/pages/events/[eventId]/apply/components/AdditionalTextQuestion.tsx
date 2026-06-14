@@ -30,7 +30,7 @@ export const AdditionalTextQuestion = ({
           name={`additionalAnswers.${question.questionId}`}
           render={({ field }) => (
             <Input
-              label="답변"
+              label="답변을 입력해주세요"
               placeholder="답변을 입력해주세요"
               value={field.value ?? ''}
               onBlur={field.onBlur}
