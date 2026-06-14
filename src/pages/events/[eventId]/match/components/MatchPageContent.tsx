@@ -4,6 +4,7 @@ import styled from '@emotion/styled';
 
 import { Tabs } from '@/components';
 
+import type { EventGroupLabelContext } from '../../utils';
 import type { MatchMessageState } from '../matchPageState';
 import type { EventMatchPageModel, MatchTabId } from '../useEventMatchPage';
 import { MatchCompletedPanel } from './MatchCompletedPanel';
@@ -16,6 +17,7 @@ type MatchMessageContentProps = {
 };
 
 type MatchPageContentProps = {
+  eventGroupLabelContext: EventGroupLabelContext;
   matchPage: EventMatchPageModel;
 };
 
@@ -41,6 +43,7 @@ export const MatchPageMessageContent = ({
 };
 
 export const MatchPageContent = ({
+  eventGroupLabelContext,
   matchPage,
 }: MatchPageContentProps): ReactElement => {
   const {
@@ -82,6 +85,7 @@ export const MatchPageContent = ({
             <TabPanelContent>
               <MatchWaitingPanel
                 disabledParticipantAction={isCreatingMatching}
+                eventGroupLabelContext={eventGroupLabelContext}
                 selectedUserIds={selectedUserIds}
                 waiting={pageState.waiting}
                 onToggleParticipant={toggleParticipant}
@@ -93,6 +97,7 @@ export const MatchPageContent = ({
               <MatchCompletedPanel
                 cancelingViId={cancelingViId}
                 completed={pageState.completed}
+                eventGroupLabelContext={eventGroupLabelContext}
                 isCancelingMatching={isCancelingMatching}
                 onCancelMatching={cancelMatching}
               />

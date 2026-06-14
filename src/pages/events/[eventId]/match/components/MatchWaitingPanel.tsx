@@ -8,11 +8,16 @@ import type {
 } from '@/api/types';
 import { Text } from '@/components';
 
+import {
+  getEventGroupDisplayLabel,
+  type EventGroupLabelContext,
+} from '../../utils';
 import { MatchParticipantCard } from './MatchParticipantCard';
 import { AllMatchedState } from './MatchStates';
 
 type MatchWaitingPanelProps = {
   disabledParticipantAction: boolean;
+  eventGroupLabelContext: EventGroupLabelContext;
   selectedUserIds: ReadonlySet<string>;
   waiting: MatchingWaitingResponse;
   onToggleParticipant: (participant: MatchingWaitingParticipant) => void;
@@ -20,6 +25,7 @@ type MatchWaitingPanelProps = {
 
 export const MatchWaitingPanel = ({
   disabledParticipantAction,
+  eventGroupLabelContext,
   selectedUserIds,
   waiting,
   onToggleParticipant,
@@ -30,30 +36,37 @@ export const MatchWaitingPanel = ({
 
   return (
     <GroupStack>
-      {waiting.groups.map((group, index) => (
-        <GroupSection key={group.runningGroup} $hasDivider={index > 0}>
-          <GroupHeader>
-            <Text as="h2" color="text.primary" font="body-l-sb">
-              {group.runningGroup}그룹
-            </Text>
-            <Text color="text.tertiary" font="body-m-m">
-              {group.totalCount}명
-            </Text>
-          </GroupHeader>
-          <ParticipantList>
-            {group.participants.map((participant) => (
-              <li key={participant.userId}>
-                <MatchParticipantCard
-                  disabled={disabledParticipantAction}
-                  isSelected={selectedUserIds.has(participant.userId)}
-                  participant={participant}
-                  onToggle={onToggleParticipant}
-                />
-              </li>
-            ))}
-          </ParticipantList>
-        </GroupSection>
-      ))}
+      {waiting.groups.map((group, index) => {
+        const groupLabel = getEventGroupDisplayLabel(
+          eventGroupLabelContext,
+          group.runningGroup,
+        );
+
+        return (
+          <GroupSection key={group.runningGroup} $hasDivider={index > 0}>
+            <GroupHeader>
+              <Text as="h2" color="text.primary" font="body-l-sb">
+                {groupLabel}
+              </Text>
+              <Text color="text.tertiary" font="body-m-m">
+                {group.totalCount}명
+              </Text>
+            </GroupHeader>
+            <ParticipantList>
+              {group.participants.map((participant) => (
+                <li key={participant.userId}>
+                  <MatchParticipantCard
+                    disabled={disabledParticipantAction}
+                    isSelected={selectedUserIds.has(participant.userId)}
+                    participant={participant}
+                    onToggle={onToggleParticipant}
+                  />
+                </li>
+              ))}
+            </ParticipantList>
+          </GroupSection>
+        );
+      })}
     </GroupStack>
   );
 };

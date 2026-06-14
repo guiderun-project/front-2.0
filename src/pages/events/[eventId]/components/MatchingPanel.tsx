@@ -10,11 +10,14 @@ import type {
   MatchingStatusViewModel,
   MatchingStatusViewRow,
 } from '../hooks/matchingStatusViewModel';
+import { getEventGroupDisplayLabel, type EventGroupLabelContext } from '../utils';
 import { PanelState } from './PanelState';
 import { ProfileAvatar } from './ProfileAvatar';
 
 type MatchingPanelProps = {
   data?: MatchingStatusViewModel;
+  eventCategory: EventGroupLabelContext['eventCategory'];
+  eventType: EventGroupLabelContext['eventType'];
   isError: boolean;
   isPending: boolean;
   showMyPartnerSummary: boolean;
@@ -22,6 +25,8 @@ type MatchingPanelProps = {
 
 export const MatchingPanel = ({
   data,
+  eventCategory,
+  eventType,
   isError,
   isPending,
   showMyPartnerSummary,
@@ -47,7 +52,12 @@ export const MatchingPanel = ({
 
         <GroupList>
           {data.groups.map((group) => (
-            <MatchingGroupCard key={group.runningGroup} group={group} />
+            <MatchingGroupCard
+              key={group.runningGroup}
+              eventCategory={eventCategory}
+              eventType={eventType}
+              group={group}
+            />
           ))}
         </GroupList>
       </ResultsSection>
@@ -59,24 +69,33 @@ export const MatchingPanel = ({
 };
 
 type MatchingGroupCardProps = {
+  eventCategory: EventGroupLabelContext['eventCategory'];
+  eventType: EventGroupLabelContext['eventType'];
   group: MatchingStatusViewModel['groups'][number];
 };
 
 const MatchingGroupCard = ({
+  eventCategory,
+  eventType,
   group,
 }: MatchingGroupCardProps): ReactElement => {
+  const groupLabel = getEventGroupDisplayLabel(
+    { eventCategory, eventType },
+    group.runningGroup,
+  );
+
   return (
     <GroupCard>
       <GroupHeader>
         <Text as="h2" color="text.primary" font="heading-s-sb">
-          {group.runningGroup}그룹
+          {groupLabel}
         </Text>
         <Text color="text.tertiary" font="body-m-m">
           {group.totalCount}명
         </Text>
       </GroupHeader>
       <MatchingRows
-        aria-label={`${group.runningGroup}그룹 매칭 결과`}
+        aria-label={`${groupLabel} 매칭 결과`}
         role="list"
       >
         {group.rows.map((row) => (

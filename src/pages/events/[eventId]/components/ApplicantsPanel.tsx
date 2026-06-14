@@ -5,11 +5,14 @@ import styled from '@emotion/styled';
 import type { EventApplicant, EventApplicantListResponse } from '@/api/types';
 import { Badge, Icon, RunnerTypeAvatar, Text } from '@/components';
 
+import { getEventGroupDisplayLabel, type EventGroupLabelContext } from '../utils';
 import { PanelState } from './PanelState';
 import { ProfileAvatar } from './ProfileAvatar';
 
 type ApplicantsPanelProps = {
   data?: EventApplicantListResponse;
+  eventCategory: EventGroupLabelContext['eventCategory'];
+  eventType: EventGroupLabelContext['eventType'];
   isError: boolean;
   isPending: boolean;
   onApplicantClick?: (applicantId: string) => void;
@@ -17,6 +20,8 @@ type ApplicantsPanelProps = {
 
 export const ApplicantsPanel = ({
   data,
+  eventCategory,
+  eventType,
   isError,
   isPending,
   onApplicantClick,
@@ -69,6 +74,10 @@ export const ApplicantsPanel = ({
       <GroupCard>
         {groups.map((group, index) => {
           const { applicants, totalCount } = group;
+          const groupLabel = getEventGroupDisplayLabel(
+            { eventCategory, eventType },
+            group.runningGroup,
+          );
 
           return (
             <GroupSection
@@ -77,7 +86,7 @@ export const ApplicantsPanel = ({
             >
               <GroupHeader>
                 <Text as="h2" color="text.primary" font="body-l-b">
-                  {group.runningGroup}그룹
+                  {groupLabel}
                 </Text>
                 <Text color="text.tertiary" font="body-m-m">
                   {totalCount}명
