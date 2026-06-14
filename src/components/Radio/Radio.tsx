@@ -1,4 +1,4 @@
-import type { ComponentPropsWithoutRef, ReactElement } from 'react';
+import type { ComponentPropsWithRef, ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
@@ -8,15 +8,25 @@ const RADIO_HIT_AREA_SIZE = 24;
 const RADIO_VISUAL_SIZE = 22;
 const RADIO_ICON_SIZE = 16;
 
-type RadioProps = Omit<ComponentPropsWithoutRef<'input'>, 'children' | 'type'>;
+type RadioProps = Omit<ComponentPropsWithRef<'input'>, 'children' | 'type'>;
 
-export const Radio = ({ className, disabled, ...props }: RadioProps): ReactElement => {
+export const Radio = ({
+  className,
+  disabled,
+  ref,
+  ...props
+}: RadioProps): ReactElement => {
   return (
     <RadioRoot className={className}>
-      <RadioInput disabled={disabled} type="radio" {...props} />
+      <RadioInput ref={ref} disabled={disabled} type="radio" {...props} />
       <RadioVisual aria-hidden="true">
         <RadioIconWrap>
-          <Icon aria-hidden={true} color="icon.inverse" icon="check-thick-lined" size={RADIO_ICON_SIZE} />
+          <Icon
+            aria-hidden={true}
+            color="icon.inverse"
+            icon="check-thick-lined"
+            size={RADIO_ICON_SIZE}
+          />
         </RadioIconWrap>
       </RadioVisual>
     </RadioRoot>

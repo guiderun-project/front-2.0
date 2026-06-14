@@ -29,7 +29,7 @@ export const AdditionalSelectQuestion = ({
         name={`additionalAnswers.${question.questionId}`}
         render={({ field }) => (
           <OptionList aria-label={question.question} role="radiogroup">
-            {question.options.map((option) => {
+            {question.options.map((option, optionIndex) => {
               const optionValue = String(option.optionId);
               const isSelected = field.value === optionValue;
 
@@ -39,6 +39,7 @@ export const AdditionalSelectQuestion = ({
                   $selected={isSelected}
                 >
                   <Radio
+                    ref={optionIndex === 0 ? field.ref : undefined}
                     checked={isSelected}
                     name={field.name}
                     value={optionValue}
