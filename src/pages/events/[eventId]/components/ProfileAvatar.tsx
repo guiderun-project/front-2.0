@@ -4,7 +4,6 @@ import styled from '@emotion/styled';
 
 import type { UserType } from '@/api/types';
 import { RunnerTypeAvatar, Text } from '@/components';
-import { RUNNER_TYPE_AVATAR_TYPE_BY_USER_TYPE } from '@/constants';
 
 type ProfileAvatarProps = {
   name: string;
@@ -19,7 +18,7 @@ export const ProfileAvatar = ({
     <AvatarWrap>
       <RunnerTypeAvatar
         size="m"
-        type={RUNNER_TYPE_AVATAR_TYPE_BY_USER_TYPE[type]}
+        type={type}
       />
       <Text color="text.primary" font="body-m-sb">
         {name}
