@@ -61,22 +61,24 @@ export const AdditionalQuestionEditor = ({
           <Button
             disabled={isTextAddDisabled}
             fullWidth
-            level="secondary"
+            level="line-type"
+            rightIcon={{ icon: 'plus-lined' }}
             size="m"
             type="button"
             onClick={() => handleAddQuestion('TEXT')}
           >
-            질문 추가 +
+            질문 추가
           </Button>
           <Button
             disabled={isSelectAddDisabled}
             fullWidth
-            level="secondary"
+            level="line-type"
+            rightIcon={{ icon: 'plus-lined' }}
             size="m"
             type="button"
             onClick={() => handleAddQuestion('SELECT')}
           >
-            설문 추가 +
+            설문 추가
           </Button>
         </AddActions>
       </EditorHeader>
