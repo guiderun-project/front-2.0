@@ -97,6 +97,7 @@ export const EventApplyForm = ({
                 <FieldStack>
                   <Select<EventApplyGroupValue>
                     ariaLabel={primarySelectLabel}
+                    errorText={fieldState.error?.message}
                     label={primarySelectLabel}
                     options={primarySelectOptions}
                     placeholder={primarySelectLabel}
@@ -104,11 +105,6 @@ export const EventApplyForm = ({
                     value={field.value}
                     onChange={field.onChange}
                   />
-                  {fieldState.error ? (
-                    <FieldError color="text.danger" font="detail-m-m" role="alert">
-                      {fieldState.error.message}
-                    </FieldError>
-                  ) : null}
                 </FieldStack>
               )}
             />
@@ -234,10 +230,6 @@ const FieldStack = styled.div(({ theme }) => ({
   display: 'grid',
   gap: theme.spacing.lg,
   width: '100%',
-}));
-
-const FieldError = styled(Text)(({ theme }) => ({
-  paddingInline: theme.spacing.xs,
 }));
 
 const Divider = styled.div(({ theme }) => ({
