@@ -111,10 +111,14 @@ const createCompletedGroups = (eventId: number) => {
       const groupRows = rows
         .filter((item) => item.runningGroup === runningGroup)
         .map((item) => item.row);
+      const totalCount = groupRows.reduce(
+        (count, row) => count + 1 + row.guides.length,
+        0,
+      );
 
       return {
         runningGroup,
-        totalCount: groupRows.length,
+        totalCount,
         rows: groupRows,
       };
     })

@@ -28,7 +28,7 @@ export const ParticipantInfo = ({
       <AvatarSlot aria-hidden={true}>
         <RunnerTypeAvatar
           size="m"
-          type={participant.type === 'VI' ? 'vi' : 'guide'}
+          type={participant.type}
         />
       </AvatarSlot>
       <ParticipantName color="text.primary" font="body-m-sb">
