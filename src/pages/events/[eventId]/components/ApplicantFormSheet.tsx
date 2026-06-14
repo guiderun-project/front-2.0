@@ -5,19 +5,15 @@ import styled from '@emotion/styled';
 import type { EventApplicantFormResponse, EventType, RunningGroup } from '@/api/types';
 import { BottomSheet, ButtonGroup, Text } from '@/components';
 
+import {
+  COMPETITION_COURSE_LABELS,
+  EVENT_VISIBLE_RUNNING_GROUPS,
+  type EventVisibleRunningGroup,
+} from '../constants';
 import { copyTextToClipboard } from '../utils';
 import { PanelState } from './PanelState';
 
 const EMPTY_VALUE = '미입력';
-const COMPETITION_COURSE_LABELS = {
-  A: '풀코스',
-  B: '30km 코스',
-  C: '하프 코스',
-  D: '10km 코스',
-  E: '5km 코스',
-} as const;
-const DISPLAY_RUNNING_GROUPS = ['A', 'B', 'C', 'D', 'E'] as const;
-type DisplayRunningGroup = (typeof DISPLAY_RUNNING_GROUPS)[number];
 
 type ApplicantFormSheetProps = {
   data?: EventApplicantFormResponse;
@@ -180,8 +176,8 @@ const formatApplyGroup = (
 
 const isDisplayRunningGroup = (
   group: RunningGroup,
-): group is DisplayRunningGroup => {
-  return DISPLAY_RUNNING_GROUPS.some((displayGroup) => displayGroup === group);
+): group is EventVisibleRunningGroup => {
+  return EVENT_VISIBLE_RUNNING_GROUPS.some((displayGroup) => displayGroup === group);
 };
 
 const getDisplayValue = (value: string | null | undefined): string => {

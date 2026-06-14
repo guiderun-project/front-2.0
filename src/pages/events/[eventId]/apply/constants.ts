@@ -1,9 +1,15 @@
-import type { EventCategory, EventType, RunningGroup, UserType } from '@/api/types';
+import type { EventCategory, EventType, UserType } from '@/api/types';
 import type { SelectOptions } from '@/components';
 
-export type EventApplyGroupValue = Extract<RunningGroup, 'A' | 'B' | 'C' | 'D' | 'E'>;
+import {
+  COMPETITION_COURSE_OPTIONS,
+  EVENT_VISIBLE_RUNNING_GROUPS,
+  type EventVisibleRunningGroup,
+} from '../constants';
 
-export const EVENT_APPLY_GROUP_VALUES = ['A', 'B', 'C', 'D', 'E'] as const;
+export type EventApplyGroupValue = EventVisibleRunningGroup;
+
+export const EVENT_APPLY_GROUP_VALUES = EVENT_VISIBLE_RUNNING_GROUPS;
 
 const TRAINING_RECORD_LABELS: Record<UserType, Record<EventApplyGroupValue, string>> = {
   VI: {
@@ -40,13 +46,7 @@ export const GROUP_TRAINING_OPTIONS = [
   },
 ] as const satisfies SelectOptions<EventApplyGroupValue>;
 
-export const COMPETITION_COURSE_OPTIONS = [
-  { value: 'A', label: '풀코스' },
-  { value: 'B', label: '30km 코스' },
-  { value: 'C', label: '하프 코스' },
-  { value: 'D', label: '10km 코스' },
-  { value: 'E', label: '5km 코스' },
-] as const satisfies SelectOptions<EventApplyGroupValue>;
+export { COMPETITION_COURSE_OPTIONS };
 
 export const EVENT_TYPE_LABELS: Record<EventType, string> = {
   TRAINING: '훈련',
