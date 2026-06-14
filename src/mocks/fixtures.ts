@@ -1072,6 +1072,8 @@ export const toEventDetail = (event: MockEvent): EventDetailResponse => {
 
   return {
     eventId: event.eventId,
+    recruitStartDate: event.recruitStartDate,
+    recruitEndDate: event.recruitEndDate,
     name: event.name,
     eventType: event.eventType,
     eventCategory: event.eventCategory,

@@ -18,6 +18,7 @@ export const Textarea = ({
   errorText,
   maxLength,
   className,
+  controlRef,
   placeholder,
   value,
   defaultValue,
@@ -35,6 +36,7 @@ export const Textarea = ({
   return (
     <InputFieldShell<HTMLTextAreaElement>
       className={className}
+      controlRef={controlRef}
       defaultValue={defaultValue}
       errorText={errorText}
       helperText={helperText}

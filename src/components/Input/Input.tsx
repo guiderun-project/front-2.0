@@ -17,6 +17,7 @@ export const Input = ({
   trailing,
   className,
   describedById,
+  controlRef,
   placeholder,
   value,
   defaultValue,
@@ -28,6 +29,7 @@ export const Input = ({
       className={className}
       clearLabel={clearLabel}
       clearable={clearable}
+      controlRef={controlRef}
       defaultValue={defaultValue}
       describedById={describedById}
       errorText={errorText}
