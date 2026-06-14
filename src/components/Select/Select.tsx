@@ -11,6 +11,9 @@ import type { SelectOption, SelectOptions, SelectProps } from './Select.types';
 const DEFAULT_CONFIRM_TEXT = '확인';
 const SELECT_TRIGGER_ICON_SIZE = 24;
 const SELECT_CHECK_ICON_SIZE = 32;
+const SELECT_TRIGGER_CONTENT_HEIGHT = 40;
+const SELECT_TRIGGER_FILLED_LABEL_TOP = -2;
+const SELECT_TRIGGER_VALUE_TOP = 21;
 
 type SelectCheckListProps<TValue extends string> = {
   options: SelectOptions<TValue>;
@@ -99,18 +102,17 @@ export const Select = <TValue extends string = string>({
           type="button"
           onClick={handleOpen}
         >
-          <SelectTriggerContent>
-            <SelectTriggerLabel
-              color="text.tertiary"
-              font={selectedOption ? 'detail-m-m' : 'heading-s-m'}
-            >
+          <SelectTriggerContent data-filled={selectedOption ? 'true' : undefined}>
+            <SelectTriggerLabel>
               {selectedOption ? label : placeholder ?? label}
             </SelectTriggerLabel>
-            {selectedOption ? (
-              <SelectTriggerValue color="text.primary" font="heading-s-m">
-                {selectedOption.label}
-              </SelectTriggerValue>
-            ) : null}
+            <SelectTriggerValue
+              aria-hidden={selectedOption ? undefined : true}
+              color="text.primary"
+              font="heading-s-m"
+            >
+              {selectedOption?.label ?? ''}
+            </SelectTriggerValue>
           </SelectTriggerContent>
           <Icon
             aria-hidden={true}
@@ -244,26 +246,80 @@ const SelectTrigger = styled.button`
 `;
 
 const SelectTriggerContent = styled.span`
+  position: relative;
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing.s};
+  min-height: ${({ theme }) => theme.pxToRem(SELECT_TRIGGER_CONTENT_HEIGHT)};
   min-width: 0;
 `;
 
-const SelectTriggerLabel = styled(Text)`
+const SelectTriggerLabel = styled.span`
+  position: absolute;
+  top: 50%;
+  left: 0;
   display: block;
+  max-width: 100%;
   min-width: 0;
   overflow: hidden;
+  color: ${({ theme }) => theme.color.text.tertiary};
+  font-family: ${({ theme }) => theme.typography['heading-s-m'].fontFamily};
+  font-size: ${({ theme }) => theme.typography['heading-s-m'].fontSize};
+  font-weight: ${({ theme }) => theme.typography['heading-s-m'].fontWeight};
+  letter-spacing: ${({ theme }) => theme.typography['heading-s-m'].letterSpacing};
+  line-height: ${({ theme }) => theme.typography['heading-s-m'].lineHeight};
   text-overflow: ellipsis;
+  transform: translateY(-50%) scale(1);
+  transform-origin: left center;
+  transition:
+    font-size 120ms ease,
+    line-height 120ms ease,
+    top 120ms ease,
+    color 120ms ease,
+    transform 120ms ease;
   white-space: nowrap;
+
+  [data-filled='true'] & {
+    top: ${({ theme }) => theme.pxToRem(SELECT_TRIGGER_FILLED_LABEL_TOP)};
+    color: ${({ theme }) => theme.color.text.tertiary};
+    font-family: ${({ theme }) => theme.typography['detail-m-m'].fontFamily};
+    font-size: ${({ theme }) => theme.typography['detail-m-m'].fontSize};
+    font-weight: ${({ theme }) => theme.typography['detail-m-m'].fontWeight};
+    letter-spacing: ${({ theme }) => theme.typography['detail-m-m'].letterSpacing};
+    line-height: ${({ theme }) => theme.typography['detail-m-m'].lineHeight};
+    transform: translateY(0);
+    transform-origin: left top;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: color 120ms ease;
+  }
 `;
 
 const SelectTriggerValue = styled(Text)`
+  position: absolute;
+  right: 0;
+  top: ${({ theme }) => theme.pxToRem(SELECT_TRIGGER_VALUE_TOP)};
+  left: 0;
   min-width: 0;
   overflow: hidden;
+  opacity: 0;
   text-overflow: ellipsis;
+  transform: translateY(${({ theme }) => theme.spacing.xs});
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
   white-space: nowrap;
+
+  [data-filled='true'] & {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: opacity 120ms ease;
+  }
 `;
 
 const SelectCheckListRoot = styled.div`
