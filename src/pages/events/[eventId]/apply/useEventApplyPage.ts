@@ -12,6 +12,7 @@ import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
 
 import {
+  eventApplyQueryKeys,
   eventDetailQueryKeys,
   getEventDetailViewerKey,
 } from '../queryKeys';
@@ -22,17 +23,12 @@ import {
 import {
   createEventApplyInitialValues,
   createEventApplyRequestBody,
-} from './mappers';
+} from './utils';
 import {
   EMPTY_EVENT_APPLY_FORM_VALUES,
   eventApplyFormSchema,
   type EventApplyFormValues,
 } from './schema';
-
-const eventApplyQueryKeys = {
-  myForm: (eventId: number, viewerKey: string) =>
-    [...eventDetailQueryKeys.detailRoot(eventId), 'my-form', viewerKey] as const,
-};
 
 const isNotFoundError = (error: unknown) => {
   return isAxiosError(error) && error.response?.status === 404;

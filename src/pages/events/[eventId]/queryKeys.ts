@@ -19,3 +19,8 @@ export const eventDetailQueryKeys = {
   comments: (eventId: number) =>
     [...eventDetailQueryKeys.root, 'comments', eventId] as const,
 };
+
+export const eventApplyQueryKeys = {
+  myForm: (eventId: number, viewerKey: string) =>
+    [...eventDetailQueryKeys.detailRoot(eventId), 'my-form', viewerKey] as const,
+};
