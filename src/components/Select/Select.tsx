@@ -47,6 +47,9 @@ export const Select = <TValue extends string = string>({
   const isConfirmDisabled = pendingValue === undefined || pendingValue === value;
   const hasError = Boolean(errorText);
   const errorId = `${reactId}-error`;
+  const triggerAccessibleName = selectedOption
+    ? `${ariaLabel ?? label}, 현재 선택: ${selectedOption.label}`
+    : ariaLabel ?? label;
 
   const handleOpen = () => {
     if (disabled) {
@@ -104,7 +107,7 @@ export const Select = <TValue extends string = string>({
             aria-expanded={open}
             aria-haspopup="dialog"
             aria-invalid={hasError || undefined}
-            aria-label={ariaLabel ?? label}
+            aria-label={triggerAccessibleName}
             disabled={disabled}
             type="button"
             onClick={handleOpen}
