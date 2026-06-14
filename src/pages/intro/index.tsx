@@ -5,12 +5,15 @@ import { useNavigate } from 'react-router-dom';
 
 import { Button, Icon, PageLayout, Text } from '@/components';
 import { APP_PATH } from '@/router/path';
+import { useColorMode } from '@/styles/useColorMode';
 
+import introRunnersDark from './assets/intro-runners-dark.png';
 import introRunners from './assets/intro-runners.png';
 import { KakaoLoginButton } from './components/KakaoLoginButton';
 
 export const IntroPage = (): ReactElement => {
   const navigate = useNavigate();
+  const { colorMode } = useColorMode();
 
   const handleGuideRunInfoClick = () => {
     // TODO: 가이드런 외부 랜딩 페이지로 이동
@@ -44,7 +47,7 @@ export const IntroPage = (): ReactElement => {
 
         <Illustration
           alt="끈으로 연결되어 함께 달리는 두 러너"
-          src={introRunners}
+          src={colorMode === 'light' ? introRunners : introRunnersDark}
         />
 
         <GuideRunInfoSection>
