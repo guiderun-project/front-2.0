@@ -304,7 +304,7 @@ export const mockDb: MockDb = {
       recruitEndDate: '2026-06-20',
       name: 'Summer 10K Race Support',
       eventType: 'COMPETITION',
-      eventCategory: 'TEAM',
+      eventCategory: 'GENERAL',
       recruitStatus: 'RECRUIT_OPEN',
       isPrivate: false,
       organizerId: 'user-guide-1',
@@ -442,7 +442,7 @@ export const mockDb: MockDb = {
       recruitEndDate: '2026-06-18',
       name: 'Midsummer Night 5K',
       eventType: 'COMPETITION',
-      eventCategory: 'TEAM',
+      eventCategory: 'GENERAL',
       recruitStatus: 'RECRUIT_OPEN',
       isPrivate: false,
       organizerId: 'user-guide-1',
@@ -1072,6 +1072,8 @@ export const toEventDetail = (event: MockEvent): EventDetailResponse => {
 
   return {
     eventId: event.eventId,
+    recruitStartDate: event.recruitStartDate,
+    recruitEndDate: event.recruitEndDate,
     name: event.name,
     eventType: event.eventType,
     eventCategory: event.eventCategory,

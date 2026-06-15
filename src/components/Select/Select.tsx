@@ -37,6 +37,7 @@ export const Select = <TValue extends string = string>({
   placeholder,
   renderTrigger,
   sheetTitle,
+  triggerRef,
   value,
 }: SelectProps<TValue>): ReactElement => {
   const reactId = useId();
@@ -103,6 +104,7 @@ export const Select = <TValue extends string = string>({
           })
         ) : (
           <SelectTrigger
+            ref={triggerRef}
             aria-describedby={hasError ? errorId : undefined}
             aria-expanded={open}
             aria-haspopup="dialog"

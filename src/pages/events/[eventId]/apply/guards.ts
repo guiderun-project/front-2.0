@@ -1,4 +1,5 @@
 import type { EventDetailResponse, UserInfoGetResponse } from '@/api/types';
+import { USER_ROLES } from '@/constants/roles';
 
 export const getEventApplyIneligibleMessage = (
   event: EventDetailResponse,
@@ -8,7 +9,7 @@ export const getEventApplyIneligibleMessage = (
     return '현재 모집 중인 이벤트만 신청할 수 있어요.';
   }
 
-  if (event.viewer?.isOrganizer === true || user.role === 'ROLE_ADMIN') {
+  if (event.viewer?.isOrganizer === true || user.role === USER_ROLES.ADMIN) {
     return '주최자와 관리자는 참여 신청을 진행할 수 없어요.';
   }
 
