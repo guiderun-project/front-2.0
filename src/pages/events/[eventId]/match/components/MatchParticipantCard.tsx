@@ -2,6 +2,7 @@ import type { ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
+import { EVENT_CATEGORIES, EVENT_TYPES } from '@/api/constants';
 import type { MatchingWaitingParticipant, RunningGroup } from '@/api/types';
 import { Badge, Button, RunnerTypeAvatar, Text } from '@/components';
 
@@ -43,7 +44,8 @@ const getOriginalRunningGroupText = (
   originalRunningGroup: RunningGroup | null,
 ): string | null => {
   const shouldAlwaysShow =
-    eventType === 'COMPETITION' || eventCategory === 'GROUP';
+    eventType === EVENT_TYPES.COMPETITION ||
+    eventCategory === EVENT_CATEGORIES.GROUP;
 
   if (shouldAlwaysShow) {
     return originalRunningGroup ? `기존 ${originalRunningGroup}그룹` : null;

@@ -1,4 +1,5 @@
 import type { EventCategory, EventType, RunningGroup } from '@/api/types';
+import { EVENT_CATEGORIES, EVENT_TYPES } from '@/api/constants';
 
 import {
   COMPETITION_COURSE_LABELS,
@@ -21,11 +22,11 @@ export const getEventGroupDisplayLabel = (
     return `${group}그룹`;
   }
 
-  if (context.eventType === 'COMPETITION') {
+  if (context.eventType === EVENT_TYPES.COMPETITION) {
     return COMPETITION_COURSE_LABELS[group];
   }
 
-  if (context.eventCategory === 'GROUP') {
+  if (context.eventCategory === EVENT_CATEGORIES.GROUP) {
     const groupTrainingLabel = isGroupTrainingRunningGroup(group)
       ? GROUP_TRAINING_LABELS[group]
       : null;
@@ -40,11 +41,13 @@ export const getEventPrimaryGroupLabel = ({
   eventCategory,
   eventType,
 }: EventGroupLabelContext): string => {
-  if (eventType === 'COMPETITION') {
+  if (eventType === EVENT_TYPES.COMPETITION) {
     return '참가 희망 코스';
   }
 
-  return eventCategory === 'GROUP' ? '훈련 희망 그룹' : '훈련 희망 팀';
+  return eventCategory === EVENT_CATEGORIES.GROUP
+    ? '훈련 희망 그룹'
+    : '훈련 희망 팀';
 };
 
 const isEventVisibleRunningGroup = (
