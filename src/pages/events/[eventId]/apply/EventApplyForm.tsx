@@ -22,6 +22,7 @@ import { AdditionalTextQuestion } from './components/AdditionalTextQuestion';
 import {
   COMPETITION_COURSE_OPTIONS,
   createGeneralTrainingOptions,
+  EVENT_APPLY_DETAIL_MAX_LENGTH,
   EVENT_TYPE_LABELS,
   getPrimarySelectLabel,
   GROUP_TRAINING_OPTIONS,
@@ -141,7 +142,7 @@ export const EventApplyForm = ({
                   <Textarea
                     controlRef={field.ref}
                     label="추가 코멘트"
-                    maxLength={500}
+                    maxLength={EVENT_APPLY_DETAIL_MAX_LENGTH}
                     placeholder="추가로 전달하고 싶은 내용을 입력해주세요"
                     value={field.value}
                     onBlur={field.onBlur}
