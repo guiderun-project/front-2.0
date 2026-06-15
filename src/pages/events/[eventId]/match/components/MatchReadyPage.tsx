@@ -2,6 +2,7 @@ import { useState, type ReactElement } from 'react';
 
 import { ConfirmPopup, HiddenText } from '@/components';
 
+import type { EventGroupLabelContext } from '../../utils';
 import {
   type EventMatchPageModel,
   useEventMatchPage,
@@ -12,22 +13,31 @@ import { MatchPageContent } from './MatchPageContent';
 import { MatchPageShell } from './MatchPageShell';
 
 type MatchReadyPageProps = {
+  eventGroupLabelContext: EventGroupLabelContext;
   eventId: number;
 };
 
 export const MatchReadyPage = ({
+  eventGroupLabelContext,
   eventId,
 }: MatchReadyPageProps): ReactElement => {
   const matchPage = useEventMatchPage(eventId);
 
-  return <MatchReadyPageContent matchPage={matchPage} />;
+  return (
+    <MatchReadyPageContent
+      eventGroupLabelContext={eventGroupLabelContext}
+      matchPage={matchPage}
+    />
+  );
 };
 
 type MatchReadyPageContentProps = {
+  eventGroupLabelContext: EventGroupLabelContext;
   matchPage: EventMatchPageModel;
 };
 
 const MatchReadyPageContent = ({
+  eventGroupLabelContext,
   matchPage,
 }: MatchReadyPageContentProps): ReactElement => {
   const { navigateBack } = useEventMatchRoute();
@@ -70,7 +80,10 @@ const MatchReadyPageContent = ({
       onBack={handleBack}
     >
       <HiddenText role="status">{announcement}</HiddenText>
-      <MatchPageContent matchPage={matchPage} />
+      <MatchPageContent
+        eventGroupLabelContext={eventGroupLabelContext}
+        matchPage={matchPage}
+      />
 
       <ConfirmPopup
         cancelText="아니요"

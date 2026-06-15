@@ -151,6 +151,8 @@ export const EventDetailPage = (): ReactElement => {
           <Tabs.Panel id="applicants">
             <ApplicantsPanel
               data={applicantsQuery.data}
+              eventCategory={event.eventCategory}
+              eventType={event.eventType}
               isError={applicantsQuery.isError}
               isPending={applicantsQuery.isPending}
               onApplicantClick={canManageEvent ? openApplicantForm : undefined}
@@ -159,6 +161,8 @@ export const EventDetailPage = (): ReactElement => {
           <Tabs.Panel id="matching">
             <MatchingPanel
               data={matchingStatus.data}
+              eventCategory={event.eventCategory}
+              eventType={event.eventType}
               isError={matchingStatus.isError}
               isPending={matchingStatus.isPending}
               showMyPartnerSummary={event.viewer?.isApplied === true}
@@ -190,6 +194,7 @@ export const EventDetailPage = (): ReactElement => {
       />
       <ApplicantFormSheet
         data={applicantFormQuery.data}
+        eventCategory={event.eventCategory}
         eventType={event.eventType}
         isError={applicantFormQuery.isError}
         isPending={applicantFormQuery.isPending}

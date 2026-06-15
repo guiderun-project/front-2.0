@@ -4,8 +4,10 @@ import type { SelectOptions } from '@/components';
 import {
   COMPETITION_COURSE_OPTIONS,
   EVENT_VISIBLE_RUNNING_GROUPS,
+  GROUP_TRAINING_LABELS,
   type EventVisibleRunningGroup,
 } from '../constants';
+import { getEventPrimaryGroupLabel } from '../utils/groupLabel';
 
 export type EventApplyGroupValue = EventVisibleRunningGroup;
 
@@ -37,12 +39,12 @@ const RUNNER_TYPE_LABELS: Record<UserType, string> = {
 export const GROUP_TRAINING_OPTIONS = [
   {
     value: 'A',
-    label: '마일리지 그룹',
+    label: GROUP_TRAINING_LABELS.A,
     description: '풀 마라톤 대비 마일리지 누적 중심',
   },
   {
     value: 'B',
-    label: '기초보강 그룹',
+    label: GROUP_TRAINING_LABELS.B,
     description: '기초, 보강 중심 훈련',
   },
 ] as const satisfies SelectOptions<EventApplyGroupValue>;
@@ -67,9 +69,5 @@ export const getPrimarySelectLabel = (
   eventType: EventType,
   eventCategory: EventCategory,
 ): string => {
-  if (eventType === 'COMPETITION') {
-    return '참가 희망 코스';
-  }
-
-  return eventCategory === 'GROUP' ? '훈련 희망 그룹' : '훈련 희망 팀';
+  return getEventPrimaryGroupLabel({ eventType, eventCategory });
 };

@@ -3,10 +3,21 @@ export const EVENT_LIST_TABS = {
   PAST: 'PAST',
 } as const;
 
-export const EVENT_LIST_TYPE_FILTERS = {
-  TOTAL: 'TOTAL',
+export const EVENT_TYPES = {
   COMPETITION: 'COMPETITION',
   TRAINING: 'TRAINING',
+} as const;
+
+export const EVENT_CATEGORIES = {
+  GENERAL: 'GENERAL',
+  GROUP: 'GROUP',
+  TEAM: 'TEAM',
+} as const;
+
+export const EVENT_LIST_TYPE_FILTERS = {
+  TOTAL: 'TOTAL',
+  COMPETITION: EVENT_TYPES.COMPETITION,
+  TRAINING: EVENT_TYPES.TRAINING,
 } as const;
 
 export const RECRUIT_STATUS_FILTERS = {

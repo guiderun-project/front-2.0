@@ -9,11 +9,16 @@ import type {
 } from '@/api/types';
 import { ConfirmPopup, Icon, RunnerTypeAvatar, Text } from '@/components';
 
+import {
+  getEventGroupDisplayLabel,
+  type EventGroupLabelContext,
+} from '../../utils';
 import { SectionState } from './MatchStates';
 
 type MatchCompletedPanelProps = {
   cancelingViId: string | null;
   completed: MatchingCompletedResponse;
+  eventGroupLabelContext: EventGroupLabelContext;
   isCancelingMatching: boolean;
   onCancelMatching: (
     row: MatchingCompletedRow,
@@ -24,6 +29,7 @@ type MatchCompletedPanelProps = {
 export const MatchCompletedPanel = ({
   cancelingViId,
   completed,
+  eventGroupLabelContext,
   isCancelingMatching,
   onCancelMatching,
 }: MatchCompletedPanelProps): ReactElement => {
@@ -50,29 +56,36 @@ export const MatchCompletedPanel = ({
   return (
     <>
       <GroupStack>
-        {completed.groups.map((group, index) => (
-          <GroupSection key={group.runningGroup} $hasDivider={index > 0}>
-            <GroupHeader>
-              <Text as="h2" color="text.primary" font="body-l-sb">
-                {group.runningGroup}그룹
-              </Text>
-              <Text color="text.tertiary" font="body-m-m">
-                {group.totalCount}명
-              </Text>
-            </GroupHeader>
-            <CompletedList>
-              {group.rows.map((row) => (
-                <li key={row.vi.userId}>
-                  <CompletedMatchingCard
-                    disabled={cancelingViId === row.vi.userId}
-                    row={row}
-                    onRequestCancelMatching={setCancelTarget}
-                  />
-                </li>
-              ))}
-            </CompletedList>
-          </GroupSection>
-        ))}
+        {completed.groups.map((group, index) => {
+          const groupLabel = getEventGroupDisplayLabel(
+            eventGroupLabelContext,
+            group.runningGroup,
+          );
+
+          return (
+            <GroupSection key={group.runningGroup} $hasDivider={index > 0}>
+              <GroupHeader>
+                <Text as="h2" color="text.primary" font="body-l-sb">
+                  {groupLabel}
+                </Text>
+                <Text color="text.tertiary" font="body-m-m">
+                  {group.totalCount}명
+                </Text>
+              </GroupHeader>
+              <CompletedList>
+                {group.rows.map((row) => (
+                  <li key={row.vi.userId}>
+                    <CompletedMatchingCard
+                      disabled={cancelingViId === row.vi.userId}
+                      row={row}
+                      onRequestCancelMatching={setCancelTarget}
+                    />
+                  </li>
+                ))}
+              </CompletedList>
+            </GroupSection>
+          );
+        })}
       </GroupStack>
 
       <ConfirmPopup

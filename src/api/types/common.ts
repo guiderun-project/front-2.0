@@ -1,6 +1,8 @@
 import {
+  EVENT_CATEGORIES,
   EVENT_LIST_TABS,
   EVENT_LIST_TYPE_FILTERS,
+  EVENT_TYPES,
   RECRUIT_STATUS_FILTERS,
 } from '@/api/constants/common';
 
@@ -10,8 +12,8 @@ export type UserType = 'VI' | 'GUIDE';
 export type DisabilityType = UserType;
 export type Gender = 'MALE' | 'FEMALE';
 export type RunningGroup = 'A' | 'B' | 'C' | 'D' | 'E' | 'P';
-export type EventType = 'TRAINING' | 'COMPETITION';
-export type EventCategory = 'GENERAL' | 'GROUP' | 'TEAM';
+export type EventType = ValueOf<typeof EVENT_TYPES>;
+export type EventCategory = ValueOf<typeof EVENT_CATEGORIES>;
 
 export type EventListTab = ValueOf<typeof EVENT_LIST_TABS>;
 

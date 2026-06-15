@@ -10,6 +10,10 @@ export type EventVisibleRunningGroup = Extract<
   RunningGroup,
   'A' | 'B' | 'C' | 'D' | 'E'
 >;
+export type GroupTrainingRunningGroup = Extract<
+  EventVisibleRunningGroup,
+  'A' | 'B'
+>;
 
 export const EVENT_VISIBLE_RUNNING_GROUPS = [
   'A',
@@ -25,6 +29,11 @@ export const COMPETITION_COURSE_LABELS: Record<EventVisibleRunningGroup, string>
   C: '하프 코스',
   D: '10km 코스',
   E: '5km 코스',
+};
+
+export const GROUP_TRAINING_LABELS: Record<GroupTrainingRunningGroup, string> = {
+  A: '마일리지 그룹',
+  B: '기초 보강 그룹',
 };
 
 export const COMPETITION_COURSE_OPTIONS = EVENT_VISIBLE_RUNNING_GROUPS.map(
