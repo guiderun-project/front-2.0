@@ -12,6 +12,7 @@ import DeleteFilledIcon from "@/assets/icons/delete-filled.svg?react";
 import DeleteLinedIcon from "@/assets/icons/delete-lined.svg?react";
 import DownloadLinedIcon from "@/assets/icons/download-lined.svg?react";
 import EditLinedIcon from "@/assets/icons/edit-lined.svg?react";
+import ExternalLinkLinedIcon from "@/assets/icons/external-link-lined.svg?react";
 import HelpCircleFilledIcon from "@/assets/icons/help-circle-filled.svg?react";
 import HomeFilledIcon from "@/assets/icons/home-filled.svg?react";
 import HomeLinedIcon from "@/assets/icons/home-lined.svg?react";
@@ -50,6 +51,7 @@ export const iconRegistry = {
   "delete-lined": DeleteLinedIcon,
   "download-lined": DownloadLinedIcon,
   "edit-lined": EditLinedIcon,
+  "external-link-lined": ExternalLinkLinedIcon,
   "help-circle-filled": HelpCircleFilledIcon,
   "home-filled": HomeFilledIcon,
   "home-lined": HomeLinedIcon,
