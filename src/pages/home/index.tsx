@@ -2,15 +2,14 @@ import type { ReactElement } from "react";
 
 import styled from "@emotion/styled";
 
-import { PageLayout } from "@/components";
+import { PageLayout, QueryBoundary, SearchEntry } from "@/components";
 import { APPROVED_ROLES } from "@/constants";
 import { useAuth } from "@/contexts";
+import { APP_PATH } from "@/router/path";
 
 import { ActivitySummary } from "./components/ActivitySummary";
 import { HomeHeader } from "./components/HomeHeader";
 import { HomeQuickActions } from "./components/HomeQuickActions";
-import { HomeSearchBar } from "./components/HomeSearchBar";
-import { HomeSectionBoundary } from "./components/HomeSectionBoundary";
 import { HomeSectionMessage } from "./components/HomeSectionMessage";
 import { UpcomingEventList } from "./components/UpcomingEventList";
 
@@ -27,23 +26,23 @@ export const MainPage = (): ReactElement => {
     <PageLayout background="gradient.bg.brand-main">
       <HomeHeader />
       <Content>
-        <HomeSearchBar />
+        <SearchEntry to={APP_PATH.EVENT_SEARCH} />
 
         {isAuthReady ? (
           <>
-            <HomeSectionBoundary
+            <QueryBoundary
               errorMessage={SUMMARY_ERROR_MESSAGE}
               loadingMessage={SUMMARY_LOADING_MESSAGE}
             >
               <ActivitySummary />
-            </HomeSectionBoundary>
+            </QueryBoundary>
             {isApproved ? <HomeQuickActions /> : null}
-            <HomeSectionBoundary
+            <QueryBoundary
               errorMessage={UPCOMING_ERROR_MESSAGE}
               loadingMessage={UPCOMING_LOADING_MESSAGE}
             >
               <UpcomingEventList />
-            </HomeSectionBoundary>
+            </QueryBoundary>
           </>
         ) : (
           <>

@@ -1,21 +1,24 @@
 import { useState, useTransition, type Key, type ReactElement } from "react";
 
 import styled from "@emotion/styled";
-import { Link } from "react-router-dom";
 
-import { EVENT_LIST_TABS, EVENT_LIST_TYPE_FILTERS, RECRUIT_STATUS_FILTERS } from "@/api/constants/common";
+import {
+  EVENT_LIST_TABS,
+  EVENT_LIST_TYPE_FILTERS,
+  RECRUIT_STATUS_FILTERS,
+} from "@/api/constants/common";
 import type {
   EventListTab,
   EventListTypeFilter,
   RecruitStatusFilter,
 } from "@/api/types";
-import { Icon, PageLayout, Tabs, Text } from "@/components";
+import { PageLayout, QueryBoundary, SearchEntry, Tabs, Text } from "@/components";
 import { APP_PATH } from "@/router/path";
 
 import { EventBrowseResult } from "./components/EventBrowseResult";
-import { EventsBoundary } from "./components/EventsBoundary";
 
-const SEARCH_PLACEHOLDER = "관심있는 모임을 찾아보세요";
+const LOADING_MESSAGE = "모임을 불러오는 중이에요.";
+const ERROR_MESSAGE = "모임을 불러오지 못했어요.";
 
 export const EventsPage = (): ReactElement => {
   const [tab, setTab] = useState<EventListTab>(EVENT_LIST_TABS.UPCOMING);
@@ -59,7 +62,7 @@ export const EventsPage = (): ReactElement => {
 
   const result = (
     <Body>
-      <EventsBoundary>
+      <QueryBoundary errorMessage={ERROR_MESSAGE} loadingMessage={LOADING_MESSAGE}>
         <EventBrowseResult
           page={page}
           recruitFilter={recruitFilter}
@@ -69,7 +72,7 @@ export const EventsPage = (): ReactElement => {
           onRecruitChange={handleRecruitChange}
           onTypeChange={handleTypeChange}
         />
-      </EventsBoundary>
+      </QueryBoundary>
     </Body>
   );
 
@@ -79,15 +82,7 @@ export const EventsPage = (): ReactElement => {
         <Text as="h1" color="text.primary" font="heading-m-sb">
           전체 모임
         </Text>
-        <SearchEntry to={APP_PATH.EVENT_SEARCH}>
-          <Icon
-            aria-hidden={true}
-            color="icon.secondary"
-            icon="search-lined"
-            size={20}
-          />
-          <SearchEntryText>{SEARCH_PLACEHOLDER}</SearchEntryText>
-        </SearchEntry>
+        <SearchEntry to={APP_PATH.EVENT_SEARCH} />
       </Header>
 
       <Tabs selectedKey={tab} onSelectionChange={handleTabChange}>
@@ -110,34 +105,6 @@ const Header = styled.header(({ theme }) => ({
   gap: theme.spacing.lg,
   padding: `${theme.spacing.xl} ${theme.spacing["2xl"]}`,
   backgroundColor: theme.color.bg.subtle,
-}));
-
-const SearchEntry = styled(Link)(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  gap: theme.spacing.md,
-  width: "100%",
-  padding: `${theme.spacing.lg} ${theme.spacing.xl}`,
-  border: `1px solid ${theme.color.border.subtle}`,
-  borderRadius: theme.radius.full,
-  backgroundColor: theme.color.bg.elevated,
-  boxSizing: "border-box",
-  textDecoration: "none",
-
-  "&:focus-visible": {
-    outline: `2px solid ${theme.color.border.focused}`,
-    outlineOffset: theme.spacing.xs,
-  },
-}));
-
-const SearchEntryText = styled.span(({ theme }) => ({
-  flex: "1 1 auto",
-  minWidth: 0,
-  overflow: "hidden",
-  whiteSpace: "nowrap",
-  textOverflow: "ellipsis",
-  color: theme.color.text.tertiary,
-  ...theme.typography["body-m-m"],
 }));
 
 const Body = styled.div(({ theme }) => ({

@@ -3,18 +3,25 @@ import type { ReactElement } from "react";
 import styled from "@emotion/styled";
 import { Link } from "react-router-dom";
 
-import { Icon, Text } from "@/components";
-import { APP_PATH } from "@/router/path";
+import { Icon } from "@/components/Icon";
+import { Text } from "@/components/Text";
 
-const SEARCH_PLACEHOLDER = "관심있는 모임을 찾아보세요";
+const DEFAULT_PLACEHOLDER = "관심있는 모임을 찾아보세요";
+
+type SearchEntryProps = {
+  to: string;
+  placeholder?: string;
+};
 
 /**
- * 메인 상단 검색 진입 바.
- * 입력 필드가 아니라, 탭하면 이벤트 검색 페이지로 이동하는 진입점이다.
+ * 입력창이 아니라 탭하면 검색 페이지로 이동하는 검색 진입 바.
  */
-export const HomeSearchBar = (): ReactElement => {
+export const SearchEntry = ({
+  placeholder = DEFAULT_PLACEHOLDER,
+  to,
+}: SearchEntryProps): ReactElement => {
   return (
-    <SearchLink to={APP_PATH.EVENT_SEARCH}>
+    <SearchLink to={to}>
       <Icon
         aria-hidden={true}
         color="icon.secondary"
@@ -22,7 +29,7 @@ export const HomeSearchBar = (): ReactElement => {
         size={20}
       />
       <Placeholder color="text.tertiary" font="body-m-m">
-        {SEARCH_PLACEHOLDER}
+        {placeholder}
       </Placeholder>
     </SearchLink>
   );
