@@ -10,7 +10,10 @@ import {
 import styled from '@emotion/styled';
 
 import { Text } from '@/components/Text';
-import { TopNavigation, type TopNavigationProps } from '@/components/TopNavigation';
+import {
+  TopNavigation,
+  type TopNavigationProps,
+} from '@/components/TopNavigation';
 
 type FormPageTitleTag = 'h1' | 'h2';
 type FormPageNavigationProps = Omit<TopNavigationProps, 'className'>;
@@ -51,7 +54,9 @@ export const FormPageLayout = ({
     }
 
     if (contentSurfaceRef.current) {
-      contentSurfaceRef.current.style.removeProperty(CONTENT_SURFACE_RADIUS_VARIABLE);
+      contentSurfaceRef.current.style.removeProperty(
+        CONTENT_SURFACE_RADIUS_VARIABLE,
+      );
     }
   }, []);
 
@@ -79,7 +84,10 @@ export const FormPageLayout = ({
         ? initialContentRadius * (1 - nextProgress)
         : 0;
 
-      scrollArea.style.setProperty(HEADING_PROGRESS_VARIABLE, String(nextProgress));
+      scrollArea.style.setProperty(
+        HEADING_PROGRESS_VARIABLE,
+        String(nextProgress),
+      );
       contentSurface.style.setProperty(
         CONTENT_SURFACE_RADIUS_VARIABLE,
         `${nextRadius}px`,
@@ -140,23 +148,17 @@ export const FormPageLayout = ({
       <ScrollArea ref={scrollAreaRef}>
         <Heading ref={headingRef}>
           <HeadingContent>
-            <Title
-              as={titleAs}
-              color="text.primary"
-              font="heading-m-sb"
-            >
+            <Title as={titleAs} color="text.primary" font="heading-m-sb">
               {title}
             </Title>
             {isRenderable(description) ? (
-              <Text as="p" color="text.secondary" font="body-m-m">
+              <Text as="p" color="text.tertiary" font="body-m-m">
                 {description}
               </Text>
             ) : null}
           </HeadingContent>
         </Heading>
-        <ContentSurface ref={contentSurfaceRef}>
-          {children}
-        </ContentSurface>
+        <ContentSurface ref={contentSurfaceRef}>{children}</ContentSurface>
       </ScrollArea>
     </Layout>
   );
@@ -170,9 +172,9 @@ const isTopNavigationRenderable = (
 ): topNavigation is FormPageNavigationProps =>
   Boolean(
     topNavigation &&
-      (topNavigation.left ||
-        isRenderable(topNavigation.title) ||
-        (topNavigation.right && topNavigation.right.length > 0)),
+    (topNavigation.left ||
+      isRenderable(topNavigation.title) ||
+      (topNavigation.right && topNavigation.right.length > 0)),
   );
 
 const clamp = (value: number, min: number, max: number): number =>
