@@ -15,6 +15,7 @@ const toAttendanceParticipant = (form: ReturnType<typeof getAppliedForms>[number
     userId: user.userId,
     name: user.name,
     type: user.type,
+    isFirstParticipation: user.firstParticipation,
   };
 };
 
