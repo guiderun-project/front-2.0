@@ -74,7 +74,7 @@ export const EventsPage = (): ReactElement => {
   );
 
   return (
-    <PageLayout background="bg.subtle">
+    <PageLayout background="bg.default">
       <Header>
         <Text as="h1" color="text.primary" font="heading-m-sb">
           전체 모임
@@ -109,6 +109,7 @@ const Header = styled.header(({ theme }) => ({
   flexDirection: "column",
   gap: theme.spacing.lg,
   padding: `${theme.spacing.xl} ${theme.spacing["2xl"]}`,
+  backgroundColor: theme.color.bg.subtle,
 }));
 
 const SearchEntry = styled(Link)(({ theme }) => ({

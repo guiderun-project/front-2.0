@@ -29,11 +29,13 @@ export const EventResultList = ({
           <EventListCard event={event} key={event.id} />
         ))}
       </List>
-      <Pagination
-        currentPage={page}
-        totalPages={totalPages}
-        onChange={onPageChange}
-      />
+      <PaginationWrap>
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          onChange={onPageChange}
+        />
+      </PaginationWrap>
     </>
   );
 };
@@ -42,3 +44,9 @@ const List = styled.ul({
   margin: 0,
   padding: 0,
 });
+
+const PaginationWrap = styled.div(({ theme }) => ({
+  display: "flex",
+  justifyContent: "center",
+  paddingTop: theme.spacing.md,
+}));
