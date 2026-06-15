@@ -76,6 +76,8 @@ export type EventDetailPath = {
 
 export type EventDetailResponse = {
   eventId: number;
+  recruitStartDate: string;
+  recruitEndDate: string;
   name: string;
   eventType: EventType;
   eventCategory: EventCategory;
@@ -148,10 +150,11 @@ export type EventUpdatePath = EventDetailPath;
 
 export type EventUpdateRequest = Omit<
   EventCreateRequest,
-  'isPrivate' | 'expectedRunningDistanceKm'
+  'isPrivate' | 'expectedRunningDistanceKm' | 'additionalQuestions'
 > & {
   isPrivate: boolean;
   expectedRunningDistanceKm?: number | null;
+  additionalQuestions: AdditionalQuestion[];
 };
 
 export type EventUpdateResponse = EventCreateResponse;

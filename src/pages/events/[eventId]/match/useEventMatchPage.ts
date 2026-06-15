@@ -14,6 +14,7 @@ import type {
   UserType,
 } from '@/api/types';
 import { api } from '@/api/services';
+import { USER_ROLES } from '@/constants/roles';
 import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
 
@@ -85,7 +86,7 @@ export const useEventMatchPermission = (eventId: number) => {
   return {
     canManageMatching:
       user !== null &&
-      (event.viewer?.isOrganizer === true || user.role === 'ROLE_ADMIN'),
+      (event.viewer?.isOrganizer === true || user.role === USER_ROLES.ADMIN),
     eventGroupLabelContext,
   };
 };

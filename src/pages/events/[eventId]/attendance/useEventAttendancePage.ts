@@ -10,6 +10,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import type { AttendanceParticipant } from '@/api/types';
 import { api } from '@/api/services';
+import { USER_ROLES } from '@/constants/roles';
 import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
 
@@ -59,7 +60,7 @@ export const useEventAttendancePermission = (eventId: number) => {
   return {
     canManageAttendance:
       user !== null &&
-      (event.viewer?.isOrganizer === true || user.role === 'ROLE_ADMIN'),
+      (event.viewer?.isOrganizer === true || user.role === USER_ROLES.ADMIN),
   };
 };
 
