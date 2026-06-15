@@ -94,6 +94,7 @@ export type EventDetailResponse = {
   place: string;
   expectedRunningDistanceKm: number | null;
   content: string;
+  additionalQuestions: AdditionalQuestionDetail[];
   viewer: {
     isApplied: boolean;
     isOrganizer: boolean;
@@ -105,6 +106,19 @@ export type EventCityName = 'SEOUL' | 'BUSAN' | string;
 export type AdditionalQuestion =
   | { type: 'TEXT'; title: string }
   | { type: 'SELECT'; title: string; options: string[] };
+
+export type AdditionalQuestionDetail =
+  | {
+      questionId: number;
+      type: 'TEXT';
+      question: string;
+    }
+  | {
+      questionId: number;
+      type: 'SELECT';
+      question: string;
+      options: Array<{ optionId: number; value: string }>;
+    };
 
 export type EventCreateRequest = {
   recruitStartDate: string;

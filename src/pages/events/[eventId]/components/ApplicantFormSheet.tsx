@@ -2,9 +2,14 @@ import type { ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
-import type { EventApplicantFormResponse, EventType } from '@/api/types';
+import type { EventApplicantFormResponse, EventType, RunningGroup } from '@/api/types';
 import { BottomSheet, ButtonGroup, Text } from '@/components';
 
+import {
+  COMPETITION_COURSE_LABELS,
+  EVENT_VISIBLE_RUNNING_GROUPS,
+  type EventVisibleRunningGroup,
+} from '../constants';
 import { copyTextToClipboard } from '../utils';
 import { PanelState } from './PanelState';
 
@@ -130,8 +135,8 @@ const createApplicantFormRows = (
   rows.push(
     {
       id: 'applyGroup',
-      label: '훈련 희망팀',
-      value: `그룹 ${data.form.applyGroup}`,
+      label: eventType === 'COMPETITION' ? '참가 희망 코스' : '훈련 희망팀',
+      value: formatApplyGroup(data.form.applyGroup, eventType),
     },
     {
       id: 'hopePartner',
@@ -154,6 +159,25 @@ const createApplicantFormRows = (
   );
 
   return rows;
+};
+
+const formatApplyGroup = (
+  group: RunningGroup,
+  eventType: EventType,
+): string => {
+  if (!isDisplayRunningGroup(group)) {
+    return EMPTY_VALUE;
+  }
+
+  return eventType === 'COMPETITION'
+    ? COMPETITION_COURSE_LABELS[group]
+    : `그룹 ${group}`;
+};
+
+const isDisplayRunningGroup = (
+  group: RunningGroup,
+): group is EventVisibleRunningGroup => {
+  return EVENT_VISIBLE_RUNNING_GROUPS.some((displayGroup) => displayGroup === group);
 };
 
 const getDisplayValue = (value: string | null | undefined): string => {

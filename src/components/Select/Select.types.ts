@@ -24,6 +24,7 @@ type SelectBaseProps<TValue extends string> = {
   options: SelectOptions<TValue>;
   value?: TValue;
   onChange: (value: TValue) => void;
+  errorText?: ReactNode;
   confirmable?: boolean;
   confirmText?: string;
   disabled?: boolean;

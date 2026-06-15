@@ -1,4 +1,4 @@
-import { useState, type ReactElement } from 'react';
+import { useId, useState, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
@@ -11,6 +11,9 @@ import type { SelectOption, SelectOptions, SelectProps } from './Select.types';
 const DEFAULT_CONFIRM_TEXT = '확인';
 const SELECT_TRIGGER_ICON_SIZE = 24;
 const SELECT_CHECK_ICON_SIZE = 32;
+const SELECT_TRIGGER_CONTENT_HEIGHT = 40;
+const SELECT_TRIGGER_FILLED_LABEL_TOP = -2;
+const SELECT_TRIGGER_VALUE_TOP = 21;
 
 type SelectCheckListProps<TValue extends string> = {
   options: SelectOptions<TValue>;
@@ -24,6 +27,7 @@ export const Select = <TValue extends string = string>({
   confirmable = false,
   confirmText = DEFAULT_CONFIRM_TEXT,
   disabled = false,
+  errorText,
   isBackdropCloseDisabled,
   isEscapeCloseDisabled,
   label,
@@ -35,11 +39,17 @@ export const Select = <TValue extends string = string>({
   sheetTitle,
   value,
 }: SelectProps<TValue>): ReactElement => {
+  const reactId = useId();
   const [open, setOpen] = useState(false);
   const [pendingValue, setPendingValue] = useState<TValue | undefined>(value);
   const selectedOption = findSelectedOption(options, value);
   const activeValue = confirmable ? pendingValue : value;
   const isConfirmDisabled = pendingValue === undefined || pendingValue === value;
+  const hasError = Boolean(errorText);
+  const errorId = `${reactId}-error`;
+  const triggerAccessibleName = selectedOption
+    ? `${ariaLabel ?? label}, 현재 선택: ${selectedOption.label}`
+    : ariaLabel ?? label;
 
   const handleOpen = () => {
     if (disabled) {
@@ -82,37 +92,52 @@ export const Select = <TValue extends string = string>({
 
   return (
     <>
-      {renderTrigger ? (
-        renderTrigger({
-          open: handleOpen,
-          isOpen: open,
-          selectedOption,
-          value,
-          disabled,
-        })
-      ) : (
-        <SelectTrigger
-          aria-expanded={open}
-          aria-haspopup="dialog"
-          aria-label={ariaLabel ?? label}
-          disabled={disabled}
-          type="button"
-          onClick={handleOpen}
-        >
-          <SelectTriggerText
-            color={selectedOption ? 'text.primary' : 'text.tertiary'}
-            font="heading-s-m"
+      <SelectRoot data-error={hasError || undefined}>
+        {renderTrigger ? (
+          renderTrigger({
+            open: handleOpen,
+            isOpen: open,
+            selectedOption,
+            value,
+            disabled,
+          })
+        ) : (
+          <SelectTrigger
+            aria-describedby={hasError ? errorId : undefined}
+            aria-expanded={open}
+            aria-haspopup="dialog"
+            aria-invalid={hasError || undefined}
+            aria-label={triggerAccessibleName}
+            disabled={disabled}
+            type="button"
+            onClick={handleOpen}
           >
-            {selectedOption?.label ?? placeholder ?? label}
-          </SelectTriggerText>
-          <Icon
-            aria-hidden={true}
-            color={disabled ? 'icon.disabled' : 'icon.secondary'}
-            icon="chevron-down-lined"
-            size={SELECT_TRIGGER_ICON_SIZE}
-          />
-        </SelectTrigger>
-      )}
+            <SelectTriggerContent data-filled={selectedOption ? 'true' : undefined}>
+              <SelectTriggerLabel>
+                {selectedOption ? label : placeholder ?? label}
+              </SelectTriggerLabel>
+              <SelectTriggerValue
+                aria-hidden={selectedOption ? undefined : true}
+                color="text.primary"
+                font="heading-s-m"
+              >
+                {selectedOption?.label ?? ''}
+              </SelectTriggerValue>
+            </SelectTriggerContent>
+            <Icon
+              aria-hidden={true}
+              color={disabled ? 'icon.disabled' : 'icon.secondary'}
+              icon="chevron-down-lined"
+              size={SELECT_TRIGGER_ICON_SIZE}
+            />
+          </SelectTrigger>
+        )}
+        {hasError ? (
+          <SelectErrorMessage id={errorId} role="alert">
+            {errorText}
+          </SelectErrorMessage>
+        ) : null}
+      </SelectRoot>
 
       <BottomSheet
         footer={
@@ -189,6 +214,13 @@ const findSelectedOption = <TValue extends string>(
   return options.find((option) => option.value === value);
 };
 
+const SelectRoot = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing.md};
+  width: 100%;
+`;
+
 // TODO: 기본 트리거 디자인은 추후 디자인 변경에 맞춰 조정될 수 있습니다.
 const SelectTrigger = styled.button`
   display: flex;
@@ -227,6 +259,11 @@ const SelectTrigger = styled.button`
     opacity: 0.48;
   }
 
+  [data-error='true'] & {
+    border-color: ${({ theme }) => theme.color.border.danger};
+    box-shadow: inset 0 0 0 1px ${({ theme }) => theme.color.border.danger};
+  }
+
   @media (prefers-reduced-motion: reduce) {
     transition: none;
 
@@ -236,9 +273,96 @@ const SelectTrigger = styled.button`
   }
 `;
 
-const SelectTriggerText = styled(Text)`
+const SelectTriggerContent = styled.span`
+  position: relative;
+  display: flex;
   flex: 1 1 auto;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing.s};
+  min-height: ${({ theme }) => theme.pxToRem(SELECT_TRIGGER_CONTENT_HEIGHT)};
   min-width: 0;
+`;
+
+const SelectTriggerLabel = styled.span`
+  position: absolute;
+  top: 50%;
+  left: 0;
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  color: ${({ theme }) => theme.color.text.tertiary};
+  font-family: ${({ theme }) => theme.typography['heading-s-m'].fontFamily};
+  font-size: ${({ theme }) => theme.typography['heading-s-m'].fontSize};
+  font-weight: ${({ theme }) => theme.typography['heading-s-m'].fontWeight};
+  letter-spacing: ${({ theme }) => theme.typography['heading-s-m'].letterSpacing};
+  line-height: ${({ theme }) => theme.typography['heading-s-m'].lineHeight};
+  text-overflow: ellipsis;
+  transform: translateY(-50%) scale(1);
+  transform-origin: left center;
+  transition:
+    font-size 120ms ease,
+    line-height 120ms ease,
+    top 120ms ease,
+    color 120ms ease,
+    transform 120ms ease;
+  white-space: nowrap;
+
+  [data-filled='true'] & {
+    top: ${({ theme }) => theme.pxToRem(SELECT_TRIGGER_FILLED_LABEL_TOP)};
+    color: ${({ theme }) => theme.color.text.tertiary};
+    font-family: ${({ theme }) => theme.typography['detail-m-m'].fontFamily};
+    font-size: ${({ theme }) => theme.typography['detail-m-m'].fontSize};
+    font-weight: ${({ theme }) => theme.typography['detail-m-m'].fontWeight};
+    letter-spacing: ${({ theme }) => theme.typography['detail-m-m'].letterSpacing};
+    line-height: ${({ theme }) => theme.typography['detail-m-m'].lineHeight};
+    transform: translateY(0);
+    transform-origin: left top;
+  }
+
+  [data-error='true'] & {
+    color: ${({ theme }) => theme.color.text.danger};
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: color 120ms ease;
+  }
+`;
+
+const SelectTriggerValue = styled(Text)`
+  position: absolute;
+  right: 0;
+  top: ${({ theme }) => theme.pxToRem(SELECT_TRIGGER_VALUE_TOP)};
+  left: 0;
+  min-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  text-overflow: ellipsis;
+  transform: translateY(${({ theme }) => theme.spacing.xs});
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
+  white-space: nowrap;
+
+  [data-filled='true'] & {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: opacity 120ms ease;
+  }
+`;
+
+const SelectErrorMessage = styled.p`
+  margin: 0;
+  padding-inline: ${({ theme }) => theme.spacing.xs};
+  color: ${({ theme }) => theme.color.text.danger};
+  font-family: ${({ theme }) => theme.typography['detail-m-m'].fontFamily};
+  font-size: ${({ theme }) => theme.typography['detail-m-m'].fontSize};
+  font-weight: ${({ theme }) => theme.typography['detail-m-m'].fontWeight};
+  letter-spacing: ${({ theme }) => theme.typography['detail-m-m'].letterSpacing};
+  line-height: ${({ theme }) => theme.typography['detail-m-m'].lineHeight};
 `;
 
 const SelectCheckListRoot = styled.div`
