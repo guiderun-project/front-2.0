@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import { api } from '@/api/services';
+import { USER_ROLES } from '@/constants/roles';
 import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
 
@@ -22,7 +23,7 @@ export const useEventDetailPage = () => {
   const eventId = Number(eventIdParam);
   const isValidEventId = Number.isInteger(eventId) && eventId > 0;
   const canAccessProtectedTabs = isApprovedUser(user);
-  const isApprovalPending = user?.role === 'ROLE_WAIT';
+  const isApprovalPending = user?.role === USER_ROLES.WAIT;
   const activeTab = canAccessProtectedTabs ? selectedTab : 'detail';
   const viewerKey = getEventDetailViewerKey(user?.userId);
 
@@ -36,7 +37,7 @@ export const useEventDetailPage = () => {
   const canManageEvent =
     event !== null &&
     user !== null &&
-    (event?.viewer?.isOrganizer === true || user.role === 'ROLE_ADMIN');
+    (event?.viewer?.isOrganizer === true || user.role === USER_ROLES.ADMIN);
 
   const openRestrictedSheet = () => {
     setIsRestrictedSheetOpen(true);

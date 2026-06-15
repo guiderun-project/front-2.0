@@ -7,6 +7,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import { api } from '@/api/services';
 import { ConfirmPopup, CONFIRM_POPUP_VARIANT, PageLayout } from '@/components';
+import { USER_ROLES } from '@/constants/roles';
 import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
 
@@ -48,7 +49,7 @@ export const EventEditPage = (): ReactElement => {
   const canManageEvent =
     event !== null &&
     user !== null &&
-    (event.viewer?.isOrganizer === true || user.role === 'ROLE_ADMIN');
+    (event.viewer?.isOrganizer === true || user.role === USER_ROLES.ADMIN);
   const eventType = event?.eventType ?? 'TRAINING';
   const formSchema = useMemo(
     () => createEventFormSchema(eventType),
@@ -57,15 +58,11 @@ export const EventEditPage = (): ReactElement => {
   const form = useForm<EventFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: createDefaultEventFormValues(eventType),
+    mode: 'onChange',
   });
-  const formValues = useWatch({ control: form.control });
   const date = useWatch({ control: form.control, name: 'date' });
   const startTime = useWatch({ control: form.control, name: 'startTime' });
-  const isFormSubmittable = useMemo(
-    () => formSchema.safeParse(formValues).success,
-    [formSchema, formValues],
-  );
-  const { dirtyFields, isDirty, touchedFields } = useFormState({
+  const { dirtyFields, isDirty, isValid, touchedFields } = useFormState({
     control: form.control,
   });
   const {
@@ -86,6 +83,7 @@ export const EventEditPage = (): ReactElement => {
     previousDateRef.current = nextValues.date;
     previousStartTimeRef.current = nextValues.startTime;
     form.reset(nextValues);
+    void form.trigger();
   }, [event, form]);
 
   useEffect(() => {
@@ -226,7 +224,7 @@ export const EventEditPage = (): ReactElement => {
         isDeleting={isDeletingEvent}
         isSubmitting={isUpdatingEvent}
         mode={EVENT_FORM_MODES.EDIT}
-        submitDisabled={!isFormSubmittable}
+        submitDisabled={!isValid}
         onBack={handleBack}
         onCancelBack={handleCancelBack}
         onConfirmBack={handleConfirmBack}
