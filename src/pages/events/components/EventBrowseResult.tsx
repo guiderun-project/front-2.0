@@ -12,23 +12,10 @@ import type {
   EventListTypeFilter,
   RecruitStatusFilter,
 } from "@/api/types";
-import { Filter, Text, type SelectOptions } from "@/components";
 
 import { useBrowseEvents } from "../hooks/useBrowseEvents";
+import { EventResultHeader } from "./EventResultHeader";
 import { EventResultList } from "./EventResultList";
-
-const TYPE_FILTER_OPTIONS: SelectOptions<EventListTypeFilter> = [
-  { label: "전체", value: EVENT_LIST_TYPE_FILTERS.TOTAL },
-  { label: "대회", value: EVENT_LIST_TYPE_FILTERS.COMPETITION },
-  { label: "훈련", value: EVENT_LIST_TYPE_FILTERS.TRAINING },
-];
-
-const RECRUIT_FILTER_OPTIONS: SelectOptions<RecruitStatusFilter> = [
-  { label: "전체", value: RECRUIT_STATUS_FILTERS.ALL },
-  { label: "모집중", value: RECRUIT_STATUS_FILTERS.OPEN },
-  { label: "모집예정", value: RECRUIT_STATUS_FILTERS.UPCOMING },
-  { label: "모집마감", value: RECRUIT_STATUS_FILTERS.CLOSE },
-];
 
 type EventBrowseResultProps = {
   tab: EventListTab;
@@ -62,33 +49,14 @@ export const EventBrowseResult = ({
 
   return (
     <>
-      <CountRow>
-        <Text color="text.secondary" font="body-s-m">
-          총 {totalCount}건
-        </Text>
-        {isUpcoming ? (
-          <Filters>
-            <Filter
-              ariaLabel="유형 필터"
-              icon="chevron-down-lined"
-              options={TYPE_FILTER_OPTIONS}
-              placeholder="유형"
-              sheetTitle="유형"
-              value={typeFilter}
-              onChange={onTypeChange}
-            />
-            <Filter
-              ariaLabel="모집구분 필터"
-              icon="chevron-down-lined"
-              options={RECRUIT_FILTER_OPTIONS}
-              placeholder="모집구분"
-              sheetTitle="모집구분"
-              value={recruitFilter}
-              onChange={onRecruitChange}
-            />
-          </Filters>
-        ) : null}
-      </CountRow>
+      <EventResultHeader
+        recruitFilter={recruitFilter}
+        showFilters={isUpcoming}
+        totalCount={totalCount}
+        typeFilter={typeFilter}
+        onRecruitChange={onRecruitChange}
+        onTypeChange={onTypeChange}
+      />
 
       {items.length === 0 ? (
         <EmptyMessage role="status">표시할 모임이 없어요.</EmptyMessage>
@@ -103,17 +71,6 @@ export const EventBrowseResult = ({
     </>
   );
 };
-
-const CountRow = styled.div({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-});
-
-const Filters = styled.div(({ theme }) => ({
-  display: "flex",
-  gap: theme.spacing.sm,
-}));
 
 const EmptyMessage = styled.p(({ theme }) => ({
   display: "grid",
