@@ -2,7 +2,7 @@ export const APP_PATH = {
   HOME: '/',
   DESIGN: '/design',
   INTRO: '/intro',
-  KAKAO_OAUTH: '/oauth/kakao',
+  OAUTH: '/oauth',
   LOGIN: '/login',
   SIGNUP: '/signup',
   ACCOUNT_FIND: '/account-find',
