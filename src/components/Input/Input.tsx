@@ -10,6 +10,7 @@ export const Input = ({
   label,
   helperText,
   errorText,
+  error,
   maxLength,
   clearable,
   clearLabel,
@@ -32,6 +33,7 @@ export const Input = ({
       controlRef={controlRef}
       defaultValue={defaultValue}
       describedById={describedById}
+      error={error}
       errorText={errorText}
       helperText={helperText}
       label={label}

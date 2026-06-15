@@ -98,6 +98,7 @@ export const InputFieldShell = <
   label,
   helperText,
   errorText,
+  error = false,
   maxLength,
   placeholder,
   value,
@@ -138,7 +139,7 @@ export const InputFieldShell = <
     : uncontrolledLength;
   const hasValue = length > 0;
 
-  const hasError = Boolean(errorText);
+  const hasError = Boolean(errorText) || error;
   const message = hasError ? errorText : helperText;
   const hasMessage = Boolean(message);
   const showCounter = maxLength != null;

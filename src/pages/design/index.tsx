@@ -919,7 +919,16 @@ const INPUT_CODE_EXAMPLES = [
 />`,
   },
   {
-    label: "Error",
+    label: "Error prop",
+    code: `<Input
+  error
+  label="닉네임"
+  placeholder="닉네임을 입력해주세요"
+  maxLength={20}
+/>`,
+  },
+  {
+    label: "Error text",
     code: `<Input
   label="이름"
   placeholder="이름을 입력해주세요"
@@ -2030,7 +2039,7 @@ export const DesignPage = () => {
             Input
           </Text>
           <Text color="text.tertiary" font="detail-m-r">
-            Single-line, multi-line, timer, time
+            Single-line, error, multi-line, timer, time
           </Text>
         </SectionTitle>
         <FieldList>
@@ -2042,6 +2051,12 @@ export const DesignPage = () => {
             onChange={(event) => setInputName(event.target.value)}
             placeholder="이름을 입력해주세요"
             value={inputName}
+          />
+          <Input
+            error
+            label="닉네임"
+            maxLength={20}
+            placeholder="닉네임을 입력해주세요"
           />
           <Input
             errorText="오류 메시지"
