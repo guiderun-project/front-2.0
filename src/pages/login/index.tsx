@@ -10,21 +10,43 @@ import {
   Input,
   PageLayout,
 } from '@/components';
+import { api } from '@/api/services';
+import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
 
 const LOGIN_FORM_ID = 'login-form';
+const LOGIN_ERROR_MESSAGE = '아이디 또는 비밀번호를 확인해주세요';
 
 export const LoginPage = (): ReactElement => {
   const navigate = useNavigate();
+  const { startSession } = useAuth();
 
   const [accountId, setAccountId] = useState('');
   const [password, setPassword] = useState('');
+  const [errorText, setErrorText] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const canSubmit = accountId.trim() !== '' && password.trim() !== '';
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // TODO: loginPost + startSession 연동 (기능 스텝)
+
+    if (!canSubmit || isSubmitting) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setErrorText('');
+
+    try {
+      const { accessToken } = await api.auth.loginPost({ accountId, password });
+      await startSession(accessToken);
+      navigate(APP_PATH.HOME, { replace: true });
+    } catch {
+      setErrorText(LOGIN_ERROR_MESSAGE);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleFindId = () => {
@@ -62,18 +84,26 @@ export const LoginPage = (): ReactElement => {
         >
           <Input
             autoComplete="username"
+            error={Boolean(errorText)}
             label="아이디"
             placeholder="아이디"
             value={accountId}
-            onChange={(event) => setAccountId(event.target.value)}
+            onChange={(event) => {
+              setAccountId(event.target.value);
+              setErrorText('');
+            }}
           />
           <Input
             autoComplete="current-password"
+            errorText={errorText}
             label="비밀번호"
             placeholder="비밀번호"
             type="password"
             value={password}
-            onChange={(event) => setPassword(event.target.value)}
+            onChange={(event) => {
+              setPassword(event.target.value);
+              setErrorText('');
+            }}
           />
 
           <FindAccountRow>
@@ -89,7 +119,7 @@ export const LoginPage = (): ReactElement => {
 
         <FooterButton>
           <FooterButton.Button
-            disabled={!canSubmit}
+            disabled={!canSubmit || isSubmitting}
             form={LOGIN_FORM_ID}
             fullWidth
             size="l"
