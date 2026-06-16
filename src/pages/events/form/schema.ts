@@ -119,7 +119,10 @@ export const createEventFormSchema = (
       content: z
         .string()
         .trim()
-        .max(EVENT_CONTENT_MAX_LENGTH, '내용은 최대 1000자까지 입력할 수 있어요.'),
+        .max(
+          EVENT_CONTENT_MAX_LENGTH,
+          `내용은 최대 ${EVENT_CONTENT_MAX_LENGTH}자까지 입력할 수 있어요.`,
+        ),
       expectedRunningDistanceKm: runningDistanceSchema,
       isPrivate: z.boolean(),
       additionalQuestions: z.array(additionalQuestionSchema),
