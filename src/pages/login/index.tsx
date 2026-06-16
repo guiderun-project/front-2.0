@@ -50,11 +50,11 @@ export const LoginPage = (): ReactElement => {
   };
 
   const handleFindId = () => {
-    navigate(APP_PATH.ACCOUNT_FIND);
+    navigate(`${APP_PATH.ACCOUNT_FIND}?type=id`);
   };
 
   const handleFindPassword = () => {
-    navigate(APP_PATH.ACCOUNT_FIND);
+    navigate(`${APP_PATH.ACCOUNT_FIND}?type=password`);
   };
 
   return (
