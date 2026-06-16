@@ -133,15 +133,18 @@ export const FindId = (): ReactElement => {
             {isCodeSent && (
               <TimerInput
                 autoComplete="one-time-code"
+                confirmDisabled={certCode.trim() === '' || isVerified}
                 confirmLabel="확인"
                 controlRef={certInputRef}
                 inputMode="numeric"
                 label="인증번호"
                 timerText={PLACEHOLDER_TIMER}
                 value={certCode}
-                onChange={(event) =>
-                  setCertCode(event.target.value.replace(/[^0-9]/g, ''))
-                }
+                onChange={(event) => {
+                  setCertCode(event.target.value.replace(/[^0-9]/g, ''));
+                  // 인증번호를 수정하면 이전 인증을 무효화 → 재확인 필요
+                  setIsVerified(false);
+                }}
                 onConfirm={handleVerifyCode}
               />
             )}
