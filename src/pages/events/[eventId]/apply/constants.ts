@@ -12,7 +12,7 @@ import { getEventPrimaryGroupLabel } from '../utils/groupLabel';
 export type EventApplyGroupValue = EventVisibleRunningGroup;
 
 export const EVENT_APPLY_GROUP_VALUES = EVENT_VISIBLE_RUNNING_GROUPS;
-export const EVENT_APPLY_DETAIL_MAX_LENGTH = 500;
+export const EVENT_APPLY_DETAIL_MAX_LENGTH = 100;
 
 const TRAINING_RECORD_LABELS: Record<UserType, Record<EventApplyGroupValue, string>> = {
   VI: {
