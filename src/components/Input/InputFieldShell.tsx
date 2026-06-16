@@ -3,9 +3,10 @@ import type {
   ChangeEventHandler,
   ReactElement,
   ReactNode,
+  Ref,
   RefObject,
 } from "react";
-import { useId, useRef, useState } from "react";
+import { useId, useLayoutEffect, useRef, useState } from "react";
 
 import styled from "@emotion/styled";
 
@@ -57,6 +58,7 @@ type InputFieldShellProps<E extends HTMLInputElement | HTMLTextAreaElement> =
     multiline?: boolean;
     className?: string;
     describedById?: string;
+    controlRef?: Ref<E>;
     renderControl: (control: InputControlRenderProps<E>) => ReactNode;
   };
 
@@ -74,12 +76,29 @@ const setNativeValue = (
   element.dispatchEvent(new Event("input", { bubbles: true }));
 };
 
+const assignRef = <E extends HTMLInputElement | HTMLTextAreaElement>(
+  ref: Ref<E> | undefined,
+  node: E | null,
+): void => {
+  if (!ref) {
+    return;
+  }
+
+  if (typeof ref === "function") {
+    ref(node);
+    return;
+  }
+
+  ref.current = node;
+};
+
 export const InputFieldShell = <
   E extends HTMLInputElement | HTMLTextAreaElement,
 >({
   label,
   helperText,
   errorText,
+  error = false,
   maxLength,
   placeholder,
   value,
@@ -92,6 +111,7 @@ export const InputFieldShell = <
   multiline = false,
   className,
   describedById,
+  controlRef: externalControlRef,
   renderControl,
 }: InputFieldShellProps<E>): ReactElement => {
   const reactId = useId();
@@ -99,6 +119,14 @@ export const InputFieldShell = <
   const messageId = `${reactId}-message`;
   const counterId = `${reactId}-counter`;
   const controlRef = useRef<E>(null);
+
+  useLayoutEffect(() => {
+    assignRef(externalControlRef, controlRef.current);
+
+    return () => {
+      assignRef(externalControlRef, null);
+    };
+  }, [externalControlRef]);
 
   const isControlled = value !== undefined;
   const [uncontrolledLength, setUncontrolledLength] = useState(() =>
@@ -111,7 +139,7 @@ export const InputFieldShell = <
     : uncontrolledLength;
   const hasValue = length > 0;
 
-  const hasError = Boolean(errorText);
+  const hasError = Boolean(errorText) || error;
   const message = hasError ? errorText : helperText;
   const hasMessage = Boolean(message);
   const showCounter = maxLength != null;

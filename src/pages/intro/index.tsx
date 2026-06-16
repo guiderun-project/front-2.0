@@ -11,12 +11,14 @@ import introRunnersDark from './assets/intro-runners-dark.png';
 import introRunners from './assets/intro-runners.png';
 import { KakaoLoginButton } from './components/KakaoLoginButton';
 
+const GUIDERUN_LANDING_URL = 'https://about.guiderun.org/';
+
 export const IntroPage = (): ReactElement => {
   const navigate = useNavigate();
   const { colorMode } = useColorMode();
 
   const handleGuideRunInfoClick = () => {
-    // TODO: 가이드런 외부 랜딩 페이지로 이동
+    window.open(GUIDERUN_LANDING_URL, '_blank', 'noopener,noreferrer');
   };
 
   const handleBrowseWithoutSignup = () => {

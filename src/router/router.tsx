@@ -27,7 +27,7 @@ const IntroPage = lazy(() =>
   import('@/pages/intro').then(({ IntroPage }) => ({ default: IntroPage })),
 );
 const KakaoOAuthPage = lazy(() =>
-  import('@/pages/oauth/kakao').then(({ KakaoOAuthPage }) => ({
+  import('@/pages/oauth').then(({ KakaoOAuthPage }) => ({
     default: KakaoOAuthPage,
   })),
 );
@@ -174,7 +174,7 @@ export const router = createBrowserRouter([
         element: createLazyRouteElement(IntroPage),
       },
       {
-        path: 'oauth/kakao',
+        path: 'oauth',
         element: createLazyRouteElement(KakaoOAuthPage),
       },
       {

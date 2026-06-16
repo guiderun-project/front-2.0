@@ -28,7 +28,8 @@ type MatchPermissionGateProps = {
 export const MatchPermissionGate = ({
   eventId,
 }: MatchPermissionGateProps): ReactElement => {
-  const { canManageMatching } = useEventMatchPermission(eventId);
+  const { canManageMatching, eventGroupLabelContext } =
+    useEventMatchPermission(eventId);
 
   if (!canManageMatching) {
     return <MatchMessagePage pageState={FORBIDDEN_STATE} />;
@@ -39,7 +40,10 @@ export const MatchPermissionGate = ({
       errorState={MATCH_ERROR_STATE}
       loadingState={MATCH_LOADING_STATE}
     >
-      <MatchReadyPage eventId={eventId} />
+      <MatchReadyPage
+        eventGroupLabelContext={eventGroupLabelContext}
+        eventId={eventId}
+      />
     </MatchPageBoundary>
   );
 };

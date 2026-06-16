@@ -84,7 +84,7 @@ const getParticipantCtaButtonConfigs = ({
         ];
       }
 
-      return [{ action: 'apply', label: '참여신청하기' }];
+      return [{ action: 'apply', label: '참여 신청하기' }];
     case 'RECRUIT_CLOSE':
       return [
         {

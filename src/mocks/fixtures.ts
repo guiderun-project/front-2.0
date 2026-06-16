@@ -15,6 +15,7 @@ import type {
   UserType,
 } from '@/api/types/common';
 import type {
+  AdditionalQuestionDetail,
   EventCreateRequest,
   EventDetailResponse,
   EventListGetResponse,
@@ -115,6 +116,7 @@ type MockDb = {
 
 export const currentUserId = 'user-vi-1';
 export const runningGroups: RunningGroup[] = ['A', 'B', 'C', 'D', 'E', 'P'];
+export const visibleRunningGroups: RunningGroup[] = ['A', 'B', 'C', 'D', 'E'];
 
 export const mockDb: MockDb = {
   users: [
@@ -302,8 +304,8 @@ export const mockDb: MockDb = {
       recruitEndDate: '2026-06-20',
       name: 'Summer 10K Race Support',
       eventType: 'COMPETITION',
-      eventCategory: 'TEAM',
-      recruitStatus: 'RECRUIT_UPCOMING',
+      eventCategory: 'GENERAL',
+      recruitStatus: 'RECRUIT_OPEN',
       isPrivate: false,
       organizerId: 'user-guide-1',
       schedule: {
@@ -440,8 +442,8 @@ export const mockDb: MockDb = {
       recruitEndDate: '2026-06-18',
       name: 'Midsummer Night 5K',
       eventType: 'COMPETITION',
-      eventCategory: 'TEAM',
-      recruitStatus: 'RECRUIT_UPCOMING',
+      eventCategory: 'GENERAL',
+      recruitStatus: 'RECRUIT_OPEN',
       isPrivate: false,
       organizerId: 'user-guide-1',
       schedule: {
@@ -636,7 +638,7 @@ export const mockDb: MockDb = {
     {
       requestId: 2001,
       eventId: 2,
-      userId: 'user-vi-1',
+      userId: 'user-vi-2',
       status: 'APPLIED',
       canceledAt: null,
       group: 'A',
@@ -998,6 +1000,30 @@ export const buildAdditionalAnswerDetails = (
     });
 };
 
+export const buildAdditionalQuestionDetails = (
+  eventId: number,
+): AdditionalQuestionDetail[] => {
+  return mockDb.additionalQuestions
+    .filter((question) => question.eventId === eventId)
+    .sort((left, right) => left.displayOrder - right.displayOrder)
+    .map((question) => {
+      if (question.type === 'TEXT') {
+        return {
+          questionId: question.questionId,
+          type: 'TEXT',
+          question: question.title,
+        };
+      }
+
+      return {
+        questionId: question.questionId,
+        type: 'SELECT',
+        question: question.title,
+        options: question.options,
+      };
+    });
+};
+
 export const buildApplicantForm = (
   eventId: number,
   userId: string,
@@ -1046,6 +1072,8 @@ export const toEventDetail = (event: MockEvent): EventDetailResponse => {
 
   return {
     eventId: event.eventId,
+    recruitStartDate: event.recruitStartDate,
+    recruitEndDate: event.recruitEndDate,
     name: event.name,
     eventType: event.eventType,
     eventCategory: event.eventCategory,
@@ -1059,6 +1087,7 @@ export const toEventDetail = (event: MockEvent): EventDetailResponse => {
     place: event.place,
     expectedRunningDistanceKm: event.expectedRunningDistanceKm,
     content: event.content,
+    additionalQuestions: buildAdditionalQuestionDetails(event.eventId),
     viewer: {
       isApplied: Boolean(appliedForm),
       isOrganizer: event.organizerId === currentUser.userId,

@@ -2,17 +2,23 @@ import type { ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
-import type { EventApplicantFormResponse, EventType } from '@/api/types';
+import type { EventApplicantFormResponse, RunningGroup } from '@/api/types';
 import { BottomSheet, ButtonGroup, Text } from '@/components';
 
-import { copyTextToClipboard } from '../utils';
+import {
+  copyTextToClipboard,
+  getEventGroupDisplayLabel,
+  getEventPrimaryGroupLabel,
+  type EventGroupLabelContext,
+} from '../utils';
 import { PanelState } from './PanelState';
 
 const EMPTY_VALUE = '미입력';
 
 type ApplicantFormSheetProps = {
   data?: EventApplicantFormResponse;
-  eventType: EventType;
+  eventCategory: EventGroupLabelContext['eventCategory'];
+  eventType: EventGroupLabelContext['eventType'];
   isError: boolean;
   isPending: boolean;
   open: boolean;
@@ -27,13 +33,15 @@ type ApplicantFormRow = {
 
 export const ApplicantFormSheet = ({
   data,
+  eventCategory,
   eventType,
   isError,
   isPending,
   onClose,
   open,
 }: ApplicantFormSheetProps): ReactElement => {
-  const rows = data ? createApplicantFormRows(data, eventType) : [];
+  const eventGroupLabelContext = { eventCategory, eventType };
+  const rows = data ? createApplicantFormRows(data, eventGroupLabelContext) : [];
   const canCopy = rows.length > 0 && !isPending && !isError;
 
   const handleCopy = () => {
@@ -102,8 +110,9 @@ export const ApplicantFormSheet = ({
 
 const createApplicantFormRows = (
   data: EventApplicantFormResponse,
-  eventType: EventType,
+  eventGroupLabelContext: EventGroupLabelContext,
 ): ApplicantFormRow[] => {
+  const { eventType } = eventGroupLabelContext;
   const rows: ApplicantFormRow[] = [
     {
       id: 'name',
@@ -130,8 +139,8 @@ const createApplicantFormRows = (
   rows.push(
     {
       id: 'applyGroup',
-      label: '훈련 희망팀',
-      value: `그룹 ${data.form.applyGroup}`,
+      label: getEventPrimaryGroupLabel(eventGroupLabelContext),
+      value: formatApplyGroup(data.form.applyGroup, eventGroupLabelContext),
     },
     {
       id: 'hopePartner',
@@ -154,6 +163,13 @@ const createApplicantFormRows = (
   );
 
   return rows;
+};
+
+const formatApplyGroup = (
+  group: RunningGroup,
+  eventGroupLabelContext: EventGroupLabelContext,
+): string => {
+  return getEventGroupDisplayLabel(eventGroupLabelContext, group) || EMPTY_VALUE;
 };
 
 const getDisplayValue = (value: string | null | undefined): string => {
