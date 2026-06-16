@@ -12,6 +12,7 @@ import type {
   EventListTypeFilter,
   RecruitStatusFilter,
 } from "@/api/types";
+import { Text } from "@/components";
 
 import { useBrowseEvents } from "../hooks/useBrowseEvents";
 import { EventResultHeader } from "./EventResultHeader";
@@ -59,7 +60,15 @@ export const EventBrowseResult = ({
       />
 
       {items.length === 0 ? (
-        <EmptyMessage role="status">표시할 모임이 없어요.</EmptyMessage>
+        <EmptyMessage
+          align="center"
+          as="p"
+          color="text.tertiary"
+          font="body-m-m"
+          role="status"
+        >
+          표시할 모임이 없어요.
+        </EmptyMessage>
       ) : (
         <EventResultList
           items={items}
@@ -72,12 +81,8 @@ export const EventBrowseResult = ({
   );
 };
 
-const EmptyMessage = styled.p(({ theme }) => ({
+const EmptyMessage = styled(Text)(({ theme }) => ({
   display: "grid",
   placeItems: "center",
   minHeight: theme.pxToRem(160),
-  margin: 0,
-  color: theme.color.text.tertiary,
-  textAlign: "center",
-  ...theme.typography["body-m-m"],
 }));
