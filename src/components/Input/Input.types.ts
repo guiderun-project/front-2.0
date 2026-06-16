@@ -4,6 +4,8 @@ export type InputFieldOwnProps = {
   label: string;
   helperText?: ReactNode;
   errorText?: ReactNode;
+  /** errorText 없이 에러 스타일(테두리/라벨)만 적용할 때 사용 */
+  error?: boolean;
   maxLength?: number;
 };
 
