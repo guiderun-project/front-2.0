@@ -12,10 +12,6 @@ type QueryBoundaryProps = {
   children: ReactNode;
 };
 
-/**
- * Suspense + ErrorBoundary를 묶어 데이터 영역의 로딩/에러를 처리하는 경계.
- * react-query의 reset과 연결해 재시도를 지원한다.
- */
 export const QueryBoundary = ({
   children,
   errorMessage,

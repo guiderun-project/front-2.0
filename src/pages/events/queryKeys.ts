@@ -4,7 +4,7 @@ import type {
   RecruitStatusFilter,
 } from "@/api/types";
 
-export type EventListQueryParams = {
+type EventListQueryParams = {
   tab: EventListTab;
   type: EventListTypeFilter;
   recruitStatus: RecruitStatusFilter;

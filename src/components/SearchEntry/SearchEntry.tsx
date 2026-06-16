@@ -13,9 +13,6 @@ type SearchEntryProps = {
   placeholder?: string;
 };
 
-/**
- * 입력창이 아니라 탭하면 검색 페이지로 이동하는 검색 진입 바.
- */
 export const SearchEntry = ({
   placeholder = DEFAULT_PLACEHOLDER,
   to,
