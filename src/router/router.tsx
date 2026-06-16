@@ -58,6 +58,13 @@ const EventNewPage = lazy(() =>
     default: EventNewPage,
   })),
 );
+const EventDetailRouteProvider = lazy(() =>
+  import('@/pages/events/[eventId]/EventDetailRouteProvider').then(
+    ({ EventDetailRouteProvider }) => ({
+      default: EventDetailRouteProvider,
+    }),
+  ),
+);
 const EventDetailPage = lazy(() =>
   import('@/pages/events/[eventId]').then(({ EventDetailPage }) => ({
     default: EventDetailPage,
@@ -199,23 +206,29 @@ export const router = createBrowserRouter([
       },
       {
         path: 'events/:eventId',
-        element: createLazyRouteElement(EventDetailPage),
-      },
-      {
-        path: 'events/:eventId/apply',
-        element: createLazyRouteElement(EventApplyPage, 'approved'),
-      },
-      {
-        path: 'events/:eventId/edit',
-        element: createLazyRouteElement(EventEditPage, 'approved'),
-      },
-      {
-        path: 'events/:eventId/match',
-        element: createLazyRouteElement(EventMatchPage, 'approved'),
-      },
-      {
-        path: 'events/:eventId/attendance',
-        element: createLazyRouteElement(EventAttendancePage, 'approved'),
+        element: createLazyRouteElement(EventDetailRouteProvider),
+        children: [
+          {
+            index: true,
+            element: createLazyRouteElement(EventDetailPage),
+          },
+          {
+            path: 'apply',
+            element: createLazyRouteElement(EventApplyPage, 'approved'),
+          },
+          {
+            path: 'edit',
+            element: createLazyRouteElement(EventEditPage, 'approved'),
+          },
+          {
+            path: 'match',
+            element: createLazyRouteElement(EventMatchPage, 'approved'),
+          },
+          {
+            path: 'attendance',
+            element: createLazyRouteElement(EventAttendancePage, 'approved'),
+          },
+        ],
       },
       {
         path: 'events/supports',

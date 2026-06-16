@@ -10,7 +10,6 @@ import { useEventApplyPage } from './useEventApplyPage';
 export const EventApplyPage = (): ReactElement => {
   const {
     event,
-    eventDetailQuery,
     form,
     handleBack,
     handleSubmit,
@@ -36,7 +35,7 @@ export const EventApplyPage = (): ReactElement => {
     );
   }
 
-  if (!isAuthReady || eventDetailQuery.isPending || !isMyFormReady) {
+  if (!isAuthReady || !isMyFormReady) {
     return (
       <PageLayout background="bg.subtle">
         <RoutePlaceholder
@@ -47,7 +46,7 @@ export const EventApplyPage = (): ReactElement => {
     );
   }
 
-  if (eventDetailQuery.isError || !event || isMyFormError) {
+  if (isMyFormError) {
     return (
       <PageLayout background="bg.subtle">
         <RoutePlaceholder
