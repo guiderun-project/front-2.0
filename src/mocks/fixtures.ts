@@ -1095,6 +1095,16 @@ export const toEventDetail = (event: MockEvent): EventDetailResponse => {
   };
 };
 
+const LIST_WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
+
+const formatListDate = (date: string) => {
+  const [year, month, day] = date.split('-').map(Number);
+  const weekday = LIST_WEEKDAY_LABELS[new Date(year, month - 1, day).getDay()];
+  const pad = (value: number) => String(value).padStart(2, '0');
+
+  return `${year}. ${pad(month)}. ${pad(day)} ${weekday}`;
+};
+
 export const toEventListItem = (
   event: MockEvent,
 ): EventListGetResponse['items'][number] => {
@@ -1106,7 +1116,7 @@ export const toEventListItem = (
         : event.recruitStatus,
     name: event.name,
     type: event.eventType,
-    dateText: event.schedule.dateText,
+    dateText: formatListDate(event.schedule.date),
   };
 };
 

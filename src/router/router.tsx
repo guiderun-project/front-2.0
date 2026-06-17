@@ -159,10 +159,6 @@ export const router = createBrowserRouter([
             element: createLazyRouteElement(EventsPage),
           },
           {
-            path: 'events/search',
-            element: createLazyRouteElement(EventSearchPage),
-          },
-          {
             path: 'design',
             element: createLazyRouteElement(DesignPage),
           },
@@ -171,6 +167,10 @@ export const router = createBrowserRouter([
             element: createLazyRouteElement(MyPage, 'authenticated'),
           },
         ],
+      },
+      {
+        path: 'events/search',
+        element: createLazyRouteElement(EventSearchPage),
       },
       {
         path: 'design/form',
