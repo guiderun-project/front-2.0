@@ -1,5 +1,5 @@
 import type { ReactElement, ReactNode } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 
 import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +12,7 @@ import {
   TimerInput,
 } from '@/components';
 import { ACCOUNT_FIND_TYPE } from '@/constants';
-import { onlyDigits } from '@/pages/account-find/utils';
+import { usePhoneCertification } from '@/pages/account-find/usePhoneCertification';
 import { APP_PATH } from '@/router/path';
 
 const FIND_ID_PHASE = {
@@ -26,9 +26,6 @@ type FindIdPhase = (typeof FIND_ID_PHASE)[keyof typeof FIND_ID_PHASE];
 const TITLE_VERIFY = '아이디를 찾기 위해\n번호 인증이 필요해요';
 const TITLE_FOUND = '아래 아이디로\n로그인해주세요';
 
-// TODO: 실제 SMS 인증 타이머로 대체. 현재는 퍼블리싱용 정적 표기.
-const PLACEHOLDER_TIMER = '03:00';
-
 // TODO: accountIdPost 결과로 found/notFound 분기. 현재는 퍼블리싱 미리보기용 트리거.
 const NO_ACCOUNT_SENTINEL = '0000';
 
@@ -36,17 +33,17 @@ export const FindId = (): ReactElement => {
   const navigate = useNavigate();
 
   const [phase, setPhase] = useState<FindIdPhase>(FIND_ID_PHASE.VERIFY);
-  const [isCodeSent, setIsCodeSent] = useState(false);
-  const [phoneNum, setPhoneNum] = useState('');
-  const [certCode, setCertCode] = useState('');
-
-  const certInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (isCodeSent) {
-      certInputRef.current?.focus();
-    }
-  }, [isCodeSent]);
+  const {
+    phoneNum,
+    certCode,
+    isCodeSent,
+    timerText,
+    certInputRef,
+    handlePhoneChange,
+    handleCertCodeChange,
+    sendCode,
+    extendTime,
+  } = usePhoneCertification();
 
   const handleBack = () => {
     if (phase !== FIND_ID_PHASE.VERIFY) {
@@ -56,17 +53,10 @@ export const FindId = (): ReactElement => {
     navigate(-1);
   };
 
-  // TODO: accountIdVerificationIssuePost 호출로 대체
+  // TODO: accountIdVerificationIssuePost 호출 후 sendCode()
   const handleSendCode = () => {
-    setIsCodeSent(true);
-    // 재발송 시 이전 입력 초기화
-    setCertCode('');
-    // 이미 노출된 경우 즉시 포커스, 최초 노출은 아래 effect가 처리
-    certInputRef.current?.focus();
+    sendCode();
   };
-
-  // TODO: smsVerificationExtendPost 호출 + 타이머 3:00 재시작
-  const handleExtendTime = () => {};
 
   const handleNext = () => {
     setPhase(
@@ -125,7 +115,7 @@ export const FindId = (): ReactElement => {
               label="전화번호"
               placeholder="-없이 숫자만 입력해주세요"
               value={phoneNum}
-              onChange={(event) => setPhoneNum(onlyDigits(event.target.value))}
+              onChange={handlePhoneChange}
               onConfirm={handleSendCode}
             />
             {isCodeSent && (
@@ -136,10 +126,10 @@ export const FindId = (): ReactElement => {
                 controlRef={certInputRef}
                 inputMode="numeric"
                 label="인증번호"
-                timerText={PLACEHOLDER_TIMER}
+                timerText={timerText}
                 value={certCode}
-                onChange={(event) => setCertCode(onlyDigits(event.target.value))}
-                onConfirm={handleExtendTime}
+                onChange={handleCertCodeChange}
+                onConfirm={extendTime}
               />
             )}
           </Container>
