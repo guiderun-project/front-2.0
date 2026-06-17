@@ -1,42 +1,38 @@
 import { Suspense, type ReactElement, type ReactNode } from "react";
 
+import styled from "@emotion/styled";
 import { QueryErrorResetBoundary } from "@tanstack/react-query";
 
-import { Button, ErrorBoundary } from "@/components";
+import { Button } from "@/components/Button";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
-import { HomeSectionMessage } from "./HomeSectionMessage";
-
-type HomeSectionBoundaryProps = {
+type QueryBoundaryProps = {
   loadingMessage: string;
   errorMessage: string;
   children: ReactNode;
 };
 
-export const HomeSectionBoundary = ({
+export const QueryBoundary = ({
   children,
   errorMessage,
   loadingMessage,
-}: HomeSectionBoundaryProps): ReactElement => {
+}: QueryBoundaryProps): ReactElement => {
   return (
     <QueryErrorResetBoundary>
       {({ reset }) => (
         <ErrorBoundary
           onReset={reset}
           fallback={({ reset: retry }) => (
-            <HomeSectionMessage role="alert">
+            <Message role="alert">
               {errorMessage}
               <Button level="secondary" size="s" type="button" onClick={retry}>
                 다시 시도
               </Button>
-            </HomeSectionMessage>
+            </Message>
           )}
         >
           <Suspense
-            fallback={
-              <HomeSectionMessage role="status">
-                {loadingMessage}
-              </HomeSectionMessage>
-            }
+            fallback={<Message role="status">{loadingMessage}</Message>}
           >
             {children}
           </Suspense>
@@ -45,3 +41,16 @@ export const HomeSectionBoundary = ({
     </QueryErrorResetBoundary>
   );
 };
+
+const Message = styled.p(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: theme.spacing.md,
+  minHeight: theme.pxToRem(160),
+  margin: 0,
+  color: theme.color.text.tertiary,
+  textAlign: "center",
+  ...theme.typography["body-m-m"],
+}));

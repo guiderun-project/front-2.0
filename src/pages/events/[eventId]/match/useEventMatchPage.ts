@@ -4,9 +4,8 @@ import {
   useMutation,
   useQueryClient,
   useSuspenseQueries,
-  useSuspenseQuery,
 } from '@tanstack/react-query';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import type {
   MatchingCompletedRow,
@@ -20,7 +19,8 @@ import { APP_PATH } from '@/router/path';
 
 import type { MatchReadyState } from './matchPageState';
 import { matchQueryKeys } from './queryKeys';
-import { eventDetailQueryKeys, getEventDetailViewerKey } from '../queryKeys';
+import { useEventDetailRoute } from '../EventDetailRouteContext';
+import { eventDetailQueryKeys } from '../queryKeys';
 import type { EventGroupLabelContext } from '../utils';
 
 export type MatchTabId = 'waiting' | 'completed';
@@ -39,12 +39,6 @@ type CancelMatchingOptions = {
   onSuccess?: () => void;
 };
 
-const getValidEventId = (eventIdParam: string | undefined): number | null => {
-  const eventId = Number(eventIdParam);
-
-  return Number.isInteger(eventId) && eventId > 0 ? eventId : null;
-};
-
 const getParticipantType = (
   participant: MatchingWaitingParticipant | undefined,
 ): UserType | null => {
@@ -52,9 +46,9 @@ const getParticipantType = (
 };
 
 export const useEventMatchRoute = () => {
-  const { eventId: eventIdParam } = useParams();
   const navigate = useNavigate();
-  const eventId = getValidEventId(eventIdParam);
+  const { eventId, isValidEventId } = useEventDetailRoute();
+  const validEventId = isValidEventId ? eventId : null;
 
   const navigateBack = () => {
     if (window.history.length > 1) {
@@ -62,22 +56,20 @@ export const useEventMatchRoute = () => {
       return;
     }
 
-    navigate(eventId === null ? APP_PATH.EVENTS : APP_PATH.EVENT_DETAIL(eventId));
+    navigate(
+      validEventId === null ? APP_PATH.EVENTS : APP_PATH.EVENT_DETAIL(validEventId),
+    );
   };
 
   return {
-    eventId,
+    eventId: validEventId,
     navigateBack,
   };
 };
 
-export const useEventMatchPermission = (eventId: number) => {
+export const useEventMatchPermission = () => {
   const { user } = useAuth();
-  const viewerKey = getEventDetailViewerKey(user?.userId);
-  const { data: event } = useSuspenseQuery({
-    queryKey: eventDetailQueryKeys.detail(eventId, viewerKey),
-    queryFn: () => api.event.detailGet({ eventId }),
-  });
+  const { event } = useEventDetailRoute();
   const eventGroupLabelContext: EventGroupLabelContext = {
     eventCategory: event.eventCategory,
     eventType: event.eventType,

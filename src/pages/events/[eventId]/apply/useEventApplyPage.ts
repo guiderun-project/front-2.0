@@ -4,13 +4,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { useForm } from 'react-hook-form';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { api } from '@/api/services';
 import type { MyEventApplyGetResponse } from '@/api/types';
 import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
 
+import { useEventDetailRoute } from '../EventDetailRouteContext';
 import {
   eventApplyQueryKeys,
   eventDetailQueryKeys,
@@ -49,22 +50,14 @@ const getMyFormOrNull = async (
 };
 
 export const useEventApplyPage = () => {
-  const { eventId: eventIdParam } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { isAuthReady, user } = useAuth();
+  const { event, eventId, isValidEventId } = useEventDetailRoute();
   const [isCompleted, setIsCompleted] = useState(false);
   const [isSubmitLocked, setIsSubmitLocked] = useState(false);
   const submitLockRef = useRef(false);
-  const eventId = Number(eventIdParam);
-  const isValidEventId = Number.isInteger(eventId) && eventId > 0;
   const viewerKey = getEventDetailViewerKey(user?.userId);
-
-  const eventDetailQuery = useQuery({
-    queryKey: eventDetailQueryKeys.detail(eventId, viewerKey),
-    queryFn: () => api.event.detailGet({ eventId }),
-    enabled: isValidEventId && isAuthReady,
-  });
 
   const myFormQuery = useQuery({
     queryKey: eventApplyQueryKeys.myForm(eventId, viewerKey),
@@ -73,13 +66,12 @@ export const useEventApplyPage = () => {
     retry: false,
   });
 
-  const event = eventDetailQuery.data ?? null;
   const myForm = myFormQuery.data ?? null;
   const isEditMode = myForm !== null;
   const ineligibleMessage =
-    event && user ? getEventApplyIneligibleMessage(event, user) : null;
+    user ? getEventApplyIneligibleMessage(event, user) : null;
   const defaultValues = useMemo(() => {
-    if (!event || !user) {
+    if (!user) {
       return EMPTY_EVENT_APPLY_FORM_VALUES;
     }
 
@@ -120,7 +112,7 @@ export const useEventApplyPage = () => {
 
   const createMutation = useMutation({
     mutationFn: (values: EventApplyFormValues) => {
-      if (!event || !user) {
+      if (!user) {
         throw new Error('Event application context is missing.');
       }
 
@@ -146,7 +138,7 @@ export const useEventApplyPage = () => {
 
   const updateMutation = useMutation({
     mutationFn: (values: EventApplyFormValues) => {
-      if (!event || !user) {
+      if (!user) {
         throw new Error('Event application context is missing.');
       }
 
@@ -183,7 +175,7 @@ export const useEventApplyPage = () => {
       return;
     }
 
-    if (!event || !user) {
+    if (!user) {
       return;
     }
 
@@ -216,7 +208,6 @@ export const useEventApplyPage = () => {
 
   return {
     event,
-    eventDetailQuery,
     eventId,
     form,
     handleBack,

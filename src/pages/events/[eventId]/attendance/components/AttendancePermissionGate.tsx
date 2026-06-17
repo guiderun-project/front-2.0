@@ -31,7 +31,7 @@ type AttendancePermissionGateProps = {
 export const AttendancePermissionGate = ({
   eventId,
 }: AttendancePermissionGateProps): ReactElement => {
-  const { canManageAttendance } = useEventAttendancePermission(eventId);
+  const { canManageAttendance } = useEventAttendancePermission();
 
   if (!canManageAttendance) {
     return <AttendanceMessagePage pageState={FORBIDDEN_STATE} />;

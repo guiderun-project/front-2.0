@@ -29,7 +29,6 @@ export const EventDetailPage = (): ReactElement => {
     closeManagementSheet,
     closeRestrictedSheet,
     event,
-    eventDetailQuery,
     eventId,
     handleBack,
     handleCopyLink,
@@ -92,32 +91,6 @@ export const EventDetailPage = (): ReactElement => {
           right={navigationRightActions}
         />
         <PageState>이벤트 주소가 올바르지 않습니다.</PageState>
-      </PageLayout>
-    );
-  }
-
-  if (eventDetailQuery.isPending) {
-    return (
-      <PageLayout background="gradient.bg.brand-event">
-        <TopNavigation
-          aria-label="이벤트 상세 상단 메뉴"
-          left={navigationLeftAction}
-          right={navigationRightActions}
-        />
-        <PageState>이벤트 정보를 불러오는 중입니다.</PageState>
-      </PageLayout>
-    );
-  }
-
-  if (eventDetailQuery.isError || !event) {
-    return (
-      <PageLayout background="gradient.bg.brand-event">
-        <TopNavigation
-          aria-label="이벤트 상세 상단 메뉴"
-          left={navigationLeftAction}
-          right={navigationRightActions}
-        />
-        <PageState>이벤트를 찾을 수 없습니다.</PageState>
       </PageLayout>
     );
   }

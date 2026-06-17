@@ -10,7 +10,7 @@ import type { EventFormValues } from '../../form/schema';
 import { createEventUpdateRequest } from '../../form/utils';
 
 type UseEventEditMutationsParams = {
-  event: EventDetailResponse | null;
+  event: EventDetailResponse;
   eventId: number;
 };
 
@@ -23,10 +23,6 @@ export const useEventEditMutations = ({
 
   const updateMutation = useMutation({
     mutationFn: (values: EventFormValues) => {
-      if (!event) {
-        throw new Error('Event detail is required.');
-      }
-
       return api.event.updatePatch({
         eventId,
         body: createEventUpdateRequest({
