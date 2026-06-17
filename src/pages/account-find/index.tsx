@@ -1,15 +1,20 @@
 import type { ReactElement } from 'react';
 
-import { PageLayout } from '@/components/PageLayout';
-import { RoutePlaceholder } from '@/pages/_shared/RoutePlaceholder';
+import { useSearchParams } from 'react-router-dom';
+
+import { ACCOUNT_FIND_TYPE, type AccountFindType } from '@/constants';
+
+import { FindId } from './FindId';
+import { FindPassword } from './FindPassword';
+
+const resolveType = (value: string | null): AccountFindType =>
+  value === ACCOUNT_FIND_TYPE.PASSWORD
+    ? ACCOUNT_FIND_TYPE.PASSWORD
+    : ACCOUNT_FIND_TYPE.ID;
 
 export const AccountFindPage = (): ReactElement => {
-  return (
-    <PageLayout background="bg.subtle">
-      <RoutePlaceholder
-        title="계정 찾기"
-        description="아이디 찾기와 비밀번호 찾기 흐름을 제공할 페이지입니다."
-      />
-    </PageLayout>
-  );
+  const [searchParams] = useSearchParams();
+  const type = resolveType(searchParams.get('type'));
+
+  return type === ACCOUNT_FIND_TYPE.PASSWORD ? <FindPassword /> : <FindId />;
 };

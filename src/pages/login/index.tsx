@@ -12,6 +12,7 @@ import {
 } from '@/components';
 import { api } from '@/api/services';
 import { useAuth } from '@/contexts';
+import { ACCOUNT_FIND_TYPE } from '@/constants';
 import { APP_PATH } from '@/router/path';
 
 const LOGIN_FORM_ID = 'login-form';
@@ -50,11 +51,11 @@ export const LoginPage = (): ReactElement => {
   };
 
   const handleFindId = () => {
-    navigate(APP_PATH.ACCOUNT_FIND);
+    navigate(`${APP_PATH.ACCOUNT_FIND}?type=${ACCOUNT_FIND_TYPE.ID}`);
   };
 
   const handleFindPassword = () => {
-    navigate(APP_PATH.ACCOUNT_FIND);
+    navigate(`${APP_PATH.ACCOUNT_FIND}?type=${ACCOUNT_FIND_TYPE.PASSWORD}`);
   };
 
   return (
