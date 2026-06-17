@@ -11,9 +11,16 @@ import {
   Text,
   TimerInput,
 } from '@/components';
+import { ACCOUNT_FIND_TYPE } from '@/constants';
 import { APP_PATH } from '@/router/path';
 
-type FindIdPhase = 'verify' | 'found' | 'notFound';
+const FIND_ID_PHASE = {
+  VERIFY: 'verify',
+  FOUND: 'found',
+  NOT_FOUND: 'notFound',
+} as const;
+
+type FindIdPhase = (typeof FIND_ID_PHASE)[keyof typeof FIND_ID_PHASE];
 
 const TITLE_VERIFY = '아이디를 찾기 위해\n번호 인증이 필요해요';
 const TITLE_FOUND = '아래 아이디로\n로그인해주세요';
@@ -27,7 +34,7 @@ const NO_ACCOUNT_SENTINEL = '0000';
 export const FindId = (): ReactElement => {
   const navigate = useNavigate();
 
-  const [phase, setPhase] = useState<FindIdPhase>('verify');
+  const [phase, setPhase] = useState<FindIdPhase>(FIND_ID_PHASE.VERIFY);
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [phoneNum, setPhoneNum] = useState('');
   const [certCode, setCertCode] = useState('');
@@ -41,8 +48,8 @@ export const FindId = (): ReactElement => {
   }, [isCodeSent]);
 
   const handleBack = () => {
-    if (phase !== 'verify') {
-      setPhase('verify');
+    if (phase !== FIND_ID_PHASE.VERIFY) {
+      setPhase(FIND_ID_PHASE.VERIFY);
       return;
     }
     navigate(-1);
@@ -61,14 +68,18 @@ export const FindId = (): ReactElement => {
   const handleExtendTime = () => {};
 
   const handleNext = () => {
-    setPhase(certCode === NO_ACCOUNT_SENTINEL ? 'notFound' : 'found');
+    setPhase(
+      certCode === NO_ACCOUNT_SENTINEL
+        ? FIND_ID_PHASE.NOT_FOUND
+        : FIND_ID_PHASE.FOUND,
+    );
   };
 
   const resolveTitle = (): ReactNode => {
-    if (phase === 'found') {
+    if (phase === FIND_ID_PHASE.FOUND) {
       return TITLE_FOUND;
     }
-    if (phase === 'notFound') {
+    if (phase === FIND_ID_PHASE.NOT_FOUND) {
       return (
         <NotFoundTitleBox>
           <Text as="span" color="text.secondary" font="body-m-m">
@@ -102,7 +113,7 @@ export const FindId = (): ReactElement => {
         }}
         title={resolveTitle()}
       >
-        {phase === 'verify' && (
+        {phase === FIND_ID_PHASE.VERIFY && (
           <Container>
             <TimerInput
               autoComplete="tel"
@@ -137,7 +148,7 @@ export const FindId = (): ReactElement => {
           </Container>
         )}
 
-        {phase === 'found' && (
+        {phase === FIND_ID_PHASE.FOUND && (
           <Container>
             <InfoCard>
               <InfoRow>
@@ -159,7 +170,11 @@ export const FindId = (): ReactElement => {
             </InfoCard>
             <ForgotPasswordButton
               type="button"
-              onClick={() => navigate(`${APP_PATH.ACCOUNT_FIND}?type=password`)}
+              onClick={() =>
+                navigate(
+                  `${APP_PATH.ACCOUNT_FIND}?type=${ACCOUNT_FIND_TYPE.PASSWORD}`,
+                )
+              }
             >
               <Text as="span" color="text.brand" font="detail-m-sb">
                 비밀번호를 잊었나요?
@@ -168,13 +183,13 @@ export const FindId = (): ReactElement => {
           </Container>
         )}
 
-        {phase === 'notFound' && (
+        {phase === FIND_ID_PHASE.NOT_FOUND && (
           <NotFoundContainer>
             <NotFoundIllustration aria-hidden={true} />
           </NotFoundContainer>
         )}
 
-        {phase === 'verify' && (
+        {phase === FIND_ID_PHASE.VERIFY && (
           <FooterButton>
             <FooterButton.Button
               disabled={certCode.trim() === ''}
@@ -187,7 +202,7 @@ export const FindId = (): ReactElement => {
           </FooterButton>
         )}
 
-        {phase === 'found' && (
+        {phase === FIND_ID_PHASE.FOUND && (
           <FooterButton>
             <FooterButton.Button
               fullWidth
@@ -199,7 +214,7 @@ export const FindId = (): ReactElement => {
           </FooterButton>
         )}
 
-        {phase === 'notFound' && (
+        {phase === FIND_ID_PHASE.NOT_FOUND && (
           <FooterButton>
             <FooterButton.Button
               fullWidth

@@ -2,17 +2,19 @@ import type { ReactElement } from 'react';
 
 import { useSearchParams } from 'react-router-dom';
 
+import { ACCOUNT_FIND_TYPE, type AccountFindType } from '@/constants';
+
 import { FindId } from './FindId';
 import { FindPassword } from './FindPassword';
 
-export type AccountFindType = 'id' | 'password';
-
 const resolveType = (value: string | null): AccountFindType =>
-  value === 'password' ? 'password' : 'id';
+  value === ACCOUNT_FIND_TYPE.PASSWORD
+    ? ACCOUNT_FIND_TYPE.PASSWORD
+    : ACCOUNT_FIND_TYPE.ID;
 
 export const AccountFindPage = (): ReactElement => {
   const [searchParams] = useSearchParams();
   const type = resolveType(searchParams.get('type'));
 
-  return type === 'password' ? <FindPassword /> : <FindId />;
+  return type === ACCOUNT_FIND_TYPE.PASSWORD ? <FindPassword /> : <FindId />;
 };
