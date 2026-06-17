@@ -31,6 +31,8 @@ const PLACEHOLDER_TIMER = '03:00';
 // TODO: accountIdPost 결과로 found/notFound 분기. 현재는 퍼블리싱 미리보기용 트리거.
 const NO_ACCOUNT_SENTINEL = '0000';
 
+const onlyDigits = (value: string): string => value.replace(/[^0-9]/g, '');
+
 export const FindId = (): ReactElement => {
   const navigate = useNavigate();
 
@@ -124,9 +126,7 @@ export const FindId = (): ReactElement => {
               label="전화번호"
               placeholder="-없이 숫자만 입력해주세요"
               value={phoneNum}
-              onChange={(event) =>
-                setPhoneNum(event.target.value.replace(/[^0-9]/g, ''))
-              }
+              onChange={(event) => setPhoneNum(onlyDigits(event.target.value))}
               onConfirm={handleSendCode}
             />
             {isCodeSent && (
@@ -139,9 +139,7 @@ export const FindId = (): ReactElement => {
                 label="인증번호"
                 timerText={PLACEHOLDER_TIMER}
                 value={certCode}
-                onChange={(event) =>
-                  setCertCode(event.target.value.replace(/[^0-9]/g, ''))
-                }
+                onChange={(event) => setCertCode(onlyDigits(event.target.value))}
                 onConfirm={handleExtendTime}
               />
             )}
