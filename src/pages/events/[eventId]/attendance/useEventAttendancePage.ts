@@ -4,9 +4,8 @@ import {
   useMutation,
   useQueryClient,
   useSuspenseQueries,
-  useSuspenseQuery,
 } from '@tanstack/react-query';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import type { AttendanceParticipant } from '@/api/types';
 import { api } from '@/api/services';
@@ -16,23 +15,17 @@ import { APP_PATH } from '@/router/path';
 
 import type { AttendancePageState } from './attendancePageState';
 import { attendanceQueryKeys } from './queryKeys';
-import { eventDetailQueryKeys, getEventDetailViewerKey } from '../queryKeys';
+import { useEventDetailRoute } from '../EventDetailRouteContext';
 
 type AttendanceMutationInput = {
   participantName: string;
   userId: string;
 };
 
-const getValidEventId = (eventIdParam: string | undefined): number | null => {
-  const eventId = Number(eventIdParam);
-
-  return Number.isInteger(eventId) && eventId > 0 ? eventId : null;
-};
-
 export const useEventAttendanceRoute = () => {
-  const { eventId: eventIdParam } = useParams();
   const navigate = useNavigate();
-  const eventId = getValidEventId(eventIdParam);
+  const { eventId, isValidEventId } = useEventDetailRoute();
+  const validEventId = isValidEventId ? eventId : null;
 
   const handleBack = () => {
     if (window.history.length > 1) {
@@ -40,22 +33,20 @@ export const useEventAttendanceRoute = () => {
       return;
     }
 
-    navigate(eventId === null ? APP_PATH.EVENTS : APP_PATH.EVENT_DETAIL(eventId));
+    navigate(
+      validEventId === null ? APP_PATH.EVENTS : APP_PATH.EVENT_DETAIL(validEventId),
+    );
   };
 
   return {
-    eventId,
+    eventId: validEventId,
     onBack: handleBack,
   };
 };
 
-export const useEventAttendancePermission = (eventId: number) => {
+export const useEventAttendancePermission = () => {
   const { user } = useAuth();
-  const viewerKey = getEventDetailViewerKey(user?.userId);
-  const { data: event } = useSuspenseQuery({
-    queryKey: eventDetailQueryKeys.detail(eventId, viewerKey),
-    queryFn: () => api.event.detailGet({ eventId }),
-  });
+  const { event } = useEventDetailRoute();
 
   return {
     canManageAttendance:

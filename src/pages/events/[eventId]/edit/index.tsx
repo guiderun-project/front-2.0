@@ -1,18 +1,16 @@
 import { useEffect, useMemo, useRef, useState, type ReactElement } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useQuery } from '@tanstack/react-query';
 import { useForm, useFormState, useWatch } from 'react-hook-form';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-import { api } from '@/api/services';
 import { ConfirmPopup, CONFIRM_POPUP_VARIANT, PageLayout } from '@/components';
 import { USER_ROLES } from '@/constants/roles';
 import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
 
 import { PageState } from '../components/PanelState';
-import { eventDetailQueryKeys, getEventDetailViewerKey } from '../queryKeys';
+import { useEventDetailRoute } from '../EventDetailRouteContext';
 import { EventForm } from '../../form/EventForm';
 import { EVENT_FORM_MODES } from '../../form/constants';
 import {
@@ -29,28 +27,18 @@ import {
 import { useEventEditMutations } from './useEventEditMutations';
 
 export const EventEditPage = (): ReactElement => {
-  const { eventId: eventIdParam } = useParams();
   const navigate = useNavigate();
-  const { isAuthReady, user } = useAuth();
+  const { user } = useAuth();
+  const { event, eventId, isValidEventId } = useEventDetailRoute();
   const [isBackConfirmOpen, setIsBackConfirmOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const initializedEventIdRef = useRef<number | null>(null);
   const previousDateRef = useRef<string | null>(null);
   const previousStartTimeRef = useRef<string | null>(null);
-  const eventId = Number(eventIdParam);
-  const isValidEventId = Number.isInteger(eventId) && eventId > 0;
-  const viewerKey = getEventDetailViewerKey(user?.userId);
-  const eventDetailQuery = useQuery({
-    queryKey: eventDetailQueryKeys.detail(eventId, viewerKey),
-    queryFn: () => api.event.detailGet({ eventId }),
-    enabled: isValidEventId && isAuthReady,
-  });
-  const event = eventDetailQuery.data ?? null;
   const canManageEvent =
-    event !== null &&
     user !== null &&
     (event.viewer?.isOrganizer === true || user.role === USER_ROLES.ADMIN);
-  const eventType = event?.eventType ?? 'TRAINING';
+  const eventType = event.eventType;
   const formSchema = useMemo(
     () => createEventFormSchema(eventType),
     [eventType],
@@ -73,7 +61,7 @@ export const EventEditPage = (): ReactElement => {
   } = useEventEditMutations({ event, eventId });
 
   useEffect(() => {
-    if (!event || initializedEventIdRef.current === event.eventId) {
+    if (initializedEventIdRef.current === event.eventId) {
       return;
     }
 
@@ -187,22 +175,6 @@ export const EventEditPage = (): ReactElement => {
     return (
       <PageLayout background="bg.subtle">
         <PageState>모임 주소가 올바르지 않아요.</PageState>
-      </PageLayout>
-    );
-  }
-
-  if (!isAuthReady || eventDetailQuery.isPending) {
-    return (
-      <PageLayout background="bg.subtle">
-        <PageState>모임 정보를 불러오는 중이에요.</PageState>
-      </PageLayout>
-    );
-  }
-
-  if (eventDetailQuery.isError || !event) {
-    return (
-      <PageLayout background="bg.subtle">
-        <PageState>모임 정보를 불러오지 못했어요.</PageState>
       </PageLayout>
     );
   }
