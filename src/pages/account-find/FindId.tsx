@@ -29,25 +29,16 @@ export const FindId = (): ReactElement => {
 
   const [phase, setPhase] = useState<FindIdPhase>('verify');
   const [isCodeSent, setIsCodeSent] = useState(false);
-  const [isVerified, setIsVerified] = useState(false);
   const [phoneNum, setPhoneNum] = useState('');
   const [certCode, setCertCode] = useState('');
 
   const certInputRef = useRef<HTMLInputElement>(null);
-  const submitButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (isCodeSent) {
       certInputRef.current?.focus();
     }
   }, [isCodeSent]);
-
-  // 인증 성공 후 활성화된 '다음' 버튼으로 포커스 이동
-  useEffect(() => {
-    if (isVerified) {
-      submitButtonRef.current?.focus();
-    }
-  }, [isVerified]);
 
   const handleBack = () => {
     if (phase !== 'verify') {
@@ -60,17 +51,14 @@ export const FindId = (): ReactElement => {
   // TODO: accountIdVerificationIssuePost 호출로 대체
   const handleSendCode = () => {
     setIsCodeSent(true);
-    // 재발송 시 이전 인증 상태 초기화
+    // 재발송 시 이전 입력 초기화
     setCertCode('');
-    setIsVerified(false);
     // 이미 노출된 경우 즉시 포커스, 최초 노출은 아래 effect가 처리
     certInputRef.current?.focus();
   };
 
-  // TODO: checkCertificationTokenPost 정상 응답 시에만 인증 완료 처리
-  const handleVerifyCode = () => {
-    setIsVerified(true);
-  };
+  // TODO: smsVerificationExtendPost 호출 + 타이머 3:00 재시작
+  const handleExtendTime = () => {};
 
   const handleNext = () => {
     setPhase(certCode === NO_ACCOUNT_SENTINEL ? 'notFound' : 'found');
@@ -133,19 +121,17 @@ export const FindId = (): ReactElement => {
             {isCodeSent && (
               <TimerInput
                 autoComplete="one-time-code"
-                confirmDisabled={certCode.trim() === '' || isVerified}
-                confirmLabel="확인"
+                confirmLabel="시간연장"
+                confirmLevel="line-type"
                 controlRef={certInputRef}
                 inputMode="numeric"
                 label="인증번호"
                 timerText={PLACEHOLDER_TIMER}
                 value={certCode}
-                onChange={(event) => {
-                  setCertCode(event.target.value.replace(/[^0-9]/g, ''));
-                  // 인증번호를 수정하면 이전 인증을 무효화 → 재확인 필요
-                  setIsVerified(false);
-                }}
-                onConfirm={handleVerifyCode}
+                onChange={(event) =>
+                  setCertCode(event.target.value.replace(/[^0-9]/g, ''))
+                }
+                onConfirm={handleExtendTime}
               />
             )}
           </Container>
@@ -191,8 +177,7 @@ export const FindId = (): ReactElement => {
         {phase === 'verify' && (
           <FooterButton>
             <FooterButton.Button
-              ref={submitButtonRef}
-              disabled={!isVerified}
+              disabled={certCode.trim() === ''}
               fullWidth
               size="l"
               onClick={handleNext}
