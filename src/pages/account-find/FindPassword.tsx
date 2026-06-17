@@ -12,6 +12,7 @@ import {
   Text,
   TimerInput,
 } from '@/components';
+import { onlyDigits } from '@/pages/account-find/utils';
 import { APP_PATH } from '@/router/path';
 
 const FIND_PASSWORD_PHASE = {
@@ -30,8 +31,6 @@ const PASSWORD_MISMATCH_MESSAGE = '비밀번호가 동일하지 않습니다.';
 
 // TODO: 실제 SMS 인증 타이머로 대체. 현재는 퍼블리싱용 정적 표기.
 const PLACEHOLDER_TIMER = '03:00';
-
-const onlyDigits = (value: string): string => value.replace(/[^0-9]/g, '');
 
 export const FindPassword = (): ReactElement => {
   const navigate = useNavigate();
