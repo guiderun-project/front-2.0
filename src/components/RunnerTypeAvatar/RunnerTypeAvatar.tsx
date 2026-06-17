@@ -10,11 +10,15 @@ const RUNNER_TYPE_AVATAR_SIZE_PX = {
 } as const;
 
 const RUNNER_TYPE_AVATAR_GRAPHIC = {
+  VI: ViAvatar,
+  GUIDE: GuideAvatar,
   vi: ViAvatar,
   guide: GuideAvatar,
 } as const;
 
 const RUNNER_TYPE_AVATAR_LABEL = {
+  VI: '시각장애러너',
+  GUIDE: '가이드러너',
   vi: '시각장애러너',
   guide: '가이드러너',
 } as const;

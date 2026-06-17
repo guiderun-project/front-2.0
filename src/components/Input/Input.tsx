@@ -10,6 +10,7 @@ export const Input = ({
   label,
   helperText,
   errorText,
+  error,
   maxLength,
   clearable,
   clearLabel,
@@ -17,6 +18,7 @@ export const Input = ({
   trailing,
   className,
   describedById,
+  controlRef,
   placeholder,
   value,
   defaultValue,
@@ -28,8 +30,10 @@ export const Input = ({
       className={className}
       clearLabel={clearLabel}
       clearable={clearable}
+      controlRef={controlRef}
       defaultValue={defaultValue}
       describedById={describedById}
+      error={error}
       errorText={errorText}
       helperText={helperText}
       label={label}

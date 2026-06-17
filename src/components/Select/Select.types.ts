@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 
 export type SelectOption<TValue extends string = string> = Readonly<{
   value: TValue;
@@ -11,6 +11,7 @@ export type SelectOptions<TValue extends string = string> = readonly SelectOptio
 
 export type SelectRenderTriggerArgs<TValue extends string = string> = {
   open: () => void;
+  isOpen: boolean;
   selectedOption?: SelectOption<TValue>;
   value?: TValue;
   disabled: boolean;
@@ -23,6 +24,7 @@ type SelectBaseProps<TValue extends string> = {
   options: SelectOptions<TValue>;
   value?: TValue;
   onChange: (value: TValue) => void;
+  errorText?: ReactNode;
   confirmable?: boolean;
   confirmText?: string;
   disabled?: boolean;
@@ -30,6 +32,7 @@ type SelectBaseProps<TValue extends string> = {
   isBackdropCloseDisabled?: boolean;
   isEscapeCloseDisabled?: boolean;
   maxHeight?: string;
+  triggerRef?: Ref<HTMLButtonElement>;
 };
 
 type SelectDefaultTriggerProps = {

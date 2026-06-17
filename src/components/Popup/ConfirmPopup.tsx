@@ -2,11 +2,11 @@ import { useEffect, useId, useRef, type ReactElement, type ReactNode } from 'rea
 
 import styled from '@emotion/styled';
 
+import { Button } from '@/components/Button';
 import { Text } from '@/components/Text';
-import { resolveColorToken, type ColorToken } from '@/styles/tokens';
 
 import { Popup } from './Popup';
-import { CONFIRM_POPUP_INITIAL_FOCUS, CONFIRM_POPUP_VARIANT } from './ConfirmPopup.types';
+import { CONFIRM_POPUP_INITIAL_FOCUS } from './ConfirmPopup.types';
 import type { ConfirmPopupInitialFocus, ConfirmPopupVariant } from './ConfirmPopup.types';
 
 type ConfirmPopupProps = {
@@ -46,7 +46,6 @@ export const ConfirmPopup = ({
   open,
   subtitle,
   title,
-  variant = CONFIRM_POPUP_VARIANT.DEFAULT,
 }: ConfirmPopupProps): ReactElement => {
   const titleId = useId();
   const descriptionId = useId();
@@ -136,72 +135,32 @@ export const ConfirmPopup = ({
           ) : null}
         </Copy>
         <Actions>
-          <PopupButton
+          <Button
             ref={cancelButtonRef}
-            $variant="secondary"
             disabled={cancelDisabled}
+            fullWidth
+            level="secondary"
+            size="l"
             type="button"
             onClick={handleCancel}
           >
             {cancelText}
-          </PopupButton>
-          <PopupButton
+          </Button>
+          <Button
             ref={confirmButtonRef}
-            $variant={variant === CONFIRM_POPUP_VARIANT.DANGER ? 'danger' : 'primary'}
             aria-busy={confirmLoading}
             disabled={isConfirmDisabled}
+            fullWidth
+            size="l"
             type="button"
             onClick={handleConfirm}
           >
             {confirmText}
-          </PopupButton>
+          </Button>
         </Actions>
       </Panel>
     </Popup>
   );
-};
-
-type PopupButtonVariant = 'primary' | 'secondary' | 'danger';
-
-type PopupButtonColorTokens = {
-  backgroundColor: ColorToken;
-  borderColor: ColorToken;
-  color: ColorToken;
-};
-
-const getButtonColors = (
-  variant: PopupButtonVariant,
-  disabled: boolean,
-): PopupButtonColorTokens => {
-  if (disabled) {
-    return {
-      backgroundColor: 'bg.subtle' as const,
-      borderColor: 'border.subtle' as const,
-      color: 'text.disabled' as const,
-    };
-  }
-
-  if (variant === 'primary') {
-    return {
-      backgroundColor: 'bg.brand-primary' as const,
-      borderColor: 'border.brand' as const,
-      color: 'text.inverse' as const,
-    };
-  }
-
-  if (variant === 'danger') {
-    return {
-      backgroundColor: 'bg.surface' as const,
-      borderColor: 'border.danger' as const,
-      color: 'text.danger' as const,
-    };
-  }
-
-  return {
-    backgroundColor: 'bg.surface' as const,
-    borderColor: 'border.subtle' as const,
-    color: 'text.primary' as const,
-  };
 };
 
 const Panel = styled.div(({ theme }) => ({
@@ -239,62 +198,3 @@ const Actions = styled.div(({ theme }) => ({
   gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
   gap: theme.spacing.md,
 }));
-
-// TODO: Replace this temporary button with the shared Button component when it is available.
-const PopupButton = styled.button<{ $variant: PopupButtonVariant }>(
-  ({ $variant, disabled, theme }) => {
-    const colors = getButtonColors($variant, Boolean(disabled));
-    const typography = theme.typography['body-m-sb'];
-
-    return {
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      minWidth: 0,
-      minHeight: theme.pxToRem(48),
-      padding: `${theme.spacing.lg} ${theme.spacing.xl}`,
-      border: `1px solid ${resolveColorToken(colors.borderColor)}`,
-      borderRadius: theme.radius.full,
-      appearance: 'none',
-      backgroundColor: resolveColorToken(colors.backgroundColor),
-      color: resolveColorToken(colors.color),
-      cursor: disabled ? 'not-allowed' : 'pointer',
-      fontFamily: typography.fontFamily,
-      fontSize: typography.fontSize,
-      fontWeight: typography.fontWeight,
-      letterSpacing: typography.letterSpacing,
-      lineHeight: typography.lineHeight,
-      touchAction: 'manipulation',
-      transition: 'background-color 120ms ease, border-color 120ms ease, opacity 120ms ease, transform 120ms ease',
-
-      '@media (hover: hover)': {
-        '&:hover:not(:disabled)': {
-          opacity: $variant === 'primary' ? 0.88 : 1,
-          backgroundColor: $variant === 'primary' ? undefined : theme.color.bg.subtle,
-        },
-      },
-
-      '&:active:not(:disabled)': {
-        opacity: $variant === 'primary' ? 0.8 : 1,
-        transform: 'scale(0.98)',
-      },
-
-      '&:focus-visible': {
-        outline: `2px solid ${theme.color.border.focused}`,
-        outlineOffset: theme.spacing.xs,
-      },
-
-      '&:disabled': {
-        transform: 'none',
-      },
-
-      '@media (prefers-reduced-motion: reduce)': {
-        transition: 'none',
-
-        '&:active:not(:disabled)': {
-          transform: 'none',
-        },
-      },
-    };
-  },
-);

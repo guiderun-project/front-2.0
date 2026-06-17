@@ -10,6 +10,7 @@ import { BUTTON_COLOR_TOKENS, BUTTON_ICON_SIZE, BUTTON_SIZE_STYLES } from './But
 import type { ButtonLevel, ButtonProps, ButtonSize, ButtonStatus } from './Button.types';
 
 type ButtonStyleProps = {
+  $fullWidth: boolean;
   $level: ButtonLevel;
   $size: ButtonSize;
   $status: ButtonStatus;
@@ -18,8 +19,10 @@ type ButtonStyleProps = {
 export const Button = ({
   children,
   disabled,
+  fullWidth = false,
   leftIcon,
   level = 'primary',
+  ref,
   rightIcon,
   size = 'm',
   status = 'default',
@@ -33,6 +36,8 @@ export const Button = ({
 
   return (
     <StyledButton
+      ref={ref}
+      $fullWidth={fullWidth}
       $level={level}
       $size={size}
       $status={resolvedStatus}
@@ -68,7 +73,7 @@ export const Button = ({
 };
 
 const StyledButton = styled.button<ButtonStyleProps>(
-  ({ $level, $size, $status, theme }) => {
+  ({ $fullWidth, $level, $size, $status, theme }) => {
     const sizeStyle = BUTTON_SIZE_STYLES[$size];
     const defaultTokens = BUTTON_COLOR_TOKENS[$level][$status];
     const pressedTokens = BUTTON_COLOR_TOKENS[$level].pressed;
@@ -94,8 +99,8 @@ const StyledButton = styled.button<ButtonStyleProps>(
       display: 'inline-flex',
       alignItems: 'center',
       justifyContent: 'center',
-      width: width ? theme.pxToRem(width) : 'fit-content',
-      minWidth: minWidth ? theme.pxToRem(minWidth) : undefined,
+      width: $fullWidth ? '100%' : width ? theme.pxToRem(width) : 'fit-content',
+      minWidth: $fullWidth ? 0 : minWidth ? theme.pxToRem(minWidth) : undefined,
       height: theme.pxToRem(sizeStyle.height),
       padding: `0 ${theme.spacing[sizeStyle.paddingX]}`,
       gap: theme.spacing[sizeStyle.gap],

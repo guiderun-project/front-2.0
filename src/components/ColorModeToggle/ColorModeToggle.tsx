@@ -2,8 +2,8 @@ import type { ComponentPropsWithoutRef, ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
+import { HiddenText } from '@/components/HiddenText';
 import { Icon, type IconName } from '@/components/Icon';
-import { Text } from '@/components/Text';
 import { useColorMode } from '@/styles/useColorMode';
 import { resolveColorToken, type ColorMode, type ColorToken } from '@/styles/tokens';
 
@@ -40,7 +40,7 @@ type ColorModeToggleProps = {
 
 const INACTIVE_COLOR_BY_MODE = {
   light: {
-    icon: 'icon.teritary',
+    icon: 'icon.tertiary',
     text: 'text.tertiary',
   },
   dark: {
@@ -85,9 +85,7 @@ export const ColorModeToggle = ({
               icon={isSelected ? icon.selected : icon.default}
               size={16}
             />
-            <ToggleOptionLabel as="span" font="body-s-sb">
-              {label}
-            </ToggleOptionLabel>
+            <HiddenText>{label}</HiddenText>
           </ToggleOption>
         );
       })}
@@ -101,7 +99,7 @@ const ToggleRoot = styled.div<{ $disabled: boolean }>`
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: center;
-  width: ${({ theme }) => theme.pxToRem(160)};
+  width: fit-content;
   height: ${({ theme }) => theme.pxToRem(38)};
   padding: ${({ theme }) => theme.spacing.s};
   gap: ${({ theme }) => theme.spacing.s};
@@ -172,10 +170,4 @@ const ToggleOption = styled.button<{ $color: ColorToken }>`
       transform: none;
     }
   }
-`;
-
-const ToggleOptionLabel = styled(Text)`
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 `;

@@ -2,7 +2,8 @@ import type { ReactElement, ReactNode } from 'react';
 
 import { Navigate, useLocation } from 'react-router-dom';
 
-import type { RoleEnum, UserInfoGetResponse } from '@/api/types';
+import type { UserInfoGetResponse } from '@/api/types';
+import { APPROVED_ROLES } from '@/constants';
 import { useAuth } from '@/contexts';
 import { APP_PATH } from './path';
 
@@ -12,12 +13,6 @@ type ProtectedRouteProps = {
   access?: ProtectedRouteAccess;
   children: ReactNode;
 };
-
-const APPROVED_ROLES = new Set<RoleEnum>([
-  'ROLE_USER',
-  'ROLE_ADMIN',
-  'ROLE_COACH',
-]);
 
 const canAccessProtectedRoute = (
   user: UserInfoGetResponse | null,
@@ -50,6 +45,5 @@ export const ProtectedRoute = ({
     return <>{children}</>;
   }
 
-  // TODO: 인증 화면 경로가 확정되면 next 파라미터 기반 redirect로 변경한다.
-  return <Navigate replace state={{ from: location }} to={APP_PATH.HOME} />;
+  return <Navigate replace state={{ from: location }} to={APP_PATH.INTRO} />;
 };
