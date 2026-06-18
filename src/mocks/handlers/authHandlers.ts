@@ -17,9 +17,19 @@ import {
   expiredRefreshTokenCookie,
   isMockRefreshSessionActive,
   noContent,
+  notFound,
   refreshTokenCookie,
   unauthorized,
 } from '@/mocks/http';
+
+// 아이디 찾기 가입일 표기용 고정값. MockUser에는 createdAt 필드가 없다.
+const ACCOUNT_CREATED_AT = '2025-01-10T09:00:00.000Z';
+
+// 전화번호 비교를 위해 숫자 이외 문자를 제거한다.
+const normalizePhone = (value: string): string => value.replace(/[^0-9]/g, '');
+
+// 아이디 찾기에서 마지막으로 인증을 요청한 전화번호를 기억해 /accountId 조회에 사용한다.
+let lastAccountIdLookupPhone: string | null = null;
 
 const createVerificationResponse = (
   verificationId: string,
@@ -173,6 +183,9 @@ export const authHandlers: HttpHandler[] = [
       return badRequest('phoneNum is required.');
     }
 
+    // 가입 여부와 무관하게 인증번호는 발송하고, 조회는 /accountId에서 판정한다.
+    lastAccountIdLookupPhone = normalizePhone(body.phoneNum);
+
     return HttpResponse.json(
       createVerificationResponse('mock-account-id-verification', 'ACCOUNT_ID'),
     );
@@ -181,7 +194,9 @@ export const authHandlers: HttpHandler[] = [
   http.post(apiUrl('/sms/password'), async ({ request }) => {
     const body = (await request.json()) as PasswordVerificationIssueRequest;
     const user = mockDb.users.find(
-      (item) => item.accountId === body.accountId && item.phoneNumber === body.phoneNum,
+      (item) =>
+        item.accountId === body.accountId &&
+        normalizePhone(item.phoneNumber) === normalizePhone(body.phoneNum),
     );
 
     if (!user) {
@@ -222,9 +237,21 @@ export const authHandlers: HttpHandler[] = [
   }),
 
   http.post(apiUrl('/accountId'), () => {
+    const user = lastAccountIdLookupPhone
+      ? mockDb.users.find(
+          (item) =>
+            item.accountId !== null &&
+            normalizePhone(item.phoneNumber) === lastAccountIdLookupPhone,
+        )
+      : undefined;
+
+    if (!user || user.accountId === null) {
+      return notFound('No account matches the request.');
+    }
+
     return HttpResponse.json({
-      accountId: 'minseo',
-      createdAt: '2025-01-10T09:00:00.000Z',
+      accountId: user.accountId,
+      createdAt: ACCOUNT_CREATED_AT,
     });
   }),
 
