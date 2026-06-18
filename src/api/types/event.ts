@@ -179,3 +179,10 @@ export type EventRunningDistancePatchResponse = {
   eventId: number;
   expectedRunningDistanceKm: number;
 };
+
+export type EventRunningDistanceSkipPath = EventDetailPath;
+
+export type EventRunningDistanceSkipResponse = {
+  eventId: number;
+  isSkipped: boolean;
+};

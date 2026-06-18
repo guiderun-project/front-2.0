@@ -33,13 +33,11 @@ const parseDistance = (value: string): number | null => {
 type RunningRecordSheetProps = {
   eventId: number;
   eventName: string;
-  onDismiss: () => void;
 };
 
 export const RunningRecordSheet = ({
   eventId,
   eventName,
-  onDismiss,
 }: RunningRecordSheetProps): ReactElement => {
   const queryClient = useQueryClient();
   const unitId = useId();
@@ -59,6 +57,23 @@ export const RunningRecordSheet = ({
       await queryClient.invalidateQueries({ queryKey: ['home'] });
     },
   });
+
+  const { isPending: isSkipping, mutate: skip } = useMutation({
+    mutationFn: () => api.event.runningDistanceSkipPatch({ eventId }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: MISSING_RUNNING_DISTANCE_QUERY_KEY,
+      });
+    },
+  });
+
+  const handleSkip = () => {
+    if (isSkipping) {
+      return;
+    }
+
+    skip();
+  };
 
   const parsedDistance = parseDistance(distance);
   const errorText = isError
@@ -107,7 +122,13 @@ export const RunningRecordSheet = ({
     </Button>
   ) : (
     <ButtonGroup ratio="35:65">
-      <Button level="secondary" size="l" type="button" onClick={onDismiss}>
+      <Button
+        disabled={isSkipping}
+        level="secondary"
+        size="l"
+        type="button"
+        onClick={handleSkip}
+      >
         괜찮아요
       </Button>
       <Button size="l" type="button" onClick={() => setIsInputStep(true)}>
@@ -123,7 +144,7 @@ export const RunningRecordSheet = ({
       isEscapeCloseDisabled
       open
       footer={footer}
-      onClose={onDismiss}
+      onClose={handleSkip}
     >
       {isInputStep ? (
         <Content>
