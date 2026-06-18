@@ -1,16 +1,13 @@
 import { useId, useState, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-
-import { api } from '@/api/services';
-import type { MissingRunningDistanceGetResponse } from '@/api/types';
 
 import { BottomSheet } from '../BottomSheet';
 import { Button, ButtonGroup } from '../Button';
 import { Input } from '../Input';
 import { Text } from '../Text';
-import { MISSING_RUNNING_DISTANCE_QUERY_KEY } from './queryKeys';
+import { useSaveRunningDistance } from './hooks/useSaveRunningDistance';
+import { useSkipRunningDistance } from './hooks/useSkipRunningDistance';
 
 const formatDistanceInput = (raw: string): string => {
   const cleaned = raw.replace(/[^0-9.]/g, '');
@@ -40,42 +37,12 @@ export const RunningRecordSheet = ({
   eventId,
   eventName,
 }: RunningRecordSheetProps): ReactElement => {
-  const queryClient = useQueryClient();
   const unitId = useId();
   const [isInputStep, setIsInputStep] = useState(false);
   const [distance, setDistance] = useState('');
 
-  const removeMissingEvent = (resolvedEventId: number) => {
-    queryClient.setQueryData<MissingRunningDistanceGetResponse>(
-      MISSING_RUNNING_DISTANCE_QUERY_KEY,
-      (previous) =>
-        previous && {
-          ...previous,
-          items: previous.items.filter(
-            (item) => item.eventId !== resolvedEventId,
-          ),
-        },
-    );
-  };
-
-  const { isError, isPending, mutate, reset } = useMutation({
-    mutationFn: (expectedRunningDistanceKm: number) =>
-      api.event.runningDistancePatch({
-        eventId,
-        body: { expectedRunningDistanceKm },
-      }),
-    onSuccess: ({ eventId: savedEventId }) => {
-      removeMissingEvent(savedEventId);
-      void queryClient.invalidateQueries({ queryKey: ['home'] });
-    },
-  });
-
-  const { isPending: isSkipping, mutate: skip } = useMutation({
-    mutationFn: () => api.event.runningDistanceSkipPatch({ eventId }),
-    onSuccess: ({ eventId: skippedEventId }) => {
-      removeMissingEvent(skippedEventId);
-    },
-  });
+  const { isError, isPending, mutate, reset } = useSaveRunningDistance(eventId);
+  const { isPending: isSkipping, mutate: skip } = useSkipRunningDistance(eventId);
 
   const handleSkip = () => {
     if (isSkipping) {

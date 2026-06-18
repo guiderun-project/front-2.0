@@ -1,4 +1,4 @@
-export const MISSING_RUNNING_DISTANCE_QUERY_KEY = [
-  'event',
-  'missing-running-distance',
-] as const;
+export const runningRecordQueryKeys = {
+  root: ['running-record'] as const,
+  missing: () => [...runningRecordQueryKeys.root, 'missing'] as const,
+};
