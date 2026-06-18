@@ -270,14 +270,9 @@ const Positioner = styled(AriaModal)(({ theme }) => ({
   },
 }));
 
-const Dialog = styled(AriaDialog)(({ theme }) => ({
+const Dialog = styled(AriaDialog)({
   outline: 'none',
-
-  '&:focus-visible': {
-    outline: `2px solid ${theme.color.border.focused}`,
-    outlineOffset: `-${theme.spacing.sm}`,
-  },
-}));
+});
 
 const Sheet = styled.div<{ $maxHeight: string }>(({ $maxHeight, theme }) => ({
   display: 'flex',
