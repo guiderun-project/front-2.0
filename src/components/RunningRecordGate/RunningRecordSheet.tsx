@@ -4,6 +4,7 @@ import styled from '@emotion/styled';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { api } from '@/api/services';
+import type { MissingRunningDistanceGetResponse } from '@/api/types';
 
 import { BottomSheet } from '../BottomSheet';
 import { Button, ButtonGroup } from '../Button';
@@ -44,26 +45,35 @@ export const RunningRecordSheet = ({
   const [isInputStep, setIsInputStep] = useState(false);
   const [distance, setDistance] = useState('');
 
+  const removeMissingEvent = (resolvedEventId: number) => {
+    queryClient.setQueryData<MissingRunningDistanceGetResponse>(
+      MISSING_RUNNING_DISTANCE_QUERY_KEY,
+      (previous) =>
+        previous && {
+          ...previous,
+          items: previous.items.filter(
+            (item) => item.eventId !== resolvedEventId,
+          ),
+        },
+    );
+  };
+
   const { isError, isPending, mutate, reset } = useMutation({
     mutationFn: (expectedRunningDistanceKm: number) =>
       api.event.runningDistancePatch({
         eventId,
         body: { expectedRunningDistanceKm },
       }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: MISSING_RUNNING_DISTANCE_QUERY_KEY,
-      });
-      await queryClient.invalidateQueries({ queryKey: ['home'] });
+    onSuccess: ({ eventId: savedEventId }) => {
+      removeMissingEvent(savedEventId);
+      void queryClient.invalidateQueries({ queryKey: ['home'] });
     },
   });
 
   const { isPending: isSkipping, mutate: skip } = useMutation({
     mutationFn: () => api.event.runningDistanceSkipPatch({ eventId }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: MISSING_RUNNING_DISTANCE_QUERY_KEY,
-      });
+    onSuccess: ({ eventId: skippedEventId }) => {
+      removeMissingEvent(skippedEventId);
     },
   });
 
