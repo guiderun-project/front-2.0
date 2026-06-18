@@ -4,6 +4,7 @@ import { useState } from 'react';
 import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
 
+import { api } from '@/api/services';
 import {
   FooterButton,
   FormPageLayout,
@@ -13,6 +14,11 @@ import {
   TimerInput,
 } from '@/components';
 import { usePhoneCertification } from '@/pages/account-find/usePhoneCertification';
+import {
+  isValidKoreanPhone,
+  isValidNewPassword,
+  NEW_PASSWORD_GUIDE,
+} from '@/pages/account-find/utils';
 import { APP_PATH } from '@/router/path';
 
 const FIND_PASSWORD_PHASE = {
@@ -28,6 +34,9 @@ const TITLE_VERIFY = '비밀번호 재설정을 위해\n아래 정보를 입력�
 const TITLE_RESET = '새롭게 사용할\n비밀번호를 입력해주세요';
 
 const PASSWORD_MISMATCH_MESSAGE = '비밀번호가 동일하지 않습니다.';
+const VERIFY_ERROR_MESSAGE = '일치하는 계정 정보가 없습니다.';
+const CERT_CODE_ERROR_MESSAGE = '인증번호가 올바르지 않습니다.';
+const RESET_ERROR_MESSAGE = '비밀번호 변경에 실패했습니다.';
 
 export const FindPassword = (): ReactElement => {
   const navigate = useNavigate();
@@ -38,10 +47,18 @@ export const FindPassword = (): ReactElement => {
   const [accountId, setAccountId] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [token, setToken] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [verifyError, setVerifyError] = useState('');
+  const [certError, setCertError] = useState('');
+  const [resetError, setResetError] = useState('');
   const {
     phoneNum,
     certCode,
     isCodeSent,
+    verificationId,
+    isExpired,
+    canExtend,
     timerText,
     certInputRef,
     handlePhoneChange,
@@ -52,10 +69,10 @@ export const FindPassword = (): ReactElement => {
 
   const passwordMismatch =
     confirmPassword.length > 0 && newPassword !== confirmPassword;
+  const newPasswordInvalid =
+    newPassword.length > 0 && !isValidNewPassword(newPassword);
   const canSubmitPassword =
-    newPassword.length > 0 &&
-    confirmPassword.length > 0 &&
-    newPassword === confirmPassword;
+    isValidNewPassword(newPassword) && newPassword === confirmPassword;
 
   const handleBack = () => {
     if (phase !== FIND_PASSWORD_PHASE.VERIFY) {
@@ -65,19 +82,89 @@ export const FindPassword = (): ReactElement => {
     navigate(-1);
   };
 
-  // TODO: passwordVerificationIssuePost 호출 후 sendCode()
-  const handleSendCode = () => {
-    sendCode();
+  // 아이디·전화번호로 인증번호를 요청한다.
+  const handleSendCode = async () => {
+    if (
+      accountId.trim() === '' ||
+      !isValidKoreanPhone(phoneNum) ||
+      isSubmitting
+    ) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setVerifyError('');
+
+    try {
+      const response = await api.auth.passwordVerificationIssuePost({
+        accountId,
+        phoneNum,
+      });
+      sendCode(response);
+    } catch {
+      setVerifyError(VERIFY_ERROR_MESSAGE);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  // TODO: checkCertificationTokenPost 호출로 인증 토큰 확보 후 단계 전환
-  const handleNext = () => {
-    setPhase(FIND_PASSWORD_PHASE.RESET);
+  // 인증번호를 검증하고 임시 토큰을 확보한 뒤 비밀번호 재설정 단계로 전환한다.
+  const handleNext = async () => {
+    if (certCode.trim() === '' || isSubmitting || verificationId === null) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setCertError('');
+
+    try {
+      const { token: issuedToken } =
+        await api.auth.checkCertificationTokenPost({
+          verificationId,
+          number: certCode,
+        });
+      setToken(issuedToken);
+      setPhase(FIND_PASSWORD_PHASE.RESET);
+    } catch {
+      setCertError(CERT_CODE_ERROR_MESSAGE);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  // TODO: newPasswordPatch 호출. 현재는 무조건 변경 완료로 전환.
-  const handleResetPassword = () => {
-    setPhase(FIND_PASSWORD_PHASE.DONE);
+  // 임시 토큰으로 새 비밀번호를 설정한다.
+  const handleResetPassword = async () => {
+    if (!canSubmitPassword || isSubmitting || token === '') {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setResetError('');
+
+    try {
+      await api.auth.newPasswordPatch({ token, newPassword });
+      setPhase(FIND_PASSWORD_PHASE.DONE);
+    } catch {
+      setResetError(RESET_ERROR_MESSAGE);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // 인증 제한시간을 연장한다.
+  const handleExtend = async () => {
+    if (verificationId === null || !canExtend) {
+      return;
+    }
+
+    try {
+      const response = await api.auth.smsVerificationExtendPost({
+        verificationId,
+      });
+      extendTime(response);
+    } catch {
+      // 연장 실패 시 기존 타이머를 유지한다.
+    }
   };
 
   const resolveTitle = (): ReactNode => {
@@ -125,34 +212,50 @@ export const FindPassword = (): ReactElement => {
               label="아이디"
               placeholder="아이디를 입력해주세요"
               value={accountId}
-              onChange={(event) => setAccountId(event.target.value)}
+              onChange={(event) => {
+                setVerifyError('');
+                setAccountId(event.target.value);
+              }}
             />
             <TimerInput
               autoComplete="tel"
               clearable={false}
               confirmDisabled={
-                accountId.trim() === '' || phoneNum.trim() === ''
+                accountId.trim() === '' ||
+                !isValidKoreanPhone(phoneNum) ||
+                isSubmitting
               }
               confirmLabel="인증"
+              error={Boolean(verifyError)}
+              errorText={verifyError || undefined}
               inputMode="numeric"
               label="전화번호"
               placeholder="-없이 숫자만 입력해주세요"
               value={phoneNum}
-              onChange={handlePhoneChange}
+              onChange={(event) => {
+                setVerifyError('');
+                handlePhoneChange(event);
+              }}
               onConfirm={handleSendCode}
             />
             {isCodeSent && (
               <TimerInput
                 autoComplete="one-time-code"
+                confirmDisabled={!canExtend}
                 confirmLabel="시간연장"
                 confirmLevel="line-type"
                 controlRef={certInputRef}
+                error={Boolean(certError)}
+                errorText={certError || undefined}
                 inputMode="numeric"
                 label="인증번호"
                 timerText={timerText}
                 value={certCode}
-                onChange={handleCertCodeChange}
-                onConfirm={extendTime}
+                onChange={(event) => {
+                  setCertError('');
+                  handleCertCodeChange(event);
+                }}
+                onConfirm={handleExtend}
               />
             )}
           </Container>
@@ -162,6 +265,9 @@ export const FindPassword = (): ReactElement => {
           <Container>
             <Input
               autoComplete="new-password"
+              error={newPasswordInvalid}
+              errorText={newPasswordInvalid ? NEW_PASSWORD_GUIDE : undefined}
+              helperText={newPasswordInvalid ? undefined : NEW_PASSWORD_GUIDE}
               label="새 비밀번호"
               type="password"
               value={newPassword}
@@ -169,14 +275,19 @@ export const FindPassword = (): ReactElement => {
             />
             <Input
               autoComplete="new-password"
-              error={passwordMismatch}
+              error={passwordMismatch || Boolean(resetError)}
               errorText={
-                passwordMismatch ? PASSWORD_MISMATCH_MESSAGE : undefined
+                passwordMismatch
+                  ? PASSWORD_MISMATCH_MESSAGE
+                  : resetError || undefined
               }
               label="새 비밀번호 확인"
               type="password"
               value={confirmPassword}
-              onChange={(event) => setConfirmPassword(event.target.value)}
+              onChange={(event) => {
+                setResetError('');
+                setConfirmPassword(event.target.value);
+              }}
             />
           </Container>
         )}
@@ -190,7 +301,7 @@ export const FindPassword = (): ReactElement => {
         {phase === FIND_PASSWORD_PHASE.VERIFY && (
           <FooterButton>
             <FooterButton.Button
-              disabled={certCode.trim() === ''}
+              disabled={certCode.trim() === '' || isSubmitting || isExpired}
               fullWidth
               size="l"
               onClick={handleNext}
@@ -203,7 +314,7 @@ export const FindPassword = (): ReactElement => {
         {phase === FIND_PASSWORD_PHASE.RESET && (
           <FooterButton>
             <FooterButton.Button
-              disabled={!canSubmitPassword}
+              disabled={!canSubmitPassword || isSubmitting}
               fullWidth
               size="l"
               onClick={handleResetPassword}
