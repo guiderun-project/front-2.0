@@ -19,7 +19,7 @@ const formatDistanceInput = (raw: string): string => {
     return whole;
   }
 
-  return `${whole}.${rest.join('').slice(0, 1)}`;
+  return `${whole}.${rest.join('').slice(0, 3)}`;
 };
 
 const parseDistance = (value: string): number | null => {
