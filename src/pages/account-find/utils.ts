@@ -13,7 +13,7 @@ export const NEW_PASSWORD_GUIDE =
 export const isValidKoreanPhone = (digits: string): boolean =>
   /^01[0-9]\d{7,8}$/.test(digits);
 
-/** 새 비밀번호 규칙: 영문 + 특수문자 포함, 8자 이상 32자 미만. */
+/** 새 비밀번호 규칙: 영문·특수문자를 포함하고 8자 이상 32자 미만이어야 한다. */
 export const isValidNewPassword = (value: string): boolean =>
   value.length >= 8 &&
   value.length < 32 &&
