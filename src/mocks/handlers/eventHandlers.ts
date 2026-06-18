@@ -331,6 +331,7 @@ export const eventHandlers: HttpHandler[] = [
         .filter(
           (event) =>
             !event.deleted &&
+            !event.runningDistanceSkipped &&
             event.organizerId === currentUser.userId &&
             event.recruitStatus === 'RECRUIT_END' &&
             event.expectedRunningDistanceKm === null,
@@ -358,6 +359,24 @@ export const eventHandlers: HttpHandler[] = [
       return HttpResponse.json({
         eventId: event.eventId,
         expectedRunningDistanceKm: event.expectedRunningDistanceKm,
+      });
+    },
+  ),
+
+  http.patch<{ eventId: string }>(
+    apiUrl('/event/:eventId/running-distance/skip'),
+    ({ params }) => {
+      const event = findEvent(Number(params.eventId));
+
+      if (!event) {
+        return notFound('Event not found.');
+      }
+
+      event.runningDistanceSkipped = true;
+
+      return HttpResponse.json({
+        eventId: event.eventId,
+        isSkipped: event.runningDistanceSkipped,
       });
     },
   ),

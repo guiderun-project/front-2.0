@@ -64,6 +64,7 @@ export type MockEvent = {
   content: string;
   cityName?: string;
   expectedRunningDistanceKm: number | null;
+  runningDistanceSkipped?: boolean;
   deleted?: boolean;
 };
 
