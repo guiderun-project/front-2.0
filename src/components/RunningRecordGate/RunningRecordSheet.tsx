@@ -1,4 +1,4 @@
-import { useState, type ReactElement } from 'react';
+import { useId, useState, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -42,6 +42,7 @@ export const RunningRecordSheet = ({
   onDismiss,
 }: RunningRecordSheetProps): ReactElement => {
   const queryClient = useQueryClient();
+  const unitId = useId();
   const [isInputStep, setIsInputStep] = useState(false);
   const [distance, setDistance] = useState('');
 
@@ -127,13 +128,15 @@ export const RunningRecordSheet = ({
       {isInputStep ? (
         <Content>
           <Input
+            autoFocus
             clearLabel="러닝 거리 지우기"
             clearable
+            describedById={unitId}
             errorText={errorText}
             inputMode="decimal"
             label="러닝 거리"
             trailing={
-              <Text as="span" color="text.primary" font="body-l-m">
+              <Text as="span" color="text.primary" font="body-l-m" id={unitId}>
                 KM
               </Text>
             }
