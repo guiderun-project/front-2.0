@@ -28,7 +28,7 @@ export const MyEventsPage = (): ReactElement => {
   const selectedTab = resolveTab(searchParams.get('tab'));
 
   return (
-    <PageLayout background="bg.subtle">
+    <Page background="bg.subtle">
       <TopNavigation
         left={{
           icon: 'chevron-left-lined',
@@ -52,9 +52,14 @@ export const MyEventsPage = (): ReactElement => {
       </TabNav>
 
       {selectedTab === 'event' ? <MyRunningTab /> : null}
-    </PageLayout>
+    </Page>
   );
 };
+
+const Page = styled(PageLayout)({
+  display: 'flex',
+  flexDirection: 'column',
+});
 
 const TabNav = styled.nav(({ theme }) => ({
   display: 'flex',

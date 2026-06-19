@@ -58,6 +58,7 @@ export const MyActivityEventList = ({
 
 const Empty = styled.div(({ theme }) => ({
   display: 'flex',
+  flex: 1,
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',

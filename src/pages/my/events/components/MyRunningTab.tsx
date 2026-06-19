@@ -122,5 +122,8 @@ const Filters = styled.div(({ theme }) => ({
 }));
 
 const ListSection = styled.div(({ theme }) => ({
+  display: 'flex',
+  flex: 1,
+  flexDirection: 'column',
   padding: `${theme.spacing['3xl']} ${theme.spacing['2xl']}`,
 }));
