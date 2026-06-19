@@ -11,14 +11,14 @@ import {
 import { PageLayout, TopNavigation } from '@/components';
 
 const MY_ACTIVITY_TAB_ITEMS = [
-  { key: 'solo', label: '나의 러닝' },
-  { key: 'together', label: '함께 달린 파트너' },
+  { key: 'event', label: '나의 러닝' },
+  { key: 'partner', label: '함께 달린 파트너' },
 ] as const;
 
 type MyActivityTab = (typeof MY_ACTIVITY_TAB_ITEMS)[number]['key'];
 
 const resolveTab = (value: string | null): MyActivityTab =>
-  value === 'together' ? 'together' : 'solo';
+  value === 'partner' ? 'partner' : 'event';
 
 export const MyEventsPage = (): ReactElement => {
   const navigate = useNavigate();
