@@ -10,6 +10,8 @@ import {
 
 import { PageLayout, TopNavigation } from '@/components';
 
+import { MyRunningTab } from './components/MyRunningTab';
+
 const MY_ACTIVITY_TAB_ITEMS = [
   { key: 'event', label: '나의 러닝' },
   { key: 'partner', label: '함께 달린 파트너' },
@@ -48,6 +50,8 @@ export const MyEventsPage = (): ReactElement => {
           </TabLink>
         ))}
       </TabNav>
+
+      {selectedTab === 'event' ? <MyRunningTab /> : null}
     </PageLayout>
   );
 };
