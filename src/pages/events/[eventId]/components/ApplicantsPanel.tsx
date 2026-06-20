@@ -53,7 +53,7 @@ export const ApplicantsPanel = ({
           <SummaryBreakdown>
             <SummaryBreakdownItem>
               <SummaryAvatar aria-hidden={true}>
-                <RunnerTypeAvatar size="s" type="vi" />
+                <RunnerTypeAvatar size="s" type="VI" />
               </SummaryAvatar>
               <Text color="text.tertiary" font="body-m-m">
                 시각장애러너 {summary.viCount}명
@@ -61,7 +61,7 @@ export const ApplicantsPanel = ({
             </SummaryBreakdownItem>
             <SummaryBreakdownItem>
               <SummaryAvatar aria-hidden={true}>
-                <RunnerTypeAvatar size="s" type="guide" />
+                <RunnerTypeAvatar size="s" type="GUIDE" />
               </SummaryAvatar>
               <Text color="text.tertiary" font="body-m-m">
                 가이드러너 {summary.guideCount}명
