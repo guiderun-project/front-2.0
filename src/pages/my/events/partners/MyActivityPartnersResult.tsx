@@ -9,6 +9,8 @@ import { EmptyPartners } from './EmptyPartners';
 import { PartnerItem } from './PartnerItem';
 import { useMyActivityPartners } from './useMyActivityPartners';
 
+const FIRST_PAGE = 1;
+
 type MyActivityPartnersResultProps = {
   page: number;
   sort: MyActivityPartnerSort;
@@ -26,9 +28,9 @@ export const MyActivityPartnersResult = ({
 
   useEffect(() => {
     if (shouldClampPage) {
-      onPageChange(totalPages);
+      onPageChange(FIRST_PAGE);
     }
-  }, [onPageChange, shouldClampPage, totalPages]);
+  }, [onPageChange, shouldClampPage]);
 
   if (data.pagination.totalCount === 0) {
     return <EmptyPartners />;
