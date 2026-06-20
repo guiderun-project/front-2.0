@@ -12,7 +12,7 @@ import { MY_ACTIVITY_PARTNER_SORTS } from '@/api/constants/user';
 import type { MyActivityPartnerSort } from '@/api/types';
 import { PageLayout, TopNavigation } from '@/components';
 
-import { MyActivityPartnersContent } from './MyActivityPartnersContent';
+import { MyActivityPartnersContent } from './partners';
 
 const MY_ACTIVITY_TAB_ITEMS = [
   { key: 'solo', label: '나의 러닝' },
