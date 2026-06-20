@@ -21,6 +21,14 @@ const gradientModes = {
       footer:
         'linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, var(--color-bg-default) 17.308%)',
     },
+    feedback: {
+      toastSweep: {
+        success:
+          'linear-gradient(97deg, rgba(0, 155, 219, 0) 8.94%, rgba(0, 155, 219, 0.14) 42.91%, rgba(0, 155, 219, 0) 90.21%)',
+        error:
+          'linear-gradient(97deg, rgba(240, 68, 56, 0) 8.94%, rgba(240, 68, 56, 0.14) 42.91%, rgba(240, 68, 56, 0) 90.21%)',
+      },
+    },
   },
   dark: {
     bg: {
@@ -33,6 +41,14 @@ const gradientModes = {
       footer:
         'linear-gradient(180deg, rgba(14, 19, 25, 0) 0%, var(--color-bg-default) 17.308%)',
     },
+    feedback: {
+      toastSweep: {
+        success:
+          'linear-gradient(97deg, rgba(0, 155, 219, 0) 8.94%, rgba(0, 155, 219, 0.14) 42.91%, rgba(0, 155, 219, 0) 90.21%)',
+        error:
+          'linear-gradient(97deg, rgba(240, 68, 56, 0) 8.94%, rgba(240, 68, 56, 0.14) 42.91%, rgba(240, 68, 56, 0) 90.21%)',
+      },
+    },
   },
 } as const satisfies Record<ColorMode, Record<string, unknown>>;
 
@@ -44,6 +60,12 @@ export const gradient = {
     'brand-event-overlay': 'var(--gradient-bg-brand-event-overlay)',
     footer: 'var(--gradient-bg-footer)',
   },
+  feedback: {
+    toastSweep: {
+      success: 'var(--gradient-feedback-toastSweep-success)',
+      error: 'var(--gradient-feedback-toastSweep-error)',
+    },
+  },
 } as const;
 
 export const gradientTokenMap = {
@@ -52,6 +74,8 @@ export const gradientTokenMap = {
   'bg.brand-event': 'var(--gradient-bg-brand-event)',
   'bg.brand-event-overlay': 'var(--gradient-bg-brand-event-overlay)',
   'bg.footer': 'var(--gradient-bg-footer)',
+  'feedback.toastSweep.success': 'var(--gradient-feedback-toastSweep-success)',
+  'feedback.toastSweep.error': 'var(--gradient-feedback-toastSweep-error)',
 } as const;
 
 export type GradientToken = keyof typeof gradientTokenMap;
