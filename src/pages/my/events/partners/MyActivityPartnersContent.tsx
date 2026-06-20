@@ -25,10 +25,6 @@ export const MyActivityPartnersContent = ({
   page,
   sort,
 }: MyActivityPartnersContentProps): ReactElement => {
-  const selectedSortLabel = PARTNER_SORT_OPTIONS.find(
-    (option) => option.value === sort,
-  )?.label;
-
   return (
     <Section>
       <SectionHeader>
@@ -36,7 +32,6 @@ export const MyActivityPartnersContent = ({
           함께 달린 파트너
         </Text>
         <Filter
-          ariaLabel={`함께 달린 파트너 정렬, 현재 정렬: ${selectedSortLabel ?? '선택 안 됨'}`}
           icon="sort-lined"
           mode="cycle"
           options={PARTNER_SORT_OPTIONS}
