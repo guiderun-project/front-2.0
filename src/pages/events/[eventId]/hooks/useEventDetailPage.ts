@@ -6,6 +6,7 @@ import {
   useSearchParams,
 } from 'react-router-dom';
 
+import { useToast } from '@/components';
 import { USER_ROLES } from '@/constants/roles';
 import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
@@ -36,6 +37,7 @@ export const useEventDetailPage = () => {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { isAuthenticated, user } = useAuth();
+  const { showToast } = useToast();
   const { event, eventId, isValidEventId } = useEventDetailRoute();
   const { shareLink } = useKakaoShare();
   const [isRestrictedSheetOpen, setIsRestrictedSheetOpen] = useState(false);
@@ -105,10 +107,11 @@ export const useEventDetailPage = () => {
 
   const handleCopyLink = () => {
     void copyTextToClipboard(window.location.href).then((isCopied) => {
-      // TODO: 공용 토스트나 스낵바가 준비되면 window.alert 대체
-      window.alert(
-        isCopied ? '링크를 복사했어요.' : '링크 복사에 실패했어요.',
-      );
+      showToast({
+        type: isCopied ? 'success' : 'error',
+        icon: isCopied ? 'check-lined' : 'alert-circle-filled',
+        content: isCopied ? '링크를 복사했어요.' : '링크 복사에 실패했어요.',
+      });
     });
   };
 
