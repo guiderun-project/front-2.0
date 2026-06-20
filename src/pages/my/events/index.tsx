@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react';
+import { useCallback, useRef, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 import {
@@ -40,32 +40,48 @@ const resolvePage = (value: string | null): number => {
 
 export const MyEventsPage = (): ReactElement => {
   const navigate = useNavigate();
+  const partnerSectionRef = useRef<HTMLElement>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedTab = resolveTab(searchParams.get('tab'));
   const partnerSort = resolvePartnerSort(searchParams.get('sort'));
   const partnerPage = resolvePage(searchParams.get('page'));
 
-  const handlePartnerSortChange = (nextSort: MyActivityPartnerSort) => {
-    setSearchParams(
-      createSearchParams({
-        tab: 'together',
-        sort: nextSort,
-        page: String(DEFAULT_PARTNER_PAGE),
-      }),
-      { replace: true },
-    );
-  };
+  const scrollToPartnerSection = useCallback(() => {
+    partnerSectionRef.current?.scrollIntoView({
+      block: 'start',
+      behavior: 'auto',
+    });
+  }, []);
 
-  const handlePartnerPageChange = (nextPage: number) => {
-    setSearchParams(
-      createSearchParams({
-        tab: 'together',
-        sort: partnerSort,
-        page: String(nextPage),
-      }),
-      { replace: true },
-    );
-  };
+  const handlePartnerSortChange = useCallback(
+    (nextSort: MyActivityPartnerSort) => {
+      setSearchParams(
+        createSearchParams({
+          tab: 'together',
+          sort: nextSort,
+          page: String(DEFAULT_PARTNER_PAGE),
+        }),
+        { replace: true },
+      );
+      window.requestAnimationFrame(scrollToPartnerSection);
+    },
+    [scrollToPartnerSection, setSearchParams],
+  );
+
+  const handlePartnerPageChange = useCallback(
+    (nextPage: number) => {
+      setSearchParams(
+        createSearchParams({
+          tab: 'together',
+          sort: partnerSort,
+          page: String(nextPage),
+        }),
+        { replace: true },
+      );
+      window.requestAnimationFrame(scrollToPartnerSection);
+    },
+    [partnerSort, scrollToPartnerSection, setSearchParams],
+  );
 
   return (
     <PageLayout background="bg.subtle">
@@ -94,6 +110,7 @@ export const MyEventsPage = (): ReactElement => {
       {selectedTab === 'together' ? (
         <MyActivityPartnersContent
           page={partnerPage}
+          sectionRef={partnerSectionRef}
           sort={partnerSort}
           onPageChange={handlePartnerPageChange}
           onSortChange={handlePartnerSortChange}

@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react';
+import { useEffect, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
@@ -21,9 +21,21 @@ export const MyActivityPartnersResult = ({
   sort,
 }: MyActivityPartnersResultProps): ReactElement => {
   const { data } = useMyActivityPartners({ sort, page });
+  const { totalPages } = data.pagination;
+  const shouldClampPage = totalPages > 0 && page > totalPages;
+
+  useEffect(() => {
+    if (shouldClampPage) {
+      onPageChange(totalPages);
+    }
+  }, [onPageChange, shouldClampPage, totalPages]);
 
   if (data.pagination.totalCount === 0) {
     return <EmptyPartners />;
+  }
+
+  if (shouldClampPage) {
+    return <ResultBody />;
   }
 
   return (
@@ -36,7 +48,7 @@ export const MyActivityPartnersResult = ({
       <PaginationWrap>
         <Pagination
           currentPage={page}
-          totalPages={data.pagination.totalPages}
+          totalPages={totalPages}
           onChange={onPageChange}
         />
       </PaginationWrap>

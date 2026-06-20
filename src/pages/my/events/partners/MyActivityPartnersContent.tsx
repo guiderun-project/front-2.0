@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react';
+import type { ReactElement, Ref } from 'react';
 
 import styled from '@emotion/styled';
 
@@ -14,6 +14,7 @@ import { MyActivityPartnersResult } from './MyActivityPartnersResult';
 
 type MyActivityPartnersContentProps = {
   page: number;
+  sectionRef?: Ref<HTMLElement>;
   sort: MyActivityPartnerSort;
   onPageChange: (page: number) => void;
   onSortChange: (sort: MyActivityPartnerSort) => void;
@@ -23,10 +24,11 @@ export const MyActivityPartnersContent = ({
   onPageChange,
   onSortChange,
   page,
+  sectionRef,
   sort,
 }: MyActivityPartnersContentProps): ReactElement => {
   return (
-    <Section>
+    <Section ref={sectionRef}>
       <SectionHeader>
         <Text as="h2" color="text.primary" font="heading-s-m">
           함께 달린 파트너
