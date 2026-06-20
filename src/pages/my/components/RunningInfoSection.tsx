@@ -2,20 +2,22 @@ import type { ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
+import type { MyPageResponse } from '@/api/types';
 import { Button, Text } from '@/components';
 
-// TODO: API 연동 시 props로 대체
-const RUNNING_INFO = {
-  group: 'E 기록이 없는 시각장애 러너',
-  personalRecord: '46:44(10km)',
-  hope: '줄글줄글',
-} as const;
+import { EMPTY_INFO_TEXT, getRunningGroupLabel } from '../constants';
 
 type RunningInfoSectionProps = {
+  runningInfo: MyPageResponse['runningInfo'];
   onEdit?: () => void;
 };
 
-export const RunningInfoSection = ({ onEdit }: RunningInfoSectionProps): ReactElement => {
+export const RunningInfoSection = ({
+  runningInfo,
+  onEdit,
+}: RunningInfoSectionProps): ReactElement => {
+  const { type, recordDegree, detailRecord, hopePrefs } = runningInfo;
+
   return (
     <Card aria-label="러닝 정보">
       <Row>
@@ -23,7 +25,7 @@ export const RunningInfoSection = ({ onEdit }: RunningInfoSectionProps): ReactEl
           러닝 그룹
         </RowLabel>
         <Text color="text.primary" font="body-m-m">
-          {RUNNING_INFO.group}
+          {getRunningGroupLabel(recordDegree, type)}
         </Text>
       </Row>
       <Row $align="flex-start">
@@ -31,7 +33,7 @@ export const RunningInfoSection = ({ onEdit }: RunningInfoSectionProps): ReactEl
           개인 기록
         </RowLabel>
         <Text color="text.primary" font="body-m-m">
-          {RUNNING_INFO.personalRecord}
+          {detailRecord ?? EMPTY_INFO_TEXT}
         </Text>
       </Row>
       <Row $align="flex-start">
@@ -39,7 +41,7 @@ export const RunningInfoSection = ({ onEdit }: RunningInfoSectionProps): ReactEl
           희망사항
         </RowLabel>
         <Text color="text.primary" font="body-m-m">
-          {RUNNING_INFO.hope}
+          {hopePrefs ?? EMPTY_INFO_TEXT}
         </Text>
       </Row>
       <Button fullWidth level="quaternary" onClick={onEdit}>

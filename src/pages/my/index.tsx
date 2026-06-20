@@ -3,7 +3,7 @@ import type { ReactElement } from 'react';
 import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
 
-import { PageLayout, Text } from '@/components';
+import { PageLayout, QueryBoundary, Text } from '@/components';
 import { APP_PATH } from '@/router/path';
 
 import { AccountMenu } from './components/AccountMenu';
@@ -11,10 +11,12 @@ import { ActivitySummaryCard } from './components/ActivitySummaryCard';
 import { ProfileInfoSection } from './components/ProfileInfoSection';
 import { ProfileSummary } from './components/ProfileSummary';
 import { RunningInfoSection } from './components/RunningInfoSection';
+import { useMyPage } from './hooks/useMyPage';
+
+const LOADING_MESSAGE = '마이페이지 정보를 불러오는 중이에요.';
+const ERROR_MESSAGE = '마이페이지 정보를 불러오지 못했어요.';
 
 export const MyPage = (): ReactElement => {
-  const navigate = useNavigate();
-
   return (
     <PageLayout background="bg.subtle">
       <Header>
@@ -23,20 +25,41 @@ export const MyPage = (): ReactElement => {
         </Text>
       </Header>
 
-      <ProfileSummary />
+      <QueryBoundary errorMessage={ERROR_MESSAGE} loadingMessage={LOADING_MESSAGE}>
+        <MyPageContent />
+      </QueryBoundary>
+    </PageLayout>
+  );
+};
+
+const MyPageContent = (): ReactElement => {
+  const navigate = useNavigate();
+  const { data } = useMyPage();
+
+  return (
+    <>
+      <ProfileSummary profile={data.profile} />
 
       <ActivitySection>
         <ActivitySummaryCard
+          participation={data.participation}
           onViewActivity={() => navigate(APP_PATH.MY_EVENTS)}
         />
       </ActivitySection>
 
       <InfoSection>
-        <ProfileInfoSection onEdit={() => navigate(APP_PATH.MY_EDIT)} />
-        <RunningInfoSection onEdit={() => navigate(APP_PATH.MY_EDIT)} />
+        <ProfileInfoSection
+          personalInfo={data.personalInfo}
+          onEdit={() => navigate(APP_PATH.MY_EDIT)}
+          onInputBirthDate={() => navigate(APP_PATH.MY_EDIT)}
+        />
+        <RunningInfoSection
+          runningInfo={data.runningInfo}
+          onEdit={() => navigate(APP_PATH.MY_EDIT)}
+        />
         <AccountMenu />
       </InfoSection>
-    </PageLayout>
+    </>
   );
 };
 

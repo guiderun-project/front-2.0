@@ -2,25 +2,29 @@ import type { ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
-import { Text } from '@/components';
+import type { MyPageResponse } from '@/api/types';
+import { RunnerTypeAvatar, Text } from '@/components';
+import { RUNNER_TYPE_LABELS } from '@/constants';
 
-// TODO: API 연동 시 props로 대체
-const PROFILE = {
-  initial: 'V',
-  name: '가나다',
-  meta: '여성・가이드러너・B그룹',
-} as const;
+const GENDER_LABEL = { FEMALE: '여성', MALE: '남성' } as const;
 
-export const ProfileSummary = (): ReactElement => {
+type ProfileSummaryProps = {
+  profile: MyPageResponse['profile'];
+};
+
+export const ProfileSummary = ({ profile }: ProfileSummaryProps): ReactElement => {
+  const { name, gender, type, recordDegree } = profile;
+  const meta = `${GENDER_LABEL[gender]}・${RUNNER_TYPE_LABELS[type]}・${recordDegree}그룹`;
+
   return (
     <Container>
-      <Avatar aria-hidden={true}>{PROFILE.initial}</Avatar>
+      <RunnerTypeAvatar size="xl" type={type} />
       <NameGroup>
         <Text as="h2" align="center" color="text.primary" font="heading-m-b">
-          {PROFILE.name}
+          {name}
         </Text>
         <Text align="center" color="text.tertiary" font="body-m-m">
-          {PROFILE.meta}
+          {meta}
         </Text>
       </NameGroup>
     </Container>
@@ -34,21 +38,6 @@ const Container = styled.section(({ theme }) => ({
   alignItems: 'center',
   gap: theme.spacing.lg,
   width: '100%',
-}));
-
-const Avatar = styled.div(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  flexShrink: 0,
-  width: theme.pxToRem(72),
-  height: theme.pxToRem(72),
-  borderRadius: theme.radius.full,
-  backgroundColor: theme.color.profile.vi,
-  color: theme.color.text.inverse,
-  fontSize: theme.pxToRem(40),
-  fontWeight: theme.fontWeight.semibold,
-  lineHeight: 1,
 }));
 
 const NameGroup = styled.div(({ theme }) => ({

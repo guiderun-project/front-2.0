@@ -2,39 +2,37 @@ import { Fragment, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
+import type { MyPageResponse } from '@/api/types';
 import { Button, Text } from '@/components';
 
-// TODO: API 연동 시 props로 대체
-const ACTIVITY = {
-  totalLabel: '참여 횟수',
-  total: '총 5회',
-  breakdown: [
-    { label: '대회', count: '2회' },
-    { label: '훈련', count: '3회' },
-  ],
-} as const;
-
 type ActivitySummaryCardProps = {
+  participation: MyPageResponse['participation'];
   onViewActivity?: () => void;
 };
 
 export const ActivitySummaryCard = ({
+  participation,
   onViewActivity,
 }: ActivitySummaryCardProps): ReactElement => {
+  const breakdown = [
+    { label: '대회', count: `${participation.competitionCount}회` },
+    { label: '훈련', count: `${participation.trainingCount}회` },
+  ];
+
   return (
     <Card>
       <Stats>
         <TotalGroup>
           <Text align="center" color="text.tertiary" font="body-m-m">
-            {ACTIVITY.totalLabel}
+            참여 횟수
           </Text>
           <Text color="text.primary" font="heading-s-sb">
-            {ACTIVITY.total}
+            총 {participation.totalCount}회
           </Text>
         </TotalGroup>
         <Divider aria-hidden={true} />
         <Breakdown>
-          {ACTIVITY.breakdown.map((item, index) => (
+          {breakdown.map((item, index) => (
             <Fragment key={item.label}>
               {index > 0 ? (
                 <Text color="text.secondary" font="body-m-m">

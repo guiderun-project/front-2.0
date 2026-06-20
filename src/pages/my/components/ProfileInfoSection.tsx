@@ -2,35 +2,33 @@ import type { ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
+import type { MyPageResponse } from '@/api/types';
 import { Button, Text } from '@/components';
 
-// TODO: API 연동 시 props로 대체
-const PROFILE_INFO = {
-  birthDate: null,
-  phone: '01012341234',
-  sns: '없음',
-  account1365: 'guiderun1365',
-  loginId: '없음',
-} as const;
+import { EMPTY_INFO_TEXT } from '../constants';
 
 type ProfileInfoSectionProps = {
+  personalInfo: MyPageResponse['personalInfo'];
   onEdit?: () => void;
   onInputBirthDate?: () => void;
 };
 
 export const ProfileInfoSection = ({
+  personalInfo,
   onEdit,
   onInputBirthDate,
 }: ProfileInfoSectionProps): ReactElement => {
+  const { birthDate, phoneNumber, snsId, id1365, accountId } = personalInfo;
+
   return (
     <Card aria-label="내 정보">
       <Row>
         <RowLabel color="text.secondary" font="body-m-sb">
           생년월일
         </RowLabel>
-        {PROFILE_INFO.birthDate ? (
+        {birthDate ? (
           <Text color="text.primary" font="body-m-m">
-            {PROFILE_INFO.birthDate}
+            {birthDate}
           </Text>
         ) : (
           <BirthDateValue>
@@ -48,7 +46,7 @@ export const ProfileInfoSection = ({
           전화번호
         </RowLabel>
         <Text color="text.primary" font="body-m-m">
-          {PROFILE_INFO.phone}
+          {phoneNumber ?? EMPTY_INFO_TEXT}
         </Text>
       </Row>
       <Row>
@@ -56,7 +54,7 @@ export const ProfileInfoSection = ({
           SNS 계정
         </RowLabel>
         <Text color="text.primary" font="body-m-m">
-          {PROFILE_INFO.sns}
+          {snsId ?? EMPTY_INFO_TEXT}
         </Text>
       </Row>
       <Row>
@@ -64,7 +62,7 @@ export const ProfileInfoSection = ({
           1365 계정
         </RowLabel>
         <Text color="text.primary" font="body-m-m">
-          {PROFILE_INFO.account1365}
+          {id1365 ?? EMPTY_INFO_TEXT}
         </Text>
       </Row>
       <Row>
@@ -72,7 +70,7 @@ export const ProfileInfoSection = ({
           아이디
         </RowLabel>
         <Text color="text.primary" font="body-m-m">
-          {PROFILE_INFO.loginId}
+          {accountId ?? EMPTY_INFO_TEXT}
         </Text>
       </Row>
       <Button fullWidth level="quaternary" onClick={onEdit}>
