@@ -87,7 +87,9 @@ const ToastRoot = styled(motion.div)(({ theme }) => {
   };
 });
 
-const Sweep = styled(motion.span)<{ $type: ToastType }>(({ $type, theme }) => ({
+const Sweep = styled(motion.span, {
+  shouldForwardProp: (propName) => propName !== '$type',
+})<{ $type: ToastType }>(({ $type, theme }) => ({
   position: 'absolute',
   top: 0,
   bottom: 0,
