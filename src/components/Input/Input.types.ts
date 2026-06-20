@@ -1,5 +1,7 @@
 import type { ComponentPropsWithoutRef, ReactNode, Ref } from "react";
 
+import type { ButtonLevel, ButtonStatus } from "../Button";
+
 export type InputFieldOwnProps = {
   label: string;
   helperText?: ReactNode;
@@ -40,6 +42,8 @@ export type TimerInputProps = Omit<InputProps, "trailing"> & {
   timerText?: string;
   timerLabel?: string;
   confirmLabel?: string;
+  confirmLevel?: ButtonLevel;
+  confirmStatus?: ButtonStatus;
   onConfirm?: () => void;
   confirmDisabled?: boolean;
 };
