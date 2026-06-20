@@ -28,7 +28,7 @@ export const ProfileInfoSection = ({
         </RowLabel>
         {birthDate ? (
           <Text color="text.primary" font="body-m-m">
-            {birthDate}
+            {birthDate.replace(/-/g, '.')}
           </Text>
         ) : (
           <BirthDateValue>
