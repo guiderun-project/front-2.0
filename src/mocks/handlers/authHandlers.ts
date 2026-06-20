@@ -8,7 +8,7 @@ import type {
   SignupPostRequest,
   SmsVerificationExtendRequest,
 } from '@/api/types/auth';
-import { mockDb } from '@/mocks/fixtures';
+import { mockDb, resetMockSessionUser, setMockSessionUser } from '@/mocks/fixtures';
 import {
   activateMockRefreshSession,
   apiUrl,
@@ -91,6 +91,7 @@ export const authHandlers: HttpHandler[] = [
     }
 
     activateMockRefreshSession();
+    setMockSessionUser(user.userId);
 
     return HttpResponse.json(
       { accessToken: 'mock-access-token' },
@@ -121,6 +122,7 @@ export const authHandlers: HttpHandler[] = [
 
   http.post(apiUrl('/logout'), () => {
     deactivateMockRefreshSession();
+    resetMockSessionUser();
 
     return new HttpResponse(null, {
       status: 204,

@@ -115,7 +115,15 @@ type MockDb = {
   comments: MockComment[];
 };
 
-export const currentUserId = 'user-vi-1';
+let mockSessionUserId = 'user-vi-1';
+
+export const setMockSessionUser = (userId: string) => {
+  mockSessionUserId = userId;
+};
+
+export const resetMockSessionUser = () => {
+  mockSessionUserId = 'user-vi-1';
+};
 export const runningGroups: RunningGroup[] = ['A', 'B', 'C', 'D', 'E', 'P'];
 export const visibleRunningGroups: RunningGroup[] = ['A', 'B', 'C', 'D', 'E'];
 
@@ -336,7 +344,7 @@ export const mockDb: MockDb = {
       eventCategory: 'GENERAL',
       recruitStatus: 'RECRUIT_OPEN',
       isPrivate: false,
-      organizerId: currentUserId,
+      organizerId: 'user-vi-1',
       schedule: {
         date: '2026-06-01',
         startTime: '09:00',
@@ -405,7 +413,7 @@ export const mockDb: MockDb = {
       eventCategory: 'GENERAL',
       recruitStatus: 'RECRUIT_END',
       isPrivate: false,
-      organizerId: currentUserId,
+      organizerId: 'user-vi-1',
       schedule: {
         date: '2026-04-20',
         startTime: '08:00',
@@ -1385,7 +1393,7 @@ export const findUser = (userId: string) => {
 };
 
 export const getCurrentUser = () => {
-  const user = findUser(currentUserId);
+  const user = findUser(mockSessionUserId);
 
   if (!user) {
     throw new Error('Current mock user is missing.');
@@ -1668,7 +1676,7 @@ export const createEventFromRequest = (
     eventCategory: body.eventCategory,
     recruitStatus: 'RECRUIT_OPEN',
     isPrivate: body.isPrivate ?? false,
-    organizerId: currentUserId,
+    organizerId: mockSessionUserId,
     schedule: {
       date: body.date,
       startTime: body.startTime,
