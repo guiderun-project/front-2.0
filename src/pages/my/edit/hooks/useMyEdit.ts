@@ -117,8 +117,7 @@ export const useMyEdit = () => {
     values,
     setBirthDate: (value: string) =>
       setField('birthDate', formatBirthDateInput(value)),
-    setPhoneNumber: (value: string) =>
-      setField('phoneNumber', value.replace(/\D/g, '')),
+    setPhoneNumber: (value: string) => setField('phoneNumber', value),
     setSnsId: (value: string) => setField('snsId', value),
     setId1365: (value: string) => setField('id1365', value),
     canEditId1365,
