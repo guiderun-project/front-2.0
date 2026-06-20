@@ -43,13 +43,14 @@ export const Toast = ({ shouldReduceMotion, toast }: ToastProps): ReactElement =
             : TOAST_OPEN_TRANSITION
       }
     >
-      <Sweep
+      <SweepMover
         aria-hidden="true"
-        $type={toast.type}
         initial={shouldReduceMotion ? false : { x: '0%' }}
         animate={shouldReduceMotion ? { x: '0%' } : { x: '100%' }}
         transition={shouldReduceMotion ? TOAST_REDUCED_MOTION_TRANSITION : TOAST_SWEEP_TRANSITION}
-      />
+      >
+        <Sweep $type={toast.type} />
+      </SweepMover>
       <IconSlot>
         <Icon aria-hidden={true} color={TOAST_ICON_COLOR[toast.type]} icon={toast.icon} size={20} />
       </IconSlot>
@@ -87,17 +88,24 @@ const ToastRoot = styled(motion.div)(({ theme }) => {
   };
 });
 
-const Sweep = styled(motion.span, {
-  shouldForwardProp: (propName) => propName !== '$type',
-})<{ $type: ToastType }>(({ $type, theme }) => ({
+const SweepMover = styled(motion.span)(({ theme }) => ({
   position: 'absolute',
   top: 0,
   bottom: 0,
   left: theme.pxToRem(-63),
-  width: theme.pxToRem(180),
+  width: `calc(100% + ${theme.pxToRem(63)})`,
   minHeight: theme.pxToRem(53),
-  backgroundImage: theme.gradient.feedback.toastSweep[$type],
   pointerEvents: 'none',
+}));
+
+const Sweep = styled('span', {
+  shouldForwardProp: (propName) => propName !== '$type',
+})<{ $type: ToastType }>(({ $type, theme }) => ({
+  display: 'block',
+  width: theme.pxToRem(180),
+  height: '100%',
+  minHeight: 'inherit',
+  backgroundImage: theme.gradient.feedback.toastSweep[$type],
 }));
 
 const IconSlot = styled.span({
