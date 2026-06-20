@@ -55,6 +55,14 @@ export const useAccountSetup = () => {
     setAccountIdValue(value.replace(/\s/g, ''));
   };
 
+  const reset = () => {
+    setAccountIdValue('');
+    setPassword('');
+    setPasswordConfirm('');
+    setCheckedAccountId(null);
+    setIsCheckedUnique(false);
+  };
+
   /** 아이디 중복 여부를 확인한다. */
   const checkAccountIdDuplicate = async () => {
     if (!accountId || duplicateCheckMutation.isPending || isAccountIdChecked) {
@@ -112,5 +120,6 @@ export const useAccountSetup = () => {
     canSubmit,
     isSubmitting: accountMutation.isPending,
     submit,
+    reset,
   };
 };
