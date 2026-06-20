@@ -8,22 +8,64 @@ import {
   useSearchParams,
 } from 'react-router-dom';
 
+import { MY_ACTIVITY_PARTNER_SORTS } from '@/api/constants/user';
+import type { MyActivityPartnerSort } from '@/api/types';
 import { PageLayout, TopNavigation } from '@/components';
+
+import { MyActivityPartnersContent } from './MyActivityPartnersContent';
 
 const MY_ACTIVITY_TAB_ITEMS = [
   { key: 'solo', label: '나의 러닝' },
   { key: 'together', label: '함께 달린 파트너' },
 ] as const;
 
+const DEFAULT_PARTNER_PAGE = 1;
+const DEFAULT_PARTNER_SORT = MY_ACTIVITY_PARTNER_SORTS.RECENT;
+
 type MyActivityTab = (typeof MY_ACTIVITY_TAB_ITEMS)[number]['key'];
 
 const resolveTab = (value: string | null): MyActivityTab =>
   value === 'together' ? 'together' : 'solo';
 
+const resolvePartnerSort = (value: string | null): MyActivityPartnerSort =>
+  value === MY_ACTIVITY_PARTNER_SORTS.OLD
+    ? MY_ACTIVITY_PARTNER_SORTS.OLD
+    : DEFAULT_PARTNER_SORT;
+
+const resolvePage = (value: string | null): number => {
+  const page = Number(value);
+
+  return Number.isInteger(page) && page > 0 ? page : DEFAULT_PARTNER_PAGE;
+};
+
 export const MyEventsPage = (): ReactElement => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const selectedTab = resolveTab(searchParams.get('tab'));
+  const partnerSort = resolvePartnerSort(searchParams.get('sort'));
+  const partnerPage = resolvePage(searchParams.get('page'));
+
+  const handlePartnerSortChange = (nextSort: MyActivityPartnerSort) => {
+    setSearchParams(
+      createSearchParams({
+        tab: 'together',
+        sort: nextSort,
+        page: String(DEFAULT_PARTNER_PAGE),
+      }),
+      { replace: true },
+    );
+  };
+
+  const handlePartnerPageChange = (nextPage: number) => {
+    setSearchParams(
+      createSearchParams({
+        tab: 'together',
+        sort: partnerSort,
+        page: String(nextPage),
+      }),
+      { replace: true },
+    );
+  };
 
   return (
     <PageLayout background="bg.subtle">
@@ -48,6 +90,15 @@ export const MyEventsPage = (): ReactElement => {
           </TabLink>
         ))}
       </TabNav>
+
+      {selectedTab === 'together' ? (
+        <MyActivityPartnersContent
+          page={partnerPage}
+          sort={partnerSort}
+          onPageChange={handlePartnerPageChange}
+          onSortChange={handlePartnerSortChange}
+        />
+      ) : null}
     </PageLayout>
   );
 };
