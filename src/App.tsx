@@ -1,11 +1,14 @@
+import { useLayoutEffect } from 'react';
+
 import styled from '@emotion/styled';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 
 import { ToastViewport } from '@/components/Toast';
 
 const App = () => {
   return (
     <AppWrapper>
+      <ScrollToTop />
       <MobileViewport>
         <Outlet />
         <ToastViewport />
@@ -15,6 +18,16 @@ const App = () => {
 };
 
 export default App;
+
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useLayoutEffect(() => {
+    window.scrollTo({ left: 0, top: 0, behavior: 'auto' });
+  }, [pathname]);
+
+  return null;
+};
 
 const AppWrapper = styled.div`
   display: flex;

@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react';
+import { useCallback, useEffect, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 import {
@@ -8,22 +8,98 @@ import {
   useSearchParams,
 } from 'react-router-dom';
 
+import { MY_ACTIVITY_PARTNER_SORTS } from '@/api/constants/user';
+import type { MyActivityPartnerSort } from '@/api/types';
 import { PageLayout, TopNavigation } from '@/components';
+
+import { MyActivityPartnersContent } from './partners';
 
 const MY_ACTIVITY_TAB_ITEMS = [
   { key: 'solo', label: '나의 러닝' },
   { key: 'together', label: '함께 달린 파트너' },
 ] as const;
 
+const DEFAULT_PARTNER_PAGE = 1;
+const DEFAULT_PARTNER_SORT = MY_ACTIVITY_PARTNER_SORTS.RECENT;
+
 type MyActivityTab = (typeof MY_ACTIVITY_TAB_ITEMS)[number]['key'];
 
 const resolveTab = (value: string | null): MyActivityTab =>
   value === 'together' ? 'together' : 'solo';
 
+const resolvePartnerSort = (value: string | null): MyActivityPartnerSort =>
+  value === MY_ACTIVITY_PARTNER_SORTS.OLD
+    ? MY_ACTIVITY_PARTNER_SORTS.OLD
+    : DEFAULT_PARTNER_SORT;
+
+const resolvePage = (value: string | null): number => {
+  const page = Number(value);
+
+  return Number.isInteger(page) && page > 0 ? page : DEFAULT_PARTNER_PAGE;
+};
+
 export const MyEventsPage = (): ReactElement => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const selectedTab = resolveTab(searchParams.get('tab'));
+  const partnerSort = resolvePartnerSort(searchParams.get('sort'));
+  const partnerPage = resolvePage(searchParams.get('page'));
+  const rawPartnerPage = searchParams.get('page');
+
+  const scrollToPageTop = useCallback(() => {
+    window.scrollTo({
+      left: 0,
+      top: 0,
+      behavior: 'auto',
+    });
+  }, []);
+
+  useEffect(() => {
+    if (selectedTab !== 'together') {
+      return;
+    }
+
+    if (rawPartnerPage !== null && partnerPage !== Number(rawPartnerPage)) {
+      setSearchParams(
+        createSearchParams({
+          tab: 'together',
+          sort: partnerSort,
+          page: String(DEFAULT_PARTNER_PAGE),
+        }),
+        { replace: true },
+      );
+    }
+  }, [partnerPage, partnerSort, rawPartnerPage, selectedTab, setSearchParams]);
+
+  const handlePartnerSortChange = useCallback(
+    (nextSort: MyActivityPartnerSort) => {
+      setSearchParams(
+        createSearchParams({
+          tab: 'together',
+          sort: nextSort,
+          page: String(DEFAULT_PARTNER_PAGE),
+        }),
+        { replace: true },
+      );
+      window.requestAnimationFrame(scrollToPageTop);
+    },
+    [scrollToPageTop, setSearchParams],
+  );
+
+  const handlePartnerPageChange = useCallback(
+    (nextPage: number) => {
+      setSearchParams(
+        createSearchParams({
+          tab: 'together',
+          sort: partnerSort,
+          page: String(nextPage),
+        }),
+        { replace: true },
+      );
+      window.requestAnimationFrame(scrollToPageTop);
+    },
+    [partnerSort, scrollToPageTop, setSearchParams],
+  );
 
   return (
     <PageLayout background="bg.subtle">
@@ -48,6 +124,15 @@ export const MyEventsPage = (): ReactElement => {
           </TabLink>
         ))}
       </TabNav>
+
+      {selectedTab === 'together' ? (
+        <MyActivityPartnersContent
+          page={partnerPage}
+          sort={partnerSort}
+          onPageChange={handlePartnerPageChange}
+          onSortChange={handlePartnerSortChange}
+        />
+      ) : null}
     </PageLayout>
   );
 };
