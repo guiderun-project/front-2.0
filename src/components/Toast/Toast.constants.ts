@@ -39,8 +39,8 @@ export const TOAST_CLOSE_TRANSITION = {
 } as const satisfies Transition;
 
 export const TOAST_SWEEP_TRANSITION = {
-  delay: 0.5,
-  duration: 0.6,
+  delay: 0.32,
+  duration: 0.76,
   ease: [0.25, 0.1, 0.25, 1],
 } as const satisfies Transition;
 
