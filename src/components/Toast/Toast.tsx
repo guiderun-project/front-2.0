@@ -46,7 +46,7 @@ export const Toast = ({ shouldReduceMotion, toast }: ToastProps): ReactElement =
       <SweepMover
         aria-hidden="true"
         initial={shouldReduceMotion ? false : { opacity: 1, x: '0%' }}
-        animate={shouldReduceMotion ? { opacity: 1, x: '0%' } : { opacity: 0.4, x: '100%' }}
+        animate={shouldReduceMotion ? { opacity: 1, x: '0%' } : { opacity: 0.25, x: '100%' }}
         transition={shouldReduceMotion ? TOAST_REDUCED_MOTION_TRANSITION : TOAST_SWEEP_TRANSITION}
       >
         <Sweep $type={toast.type} />
