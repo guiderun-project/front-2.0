@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { api } from '@/api/services';
 import type { EventDetailResponse } from '@/api/types';
+import { useToast } from '@/components';
 import { APP_PATH } from '@/router/path';
 
 import { eventDetailQueryKeys } from '../queryKeys';
@@ -20,6 +21,7 @@ export const useEventEditMutations = ({
 }: UseEventEditMutationsParams) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
 
   const updateMutation = useMutation({
     mutationFn: (values: EventFormValues) => {
@@ -39,6 +41,13 @@ export const useEventEditMutations = ({
         queryKey: eventDetailQueryKeys.root,
       });
       navigate(APP_PATH.EVENT_DETAIL(eventId));
+      window.setTimeout(() => {
+        showToast({
+          type: 'success',
+          icon: 'check-lined',
+          content: '모임 수정이 완료됐어요.',
+        });
+      }, 0);
     },
     onError: () => {
       window.alert('모임 수정에 실패했어요.');

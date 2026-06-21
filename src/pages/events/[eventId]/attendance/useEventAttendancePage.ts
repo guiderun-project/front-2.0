@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 
 import type { AttendanceParticipant } from '@/api/types';
 import { api } from '@/api/services';
+import { useToast } from '@/components';
 import { USER_ROLES } from '@/constants/roles';
 import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
@@ -57,6 +58,7 @@ export const useEventAttendancePermission = () => {
 
 export const useEventAttendancePage = (eventId: number) => {
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
   const [announcement, setAnnouncement] = useState('');
   const [updatingParticipantIds, setUpdatingParticipantIds] = useState<
     ReadonlySet<string>
@@ -103,7 +105,12 @@ export const useEventAttendancePage = (eventId: number) => {
     mutationFn: ({ userId }: AttendanceMutationInput) =>
       api.attendance.attendPost({ eventId, userId }),
     onSuccess: async (_, participant) => {
-      setAnnouncement(`${participant.participantName}님을 출석 처리했어요.`);
+      setAnnouncement('');
+      showToast({
+        type: 'success',
+        icon: 'check-thick-lined',
+        content: `${participant.participantName}님 출석을 완료했어요`,
+      });
       await invalidateAttendanceStatus();
     },
     onError: (_, participant) => {
@@ -118,7 +125,12 @@ export const useEventAttendancePage = (eventId: number) => {
     mutationFn: ({ userId }: AttendanceMutationInput) =>
       api.attendance.attendDelete({ eventId, userId }),
     onSuccess: async (_, participant) => {
-      setAnnouncement(`${participant.participantName}님 출석을 취소했어요.`);
+      setAnnouncement('');
+      showToast({
+        type: 'error',
+        icon: 'delete-lined',
+        content: `${participant.participantName}님 출석을 취소했어요`,
+      });
       await invalidateAttendanceStatus();
     },
     onError: (_, participant) => {

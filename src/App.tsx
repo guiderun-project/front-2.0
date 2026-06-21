@@ -1,11 +1,14 @@
 import styled from '@emotion/styled';
 import { Outlet } from 'react-router-dom';
 
+import { ToastViewport } from '@/components/Toast';
+
 const App = () => {
   return (
     <AppWrapper>
       <MobileViewport>
         <Outlet />
+        <ToastViewport />
       </MobileViewport>
     </AppWrapper>
   );
