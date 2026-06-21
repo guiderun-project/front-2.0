@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { api } from '@/api/services';
 import type { MyEventApplyGetResponse } from '@/api/types';
+import { useToast } from '@/components';
 import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
 
@@ -53,6 +54,7 @@ export const useEventApplyPage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { isAuthReady, user } = useAuth();
+  const { showToast } = useToast();
   const { event, eventId, isValidEventId } = useEventDetailRoute();
   const [isCompleted, setIsCompleted] = useState(false);
   const [isSubmitLocked, setIsSubmitLocked] = useState(false);
@@ -157,8 +159,11 @@ export const useEventApplyPage = () => {
       void invalidateEventQueries();
       navigate(APP_PATH.EVENT_DETAIL(eventId));
       window.setTimeout(() => {
-        // TODO: Toast 적용 필요
-        window.alert('신청서 수정이 완료됐어요.');
+        showToast({
+          type: 'success',
+          icon: 'check-lined',
+          content: '신청서 수정이 완료됐어요.',
+        });
       }, 0);
     },
     onError: () => {

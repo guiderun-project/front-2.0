@@ -17,6 +17,7 @@
     "@hookform/resolvers": "^5.4.0",
     "@tanstack/react-query": "5.90.21",
     "axios": "1.13.6",
+    "framer-motion": "^12.40.0",
     "react": "^19.2.6",
     "react-aria-components": "1.17.0",
     "react-dom": "^19.2.6",

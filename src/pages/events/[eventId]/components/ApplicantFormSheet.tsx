@@ -3,7 +3,7 @@ import type { ReactElement } from 'react';
 import styled from '@emotion/styled';
 
 import type { EventApplicantFormResponse, RunningGroup } from '@/api/types';
-import { BottomSheet, ButtonGroup, Text } from '@/components';
+import { BottomSheet, ButtonGroup, Text, useToast } from '@/components';
 
 import {
   copyTextToClipboard,
@@ -40,6 +40,7 @@ export const ApplicantFormSheet = ({
   onClose,
   open,
 }: ApplicantFormSheetProps): ReactElement => {
+  const { showToast } = useToast();
   const eventGroupLabelContext = { eventCategory, eventType };
   const rows = data ? createApplicantFormRows(data, eventGroupLabelContext) : [];
   const canCopy = rows.length > 0 && !isPending && !isError;
@@ -50,12 +51,13 @@ export const ApplicantFormSheet = ({
     }
 
     void copyTextToClipboard(formatRowsForCopy(rows)).then((isCopied) => {
-      // TODO: 공용 토스트나 스낵바가 준비되면 window.alert 대체
-      window.alert(
-        isCopied
+      showToast({
+        type: isCopied ? 'success' : 'error',
+        icon: isCopied ? 'check-lined' : 'alert-circle-filled',
+        content: isCopied
           ? '신청서 내용을 복사했어요.'
           : '신청서 내용 복사에 실패했어요.',
-      );
+      });
     });
   };
 

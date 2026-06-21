@@ -3,12 +3,15 @@ import { useLayoutEffect } from 'react';
 import styled from '@emotion/styled';
 import { Outlet, useLocation } from 'react-router-dom';
 
+import { ToastViewport } from '@/components/Toast';
+
 const App = () => {
   return (
     <AppWrapper>
       <ScrollToTop />
       <MobileViewport>
         <Outlet />
+        <ToastViewport />
       </MobileViewport>
     </AppWrapper>
   );
