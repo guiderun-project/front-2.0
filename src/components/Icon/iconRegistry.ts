@@ -8,10 +8,12 @@ import ChevronRightLinedIcon from "@/assets/icons/chevron-right-lined.svg?react"
 import ChevronUpLinedIcon from "@/assets/icons/chevron-up-lined.svg?react";
 import CheckLinedIcon from "@/assets/icons/check-lined.svg?react";
 import CheckThickLinedIcon from "@/assets/icons/check-thick-lined.svg?react";
+import CloseLinedIcon from "@/assets/icons/close-lined.svg?react";
 import DeleteFilledIcon from "@/assets/icons/delete-filled.svg?react";
 import DeleteLinedIcon from "@/assets/icons/delete-lined.svg?react";
 import DownloadLinedIcon from "@/assets/icons/download-lined.svg?react";
 import EditLinedIcon from "@/assets/icons/edit-lined.svg?react";
+import ExternalLinkLinedIcon from "@/assets/icons/external-link-lined.svg?react";
 import HelpCircleFilledIcon from "@/assets/icons/help-circle-filled.svg?react";
 import HomeFilledIcon from "@/assets/icons/home-filled.svg?react";
 import HomeLinedIcon from "@/assets/icons/home-lined.svg?react";
@@ -46,10 +48,12 @@ export const iconRegistry = {
   "chevron-up-lined": ChevronUpLinedIcon,
   "check-lined": CheckLinedIcon,
   "check-thick-lined": CheckThickLinedIcon,
+  "close-lined": CloseLinedIcon,
   "delete-filled": DeleteFilledIcon,
   "delete-lined": DeleteLinedIcon,
   "download-lined": DownloadLinedIcon,
   "edit-lined": EditLinedIcon,
+  "external-link-lined": ExternalLinkLinedIcon,
   "help-circle-filled": HelpCircleFilledIcon,
   "home-filled": HomeFilledIcon,
   "home-lined": HomeLinedIcon,

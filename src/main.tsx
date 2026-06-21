@@ -6,6 +6,8 @@ import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 
 import { baseURL } from '@/api/core/client';
+import { BirthDateGate } from '@/components/BirthDateGate';
+import { RunningRecordGate } from '@/components/RunningRecordGate';
 import { AuthProvider } from '@/contexts';
 import { router } from '@/router/router';
 import { ColorModeProvider } from '@/styles/colorMode';
@@ -52,6 +54,8 @@ const bootstrap = async () => {
             <Global styles={globalStyles} />
             <ColorModeProvider>
               <RouterProvider router={router} />
+              <BirthDateGate />
+              <RunningRecordGate />
             </ColorModeProvider>
           </ThemeProvider>
         </AuthProvider>

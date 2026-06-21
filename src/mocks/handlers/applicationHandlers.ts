@@ -4,6 +4,7 @@ import type {
   EventApplyPatchRequestBody,
   EventApplyPostRequestBody,
 } from '@/api/types/application';
+import { USER_ROLES } from '@/constants/roles';
 import {
   buildAdditionalAnswerDetails,
   buildApplicantForm,
@@ -14,10 +15,48 @@ import {
   getFormUser,
   getParticipantSummary,
   mockDb,
-  runningGroups,
   toApplicant,
+  type MockEvent,
+  type MockUser,
+  visibleRunningGroups,
 } from '@/mocks/fixtures';
 import { apiUrl, badRequest, notFound } from '@/mocks/http';
+
+const getApplicationEligibilityError = (
+  event: MockEvent,
+  user: MockUser,
+): ReturnType<typeof badRequest> | null => {
+  if (event.recruitStatus !== 'RECRUIT_OPEN') {
+    return badRequest('Event application is not open.');
+  }
+
+  if (event.organizerId === user.userId || user.role === USER_ROLES.ADMIN) {
+    return badRequest('Event managers cannot apply to this event.');
+  }
+
+  return null;
+};
+
+const getCompetitionInfoError = (
+  event: MockEvent,
+  body: EventApplyPostRequestBody | EventApplyPatchRequestBody,
+): ReturnType<typeof badRequest> | null => {
+  if (event.eventType !== 'COMPETITION') {
+    return null;
+  }
+
+  if (!body.competitionInfo) {
+    return badRequest('competitionInfo is required for competition events.');
+  }
+
+  if (!body.competitionInfo.birthDate || !body.competitionInfo.phoneNumber) {
+    return badRequest(
+      'competitionInfo.birthDate and competitionInfo.phoneNumber are required for competition events.',
+    );
+  }
+
+  return null;
+};
 
 const upsertCurrentUserForm = (
   eventId: number,
@@ -62,7 +101,7 @@ const upsertCurrentUserForm = (
 const createApplicantGroups = (eventId: number) => {
   const forms = getAppliedForms(eventId);
 
-  return runningGroups
+  return visibleRunningGroups
     .map((runningGroup) => {
       const applicants = forms
         .filter((form) => form.group === runningGroup)
@@ -89,8 +128,17 @@ export const applicationHandlers: HttpHandler[] = [
         return notFound('Event not found.');
       }
 
-      if (event.eventType === 'COMPETITION' && !body.competitionInfo) {
-        return badRequest('competitionInfo is required for competition events.');
+      const currentUser = getCurrentUser();
+      const eligibilityError = getApplicationEligibilityError(event, currentUser);
+
+      if (eligibilityError) {
+        return eligibilityError;
+      }
+
+      const competitionInfoError = getCompetitionInfoError(event, body);
+
+      if (competitionInfoError) {
+        return competitionInfoError;
       }
 
       const form = upsertCurrentUserForm(eventId, body);
@@ -108,6 +156,19 @@ export const applicationHandlers: HttpHandler[] = [
 
       if (!event) {
         return notFound('Event not found.');
+      }
+
+      const currentUser = getCurrentUser();
+      const eligibilityError = getApplicationEligibilityError(event, currentUser);
+
+      if (eligibilityError) {
+        return eligibilityError;
+      }
+
+      const competitionInfoError = getCompetitionInfoError(event, body);
+
+      if (competitionInfoError) {
+        return competitionInfoError;
       }
 
       const form = upsertCurrentUserForm(eventId, body);

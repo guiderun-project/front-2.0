@@ -16,8 +16,8 @@ import {
   getMatchingSummary,
   isMatched,
   mockDb,
-  runningGroups,
   toMatchingUser,
+  visibleRunningGroups,
 } from '@/mocks/fixtures';
 import { apiUrl, notFound } from '@/mocks/http';
 
@@ -50,7 +50,7 @@ const createWaitingGroups = (eventId: number) => {
     (form) => !isMatched(eventId, form.userId),
   );
 
-  return runningGroups
+  return visibleRunningGroups
     .map((runningGroup) => {
       const participants = waitingForms
         .filter((form) => form.group === runningGroup)
@@ -106,15 +106,19 @@ const createCompletedRows = (eventId: number): CompletedRowEntry[] => {
 const createCompletedGroups = (eventId: number) => {
   const rows = createCompletedRows(eventId);
 
-  return runningGroups
+  return visibleRunningGroups
     .map((runningGroup) => {
       const groupRows = rows
         .filter((item) => item.runningGroup === runningGroup)
         .map((item) => item.row);
+      const totalCount = groupRows.reduce(
+        (count, row) => count + 1 + row.guides.length,
+        0,
+      );
 
       return {
         runningGroup,
-        totalCount: groupRows.length,
+        totalCount,
         rows: groupRows,
       };
     })
@@ -140,7 +144,7 @@ const createStatusGroups = (eventId: number) => {
     });
   const rows = [...matchedRows, ...unmatchedRows];
 
-  return runningGroups
+  return visibleRunningGroups
     .map((runningGroup) => {
       const groupRows = rows
         .filter((item) => item.runningGroup === runningGroup)

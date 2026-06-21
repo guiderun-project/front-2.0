@@ -1,42 +1,52 @@
 import { useState, type Key } from 'react';
 
-import { useQuery } from '@tanstack/react-query';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import {
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from 'react-router-dom';
 
-import { api } from '@/api/services';
+import { USER_ROLES } from '@/constants/roles';
 import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
 
-import { eventDetailQueryKeys, getEventDetailViewerKey } from '../queryKeys';
+import { useEventDetailRoute } from '../EventDetailRouteContext';
 import type { EventDetailTab } from '../types';
 import { copyTextToClipboard, isApprovedUser, isEventDetailTab } from '../utils';
+import { useKakaoShare } from './useKakaoShare';
+
+const EVENT_DETAIL_SECTION_TO_TAB: Record<string, EventDetailTab> = {
+  applicants: 'applicants',
+  detail: 'detail',
+  matching: 'matching',
+};
+
+const getEventDetailTabFromSection = (
+  section: string | null,
+): EventDetailTab => {
+  if (section === null) {
+    return 'detail';
+  }
+
+  return EVENT_DETAIL_SECTION_TO_TAB[section] ?? 'detail';
+};
 
 export const useEventDetailPage = () => {
-  const { eventId: eventIdParam } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, isAuthReady, user } = useAuth();
-  const [selectedTab, setSelectedTab] = useState<EventDetailTab>('detail');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { isAuthenticated, user } = useAuth();
+  const { event, eventId, isValidEventId } = useEventDetailRoute();
+  const { shareLink } = useKakaoShare();
   const [isRestrictedSheetOpen, setIsRestrictedSheetOpen] = useState(false);
   const [isManagementSheetOpen, setIsManagementSheetOpen] = useState(false);
-  const eventId = Number(eventIdParam);
-  const isValidEventId = Number.isInteger(eventId) && eventId > 0;
   const canAccessProtectedTabs = isApprovedUser(user);
-  const isApprovalPending = user?.role === 'ROLE_WAIT';
+  const isApprovalPending = user?.role === USER_ROLES.WAIT;
+  const selectedTab = getEventDetailTabFromSection(searchParams.get('section'));
   const activeTab = canAccessProtectedTabs ? selectedTab : 'detail';
-  const viewerKey = getEventDetailViewerKey(user?.userId);
-
-  const eventDetailQuery = useQuery({
-    queryKey: eventDetailQueryKeys.detail(eventId, viewerKey),
-    queryFn: () => api.event.detailGet({ eventId }),
-    enabled: isValidEventId && isAuthReady,
-  });
-
-  const event = eventDetailQuery.data ?? null;
   const canManageEvent =
-    event !== null &&
     user !== null &&
-    (event?.viewer?.isOrganizer === true || user.role === 'ROLE_ADMIN');
+    (event.viewer?.isOrganizer === true || user.role === USER_ROLES.ADMIN);
 
   const openRestrictedSheet = () => {
     setIsRestrictedSheetOpen(true);
@@ -64,7 +74,20 @@ export const useEventDetailPage = () => {
       return;
     }
 
-    setSelectedTab(key);
+    setSearchParams(
+      (prevSearchParams) => {
+        const nextSearchParams = new URLSearchParams(prevSearchParams);
+
+        if (key === 'detail') {
+          nextSearchParams.delete('section');
+        } else {
+          nextSearchParams.set('section', key);
+        }
+
+        return nextSearchParams;
+      },
+      { replace: true },
+    );
   };
 
   const handleBack = () => {
@@ -90,7 +113,7 @@ export const useEventDetailPage = () => {
   };
 
   const handleKakaoShare = () => {
-    // TODO: 카카오톡 공유하기 로직 구현 필요
+    shareLink(event.name, event.organizer.name);
   };
 
   return {
@@ -100,7 +123,6 @@ export const useEventDetailPage = () => {
     closeManagementSheet,
     closeRestrictedSheet,
     event,
-    eventDetailQuery,
     eventId,
     handleBack,
     handleCopyLink,

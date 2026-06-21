@@ -17,6 +17,7 @@ export type AttendanceParticipant = {
   userId: string;
   name: string;
   type: UserType;
+  isFirstParticipation: boolean;
 };
 
 export type AttendanceUpdatePath = {

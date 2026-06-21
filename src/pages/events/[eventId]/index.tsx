@@ -29,7 +29,6 @@ export const EventDetailPage = (): ReactElement => {
     closeManagementSheet,
     closeRestrictedSheet,
     event,
-    eventDetailQuery,
     eventId,
     handleBack,
     handleCopyLink,
@@ -96,32 +95,6 @@ export const EventDetailPage = (): ReactElement => {
     );
   }
 
-  if (eventDetailQuery.isPending) {
-    return (
-      <PageLayout background="gradient.bg.brand-event">
-        <TopNavigation
-          aria-label="이벤트 상세 상단 메뉴"
-          left={navigationLeftAction}
-          right={navigationRightActions}
-        />
-        <PageState>이벤트 정보를 불러오는 중입니다.</PageState>
-      </PageLayout>
-    );
-  }
-
-  if (eventDetailQuery.isError || !event) {
-    return (
-      <PageLayout background="gradient.bg.brand-event">
-        <TopNavigation
-          aria-label="이벤트 상세 상단 메뉴"
-          left={navigationLeftAction}
-          right={navigationRightActions}
-        />
-        <PageState>이벤트를 찾을 수 없습니다.</PageState>
-      </PageLayout>
-    );
-  }
-
   return (
     <PageLayout background="gradient.bg.brand-event">
       <TopNavigation
@@ -151,6 +124,8 @@ export const EventDetailPage = (): ReactElement => {
           <Tabs.Panel id="applicants">
             <ApplicantsPanel
               data={applicantsQuery.data}
+              eventCategory={event.eventCategory}
+              eventType={event.eventType}
               isError={applicantsQuery.isError}
               isPending={applicantsQuery.isPending}
               onApplicantClick={canManageEvent ? openApplicantForm : undefined}
@@ -159,6 +134,8 @@ export const EventDetailPage = (): ReactElement => {
           <Tabs.Panel id="matching">
             <MatchingPanel
               data={matchingStatus.data}
+              eventCategory={event.eventCategory}
+              eventType={event.eventType}
               isError={matchingStatus.isError}
               isPending={matchingStatus.isPending}
               showMyPartnerSummary={event.viewer?.isApplied === true}
@@ -190,6 +167,7 @@ export const EventDetailPage = (): ReactElement => {
       />
       <ApplicantFormSheet
         data={applicantFormQuery.data}
+        eventCategory={event.eventCategory}
         eventType={event.eventType}
         isError={applicantFormQuery.isError}
         isPending={applicantFormQuery.isPending}

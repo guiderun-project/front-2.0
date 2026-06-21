@@ -1,15 +1,42 @@
 import type { ReactElement } from 'react';
 
-import { PageLayout } from '@/components/PageLayout';
-import { RoutePlaceholder } from '@/pages/_shared/RoutePlaceholder';
+import type { AttendanceMessageState } from './attendancePageState';
+import { AttendanceMessagePage } from './components/AttendanceMessagePage';
+import { AttendancePageBoundary } from './components/AttendancePageBoundary';
+import { AttendancePermissionGate } from './components/AttendancePermissionGate';
+import { useEventAttendanceRoute } from './useEventAttendancePage';
+
+const EVENT_CHECKING_STATE: AttendanceMessageState = {
+  message: '출석 정보를 가지고 오고 있어요',
+  role: 'status',
+  status: 'message',
+};
+
+const EVENT_ERROR_STATE: AttendanceMessageState = {
+  message: '출석 정보를 가지고 오지 못했어요',
+  role: 'alert',
+  status: 'message',
+};
+
+const INVALID_EVENT_STATE: AttendanceMessageState = {
+  message: '잘못된 이벤트 주소예요',
+  role: 'alert',
+  status: 'message',
+};
 
 export const EventAttendancePage = (): ReactElement => {
+  const { eventId } = useEventAttendanceRoute();
+
+  if (eventId === null) {
+    return <AttendanceMessagePage pageState={INVALID_EVENT_STATE} />;
+  }
+
   return (
-    <PageLayout background="bg.subtle">
-      <RoutePlaceholder
-        title="출석하기"
-        description="이벤트 참가자의 출석 상태를 확인하고 기록할 페이지입니다."
-      />
-    </PageLayout>
+    <AttendancePageBoundary
+      errorState={EVENT_ERROR_STATE}
+      loadingState={EVENT_CHECKING_STATE}
+    >
+      <AttendancePermissionGate eventId={eventId} />
+    </AttendancePageBoundary>
   );
 };
