@@ -4,7 +4,7 @@ import type { ColorToken } from '@/styles/tokens';
 
 import type { ToastType } from './Toast.types';
 
-export const TOAST_CLOSE_DELAY_MS = 1240;
+export const TOAST_CLOSE_DELAY_MS = 1180;
 export const TOAST_CLOSE_ANIMATION_MS = 720;
 
 export const TOAST_ICON_COLOR = {
