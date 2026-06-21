@@ -4,7 +4,7 @@ import type { ColorToken } from '@/styles/tokens';
 
 import type { ToastType } from './Toast.types';
 
-export const TOAST_CLOSE_DELAY_MS = 1320;
+export const TOAST_CLOSE_DELAY_MS = 1100;
 export const TOAST_CLOSE_ANIMATION_MS = 720;
 
 export const TOAST_ICON_COLOR = {
@@ -39,7 +39,7 @@ export const TOAST_CLOSE_TRANSITION = {
 } as const satisfies Transition;
 
 export const TOAST_SWEEP_TRANSITION = {
-  delay: 0.72,
+  delay: 0.5,
   duration: 0.6,
   ease: [0.25, 0.1, 0.25, 1],
 } as const satisfies Transition;
