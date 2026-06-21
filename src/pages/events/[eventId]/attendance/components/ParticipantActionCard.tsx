@@ -1,10 +1,9 @@
 import { useId, type ReactElement } from 'react';
 
-import styled from '@emotion/styled';
-
 import type { AttendanceParticipant } from '@/api/types';
 import { Button } from '@/components';
 
+import { ParticipantCard } from './ParticipantCard';
 import { ParticipantInfo } from './ParticipantInfo';
 
 type AttendanceActionStatus = 'waiting' | 'attended';
@@ -42,16 +41,3 @@ export const ParticipantActionCard = ({
     </ParticipantCard>
   );
 };
-
-const ParticipantCard = styled.article(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: theme.spacing.lg,
-  width: '100%',
-  minWidth: 0,
-  padding: theme.spacing.lg,
-  borderRadius: theme.radius.lg,
-  boxSizing: 'border-box',
-  backgroundColor: theme.color.bg.subtle,
-}));
