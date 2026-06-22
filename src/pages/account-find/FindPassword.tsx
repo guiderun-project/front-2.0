@@ -8,6 +8,7 @@ import { api } from '@/api/services';
 import {
   FooterButton,
   FormPageLayout,
+  Icon,
   Input,
   PageLayout,
   Text,
@@ -294,7 +295,14 @@ export const FindPassword = (): ReactElement => {
 
         {phase === FIND_PASSWORD_PHASE.DONE && (
           <DoneContainer>
-            <DoneIllustration aria-hidden={true} />
+            <DoneIllustration>
+              <Icon
+                aria-hidden={true}
+                color="icon.inverse"
+                icon="check-thick-lined"
+                size={56}
+              />
+            </DoneIllustration>
           </DoneContainer>
         )}
 
@@ -362,9 +370,11 @@ const DoneContainer = styled.div(({ theme }) => ({
 }));
 
 const DoneIllustration = styled.div(({ theme }) => ({
-  width: theme.pxToRem(102),
-  height: theme.pxToRem(102),
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: theme.pxToRem(94),
+  height: theme.pxToRem(94),
   borderRadius: theme.radius.full,
-  // TODO: 일러스트 변경 예정
-  backgroundColor: 'rgba(169, 173, 181, 0.2)',
+  backgroundColor: theme.color.bg['brand-primary'],
 }));
