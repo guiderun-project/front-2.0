@@ -5,16 +5,13 @@ import styled from '@emotion/styled';
 import { HiddenText, Text } from '@/components';
 
 export type StepperProps = {
-  /** 단계 라벨 목록 (표시 순서대로) */
-  steps: string[];
-  /** 현재 단계 (1-based) */
-  current: number;
+  steps: readonly string[]; // 단계 라벨 목록 (표시 순서대로)
+  current: number; // 현재 단계 (1-based)
   className?: string;
 };
 
 /**
- * 회원가입 단계 진행 표시기.
- * 각 단계의 진행 바와 번호·라벨을 보여주며, 현재 단계까지의 바를 brand 색으로 채운다.
+ * 회원가입 각 단계의 진행 바와 번호·라벨을 보여주며, 현재 단계까지의 바를 brand 색으로 채운다.
  */
 export const Stepper = ({
   steps,
