@@ -1,20 +1,45 @@
 import type { ReactElement } from 'react';
 
-import styled from '@emotion/styled';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
-import { FooterButton, PageLayout, Text, TopNavigation } from '@/components';
+import { FooterButton, PageLayout, TopNavigation } from '@/components';
 import { APP_PATH } from '@/router/path';
 
 import { Stepper } from '@/pages/signup/components/Stepper';
+import { BasicInfoStep } from '@/pages/signup/components/steps/BasicInfoStep';
+import { CompleteStep } from '@/pages/signup/components/steps/CompleteStep';
+import { ExperienceStep } from '@/pages/signup/components/steps/ExperienceStep';
+import { GenderStep } from '@/pages/signup/components/steps/GenderStep';
+import { RecordStep } from '@/pages/signup/components/steps/RecordStep';
+import { RunnerTypeStep } from '@/pages/signup/components/steps/RunnerTypeStep';
+import { TermsStep } from '@/pages/signup/components/steps/TermsStep';
 import {
   SIGNUP_FORM_DEFAULT_VALUES,
   SIGNUP_STEPPER_LABELS,
   SIGNUP_STEP_STAGE,
 } from '@/pages/signup/constants';
 import { useSignupFunnel } from '@/pages/signup/hooks/useSignupFunnel';
-import type { SignupFormValues } from '@/pages/signup/types';
+import type { SignupFormValues, SignupStepId } from '@/pages/signup/types';
+
+const renderStep = (step: SignupStepId): ReactElement => {
+  switch (step) {
+    case 'runnerType':
+      return <RunnerTypeStep />;
+    case 'gender':
+      return <GenderStep />;
+    case 'basicInfo':
+      return <BasicInfoStep />;
+    case 'experience':
+      return <ExperienceStep />;
+    case 'record':
+      return <RecordStep />;
+    case 'terms':
+      return <TermsStep />;
+    case 'complete':
+      return <CompleteStep />;
+  }
+};
 
 export const SignupPage = (): ReactElement => {
   const navigate = useNavigate();
@@ -81,15 +106,7 @@ export const SignupPage = (): ReactElement => {
           <Stepper current={stepperStage} steps={SIGNUP_STEPPER_LABELS} />
         ) : null}
 
-        <StepArea>
-          {/* 단계별 입력 화면이 들어갈 자리. 지금은 단계 전환 동작 확인용 임시 화면이다. */}
-          <Text as="h1" font="heading-m-sb">
-            {step}
-          </Text>
-          <Text color="text.tertiary" font="body-s-r">
-            단계 화면 준비 중 (PR2b)
-          </Text>
-        </StepArea>
+        {renderStep(step)}
 
         <FooterButton>
           <FooterButton.Button
@@ -105,10 +122,3 @@ export const SignupPage = (): ReactElement => {
     </PageLayout>
   );
 };
-
-const StepArea = styled.div(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: theme.spacing.md,
-  padding: theme.spacing['2xl'],
-}));
