@@ -1,9 +1,10 @@
-import type { ReactElement } from 'react';
+import { useState, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
 
-import { PageLayout, QueryBoundary, Text } from '@/components';
+import { ConfirmPopup, PageLayout, QueryBoundary, Text } from '@/components';
+import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
 
 import { AccountMenu } from './components/AccountMenu';
@@ -36,10 +37,26 @@ export const MyPage = (): ReactElement => {
 
 const MyPageContent = (): ReactElement => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const { data } = useMyPage();
+  const [isLogoutPopupOpen, setIsLogoutPopupOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleInquiry = () => {
     window.open(INQUIRY_URL, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+
+    try {
+      await logout();
+    } catch {
+      // 서버 로그아웃이 실패해도 로컬 세션은 정리되므로 인트로로 진행한다.
+    } finally {
+      navigate(APP_PATH.INTRO, { replace: true });
+      setIsLoggingOut(false);
+    }
   };
 
   return (
@@ -66,8 +83,19 @@ const MyPageContent = (): ReactElement => {
         <AccountMenu
           onInquiry={handleInquiry}
           onViewTerms={() => navigate(APP_PATH.TERMS)}
+          onLogout={() => setIsLogoutPopupOpen(true)}
         />
       </InfoSection>
+
+      <ConfirmPopup
+        cancelText="아니요"
+        confirmLoading={isLoggingOut}
+        confirmText="로그아웃"
+        open={isLogoutPopupOpen}
+        title="지금 로그아웃 할까요?"
+        onCancel={() => setIsLogoutPopupOpen(false)}
+        onConfirm={handleLogout}
+      />
     </>
   );
 };
