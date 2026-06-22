@@ -63,9 +63,9 @@ export const MemberUpcomingEventCard = ({
 
         {isMatched ? (
           <MatchedPartnerBox>
-            <Text color="text.secondary" font="detail-m-m">
+            <PartnerLabel color="text.secondary" font="detail-m-m">
               내 파트너
-            </Text>
+            </PartnerLabel>
             <PartnerChips>
               {partners.map((partner, index) => (
                 <PartnerChip key={`${partner.type}-${partner.name}-${index}`}>
@@ -141,21 +141,30 @@ const InfoRow = styled.div(({ theme }) => ({
 const MatchedPartnerBox = styled.div(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  flexWrap: 'wrap',
+  justifyContent: 'space-between',
   gap: theme.spacing['3xl'],
   padding: theme.spacing.lg,
   borderRadius: theme.pxToRem(10),
   backgroundColor: theme.color.bg['brand-soft'],
 }));
 
+const PartnerLabel = styled(Text)({
+  flex: '0 0 auto',
+  whiteSpace: 'nowrap',
+});
+
 const PartnerChips = styled.div(({ theme }) => ({
   display: 'flex',
+  flex: '1 1 0',
   flexWrap: 'wrap',
+  justifyContent: 'flex-end',
   gap: theme.spacing.md,
+  minWidth: 0,
 }));
 
 const PartnerChip = styled.span(({ theme }) => ({
   display: 'inline-flex',
+  flex: '0 0 auto',
   alignItems: 'center',
   gap: theme.spacing.s,
 }));
