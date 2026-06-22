@@ -3,19 +3,15 @@ import type { ReactElement } from 'react';
 import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
 
-import { Button, Icon, PageLayout, Text } from '@/components';
+import { Button, Graphic, Icon, PageLayout, Text } from '@/components';
 import { APP_PATH } from '@/router/path';
-import { useColorMode } from '@/styles/useColorMode';
 
-import introRunnersDark from './assets/intro-runners-dark.png';
-import introRunners from './assets/intro-runners.png';
 import { KakaoLoginButton } from './components/KakaoLoginButton';
 
 const GUIDERUN_LANDING_URL = 'https://about.guiderun.org/';
 
 export const IntroPage = (): ReactElement => {
   const navigate = useNavigate();
-  const { colorMode } = useColorMode();
 
   const handleGuideRunInfoClick = () => {
     window.open(GUIDERUN_LANDING_URL, '_blank', 'noopener,noreferrer');
@@ -47,10 +43,7 @@ export const IntroPage = (): ReactElement => {
           </Text>
         </TitleSection>
 
-        <Illustration
-          alt="끈으로 연결되어 함께 달리는 두 러너"
-          src={colorMode === 'light' ? introRunners : introRunnersDark}
-        />
+        <Illustration color="icon.primary" graphic="welcome" />
 
         <GuideRunInfoSection>
           <GuideRunInfoButton type="button" onClick={handleGuideRunInfoClick}>
@@ -105,12 +98,8 @@ const TitleSection = styled.section`
     `${theme.spacing['6xl']} ${theme.spacing['2xl']} ${theme.spacing['4xl']}`};
 `;
 
-const Illustration = styled.img`
-  width: ${({ theme }) => theme.pxToRem(299)};
-  height: ${({ theme }) => theme.pxToRem(120)};
+const Illustration = styled(Graphic)`
   align-self: center;
-  object-fit: contain;
-  image-rendering: pixelated;
 `;
 
 const GuideRunInfoSection = styled.section`

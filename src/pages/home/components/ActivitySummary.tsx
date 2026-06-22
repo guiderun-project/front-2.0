@@ -2,10 +2,8 @@ import { useId, type ReactElement } from "react";
 
 import styled from "@emotion/styled";
 
-import { HiddenText, Text } from "@/components";
+import { Graphic, HiddenText, Text } from "@/components";
 import { useAuth } from "@/contexts";
-
-import runnerImageUrl from "@/assets/images/home-summary-runner.png";
 
 import { useHomeSummary } from "../hooks/useHomeSummary";
 
@@ -38,9 +36,9 @@ export const ActivitySummary = (): ReactElement => {
               {MEMBER_HEADLINE_SUBTITLE}
             </Text>
           </Headline>
-          <RunnerImageBox aria-hidden={true}>
-            <RunnerImage alt="" src={runnerImageUrl} />
-          </RunnerImageBox>
+          <RunnerGraphicBox aria-hidden={true}>
+            <Graphic color="icon.primary" decorative graphic="main" />
+          </RunnerGraphicBox>
         </HeadlineRow>
 
         <Metrics>
@@ -87,9 +85,9 @@ export const ActivitySummary = (): ReactElement => {
             열심히 달리고 있어요
           </Text>
         </Headline>
-        <RunnerImageBox aria-hidden={true}>
-          <RunnerImage alt="" src={runnerImageUrl} />
-        </RunnerImageBox>
+        <RunnerGraphicBox aria-hidden={true}>
+          <Graphic color="icon.primary" decorative graphic="main" />
+        </RunnerGraphicBox>
       </HeadlineRow>
 
       <Metrics>
@@ -149,33 +147,13 @@ const NameLine = styled.span({
   alignItems: "flex-end",
 });
 
-const RunnerImageBox = styled.span(({ theme }) => ({
-  position: "relative",
+const RunnerGraphicBox = styled.span(({ theme }) => ({
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
   flexShrink: 0,
   width: theme.pxToRem(94),
-  height: theme.pxToRem(64),
-  overflow: "hidden",
-}));
-
-const RunnerImage = styled.img(({ theme }) => ({
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  width: theme.pxToRem(140),
-  height: theme.pxToRem(140),
-  transform: "translate(-50%, -50%)",
-
-  filter: "none",
-
-  "html[data-color-mode='dark'] &": {
-    filter: "brightness(0) invert(1)",
-  },
-
-  "@media (prefers-color-scheme: dark)": {
-    "html:not([data-color-mode='light']) &": {
-      filter: "brightness(0) invert(1)",
-    },
-  },
+  height: theme.pxToRem(70),
 }));
 
 const Metrics = styled.div(({ theme }) => ({
