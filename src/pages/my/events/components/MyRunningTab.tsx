@@ -1,7 +1,7 @@
 import { useTransition, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
-import { createSearchParams, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 import { EVENT_LIST_TYPE_FILTERS } from '@/api/constants/common';
 import { MY_ACTIVITY_EVENT_RELATION_FILTERS } from '@/api/constants/user';
@@ -50,44 +50,52 @@ export const MyRunningTab = (): ReactElement => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [, startTransition] = useTransition();
 
-  const typeFilter = resolveType(searchParams.get('type'));
-  const relationFilter = resolveRelation(searchParams.get('relation'));
+  const typeParam = searchParams.get('type');
+  const relationParam = searchParams.get('relation');
+  const typeValue = typeParam === null ? undefined : resolveType(typeParam);
+  const relationValue =
+    relationParam === null ? undefined : resolveRelation(relationParam);
+  const typeFilter = typeValue ?? EVENT_LIST_TYPE_FILTERS.TOTAL;
+  const relationFilter = relationValue ?? MY_ACTIVITY_EVENT_RELATION_FILTERS.TOTAL;
   const page = resolvePage(searchParams.get('page'));
 
-  const applyParams = (next: {
-    type: EventListTypeFilter;
-    relation: MyActivityEventRelationFilter;
-    page: number;
-  }) => {
-    const params = createSearchParams({ tab: 'event' });
-
-    if (next.type !== EVENT_LIST_TYPE_FILTERS.TOTAL) {
-      params.set('type', next.type);
-    }
-
-    if (next.relation !== MY_ACTIVITY_EVENT_RELATION_FILTERS.TOTAL) {
-      params.set('relation', next.relation);
-    }
-
-    if (next.page > 1) {
-      params.set('page', String(next.page));
-    }
-
+  const updateSearchParams = (mutate: (params: URLSearchParams) => void) => {
     startTransition(() => {
-      setSearchParams(params, { replace: true });
+      setSearchParams(
+        (previous) => {
+          const params = new URLSearchParams(previous);
+          params.set('tab', 'event');
+          mutate(params);
+
+          return params;
+        },
+        { replace: true },
+      );
     });
   };
 
   const handleTypeChange = (value: EventListTypeFilter) => {
-    applyParams({ type: value, relation: relationFilter, page: 1 });
+    updateSearchParams((params) => {
+      params.set('type', value);
+      params.delete('page');
+    });
   };
 
   const handleRelationChange = (value: MyActivityEventRelationFilter) => {
-    applyParams({ type: typeFilter, relation: value, page: 1 });
+    updateSearchParams((params) => {
+      params.set('relation', value);
+      params.delete('page');
+    });
   };
 
   const handlePageChange = (next: number) => {
-    applyParams({ type: typeFilter, relation: relationFilter, page: next });
+    updateSearchParams((params) => {
+      if (next > 1) {
+        params.set('page', String(next));
+      } else {
+        params.delete('page');
+      }
+    });
   };
 
   return (
@@ -103,7 +111,7 @@ export const MyRunningTab = (): ReactElement => {
             options={TYPE_FILTER_OPTIONS}
             placeholder="유형"
             sheetTitle="유형 선택"
-            value={typeFilter}
+            value={typeValue}
             onChange={handleTypeChange}
           />
           <Filter
@@ -112,7 +120,7 @@ export const MyRunningTab = (): ReactElement => {
             options={RELATION_FILTER_OPTIONS}
             placeholder="주최여부"
             sheetTitle="주최여부 선택"
-            value={relationFilter}
+            value={relationValue}
             onChange={handleRelationChange}
           />
         </Filters>
