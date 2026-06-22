@@ -3,19 +3,24 @@ import type { ChangeEvent, ReactElement } from 'react';
 import styled from '@emotion/styled';
 import { Controller, useWatch, type UseFormReturn } from 'react-hook-form';
 
-import { Button } from '@/components';
+import { Button, IconButton } from '@/components';
 
-import { ADDITIONAL_SELECT_OPTION_MAX_COUNT } from '../constants';
+import {
+  ADDITIONAL_SELECT_OPTION_DELETABLE_START_INDEX,
+  ADDITIONAL_SELECT_OPTION_MAX_COUNT,
+} from '../constants';
 import type { EventFormValues } from '../schema';
 
 type AdditionalSelectOptionFieldsProps = {
   form: UseFormReturn<EventFormValues>;
   questionIndex: number;
+  readOnly?: boolean;
 };
 
 export const AdditionalSelectOptionFields = ({
   form,
   questionIndex,
+  readOnly = false,
 }: AdditionalSelectOptionFieldsProps): ReactElement | null => {
   const options =
     useWatch({
@@ -28,7 +33,7 @@ export const AdditionalSelectOptionFields = ({
   }
 
   const handleAddOption = () => {
-    if (options.length >= ADDITIONAL_SELECT_OPTION_MAX_COUNT) {
+    if (readOnly || options.length >= ADDITIONAL_SELECT_OPTION_MAX_COUNT) {
       return;
     }
 
@@ -36,6 +41,20 @@ export const AdditionalSelectOptionFields = ({
       `additionalQuestions.${questionIndex}.options`,
       [...options, ''],
       { shouldDirty: true, shouldTouch: true, shouldValidate: false },
+    );
+  };
+  const handleRemoveOption = (optionIndex: number) => {
+    if (
+      readOnly ||
+      optionIndex < ADDITIONAL_SELECT_OPTION_DELETABLE_START_INDEX
+    ) {
+      return;
+    }
+
+    form.setValue(
+      `additionalQuestions.${questionIndex}.options`,
+      options.filter((_, currentIndex) => currentIndex !== optionIndex),
+      { shouldDirty: true, shouldTouch: true, shouldValidate: true },
     );
   };
 
@@ -48,6 +67,9 @@ export const AdditionalSelectOptionFields = ({
             control={form.control}
             name={`additionalQuestions.${questionIndex}.options.${optionIndex}`}
             render={({ field, fieldState }) => {
+              const canDeleteOption =
+                !readOnly &&
+                optionIndex >= ADDITIONAL_SELECT_OPTION_DELETABLE_START_INDEX;
               const handleOptionChange = (
                 event: ChangeEvent<HTMLInputElement>,
               ) => {
@@ -60,22 +82,37 @@ export const AdditionalSelectOptionFields = ({
 
               return (
                 <OptionField>
-                  <OptionInput
-                    ref={field.ref}
-                    $hasError={fieldState.invalid}
-                    aria-describedby={
-                      fieldState.error
-                        ? `select-option-${questionIndex}-${optionIndex}-error`
-                        : undefined
-                    }
-                    aria-invalid={fieldState.invalid}
-                    aria-label={`선택지 ${optionIndex + 1}`}
-                    name={field.name}
-                    placeholder="선택지를 입력하세요"
-                    value={field.value}
-                    onBlur={field.onBlur}
-                    onChange={handleOptionChange}
-                  />
+                  <OptionControlRow>
+                    <OptionInput
+                      ref={field.ref}
+                      $hasError={fieldState.invalid}
+                      aria-describedby={
+                        fieldState.error
+                          ? `select-option-${questionIndex}-${optionIndex}-error`
+                          : undefined
+                      }
+                      aria-invalid={fieldState.invalid}
+                      aria-label={`선택지 ${optionIndex + 1}`}
+                      name={field.name}
+                      placeholder="선택지를 입력하세요"
+                      readOnly={readOnly}
+                      value={field.value}
+                      onBlur={field.onBlur}
+                      onChange={handleOptionChange}
+                    />
+                    {canDeleteOption ? (
+                      <IconButton
+                        aria-label={`선택지 ${optionIndex + 1} 삭제`}
+                        color="icon.secondary"
+                        icon="delete-filled"
+                        iconSize={24}
+                        shape="round"
+                        size={24}
+                        type="button"
+                        onClick={() => handleRemoveOption(optionIndex)}
+                      />
+                    ) : null}
+                  </OptionControlRow>
                   {fieldState.error ? (
                     <FieldError
                       id={`select-option-${questionIndex}-${optionIndex}-error`}
@@ -90,7 +127,7 @@ export const AdditionalSelectOptionFields = ({
         ))}
       </OptionList>
       <Button
-        disabled={options.length >= ADDITIONAL_SELECT_OPTION_MAX_COUNT}
+        disabled={readOnly || options.length >= ADDITIONAL_SELECT_OPTION_MAX_COUNT}
         fullWidth
         level="quaternary"
         rightIcon={{ icon: 'plus-lined' }}
@@ -130,6 +167,12 @@ const OptionField = styled.div(({ theme }) => ({
   },
 }));
 
+const OptionControlRow = styled.div(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  gap: theme.spacing.md,
+}));
+
 const OptionInput = styled.input<{ $hasError: boolean }>(
   ({ $hasError, theme }) => ({
     ...theme.typography['body-m-m'],
@@ -143,6 +186,10 @@ const OptionInput = styled.input<{ $hasError: boolean }>(
 
     '&::placeholder': {
       color: theme.color.text.tertiary,
+    },
+
+    '&:read-only': {
+      cursor: 'default',
     },
   }),
 );

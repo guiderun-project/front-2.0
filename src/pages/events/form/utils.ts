@@ -7,6 +7,8 @@ import type {
 } from '@/api/types';
 
 import {
+  ADDITIONAL_SELECT_OPTION_DEFAULT_COUNT,
+  ADDITIONAL_SELECT_OPTION_MAX_COUNT,
   DEFAULT_EVENT_END_TIME,
   DEFAULT_EVENT_MIN_NUM_G,
   DEFAULT_EVENT_MIN_NUM_V,
@@ -205,7 +207,10 @@ export const createAdditionalQuestionDraft = (
     formId,
     type: 'SELECT',
     title: '',
-    options: [''],
+    options: Array.from(
+      { length: ADDITIONAL_SELECT_OPTION_DEFAULT_COUNT },
+      () => '',
+    ),
   };
 };
 
@@ -348,7 +353,7 @@ const createAdditionalQuestions = (
       const options = question.options
         .map((option) => option.trim())
         .filter(Boolean)
-        .slice(0, 3);
+        .slice(0, ADDITIONAL_SELECT_OPTION_MAX_COUNT);
 
       if (options.length > 0) {
         questions.push({ type: 'SELECT', title, options });

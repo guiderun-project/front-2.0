@@ -2,20 +2,40 @@ import type { ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
+import type { EventDetailResponse } from '@/api/types';
 import fireworksImageUrl from '@/assets/images/fireworks.png';
-import { FooterButton, PageLayout, Text, TopNavigation } from '@/components';
+import {
+  FooterButton,
+  HiddenText,
+  PageLayout,
+  Text,
+  TopNavigation,
+} from '@/components';
+
+import { createGoogleCalendarEventUrl } from './googleCalendar';
 
 type EventApplyCompletedProps = {
+  event: EventDetailResponse;
   onBack: () => void;
   onViewEvent: () => void;
 };
 
 export const EventApplyCompleted = ({
+  event,
   onBack,
   onViewEvent,
 }: EventApplyCompletedProps): ReactElement => {
   const handleAddGoogleCalendar = () => {
-    // TODO: 구글 캘린더 연동 로직 구현 필요
+    const calendarUrl = createGoogleCalendarEventUrl(event);
+    const calendarWindow = window.open('', '_blank');
+
+    if (calendarWindow) {
+      calendarWindow.opener = null;
+      calendarWindow.location.href = calendarUrl;
+      return;
+    }
+
+    window.location.assign(calendarUrl);
   };
 
   return (
@@ -53,6 +73,7 @@ export const EventApplyCompleted = ({
             onClick={handleAddGoogleCalendar}
           >
             구글 캘린더에 일정 저장
+            <HiddenText>새창 열림</HiddenText>
           </FooterButton.Button>
           <FooterButton.Button size="l" onClick={onViewEvent}>
             신청한 모임 보기

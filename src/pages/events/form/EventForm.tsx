@@ -304,7 +304,10 @@ export const EventForm = ({
                 추가 정보 (선택)
               </Text>
             </SectionHeader>
-            <AdditionalQuestionEditor form={form} />
+            <AdditionalQuestionEditor
+              form={form}
+              readOnly={mode === EVENT_FORM_MODES.EDIT}
+            />
           </FormSection>
 
           <FooterButton ratio={resolvedSecondaryAction ? '35:65' : undefined}>

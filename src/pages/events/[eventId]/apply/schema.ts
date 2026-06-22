@@ -12,7 +12,7 @@ export const eventApplyFormSchema = z
     detail: z
       .string()
       .max(EVENT_APPLY_DETAIL_MAX_LENGTH, `최대 ${EVENT_APPLY_DETAIL_MAX_LENGTH}자까지 입력할 수 있어요.`),
-    additionalAnswers: z.record(z.string(), z.string()),
+    additionalAnswers: z.record(z.string(), z.string().optional()),
   })
   .superRefine((value, context) => {
     if (!value.group) {

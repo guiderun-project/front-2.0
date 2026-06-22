@@ -52,7 +52,7 @@ export const EventNewPage = (): ReactElement => {
   });
   const date = useWatch({ control: form.control, name: 'date' });
   const startTime = useWatch({ control: form.control, name: 'startTime' });
-  const { dirtyFields, isDirty, isValid, touchedFields } = useFormState({
+  const { dirtyFields, isDirty, touchedFields } = useFormState({
     control: form.control,
   });
   const { createEvent, isCreatingEvent } = useEventCreateMutation({ eventType });
@@ -176,7 +176,6 @@ export const EventNewPage = (): ReactElement => {
         form={form}
         isSubmitting={isCreatingEvent}
         mode={EVENT_FORM_MODES.CREATE}
-        submitDisabled={!isValid}
         onBack={handleBack}
         onCancelBack={handleCancelBack}
         onConfirmBack={handleConfirmBack}

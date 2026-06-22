@@ -13,10 +13,12 @@ import { AdditionalQuestionCard } from './AdditionalQuestionCard';
 
 type AdditionalQuestionEditorProps = {
   form: UseFormReturn<EventFormValues>;
+  readOnly?: boolean;
 };
 
 export const AdditionalQuestionEditor = ({
   form,
+  readOnly = false,
 }: AdditionalQuestionEditorProps): ReactElement => {
   const { append, fields, remove } = useFieldArray({
     control: form.control,
@@ -50,11 +52,13 @@ export const AdditionalQuestionEditor = ({
         <Text as="p" color="text.secondary" font="body-m-m">
           {'확인하고 싶은 질문이나 설문을 추가해보세요.\n각 항목당 하나씩 추가할 수 있어요.'}
         </Text>
-        <AdditionalQuestionAddActions
-          isSelectAddDisabled={isSelectAddDisabled}
-          isTextAddDisabled={isTextAddDisabled}
-          onAddQuestion={handleAddQuestion}
-        />
+        {readOnly ? null : (
+          <AdditionalQuestionAddActions
+            isSelectAddDisabled={isSelectAddDisabled}
+            isTextAddDisabled={isTextAddDisabled}
+            onAddQuestion={handleAddQuestion}
+          />
+        )}
       </EditorHeader>
 
       {fields.length > 0 ? (
@@ -69,6 +73,7 @@ export const AdditionalQuestionEditor = ({
                 form={form}
                 questionIndex={index}
                 questionType={question.type}
+                readOnly={readOnly}
                 onRemove={() => remove(index)}
               />
             );
