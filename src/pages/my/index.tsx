@@ -16,6 +16,7 @@ import { useMyPage } from './hooks/useMyPage';
 
 const LOADING_MESSAGE = '마이페이지 정보를 불러오는 중이에요.';
 const ERROR_MESSAGE = '마이페이지 정보를 불러오지 못했어요.';
+const INQUIRY_URL = 'https://open.kakao.com/o/sB89yqNf';
 
 export const MyPage = (): ReactElement => {
   return (
@@ -36,6 +37,10 @@ export const MyPage = (): ReactElement => {
 const MyPageContent = (): ReactElement => {
   const navigate = useNavigate();
   const { data } = useMyPage();
+
+  const handleInquiry = () => {
+    window.open(INQUIRY_URL, '_blank', 'noopener,noreferrer');
+  };
 
   return (
     <>
@@ -58,7 +63,7 @@ const MyPageContent = (): ReactElement => {
           runningInfo={data.runningInfo}
           onEdit={() => navigate(MY_RUNNING_EDIT_PATH)}
         />
-        <AccountMenu />
+        <AccountMenu onInquiry={handleInquiry} />
       </InfoSection>
     </>
   );
