@@ -8,6 +8,7 @@ import { api } from '@/api/services';
 import {
   FooterButton,
   FormPageLayout,
+  Icon,
   PageLayout,
   Text,
   TimerInput,
@@ -250,7 +251,12 @@ export const FindId = (): ReactElement => {
 
         {phase === FIND_ID_PHASE.NOT_FOUND && (
           <NotFoundContainer>
-            <NotFoundIllustration aria-hidden={true} />
+            <Icon
+              aria-hidden={true}
+              color="icon.disabled"
+              icon="alert-circle-filled"
+              size={94}
+            />
           </NotFoundContainer>
         )}
 
@@ -351,10 +357,3 @@ const NotFoundContainer = styled.div(({ theme }) => ({
   paddingInline: theme.spacing['2xl'],
 }));
 
-const NotFoundIllustration = styled.div(({ theme }) => ({
-  width: theme.pxToRem(102),
-  height: theme.pxToRem(102),
-  borderRadius: theme.radius.full,
-  // TODO: 일러스트 변경 예정
-  backgroundColor: 'rgba(169, 173, 181, 0.2)',
-}));
