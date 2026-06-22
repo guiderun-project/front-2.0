@@ -1,0 +1,21 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="78" y="89" width="3" height="3" fill="currentColor"/>
+<rect x="75" y="92" width="3" height="3" fill="currentColor"/>
+<rect x="81" y="92" width="3" height="3" fill="currentColor"/>
+<rect x="78" y="95" width="3" height="3" fill="currentColor"/>
+<rect x="61" y="12" width="3" height="3" fill="currentColor"/>
+<rect x="58" y="15" width="3" height="3" fill="currentColor"/>
+<rect x="64" y="15" width="3" height="3" fill="currentColor"/>
+<rect x="61" y="18" width="3" height="3" fill="currentColor"/>
+<rect x="38" y="21" width="3" height="3" fill="currentColor"/>
+<rect x="35" y="24" width="3" height="3" fill="currentColor"/>
+<rect x="41" y="24" width="3" height="3" fill="currentColor"/>
+<rect x="38" y="27" width="3" height="3" fill="currentColor"/>
+<rect x="110" y="61" width="3" height="3" transform="rotate(90 110 61)" fill="currentColor"/>
+<rect x="107" y="64" width="3" height="3" transform="rotate(90 107 64)" fill="currentColor"/>
+<path d="M29 91H32V94H35V97H40V100H35V102H29V104H21V99H24V91H26V85H29V91ZM35 79H37V81H40V84H43V86H45V89H48V91H51V89H56V92H51V94H45V97H40V92H37V89H34V87H32V85H29V77H32V72H35V79ZM107 96H104V93H107V96ZM46 61H40V64H43V66H45V69H47V72H50V74H53V77H56V80H58V82H64V78H67V86H61V89H56V87H52V84H49V82H46V79H43V76H40V74H37V72H35V64H37V58H46V61ZM75 86H72V83H75V86ZM99 83H96V80H99V83ZM88 80H78V77H88V80ZM96 80H93V77H96V80ZM102 80H99V77H102V80ZM64 78H61V75H64V78ZM70 77H67V74H70V77ZM93 77H88V74H93V77ZM58 72H61V75H58V73H55V70H58V72ZM73 74H70V71H73V74ZM76 71H73V68H76V71ZM55 70H52V67H55V70ZM79 68H76V65H79V68ZM52 67H49V64H52V67ZM64 67H61V64H64V67ZM94 67H88V64H94V67ZM49 64H46V61H49V64ZM67 64H64V61H67V64ZM88 64H82V61H88V64ZM97 64H94V58H97V64ZM70 61H67V58H70V61ZM58 58H55V55H58V58ZM94 58H90V55H94V58ZM46 55H43V46H46V55ZM61 55H58V52H61V55ZM64 52H61V49H64V52ZM79 52H76V46H79V52ZM67 49H64V46H67V49ZM49 46H46V43H49V46ZM87 46H79V43H87V46ZM36 43H33V40H36V43ZM52 43H49V37H52V43ZM90 43H87V38H90V43ZM87 38H84V33H87V38ZM49 37H46V34H49V37ZM73 33H70V36H67V30H70V27H73V33ZM46 34H43V31H46V34ZM97 33H87V30H97V33ZM100 30H97V21H100V30ZM103 21H100V18H103V21Z" fill="currentColor"/>
+<rect x="104" y="38" width="3" height="3" fill="currentColor"/>
+<rect x="101" y="41" width="3" height="3" fill="currentColor"/>
+<rect x="107" y="41" width="3" height="3" fill="currentColor"/>
+<rect x="104" y="44" width="3" height="3" fill="currentColor"/>
+</svg>

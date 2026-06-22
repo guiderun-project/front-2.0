@@ -8,6 +8,7 @@ export * from "./ErrorBoundary";
 export * from "./Filter";
 export * from "./FooterButton";
 export * from "./FormPageLayout";
+export * from "./Graphic";
 export * from "./HiddenText";
 export * from "./Icon";
 export * from "./Input";

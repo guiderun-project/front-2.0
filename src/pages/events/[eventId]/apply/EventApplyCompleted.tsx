@@ -3,9 +3,9 @@ import type { ReactElement } from 'react';
 import styled from '@emotion/styled';
 
 import type { EventDetailResponse } from '@/api/types';
-import fireworksImageUrl from '@/assets/images/fireworks.png';
 import {
   FooterButton,
+  Graphic,
   HiddenText,
   PageLayout,
   Text,
@@ -56,7 +56,7 @@ export const EventApplyCompleted = ({
           ]}
         />
         <CompletedContent>
-          <CompletedImage alt="" aria-hidden="true" src={fireworksImageUrl} />
+          <Graphic aria-hidden={true} color="icon.primary" graphic="congrats" />
           <Text as="h1" align="center" color="text.primary" font="heading-m-sb">
             참여 신청이 완료됐어요!
           </Text>
@@ -96,13 +96,6 @@ const CompletedContent = styled.section(({ theme }) => ({
   gap: theme.spacing.lg,
   padding: `${theme.spacing['2xl']} ${theme.spacing['2xl']} ${theme.spacing['6xl']}`,
   textAlign: 'center',
-}));
-
-const CompletedImage = styled.img(({ theme }) => ({
-  display: 'block',
-  width: theme.pxToRem(160),
-  height: theme.pxToRem(160),
-  objectFit: 'contain',
 }));
 
 const Description = styled(Text)({
