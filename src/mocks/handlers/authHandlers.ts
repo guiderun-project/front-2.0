@@ -8,7 +8,12 @@ import type {
   SignupPostRequest,
   SmsVerificationExtendRequest,
 } from '@/api/types/auth';
-import { mockDb } from '@/mocks/fixtures';
+import {
+  DEFAULT_MOCK_SESSION_USER_ID,
+  mockDb,
+  resetMockSessionUser,
+  setMockSessionUser,
+} from '@/mocks/fixtures';
 import {
   activateMockRefreshSession,
   apiUrl,
@@ -49,7 +54,7 @@ const createVerificationResponse = (
 };
 
 export const authHandlers: HttpHandler[] = [
-  http.post(apiUrl('/oauth/login/kakao'), ({ request }) => {
+  http.post(apiUrl('/oauth/login/kakao'), ({ request }: { request: Request }) => {
     const code = new URL(request.url).searchParams.get('code');
 
     if (code === 'signup-required') {
@@ -60,14 +65,17 @@ export const authHandlers: HttpHandler[] = [
       });
     }
 
+    const mockKakaoUserId = DEFAULT_MOCK_SESSION_USER_ID;
+
     activateMockRefreshSession();
+    setMockSessionUser(mockKakaoUserId);
 
     return HttpResponse.json(
       {
         status: 'LOGIN_SUCCESS',
         accessToken: 'mock-access-token',
         user: {
-          userId: 'user-vi-1',
+          userId: mockKakaoUserId,
           role: 'ROLE_USER',
           disabilityType: 'VI',
         },
@@ -91,6 +99,7 @@ export const authHandlers: HttpHandler[] = [
     }
 
     activateMockRefreshSession();
+    setMockSessionUser(user.userId);
 
     return HttpResponse.json(
       { accessToken: 'mock-access-token' },
@@ -121,6 +130,7 @@ export const authHandlers: HttpHandler[] = [
 
   http.post(apiUrl('/logout'), () => {
     deactivateMockRefreshSession();
+    resetMockSessionUser();
 
     return new HttpResponse(null, {
       status: 204,
