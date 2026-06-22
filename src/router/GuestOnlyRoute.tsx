@@ -2,6 +2,7 @@ import type { ReactElement, ReactNode } from 'react';
 
 import { Navigate, useLocation } from 'react-router-dom';
 
+import { LoaderScreen } from '@/components';
 import { useAuth } from '@/contexts';
 import { APP_PATH } from './path';
 
@@ -16,8 +17,7 @@ export const GuestOnlyRoute = ({
   const location = useLocation();
 
   if (!isAuthReady) {
-    // TODO: 인증 로딩 UI가 확정되면 직접 진입/새로고침 중 빈 화면 대신 표시한다.
-    return null;
+    return <LoaderScreen label="사용자 정보를 불러오는 중이에요." />;
   }
 
   if (user) {

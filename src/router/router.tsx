@@ -4,6 +4,7 @@ import { lazy, Suspense } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 
 import App from '@/App';
+import { LoaderScreen, PageLayout, type PageLayoutBackground } from '@/components';
 import { BottomNavigationLayout } from '@/router/BottomNavigationLayout';
 import { GuestOnlyRoute } from '@/router/GuestOnlyRoute';
 import { ProtectedRoute } from '@/router/ProtectedRoute';
@@ -119,9 +120,15 @@ const AccountDeletePage = lazy(() =>
 const createLazyRouteElement = (
   Page: ComponentType,
   access: LazyRouteAccess = 'public',
+  fallbackBackground: PageLayoutBackground = 'bg.default',
+  fallback: ReactElement | null = (
+    <PageLayout background={fallbackBackground}>
+      <LoaderScreen />
+    </PageLayout>
+  ),
 ): ReactElement => {
   const pageElement = (
-    <Suspense fallback={null}>
+    <Suspense fallback={fallback}>
       <Page />
     </Suspense>
   );
@@ -152,7 +159,11 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: createLazyRouteElement(MainPage),
+            element: createLazyRouteElement(
+              MainPage,
+              'public',
+              'gradient.bg.brand-main',
+            ),
           },
           {
             path: 'events',
@@ -206,27 +217,56 @@ export const router = createBrowserRouter([
       },
       {
         path: 'events/:eventId',
-        element: createLazyRouteElement(EventDetailRouteProvider),
+        element: createLazyRouteElement(
+          EventDetailRouteProvider,
+          'public',
+          'gradient.bg.brand-event',
+        ),
         children: [
           {
             index: true,
-            element: createLazyRouteElement(EventDetailPage),
+            element: createLazyRouteElement(
+              EventDetailPage,
+              'public',
+              'gradient.bg.brand-event',
+              null,
+            ),
           },
           {
             path: 'apply',
-            element: createLazyRouteElement(EventApplyPage, 'approved'),
+            element: createLazyRouteElement(
+              EventApplyPage,
+              'approved',
+              'gradient.bg.brand-event',
+              null,
+            ),
           },
           {
             path: 'edit',
-            element: createLazyRouteElement(EventEditPage, 'approved'),
+            element: createLazyRouteElement(
+              EventEditPage,
+              'approved',
+              'gradient.bg.brand-event',
+              null,
+            ),
           },
           {
             path: 'match',
-            element: createLazyRouteElement(EventMatchPage, 'approved'),
+            element: createLazyRouteElement(
+              EventMatchPage,
+              'approved',
+              'gradient.bg.brand-event',
+              null,
+            ),
           },
           {
             path: 'attendance',
-            element: createLazyRouteElement(EventAttendancePage, 'approved'),
+            element: createLazyRouteElement(
+              EventAttendancePage,
+              'approved',
+              'gradient.bg.brand-event',
+              null,
+            ),
           },
         ],
       },

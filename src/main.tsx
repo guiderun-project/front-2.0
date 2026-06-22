@@ -7,7 +7,6 @@ import { RouterProvider } from 'react-router-dom';
 
 import { baseURL } from '@/api/core/client';
 import { BirthDateGate } from '@/components/BirthDateGate';
-import { RunningRecordGate } from '@/components/RunningRecordGate';
 import { ToastProvider } from '@/components/Toast';
 import { AuthProvider } from '@/contexts';
 import { router } from '@/router/router';
@@ -57,7 +56,6 @@ const bootstrap = async () => {
               <ToastProvider>
                 <RouterProvider router={router} />
                 <BirthDateGate />
-                <RunningRecordGate />
               </ToastProvider>
             </ColorModeProvider>
           </ThemeProvider>
