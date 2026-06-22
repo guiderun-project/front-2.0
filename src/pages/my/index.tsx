@@ -7,6 +7,7 @@ import { PageLayout, QueryBoundary, Text } from '@/components';
 import { APP_PATH } from '@/router/path';
 
 import { AccountMenu } from './components/AccountMenu';
+import { MY_RUNNING_EDIT_PATH } from './edit/constants';
 import { ActivitySummaryCard } from './components/ActivitySummaryCard';
 import { ProfileInfoSection } from './components/ProfileInfoSection';
 import { ProfileSummary } from './components/ProfileSummary';
@@ -55,7 +56,7 @@ const MyPageContent = (): ReactElement => {
         />
         <RunningInfoSection
           runningInfo={data.runningInfo}
-          onEdit={() => navigate(APP_PATH.MY_EDIT)}
+          onEdit={() => navigate(MY_RUNNING_EDIT_PATH)}
         />
         <AccountMenu />
       </InfoSection>
