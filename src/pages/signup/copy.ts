@@ -9,7 +9,12 @@ export const SIGNUP_COPY = {
   },
   gender: { title: '성별을\n선택해주세요' },
   basicInfo: { title: '기본 정보를\n입력해주세요' },
-  experience: { title: '러닝 경험이\n있으신가요?' },
+  experience: {
+    title: {
+      GUIDE: '가이드 러닝 경험이\n있으신가요?',
+      VI: '러닝 경험이\n있으신가요?',
+    },
+  },
   record: { title: '러닝 경험을\n알려주세요' },
   terms: { title: '마지막으로,\n가입을 위해 약관에 동의해주세요' },
   complete: {

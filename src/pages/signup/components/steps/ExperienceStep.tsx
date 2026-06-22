@@ -13,10 +13,11 @@ const EXPERIENCE_OPTIONS: ReadonlyArray<{ value: boolean; label: string }> = [
 ];
 
 export const ExperienceStep = (): ReactElement => {
-  const { control } = useFormContext<SignupFormValues>();
+  const { control, watch } = useFormContext<SignupFormValues>();
+  const runnerType = watch('disabilityType') ?? 'GUIDE';
 
   return (
-    <StepLayout title={SIGNUP_COPY.experience.title}>
+    <StepLayout title={SIGNUP_COPY.experience.title[runnerType]}>
       <Controller
         control={control}
         name="hasExperience"
