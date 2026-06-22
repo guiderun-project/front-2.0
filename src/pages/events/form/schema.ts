@@ -81,11 +81,11 @@ const additionalQuestionSchema = z.discriminatedUnion('type', [
       .array(requiredTextSchema)
       .min(
         ADDITIONAL_SELECT_OPTION_MIN_COUNT,
-        '선택지는 최소 1개 이상 입력해주세요.',
+        '선택지는 최소 3개 이상 입력해주세요.',
       )
       .max(
         ADDITIONAL_SELECT_OPTION_MAX_COUNT,
-        '선택지는 최대 3개까지 입력할 수 있어요.',
+        '선택지는 최대 5개까지 입력할 수 있어요.',
       ),
   }),
 ]);

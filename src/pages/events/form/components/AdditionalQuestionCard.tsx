@@ -14,6 +14,7 @@ type AdditionalQuestionCardProps = {
   form: UseFormReturn<EventFormValues>;
   questionIndex: number;
   questionType: EventFormValues['additionalQuestions'][number]['type'];
+  readOnly?: boolean;
   onRemove: () => void;
 };
 
@@ -22,6 +23,7 @@ export const AdditionalQuestionCard = ({
   form,
   questionIndex,
   questionType,
+  readOnly = false,
   onRemove,
 }: AdditionalQuestionCardProps): ReactElement => {
   const title = questionType === 'TEXT' ? '질문' : '설문';
@@ -33,15 +35,18 @@ export const AdditionalQuestionCard = ({
         <Text as="h3" color="text.primary" font="body-m-sb">
           {title}
         </Text>
-        <IconButton
-          aria-label={`${title} 삭제`}
-          color="icon.secondary"
-          icon="delete-lined"
-          iconSize={24}
-          size={24}
-          type="button"
-          onClick={onRemove}
-        />
+        {readOnly ? null : (
+          <IconButton
+            aria-label={`${title} 삭제`}
+            color="icon.secondary"
+            icon="delete-filled"
+            iconSize={24}
+            shape="round"
+            size={24}
+            type="button"
+            onClick={onRemove}
+          />
+        )}
       </QuestionCardHeader>
 
       <Controller
@@ -58,6 +63,7 @@ export const AdditionalQuestionCard = ({
               maxLength={ADDITIONAL_QUESTION_TITLE_MAX_LENGTH}
               name={titleField.name}
               placeholder="질문을 입력하세요"
+              readOnly={readOnly}
               value={titleField.value}
               onBlur={titleField.onBlur}
               onChange={titleField.onChange}
@@ -84,7 +90,11 @@ export const AdditionalQuestionCard = ({
       />
 
       {questionType === 'SELECT' ? (
-        <AdditionalSelectOptionFields form={form} questionIndex={questionIndex} />
+        <AdditionalSelectOptionFields
+          form={form}
+          questionIndex={questionIndex}
+          readOnly={readOnly}
+        />
       ) : null}
     </QuestionCard>
   );
@@ -134,6 +144,10 @@ const QuestionTitleInput = styled.input<{ $hasError: boolean }>(
       borderColor: $hasError
         ? theme.color.border.danger
         : theme.color.border.brand,
+    },
+
+    '&:read-only': {
+      cursor: 'default',
     },
   }),
 );
