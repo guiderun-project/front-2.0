@@ -83,6 +83,7 @@ const MyPageContent = (): ReactElement => {
         <AccountMenu
           onInquiry={handleInquiry}
           onViewTerms={() => navigate(APP_PATH.TERMS)}
+          onWithdraw={() => navigate(APP_PATH.ACCOUNT_DELETE)}
           onLogout={() => setIsLogoutPopupOpen(true)}
         />
       </InfoSection>
