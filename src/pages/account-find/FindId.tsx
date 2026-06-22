@@ -1,9 +1,10 @@
 import type { ReactElement, ReactNode } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 
 import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
 
+import { api } from '@/api/services';
 import {
   FooterButton,
   FormPageLayout,
@@ -12,6 +13,8 @@ import {
   TimerInput,
 } from '@/components';
 import { ACCOUNT_FIND_TYPE } from '@/constants';
+import { usePhoneCertification } from '@/pages/account-find/usePhoneCertification';
+import { formatJoinDate, isValidKoreanPhone } from '@/pages/account-find/utils';
 import { APP_PATH } from '@/router/path';
 
 const FIND_ID_PHASE = {
@@ -25,29 +28,32 @@ type FindIdPhase = (typeof FIND_ID_PHASE)[keyof typeof FIND_ID_PHASE];
 const TITLE_VERIFY = '아이디를 찾기 위해\n번호 인증이 필요해요';
 const TITLE_FOUND = '아래 아이디로\n로그인해주세요';
 
-// TODO: 실제 SMS 인증 타이머로 대체. 현재는 퍼블리싱용 정적 표기.
-const PLACEHOLDER_TIMER = '03:00';
-
-// TODO: accountIdPost 결과로 found/notFound 분기. 현재는 퍼블리싱 미리보기용 트리거.
-const NO_ACCOUNT_SENTINEL = '0000';
-
-const onlyDigits = (value: string): string => value.replace(/[^0-9]/g, '');
+const SEND_CODE_ERROR_MESSAGE = '인증번호 발송에 실패했습니다.';
+const CERT_CODE_ERROR_MESSAGE = '인증번호가 올바르지 않습니다.';
 
 export const FindId = (): ReactElement => {
   const navigate = useNavigate();
 
   const [phase, setPhase] = useState<FindIdPhase>(FIND_ID_PHASE.VERIFY);
-  const [isCodeSent, setIsCodeSent] = useState(false);
-  const [phoneNum, setPhoneNum] = useState('');
-  const [certCode, setCertCode] = useState('');
-
-  const certInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (isCodeSent) {
-      certInputRef.current?.focus();
-    }
-  }, [isCodeSent]);
+  const [accountId, setAccountId] = useState('');
+  const [joinDate, setJoinDate] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [phoneError, setPhoneError] = useState('');
+  const [certError, setCertError] = useState('');
+  const {
+    phoneNum,
+    certCode,
+    isCodeSent,
+    verificationId,
+    isExpired,
+    canExtend,
+    timerText,
+    certInputRef,
+    handlePhoneChange,
+    handleCertCodeChange,
+    sendCode,
+    extendTime,
+  } = usePhoneCertification();
 
   const handleBack = () => {
     if (phase !== FIND_ID_PHASE.VERIFY) {
@@ -57,24 +63,74 @@ export const FindId = (): ReactElement => {
     navigate(-1);
   };
 
-  // TODO: accountIdVerificationIssuePost 호출로 대체
-  const handleSendCode = () => {
-    setIsCodeSent(true);
-    // 재발송 시 이전 입력 초기화
-    setCertCode('');
-    // 이미 노출된 경우 즉시 포커스, 최초 노출은 아래 effect가 처리
-    certInputRef.current?.focus();
+  // 전화번호로 인증번호를 요청한다.
+  const handleSendCode = async () => {
+    if (!isValidKoreanPhone(phoneNum) || isSubmitting) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setPhoneError('');
+
+    try {
+      const response = await api.auth.accountIdVerificationIssuePost({
+        phoneNum,
+      });
+      sendCode(response);
+    } catch {
+      setPhoneError(SEND_CODE_ERROR_MESSAGE);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  // TODO: smsVerificationExtendPost 호출 + 타이머 3:00 재시작
-  const handleExtendTime = () => {};
+  // 인증번호를 검증하고 아이디 조회 결과로 단계를 전환한다.
+  const handleNext = async () => {
+    if (certCode.trim() === '' || isSubmitting || verificationId === null) {
+      return;
+    }
 
-  const handleNext = () => {
-    setPhase(
-      certCode === NO_ACCOUNT_SENTINEL
-        ? FIND_ID_PHASE.NOT_FOUND
-        : FIND_ID_PHASE.FOUND,
-    );
+    setIsSubmitting(true);
+    setCertError('');
+
+    try {
+      const { token } = await api.auth.checkCertificationTokenPost({
+        verificationId,
+        number: certCode,
+      });
+
+      try {
+        const { accountId: foundId, createdAt } = await api.auth.accountIdPost({
+          token,
+        });
+        setAccountId(foundId);
+        setJoinDate(formatJoinDate(createdAt));
+        setPhase(FIND_ID_PHASE.FOUND);
+      } catch {
+        // 인증은 성공했으나 일치하는 계정이 없는 경우다.
+        setPhase(FIND_ID_PHASE.NOT_FOUND);
+      }
+    } catch {
+      setCertError(CERT_CODE_ERROR_MESSAGE);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // 인증 제한시간을 연장한다.
+  const handleExtend = async () => {
+    if (verificationId === null || !canExtend) {
+      return;
+    }
+
+    try {
+      const response = await api.auth.smsVerificationExtendPost({
+        verificationId,
+      });
+      extendTime(response);
+    } catch {
+      // 연장 실패 시 기존 타이머를 유지한다.
+    }
   };
 
   const resolveTitle = (): ReactNode => {
@@ -120,27 +176,38 @@ export const FindId = (): ReactElement => {
             <TimerInput
               autoComplete="tel"
               clearable={false}
-              confirmDisabled={phoneNum.trim() === ''}
+              confirmDisabled={!isValidKoreanPhone(phoneNum) || isSubmitting}
               confirmLabel="확인"
+              error={Boolean(phoneError)}
+              errorText={phoneError || undefined}
               inputMode="numeric"
               label="전화번호"
               placeholder="-없이 숫자만 입력해주세요"
               value={phoneNum}
-              onChange={(event) => setPhoneNum(onlyDigits(event.target.value))}
+              onChange={(event) => {
+                setPhoneError('');
+                handlePhoneChange(event);
+              }}
               onConfirm={handleSendCode}
             />
             {isCodeSent && (
               <TimerInput
                 autoComplete="one-time-code"
+                confirmDisabled={!canExtend}
                 confirmLabel="시간연장"
                 confirmLevel="line-type"
                 controlRef={certInputRef}
+                error={Boolean(certError)}
+                errorText={certError || undefined}
                 inputMode="numeric"
                 label="인증번호"
-                timerText={PLACEHOLDER_TIMER}
+                timerText={timerText}
                 value={certCode}
-                onChange={(event) => setCertCode(onlyDigits(event.target.value))}
-                onConfirm={handleExtendTime}
+                onChange={(event) => {
+                  setCertError('');
+                  handleCertCodeChange(event);
+                }}
+                onConfirm={handleExtend}
               />
             )}
           </Container>
@@ -154,7 +221,7 @@ export const FindId = (): ReactElement => {
                   아이디
                 </InfoLabel>
                 <Text as="span" color="text.primary" font="body-m-m">
-                  guiderun
+                  {accountId}
                 </Text>
               </InfoRow>
               <InfoRow>
@@ -162,7 +229,7 @@ export const FindId = (): ReactElement => {
                   가입일
                 </InfoLabel>
                 <Text as="span" color="text.primary" font="body-m-m">
-                  2026.01.01
+                  {joinDate}
                 </Text>
               </InfoRow>
             </InfoCard>
@@ -190,7 +257,7 @@ export const FindId = (): ReactElement => {
         {phase === FIND_ID_PHASE.VERIFY && (
           <FooterButton>
             <FooterButton.Button
-              disabled={certCode.trim() === ''}
+              disabled={certCode.trim() === '' || isSubmitting || isExpired}
               fullWidth
               size="l"
               onClick={handleNext}

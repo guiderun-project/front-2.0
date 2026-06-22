@@ -37,6 +37,7 @@ import {
   type PageLayoutBackground,
   type SelectOptions,
   type TimeValue,
+  useToast,
 } from "@/components";
 import { type ColorToken, type TypographyToken } from "@/styles/tokens";
 
@@ -488,6 +489,32 @@ const ICON_BUTTON_CODE_EXAMPLES = [
   shape="round"
   aria-label="추가"
 />`,
+  },
+] as const;
+
+const TOAST_LONG_CONTENT =
+  "참가자 출석 처리 결과를 확인할 수 없어요. 네트워크 상태를 확인한 뒤 다시 시도해주세요.";
+
+const TOAST_CODE_EXAMPLES = [
+  {
+    label: "Success",
+    code: `const { showToast } = useToast();
+
+showToast({
+  type: 'success',
+  icon: 'check-lined',
+  content: '김가나님 출석을 완료했어요',
+});`,
+  },
+  {
+    label: "Error",
+    code: `const { showToast } = useToast();
+
+showToast({
+  type: 'error',
+  icon: 'alert-circle-filled',
+  content: '출석 처리에 실패했어요',
+});`,
   },
 ] as const;
 
@@ -1128,6 +1155,7 @@ export const DesignPage = () => {
     minutes: "",
     seconds: "",
   });
+  const { showToast } = useToast();
   const confirmPopupLoadingTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -1700,6 +1728,59 @@ export const DesignPage = () => {
           )}
         </IconButtonGrid>
         <CodeExamples examples={ICON_BUTTON_CODE_EXAMPLES} />
+      </ShowcaseSection>
+
+      <ShowcaseSection>
+        <SectionTitle>
+          <Text as="h2" font="heading-s-m">
+            Toast
+          </Text>
+          <Text color="text.tertiary" font="detail-m-r">
+            Success, error, long content
+          </Text>
+        </SectionTitle>
+        <PopupSampleGrid>
+          <Button
+            level="secondary"
+            size="s"
+            onClick={() =>
+              showToast({
+                type: "success",
+                icon: "check-lined",
+                content: "김가나님 출석을 완료했어요",
+              })
+            }
+          >
+            Success toast
+          </Button>
+          <Button
+            level="secondary"
+            size="s"
+            onClick={() =>
+              showToast({
+                type: "error",
+                icon: "alert-circle-filled",
+                content: "출석 처리에 실패했어요",
+              })
+            }
+          >
+            Error toast
+          </Button>
+          <Button
+            level="secondary"
+            size="s"
+            onClick={() =>
+              showToast({
+                type: "error",
+                icon: "alert-circle-filled",
+                content: TOAST_LONG_CONTENT,
+              })
+            }
+          >
+            Long content
+          </Button>
+        </PopupSampleGrid>
+        <CodeExamples examples={TOAST_CODE_EXAMPLES} />
       </ShowcaseSection>
 
       <ShowcaseSection>

@@ -40,7 +40,7 @@ type ColorModeToggleProps = {
 
 const INACTIVE_COLOR_BY_MODE = {
   light: {
-    icon: 'icon.tertiary',
+    icon: 'icon.secondary',
     text: 'text.tertiary',
   },
   dark: {

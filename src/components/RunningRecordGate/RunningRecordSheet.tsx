@@ -98,7 +98,7 @@ export const RunningRecordSheet = ({
       확인
     </Button>
   ) : (
-    <ButtonGroup ratio="35:65">
+    <SheetButtonGroup ratio="35:65">
       <Button
         disabled={isSkipping}
         level="secondary"
@@ -111,7 +111,7 @@ export const RunningRecordSheet = ({
       <Button size="l" type="button" onClick={() => setIsInputStep(true)}>
         기록 입력할게요
       </Button>
-    </ButtonGroup>
+    </SheetButtonGroup>
   );
 
   return (
@@ -156,3 +156,7 @@ export const RunningRecordSheet = ({
 const Content = styled.div(({ theme }) => ({
   padding: `${theme.spacing.none} ${theme.spacing['2xl']} ${theme.spacing['3xl']}`,
 }));
+
+const SheetButtonGroup = styled(ButtonGroup)({
+  paddingInline: 0,
+});
