@@ -34,20 +34,17 @@ export const Filter = <TValue extends string = string>(
     onChange,
     options,
     placeholder,
-    placeholderValue,
     value,
     variant = 'line',
   } = props;
   const selectedOption = findSelectedOption(options, value);
-  const triggerSelectedOption =
-    value === placeholderValue ? undefined : selectedOption;
 
   if (props.mode === 'cycle') {
     const nextOption = findNextEnabledOption(options, value);
     const isTriggerDisabled = disabled || !nextOption;
     const label = getTriggerLabel({
       placeholder,
-      selectedOption: triggerSelectedOption,
+      selectedOption,
     });
 
     const handleCycle = () => {
@@ -83,7 +80,7 @@ export const Filter = <TValue extends string = string>(
       options={options}
       sheetTitle={props.sheetTitle}
       value={value}
-      renderTrigger={({ disabled: isTriggerDisabled, isOpen, open }) => (
+      renderTrigger={({ disabled: isTriggerDisabled, isOpen, open, selectedOption }) => (
         <FilterTriggerButton
           ariaLabel={ariaLabel}
           className={className}
@@ -93,7 +90,7 @@ export const Filter = <TValue extends string = string>(
           label={getTriggerLabel({
             fallback: typeof props.sheetTitle === 'string' ? props.sheetTitle : undefined,
             placeholder,
-            selectedOption: triggerSelectedOption,
+            selectedOption,
           })}
           mode="sheet"
           variant={variant}

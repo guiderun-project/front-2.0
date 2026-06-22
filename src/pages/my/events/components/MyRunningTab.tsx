@@ -102,7 +102,6 @@ export const MyRunningTab = (): ReactElement => {
             icon="chevron-down-lined"
             options={TYPE_FILTER_OPTIONS}
             placeholder="유형"
-            placeholderValue={EVENT_LIST_TYPE_FILTERS.TOTAL}
             sheetTitle="유형 선택"
             value={typeFilter}
             onChange={handleTypeChange}
@@ -112,7 +111,6 @@ export const MyRunningTab = (): ReactElement => {
             icon="chevron-down-lined"
             options={RELATION_FILTER_OPTIONS}
             placeholder="주최여부"
-            placeholderValue={MY_ACTIVITY_EVENT_RELATION_FILTERS.TOTAL}
             sheetTitle="주최여부 선택"
             value={relationFilter}
             onChange={handleRelationChange}
