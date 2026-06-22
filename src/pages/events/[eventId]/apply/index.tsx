@@ -71,6 +71,7 @@ export const EventApplyPage = (): ReactElement => {
   if (isCompleted) {
     return (
       <EventApplyCompleted
+        event={event}
         onBack={handleBack}
         onViewEvent={handleBack}
       />
