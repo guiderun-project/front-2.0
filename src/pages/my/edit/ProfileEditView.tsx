@@ -52,6 +52,7 @@ const MyEditContent = (): ReactElement => {
   const [isAccountSheetOpen, setIsAccountSheetOpen] = useState(false);
   const {
     values,
+    accountId,
     setBirthDate,
     setPhoneNumber,
     setSnsId,
@@ -61,6 +62,9 @@ const MyEditContent = (): ReactElement => {
     canSubmit,
     submit,
   } = useMyEdit();
+
+  // 이미 아이디가 있으면 로그인 정보 설정 섹션을 노출하지 않는다.
+  const hasAccountId = Boolean(accountId);
 
   const handleSubmit = async () => {
     const isSucceeded = await submit();
@@ -106,27 +110,31 @@ const MyEditContent = (): ReactElement => {
         ) : null}
       </Section>
 
-      <Divider aria-hidden={true} />
+      {!hasAccountId ? (
+        <>
+          <Divider aria-hidden={true} />
 
-      <Section aria-label="로그인 정보">
-        <SectionHeading>
-          <Text as="h2" color="text.primary" font="body-l-sb">
-            로그인 정보
-          </Text>
-          <Text as="p" color="text.tertiary" font="body-m-m">
-            설정해두면 나중에 아이디로 로그인 할 수 있어요
-          </Text>
-        </SectionHeading>
-        <Button
-          fullWidth
-          level="line-type"
-          rightIcon={{ icon: 'chevron-right-lined' }}
-          size="l"
-          onClick={() => setIsAccountSheetOpen(true)}
-        >
-          아이디 설정하기
-        </Button>
-      </Section>
+          <Section aria-label="로그인 정보">
+            <SectionHeading>
+              <Text as="h2" color="text.primary" font="body-l-sb">
+                로그인 정보
+              </Text>
+              <Text as="p" color="text.tertiary" font="body-m-m">
+                설정해두면 나중에 아이디로 로그인 할 수 있어요
+              </Text>
+            </SectionHeading>
+            <Button
+              fullWidth
+              level="line-type"
+              rightIcon={{ icon: 'chevron-right-lined' }}
+              size="l"
+              onClick={() => setIsAccountSheetOpen(true)}
+            >
+              아이디 설정하기
+            </Button>
+          </Section>
+        </>
+      ) : null}
 
       <FooterButton>
         <FooterButton.Button
@@ -140,6 +148,7 @@ const MyEditContent = (): ReactElement => {
       </FooterButton>
 
       <AccountSetupSheet
+        accountId={accountId}
         open={isAccountSheetOpen}
         onClose={() => setIsAccountSheetOpen(false)}
       />

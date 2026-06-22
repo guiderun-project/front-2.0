@@ -115,6 +115,7 @@ export const useMyEdit = () => {
 
   return {
     values,
+    accountId: personalInfo.accountId,
     setBirthDate: (value: string) =>
       setField('birthDate', formatBirthDateInput(value)),
     setPhoneNumber: (value: string) => setField('phoneNumber', value),
