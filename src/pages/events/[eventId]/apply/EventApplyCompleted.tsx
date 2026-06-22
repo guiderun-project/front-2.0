@@ -56,7 +56,7 @@ export const EventApplyCompleted = ({
           ]}
         />
         <CompletedContent>
-          <Graphic color="icon.primary" decorative graphic="congrats" />
+          <Graphic aria-hidden={true} color="icon.primary" graphic="congrats" />
           <Text as="h1" align="center" color="text.primary" font="heading-m-sb">
             참여 신청이 완료됐어요!
           </Text>

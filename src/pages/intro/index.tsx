@@ -43,7 +43,7 @@ export const IntroPage = (): ReactElement => {
           </Text>
         </TitleSection>
 
-        <Illustration color="icon.primary" graphic="welcome" />
+        <Illustration aria-hidden={true} color="icon.primary" graphic="welcome" />
 
         <GuideRunInfoSection>
           <GuideRunInfoButton type="button" onClick={handleGuideRunInfoClick}>

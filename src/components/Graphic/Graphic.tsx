@@ -8,17 +8,17 @@ const DEFAULT_GRAPHIC_COLOR = 'icon.primary' satisfies ColorToken;
 
 export type GraphicProps = {
   color?: ColorToken;
-  decorative?: boolean;
   graphic: GraphicName;
   label?: string;
 } & Omit<
   SVGProps<SVGSVGElement>,
-  'aria-hidden' | 'aria-label' | 'children' | 'color' | 'height' | 'role' | 'width'
+  'children' | 'color' | 'height' | 'role' | 'width'
 >;
 
 export const Graphic = ({
+  'aria-hidden': ariaHidden,
+  'aria-label': ariaLabel,
   color = DEFAULT_GRAPHIC_COLOR,
-  decorative = false,
   graphic,
   label,
   style,
@@ -30,14 +30,15 @@ export const Graphic = ({
     label: defaultLabel,
     width,
   } = graphicRegistry[graphic];
+  const isAriaHidden = ariaHidden === true || ariaHidden === 'true';
 
   return (
     <SvgGraphic
-      aria-hidden={decorative ? true : undefined}
-      aria-label={decorative ? undefined : (label ?? defaultLabel)}
+      aria-hidden={ariaHidden}
+      aria-label={isAriaHidden ? undefined : (ariaLabel ?? label ?? defaultLabel)}
       focusable="false"
       height={height}
-      role={decorative ? undefined : 'img'}
+      role={isAriaHidden ? undefined : 'img'}
       style={{
         ...style,
         color: resolveColorToken(color),

@@ -37,7 +37,7 @@ export const ActivitySummary = (): ReactElement => {
             </Text>
           </Headline>
           <RunnerGraphicBox aria-hidden={true}>
-            <Graphic color="icon.primary" decorative graphic="main" />
+            <Graphic aria-hidden={true} color="icon.primary" graphic="main" />
           </RunnerGraphicBox>
         </HeadlineRow>
 
@@ -86,7 +86,7 @@ export const ActivitySummary = (): ReactElement => {
           </Text>
         </Headline>
         <RunnerGraphicBox aria-hidden={true}>
-          <Graphic color="icon.primary" decorative graphic="main" />
+          <Graphic aria-hidden={true} color="icon.primary" graphic="main" />
         </RunnerGraphicBox>
       </HeadlineRow>
 
