@@ -11,7 +11,8 @@ export type StepperProps = {
 };
 
 /**
- * 회원가입 각 단계의 진행 바와 번호·라벨을 보여주며, 현재 단계까지의 바를 brand 색으로 채운다.
+ * 회원가입 각 단계의 진행 바와 번호·라벨을 보여준다.
+ * 현재 단계까지(완료 단계 포함)의 바와 라벨을 brand 색으로 표시한다.
  */
 export const Stepper = ({
   steps,
@@ -35,7 +36,7 @@ export const Stepper = ({
               <ProgressBar $filled={isFilled} aria-hidden="true" />
               <StepLabel
                 font="detail-s-sb"
-                color={isCurrent ? 'text.brand' : 'text.quaternary'}
+                color={isFilled ? 'text.brand' : 'text.quaternary'}
               >
                 <span>{stepNumber}</span>
                 <span>{label}</span>
