@@ -7,6 +7,9 @@ import { RouterProvider } from 'react-router-dom';
 
 import { baseURL } from '@/api/core/client';
 import { BirthDateGate } from '@/components/BirthDateGate';
+import { LoaderScreen } from '@/components/Loader';
+import { PageLayout, type PageLayoutBackground } from '@/components/PageLayout';
+import { RunningRecordGate } from '@/components/RunningRecordGate';
 import { ToastProvider } from '@/components/Toast';
 import { AuthProvider } from '@/contexts';
 import { router } from '@/router/router';
@@ -21,6 +24,15 @@ if (!rootElement) {
 }
 
 void baseURL;
+
+const root = createRoot(rootElement);
+const EVENT_DETAIL_PATH_PATTERN =
+  /^\/events\/(?!new(?:\/|$)|search(?:\/|$)|supports(?:\/|$))[^/]+(?:\/|$)/;
+
+type BootstrapLoaderState = {
+  background: PageLayoutBackground;
+  showLoader: boolean;
+};
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -43,10 +55,59 @@ const enableMocking = async () => {
   });
 };
 
+const getBootstrapLoaderState = (): BootstrapLoaderState => {
+  const { pathname } = window.location;
+
+  if (pathname === '/') {
+    return {
+      background: 'gradient.bg.brand-main',
+      showLoader: true,
+    };
+  }
+
+  if (pathname === '/intro') {
+    return {
+      background: 'gradient.bg.brand-main',
+      showLoader: false,
+    };
+  }
+
+  if (EVENT_DETAIL_PATH_PATTERN.test(pathname)) {
+    return {
+      background: 'gradient.bg.brand-event',
+      showLoader: true,
+    };
+  }
+
+  return {
+    background: 'bg.default',
+    showLoader: false,
+  };
+};
+
+const renderBootstrapLoader = () => {
+  const { background, showLoader } = getBootstrapLoaderState();
+
+  root.render(
+    <StrictMode>
+      <ThemeProvider theme={theme}>
+        <Global styles={globalStyles} />
+        <ColorModeProvider>
+          <PageLayout background={background}>
+            {showLoader ? <LoaderScreen /> : null}
+          </PageLayout>
+        </ColorModeProvider>
+      </ThemeProvider>
+    </StrictMode>,
+  );
+};
+
 const bootstrap = async () => {
+  renderBootstrapLoader();
+
   await enableMocking();
 
-  createRoot(rootElement).render(
+  root.render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
@@ -56,6 +117,7 @@ const bootstrap = async () => {
               <ToastProvider>
                 <RouterProvider router={router} />
                 <BirthDateGate />
+                <RunningRecordGate />
               </ToastProvider>
             </ColorModeProvider>
           </ThemeProvider>
