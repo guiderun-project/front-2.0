@@ -16,6 +16,8 @@ type FilterBaseProps<TValue extends string> = {
   variant?: FilterVariant;
   disabled?: boolean;
   placeholder?: string;
+  /** value가 이 값과 같으면 선택값 대신 placeholder를 트리거에 표시한다(시트 선택 표시는 유지). */
+  placeholderValue?: TValue;
   ariaLabel?: string;
   className?: string;
 };

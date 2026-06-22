@@ -70,12 +70,9 @@ export const MyRunningTab = (): ReactElement => {
             icon="chevron-down-lined"
             options={TYPE_FILTER_OPTIONS}
             placeholder="유형"
-            sheetTitle="유형"
-            value={
-              typeFilter === EVENT_LIST_TYPE_FILTERS.TOTAL
-                ? undefined
-                : typeFilter
-            }
+            placeholderValue={EVENT_LIST_TYPE_FILTERS.TOTAL}
+            sheetTitle="유형 선택"
+            value={typeFilter}
             onChange={handleTypeChange}
           />
           <Filter
@@ -83,12 +80,9 @@ export const MyRunningTab = (): ReactElement => {
             icon="chevron-down-lined"
             options={RELATION_FILTER_OPTIONS}
             placeholder="주최여부"
-            sheetTitle="주최여부"
-            value={
-              relationFilter === MY_ACTIVITY_EVENT_RELATION_FILTERS.TOTAL
-                ? undefined
-                : relationFilter
-            }
+            placeholderValue={MY_ACTIVITY_EVENT_RELATION_FILTERS.TOTAL}
+            sheetTitle="주최여부 선택"
+            value={relationFilter}
             onChange={handleRelationChange}
           />
         </Filters>
