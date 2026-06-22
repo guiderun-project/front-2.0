@@ -39,7 +39,7 @@ export const BottomNavigation = ({
 
   const handleLogin = () => {
     setIsLoginSheetOpen(false);
-    navigate(APP_PATH.LOGIN, { state: { from: location } });
+    navigate(APP_PATH.INTRO, { state: { from: location } });
   };
 
   return (
