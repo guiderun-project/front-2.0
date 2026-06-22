@@ -1,6 +1,7 @@
-import { useState, useTransition, type ReactElement } from 'react';
+import { useTransition, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
+import { createSearchParams, useSearchParams } from 'react-router-dom';
 
 import { EVENT_LIST_TYPE_FILTERS } from '@/api/constants/common';
 import { MY_ACTIVITY_EVENT_RELATION_FILTERS } from '@/api/constants/user';
@@ -27,35 +28,66 @@ const RELATION_FILTER_OPTIONS: SelectOptions<MyActivityEventRelationFilter> = [
 const LOADING_MESSAGE = '러닝 기록을 불러오는 중이에요.';
 const ERROR_MESSAGE = '러닝 기록을 불러오지 못했어요.';
 
+const resolveType = (value: string | null): EventListTypeFilter =>
+  value === EVENT_LIST_TYPE_FILTERS.COMPETITION ||
+  value === EVENT_LIST_TYPE_FILTERS.TRAINING
+    ? value
+    : EVENT_LIST_TYPE_FILTERS.TOTAL;
+
+const resolveRelation = (value: string | null): MyActivityEventRelationFilter =>
+  value === MY_ACTIVITY_EVENT_RELATION_FILTERS.PARTICIPATED ||
+  value === MY_ACTIVITY_EVENT_RELATION_FILTERS.HOSTED
+    ? value
+    : MY_ACTIVITY_EVENT_RELATION_FILTERS.TOTAL;
+
+const resolvePage = (value: string | null): number => {
+  const page = Number(value);
+
+  return Number.isInteger(page) && page > 0 ? page : 1;
+};
+
 export const MyRunningTab = (): ReactElement => {
-  const [typeFilter, setTypeFilter] = useState<EventListTypeFilter>(
-    EVENT_LIST_TYPE_FILTERS.TOTAL,
-  );
-  const [relationFilter, setRelationFilter] =
-    useState<MyActivityEventRelationFilter>(
-      MY_ACTIVITY_EVENT_RELATION_FILTERS.TOTAL,
-    );
-  const [page, setPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [, startTransition] = useTransition();
 
-  const handleTypeChange = (value: EventListTypeFilter) => {
+  const typeFilter = resolveType(searchParams.get('type'));
+  const relationFilter = resolveRelation(searchParams.get('relation'));
+  const page = resolvePage(searchParams.get('page'));
+
+  const applyParams = (next: {
+    type: EventListTypeFilter;
+    relation: MyActivityEventRelationFilter;
+    page: number;
+  }) => {
+    const params = createSearchParams({ tab: 'event' });
+
+    if (next.type !== EVENT_LIST_TYPE_FILTERS.TOTAL) {
+      params.set('type', next.type);
+    }
+
+    if (next.relation !== MY_ACTIVITY_EVENT_RELATION_FILTERS.TOTAL) {
+      params.set('relation', next.relation);
+    }
+
+    if (next.page > 1) {
+      params.set('page', String(next.page));
+    }
+
     startTransition(() => {
-      setTypeFilter(value);
-      setPage(1);
+      setSearchParams(params, { replace: true });
     });
+  };
+
+  const handleTypeChange = (value: EventListTypeFilter) => {
+    applyParams({ type: value, relation: relationFilter, page: 1 });
   };
 
   const handleRelationChange = (value: MyActivityEventRelationFilter) => {
-    startTransition(() => {
-      setRelationFilter(value);
-      setPage(1);
-    });
+    applyParams({ type: typeFilter, relation: value, page: 1 });
   };
 
   const handlePageChange = (next: number) => {
-    startTransition(() => {
-      setPage(next);
-    });
+    applyParams({ type: typeFilter, relation: relationFilter, page: next });
   };
 
   return (
