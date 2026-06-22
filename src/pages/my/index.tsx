@@ -63,7 +63,10 @@ const MyPageContent = (): ReactElement => {
           runningInfo={data.runningInfo}
           onEdit={() => navigate(MY_RUNNING_EDIT_PATH)}
         />
-        <AccountMenu onInquiry={handleInquiry} />
+        <AccountMenu
+          onInquiry={handleInquiry}
+          onViewTerms={() => navigate(APP_PATH.TERMS)}
+        />
       </InfoSection>
     </>
   );
