@@ -11,19 +11,19 @@ import { BottomSheet } from '../BottomSheet';
 import { Button } from '../Button';
 import { Input } from '../Input';
 
-const BIRTH_DATE_MAX_LENGTH = 10;
-const BIRTH_DATE_HELPER_TEXT = 'YYYY.MM.DD 형식으로 입력해주세요';
+const BIRTH_DATE_MAX_LENGTH = 12;
+const BIRTH_DATE_PLACEHOLDER = 'YYYY. MM. DD';
 
 const formatBirthDateInput = (raw: string): string => {
   const digits = raw.replace(/\D/g, '').slice(0, 8);
 
   return [digits.slice(0, 4), digits.slice(4, 6), digits.slice(6, 8)]
     .filter(Boolean)
-    .join('.');
+    .join('. ');
 };
 
 const toISODate = (formatted: string): string | null => {
-  const match = /^(\d{4})\.(\d{2})\.(\d{2})$/.exec(formatted);
+  const match = /^(\d{4})\. (\d{2})\. (\d{2})$/.exec(formatted);
 
   if (!match) {
     return null;
@@ -103,11 +103,13 @@ export const BirthDateSheet = ({
     >
       <Content>
         <Input
+          clearLabel="생년월일 지우기"
+          clearable
           errorText={errorText}
-          helperText={BIRTH_DATE_HELPER_TEXT}
           inputMode="numeric"
-          label="생년월일"
+          label="생년월일 8자리"
           maxLength={BIRTH_DATE_MAX_LENGTH}
+          placeholder={BIRTH_DATE_PLACEHOLDER}
           value={birthDate}
           onChange={(event) => {
             if (isError) {
