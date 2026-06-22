@@ -115,14 +115,16 @@ type MockDb = {
   comments: MockComment[];
 };
 
-let mockSessionUserId = 'user-vi-1';
+export const DEFAULT_MOCK_SESSION_USER_ID = 'user-vi-1';
+
+let mockSessionUserId = DEFAULT_MOCK_SESSION_USER_ID;
 
 export const setMockSessionUser = (userId: string) => {
   mockSessionUserId = userId;
 };
 
 export const resetMockSessionUser = () => {
-  mockSessionUserId = 'user-vi-1';
+  mockSessionUserId = DEFAULT_MOCK_SESSION_USER_ID;
 };
 export const runningGroups: RunningGroup[] = ['A', 'B', 'C', 'D', 'E', 'P'];
 export const visibleRunningGroups: RunningGroup[] = ['A', 'B', 'C', 'D', 'E'];
@@ -344,7 +346,7 @@ export const mockDb: MockDb = {
       eventCategory: 'GENERAL',
       recruitStatus: 'RECRUIT_OPEN',
       isPrivate: false,
-      organizerId: 'user-vi-1',
+      organizerId: DEFAULT_MOCK_SESSION_USER_ID,
       schedule: {
         date: '2026-06-01',
         startTime: '09:00',
@@ -390,7 +392,7 @@ export const mockDb: MockDb = {
       eventCategory: 'GROUP',
       recruitStatus: 'RECRUIT_OPEN',
       isPrivate: true,
-      organizerId: 'user-vi-1',
+      organizerId: DEFAULT_MOCK_SESSION_USER_ID,
       schedule: {
         date: '2026-06-15',
         startTime: '19:00',
@@ -413,7 +415,7 @@ export const mockDb: MockDb = {
       eventCategory: 'GENERAL',
       recruitStatus: 'RECRUIT_END',
       isPrivate: false,
-      organizerId: 'user-vi-1',
+      organizerId: DEFAULT_MOCK_SESSION_USER_ID,
       schedule: {
         date: '2026-04-20',
         startTime: '08:00',
@@ -482,7 +484,7 @@ export const mockDb: MockDb = {
       eventCategory: 'GENERAL',
       recruitStatus: 'RECRUIT_OPEN',
       isPrivate: false,
-      organizerId: 'user-vi-1',
+      organizerId: DEFAULT_MOCK_SESSION_USER_ID,
       schedule: {
         date: '2026-06-08',
         startTime: '09:00',
@@ -551,7 +553,7 @@ export const mockDb: MockDb = {
       eventCategory: 'GROUP',
       recruitStatus: 'RECRUIT_OPEN',
       isPrivate: false,
-      organizerId: currentUserId,
+      organizerId: DEFAULT_MOCK_SESSION_USER_ID,
       schedule: {
         date: '2026-06-12',
         startTime: '20:00',
