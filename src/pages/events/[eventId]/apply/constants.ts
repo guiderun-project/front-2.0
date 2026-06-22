@@ -1,5 +1,6 @@
 import type { EventCategory, EventType, UserType } from '@/api/types';
 import type { SelectOptions } from '@/components';
+import { RUNNER_TYPE_LABELS, TRAINING_RECORD_LABELS } from '@/constants';
 
 import {
   COMPETITION_COURSE_OPTIONS,
@@ -13,28 +14,6 @@ export type EventApplyGroupValue = EventVisibleRunningGroup;
 
 export const EVENT_APPLY_GROUP_VALUES = EVENT_VISIBLE_RUNNING_GROUPS;
 export const EVENT_APPLY_DETAIL_MAX_LENGTH = 100;
-
-const TRAINING_RECORD_LABELS: Record<UserType, Record<EventApplyGroupValue, string>> = {
-  VI: {
-    A: '~50분',
-    B: '51~56분',
-    C: '57~65분',
-    D: '66분~',
-    E: '기록 없음',
-  },
-  GUIDE: {
-    A: '~45분',
-    B: '46~52분',
-    C: '53~59분',
-    D: '60분~',
-    E: '기록 없음',
-  },
-};
-
-const RUNNER_TYPE_LABELS: Record<UserType, string> = {
-  VI: '시각장애러너',
-  GUIDE: '가이드러너',
-};
 
 export const GROUP_TRAINING_OPTIONS = [
   {

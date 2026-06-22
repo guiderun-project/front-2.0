@@ -1,5 +1,8 @@
 import type { ReactElement } from 'react';
 
+import type { UserType } from '@/api/types';
+import { RUNNER_TYPE_LABELS } from '@/constants';
+
 import GuideAvatar from './assets/guide.svg?react';
 import ViAvatar from './assets/vi.svg?react';
 
@@ -12,22 +15,12 @@ const RUNNER_TYPE_AVATAR_SIZE_PX = {
 const RUNNER_TYPE_AVATAR_GRAPHIC = {
   VI: ViAvatar,
   GUIDE: GuideAvatar,
-  vi: ViAvatar,
-  guide: GuideAvatar,
-} as const;
-
-const RUNNER_TYPE_AVATAR_LABEL = {
-  VI: '시각장애러너',
-  GUIDE: '가이드러너',
-  vi: '시각장애러너',
-  guide: '가이드러너',
 } as const;
 
 type RunnerTypeAvatarSize = keyof typeof RUNNER_TYPE_AVATAR_SIZE_PX;
-type RunnerTypeAvatarType = keyof typeof RUNNER_TYPE_AVATAR_GRAPHIC;
 
 type RunnerTypeAvatarProps = {
-  type: RunnerTypeAvatarType;
+  type: UserType;
   size?: RunnerTypeAvatarSize;
 };
 
@@ -40,7 +33,7 @@ export const RunnerTypeAvatar = ({
 
   return (
     <AvatarGraphic
-      aria-label={RUNNER_TYPE_AVATAR_LABEL[type]}
+      aria-label={RUNNER_TYPE_LABELS[type]}
       focusable="false"
       height={avatarSize}
       role="img"

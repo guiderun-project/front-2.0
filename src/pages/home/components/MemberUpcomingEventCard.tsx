@@ -4,6 +4,7 @@ import styled from '@emotion/styled';
 import { Link } from 'react-router-dom';
 
 import { Badge, Icon, RunnerTypeAvatar, Text } from '@/components';
+import { RUNNER_TYPE_LABELS } from '@/constants';
 import { APP_PATH } from '@/router/path';
 
 import { formatDday, formatDdayLabel, type UpcomingMemberEvent } from '../utils';
@@ -12,15 +13,13 @@ type MemberUpcomingEventCardProps = {
   event: UpcomingMemberEvent;
 };
 
-const PARTNER_TYPE_LABEL = { VI: '시각장애러너', GUIDE: '가이드러너' } as const;
-
 export const MemberUpcomingEventCard = ({
   event,
 }: MemberUpcomingEventCardProps): ReactElement => {
   const partners = event.myPartner ?? [];
   const isMatched = partners.length > 0;
   const partnerText = isMatched
-    ? `파트너 ${partners.map((partner) => `${PARTNER_TYPE_LABEL[partner.type]} ${partner.name}`).join(', ')}`
+    ? `파트너 ${partners.map((partner) => `${RUNNER_TYPE_LABELS[partner.type]} ${partner.name}`).join(', ')}`
     : '아직 파트너 매칭 전이에요';
   const ariaLabel = `${event.name}, ${formatDdayLabel(event.dDay)}, ${event.place}, ${event.scheduleText}, ${partnerText}`;
 
