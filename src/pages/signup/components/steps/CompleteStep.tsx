@@ -4,7 +4,7 @@ import styled from '@emotion/styled';
 
 import { Graphic, Text } from '@/components';
 
-import { SIGNUP_COPY } from '../../copy';
+import { SIGNUP_COPY } from '@/pages/signup/copy';
 
 export const CompleteStep = (): ReactElement => {
   return (

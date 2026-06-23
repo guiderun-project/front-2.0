@@ -3,15 +3,16 @@ import type { ReactElement } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { Input } from '@/components';
+import { RUNNER_TYPE } from '@/constants';
 import { BIRTH_DATE_MAX_LENGTH, formatBirthDateInput } from '@/utils';
 
-import { SIGNUP_COPY } from '../../copy';
-import type { SignupFormValues } from '../../types';
-import { StepLayout } from '../StepLayout';
+import { SIGNUP_COPY } from '@/pages/signup/copy';
+import type { SignupFormValues } from '@/pages/signup/types';
+import { StepLayout } from '@/pages/signup/components/StepLayout';
 
 export const BasicInfoStep = (): ReactElement => {
   const { control, watch } = useFormContext<SignupFormValues>();
-  const isGuide = watch('disabilityType') === 'GUIDE';
+  const isGuide = watch('disabilityType') === RUNNER_TYPE.GUIDE;
 
   return (
     <StepLayout title={SIGNUP_COPY.basicInfo.title}>
@@ -31,7 +32,9 @@ export const BasicInfoStep = (): ReactElement => {
             label="생년월일"
             maxLength={BIRTH_DATE_MAX_LENGTH}
             value={field.value}
-            onChange={(event) => field.onChange(formatBirthDateInput(event.target.value))}
+            onChange={(event) =>
+              field.onChange(formatBirthDateInput(event.target.value))
+            }
           />
         )}
       />
@@ -51,7 +54,11 @@ export const BasicInfoStep = (): ReactElement => {
         control={control}
         name="snsId"
         render={({ field }) => (
-          <Input label="인스타그램 아이디 (선택)" value={field.value} onChange={field.onChange} />
+          <Input
+            label="인스타그램 아이디 (선택)"
+            value={field.value}
+            onChange={field.onChange}
+          />
         )}
       />
       {isGuide ? (
@@ -59,7 +66,11 @@ export const BasicInfoStep = (): ReactElement => {
           control={control}
           name="id1365"
           render={({ field }) => (
-            <Input label="1365 (선택)" value={field.value} onChange={field.onChange} />
+            <Input
+              label="1365 (선택)"
+              value={field.value}
+              onChange={field.onChange}
+            />
           )}
         />
       ) : null}

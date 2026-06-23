@@ -4,16 +4,16 @@ import styled from '@emotion/styled';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { Icon, Text } from '@/components';
-import { RUNNER_TYPE_LABELS } from '@/constants';
+import { RUNNER_TYPE, RUNNER_TYPE_LABELS } from '@/constants';
 
-import { SIGNUP_COPY } from '../../copy';
-import type { RunnerType, SignupFormValues } from '../../types';
-import { SelectCardGroup } from '../SelectCardGroup';
-import { StepLayout } from '../StepLayout';
+import { SIGNUP_COPY } from '@/pages/signup/copy';
+import type { RunnerType, SignupFormValues } from '@/pages/signup/types';
+import { SelectCardGroup } from '@/pages/signup/components/SelectCardGroup';
+import { StepLayout } from '@/pages/signup/components/StepLayout';
 
 const RUNNER_TYPE_OPTIONS: ReadonlyArray<{ value: RunnerType; label: string }> = [
-  { value: 'GUIDE', label: RUNNER_TYPE_LABELS.GUIDE },
-  { value: 'VI', label: RUNNER_TYPE_LABELS.VI },
+  { value: RUNNER_TYPE.GUIDE, label: RUNNER_TYPE_LABELS.GUIDE },
+  { value: RUNNER_TYPE.VI, label: RUNNER_TYPE_LABELS.VI },
 ];
 
 export const RunnerTypeStep = (): ReactElement => {

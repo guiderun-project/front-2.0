@@ -3,16 +3,17 @@ import type { ReactElement } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { Input, Textarea, TimeInput } from '@/components';
+import { RUNNER_TYPE } from '@/constants';
 
-import { SIGNUP_COPY } from '../../copy';
-import type { SignupFormValues } from '../../types';
-import { StepLayout } from '../StepLayout';
+import { SIGNUP_COPY } from '@/pages/signup/copy';
+import type { SignupFormValues } from '@/pages/signup/types';
+import { StepLayout } from '@/pages/signup/components/StepLayout';
 
 const HOPE_PREFS_MAX_LENGTH = 100;
 
 export const RecordStep = (): ReactElement => {
   const { control, watch } = useFormContext<SignupFormValues>();
-  const isGuide = watch('disabilityType') === 'GUIDE';
+  const isGuide = watch('disabilityType') === RUNNER_TYPE.GUIDE;
 
   return (
     <StepLayout title={SIGNUP_COPY.record.title}>

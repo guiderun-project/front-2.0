@@ -1,5 +1,10 @@
 import type { RunningGroup, UserType } from '@/api/types';
 
+export const RUNNER_TYPE = {
+  VI: 'VI',
+  GUIDE: 'GUIDE',
+} as const satisfies Record<string, UserType>;
+
 export const RUNNER_TYPE_LABELS: Record<UserType, string> = {
   VI: '시각장애러너',
   GUIDE: '가이드러너',
@@ -8,7 +13,10 @@ export const RUNNER_TYPE_LABELS: Record<UserType, string> = {
 /** 러닝 그룹은 실제로 A~E만 사용한다 (P 그룹 미사용). */
 export type RunnerRecordGroup = Exclude<RunningGroup, 'P'>;
 
-export const TRAINING_RECORD_LABELS: Record<UserType, Record<RunnerRecordGroup, string>> = {
+export const TRAINING_RECORD_LABELS: Record<
+  UserType,
+  Record<RunnerRecordGroup, string>
+> = {
   VI: {
     A: '~50분',
     B: '51~56분',

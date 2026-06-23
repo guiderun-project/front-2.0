@@ -2,10 +2,10 @@ import type { ReactElement } from 'react';
 
 import { Controller, useFormContext } from 'react-hook-form';
 
-import { SIGNUP_COPY } from '../../copy';
-import type { Gender, SignupFormValues } from '../../types';
-import { SelectCardGroup } from '../SelectCardGroup';
-import { StepLayout } from '../StepLayout';
+import { SIGNUP_COPY } from '@/pages/signup/copy';
+import type { Gender, SignupFormValues } from '@/pages/signup/types';
+import { SelectCardGroup } from '@/pages/signup/components/SelectCardGroup';
+import { StepLayout } from '@/pages/signup/components/StepLayout';
 
 const GENDER_OPTIONS: ReadonlyArray<{ value: Gender; label: string }> = [
   { value: 'FEMALE', label: '여자' },

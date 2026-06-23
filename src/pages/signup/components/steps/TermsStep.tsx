@@ -5,9 +5,9 @@ import { useFormContext } from 'react-hook-form';
 
 import { CheckBox, Text } from '@/components';
 
-import { SIGNUP_COPY } from '../../copy';
-import type { SignupFormValues } from '../../types';
-import { StepLayout } from '../StepLayout';
+import { SIGNUP_COPY } from '@/pages/signup/copy';
+import type { SignupFormValues } from '@/pages/signup/types';
+import { StepLayout } from '@/pages/signup/components/StepLayout';
 
 export const TermsStep = (): ReactElement => {
   const { watch, setValue } = useFormContext<SignupFormValues>();
