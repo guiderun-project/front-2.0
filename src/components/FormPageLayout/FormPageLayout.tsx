@@ -194,14 +194,22 @@ const Layout = styled.div(({ theme }) => ({
   width: '100%',
   height: 'calc(100dvh - env(safe-area-inset-top))',
   overflow: 'hidden',
-  background: `var(--page-layout-background, ${theme.color.bg.default})`,
+  backgroundColor: `var(--page-layout-background-color, ${theme.color.bg.default})`,
+  backgroundImage: 'var(--page-layout-background-image, none)',
+  backgroundPosition: 'top center',
+  backgroundRepeat: 'no-repeat',
+  backgroundSize: '100% var(--page-layout-background-gradient-height, 100%)',
 }));
 
 const TopNavigationArea = styled.div(({ theme }) => ({
   position: 'relative',
   zIndex: theme.zIndex.control,
   flex: `0 0 ${theme.pxToRem(TOP_NAVIGATION_HEIGHT_PX)}`,
-  background: `var(--page-layout-background, ${theme.color.bg.default})`,
+  backgroundColor: `var(--page-layout-background-color, ${theme.color.bg.default})`,
+  backgroundImage: 'var(--page-layout-background-image, none)',
+  backgroundPosition: 'top center',
+  backgroundRepeat: 'no-repeat',
+  backgroundSize: '100% var(--page-layout-background-gradient-height, 100%)',
 }));
 
 const ScrollArea = styled.div({

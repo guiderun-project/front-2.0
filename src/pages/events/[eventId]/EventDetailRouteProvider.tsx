@@ -39,7 +39,7 @@ const EventDetailRouteState = ({
 
 const EventDetailRouteLoader = (): ReactElement => {
   return (
-    <PageLayout background="gradient.bg.brand-event">
+    <PageLayout background="bg.brand-event" gradient="gradient.bg.brand-event">
       <LoaderScreen label="이벤트 정보를 불러오는 중이에요." />
     </PageLayout>
   );

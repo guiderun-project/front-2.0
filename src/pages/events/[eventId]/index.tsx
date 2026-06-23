@@ -84,7 +84,7 @@ export const EventDetailPage = (): ReactElement => {
 
   if (!isValidEventId) {
     return (
-      <PageLayout background="gradient.bg.brand-event">
+      <PageLayout background="bg.brand-event" gradient="gradient.bg.brand-event">
         <TopNavigation
           aria-label="이벤트 상세 상단 메뉴"
           left={navigationLeftAction}
@@ -96,7 +96,7 @@ export const EventDetailPage = (): ReactElement => {
   }
 
   return (
-    <PageLayout background="gradient.bg.brand-event">
+    <PageLayout background="bg.brand-event" gradient="gradient.bg.brand-event">
       <TopNavigation
         aria-label="이벤트 상세 상단 메뉴"
         left={navigationLeftAction}

@@ -3,7 +3,6 @@ import type { ReactElement, ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 
 import type { UserInfoGetResponse } from '@/api/types';
-import { LoaderScreen } from '@/components';
 import { APPROVED_ROLES } from '@/constants';
 import { useAuth } from '@/contexts';
 import { APP_PATH } from './path';
@@ -13,6 +12,7 @@ type ProtectedRouteAccess = 'authenticated' | 'approved';
 type ProtectedRouteProps = {
   access?: ProtectedRouteAccess;
   children: ReactNode;
+  fallback?: ReactElement;
 };
 
 const canAccessProtectedRoute = (
@@ -33,12 +33,13 @@ const canAccessProtectedRoute = (
 export const ProtectedRoute = ({
   access = 'authenticated',
   children,
+  fallback,
 }: ProtectedRouteProps): ReactElement | null => {
   const { user, isAuthReady } = useAuth();
   const location = useLocation();
 
   if (!isAuthReady) {
-    return <LoaderScreen label="사용자 정보를 불러오는 중이에요." />;
+    return fallback ?? null;
   }
 
   if (canAccessProtectedRoute(user, access)) {

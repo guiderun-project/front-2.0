@@ -8,7 +8,11 @@ import { RouterProvider } from 'react-router-dom';
 import { baseURL } from '@/api/core/client';
 import { BirthDateGate } from '@/components/BirthDateGate';
 import { LoaderScreen } from '@/components/Loader';
-import { PageLayout, type PageLayoutBackground } from '@/components/PageLayout';
+import {
+  PageLayout,
+  type PageLayoutBackground,
+  type PageLayoutGradientBackground,
+} from '@/components/PageLayout';
 import { RunningRecordGate } from '@/components/RunningRecordGate';
 import { ToastProvider } from '@/components/Toast';
 import { AuthProvider } from '@/contexts';
@@ -36,6 +40,7 @@ const EVENT_DETAIL_RESERVED_PATHS = [
 
 type BootstrapLoaderState = {
   background: PageLayoutBackground;
+  gradient?: PageLayoutGradientBackground;
   showLoader: boolean;
 };
 
@@ -75,21 +80,24 @@ const getBootstrapLoaderState = (): BootstrapLoaderState => {
 
   if (pathname === APP_PATH.HOME) {
     return {
-      background: 'gradient.bg.brand-main',
+      background: 'bg.subtle',
+      gradient: 'gradient.bg.brand-main',
       showLoader: true,
     };
   }
 
   if (pathname === APP_PATH.INTRO) {
     return {
-      background: 'gradient.bg.brand-main',
+      background: 'bg.subtle',
+      gradient: 'gradient.bg.brand-main',
       showLoader: false,
     };
   }
 
   if (isEventDetailPath(pathname)) {
     return {
-      background: 'gradient.bg.brand-event',
+      background: 'bg.brand-event',
+      gradient: 'gradient.bg.brand-event',
       showLoader: true,
     };
   }
@@ -101,14 +109,14 @@ const getBootstrapLoaderState = (): BootstrapLoaderState => {
 };
 
 const renderBootstrapLoader = () => {
-  const { background, showLoader } = getBootstrapLoaderState();
+  const { background, gradient, showLoader } = getBootstrapLoaderState();
 
   root.render(
     <StrictMode>
       <ThemeProvider theme={theme}>
         <Global styles={globalStyles} />
         <ColorModeProvider>
-          <PageLayout background={background}>
+          <PageLayout background={background} gradient={gradient}>
             {showLoader ? <LoaderScreen /> : null}
           </PageLayout>
         </ColorModeProvider>

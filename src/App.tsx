@@ -34,7 +34,14 @@ const AppWrapper = styled.div`
   min-height: 100vh;
   min-height: 100dvh;
   justify-content: center;
-  background: var(--page-layout-background, ${({ theme }) => theme.color.bg.subtle});
+  background-color: var(
+    --page-layout-background-color,
+    ${({ theme }) => theme.color.bg.subtle}
+  );
+  background-image: var(--page-layout-background-image, none);
+  background-position: top center;
+  background-repeat: no-repeat;
+  background-size: 100% var(--page-layout-background-gradient-height, 100%);
 `;
 
 const MobileViewport = styled.div`
@@ -45,5 +52,8 @@ const MobileViewport = styled.div`
   min-height: 100vh;
   min-height: 100dvh;
   overflow-x: hidden;
-  background: ${({ theme }) => theme.color.bg.default};
+  background-color: var(
+    --page-layout-background-color,
+    ${({ theme }) => theme.color.bg.default}
+  );
 `;

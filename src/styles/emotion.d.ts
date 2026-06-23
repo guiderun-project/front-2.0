@@ -10,6 +10,7 @@ declare module '@emotion/react' {
     fontFamily: AppTheme['fontFamily'];
     fontWeight: AppTheme['fontWeight'];
     gradient: AppTheme['gradient'];
+    gradientBackgroundHeight: AppTheme['gradientBackgroundHeight'];
     gradientBaseColor: AppTheme['gradientBaseColor'];
     layout: AppTheme['layout'];
     pxToRem: AppTheme['pxToRem'];

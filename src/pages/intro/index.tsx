@@ -36,7 +36,7 @@ export const IntroPage = (): ReactElement => {
   };
 
   return (
-    <PageLayout background="gradient.bg.brand-main">
+    <PageLayout background="bg.subtle" gradient="gradient.bg.brand-main">
       <Content>
         <TitleSection>
           <Text align="center" as="h1" font="heading-m-sb">

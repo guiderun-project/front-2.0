@@ -1,4 +1,5 @@
 import type { ColorMode } from './color';
+import { pxToRem } from './size';
 
 type GradientValue = string;
 
@@ -13,9 +14,9 @@ const gradientModes = {
     bg: {
       subtle: 'linear-gradient(180deg, #F0F3F9 0%, #F6F7F9 100%)',
       'brand-main':
-        'linear-gradient(180deg, var(--primitive-brand-cyan-300, #5ECCF0) -45px, var(--primitive-neutral-100, #EEF2F6) 280px)',
+        'linear-gradient(180deg, #5ECCF0 0%, rgba(94, 204, 240, 0) 49.187%)',
       'brand-event':
-        'linear-gradient(180.00000000000182deg, #B2DCFF 1%, #C7F1FC 15%, #D8EDED 45%, #EEF2F6 100%)',
+        'linear-gradient(180deg, #B2DCFF 1.2%, #C7F1FC 15%, #D8EDED 44.9%, rgba(216, 237, 237, 0) 100%)',
       'brand-event-overlay':
         'linear-gradient(180.00000000000182deg, #0F2342 1%, rgba(15, 35, 66, 0) 28%)',
       footer:
@@ -34,8 +35,9 @@ const gradientModes = {
     bg: {
       subtle: 'linear-gradient(180deg, #F0F3F9 0%, #F6F7F9 100%)',
       'brand-main':
-        'linear-gradient(180deg, var(--primitive-brand-cyan-800, #0C5B7D) 9px, var(--primitive-brand-cyan-950, #06314F) 149px, var(--primitive-neutral-900, #151B23) 317px)',
-      'brand-event': `linear-gradient(180deg, #0F2342 -1.42%, rgba(15, 35, 66, 0) 22.74%), ${gradientBaseColor.bg['brand-event-overlay']}`,
+        'linear-gradient(180deg, #0C5B7D 0%, #094768 21.321%, rgba(6, 49, 79, 0.8) 51.443%, rgba(6, 49, 79, 0.2) 78.815%, rgba(6, 49, 79, 0) 100%)',
+      'brand-event':
+        'linear-gradient(180deg, #0F2342 1.2%, rgba(15, 35, 66, 0) 90%)',
       'brand-event-overlay':
         'linear-gradient(180.00000000000182deg, #0F2342 1%, rgba(15, 35, 66, 0) 28%)',
       footer:
@@ -81,6 +83,14 @@ export const gradientTokenMap = {
 export type GradientToken = keyof typeof gradientTokenMap;
 
 export const resolveGradientToken = (token: GradientToken): GradientValue => gradientTokenMap[token];
+
+export const gradientBackgroundHeight = {
+  'bg.brand-main': pxToRem(640),
+  'bg.brand-event': pxToRem(640),
+} as const satisfies Partial<Record<GradientToken, string>>;
+
+export const resolveGradientBackgroundHeight = (token: GradientToken): string =>
+  gradientBackgroundHeight[token as keyof typeof gradientBackgroundHeight] ?? '100%';
 
 const flattenGradients = (
   value: Record<string, unknown>,

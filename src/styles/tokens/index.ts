@@ -14,9 +14,11 @@ export type { EffectToken } from './effect';
 export { fontFamily, fontWeight } from './font';
 export {
   gradient,
+  gradientBackgroundHeight,
   gradientBaseColor,
   gradientModeCssVariables,
   gradientTokenMap,
+  resolveGradientBackgroundHeight,
   resolveGradientToken,
 } from './gradient';
 export type { GradientToken } from './gradient';
