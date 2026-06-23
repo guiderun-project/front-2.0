@@ -6,9 +6,7 @@ import { Graphic, HiddenText, Text } from "@/components";
 import { useAuth } from "@/contexts";
 
 import { useHomeSummary } from "../hooks/useHomeSummary";
-
-// TODO: 회원 헤드라인 2번째 줄 실제 카피 확정 후 반영
-const MEMBER_HEADLINE_SUBTITLE = "오늘도 함께 달릴 준비됐어요";
+import { getRunnerStageHeadline } from "../utils";
 
 const formatNumber = (value: number) => value.toLocaleString("ko-KR");
 
@@ -20,6 +18,10 @@ export const ActivitySummary = (): ReactElement => {
   } = useHomeSummary();
 
   if (mySummary && user) {
+    const stageHeadline = getRunnerStageHeadline(
+      mySummary.totalParticipationCount,
+    );
+
     return (
       <Section aria-labelledby={headingId}>
         <HeadlineRow>
@@ -29,12 +31,12 @@ export const ActivitySummary = (): ReactElement => {
                 {user.name}님
               </Text>
               <Text as="span" color="text.primary" font="heading-m-r">
-                은
+                {stageHeadline.connector}
               </Text>
             </NameLine>
-            <Text as="span" color="text.primary" font="heading-m-r">
-              {MEMBER_HEADLINE_SUBTITLE}
-            </Text>
+            <HeadlineBody as="span" color="text.primary" font="heading-m-r">
+              {stageHeadline.body}
+            </HeadlineBody>
           </Headline>
           <RunnerGraphicBox aria-hidden={true}>
             <Graphic aria-hidden={true} color="icon.primary" graphic="main" />
@@ -145,6 +147,11 @@ const TitleLine = styled.span(({ theme }) => ({
 const NameLine = styled.span({
   display: "flex",
   alignItems: "flex-end",
+});
+
+const HeadlineBody = styled(Text)({
+  whiteSpace: "normal",
+  wordBreak: "keep-all",
 });
 
 const RunnerGraphicBox = styled.span(({ theme }) => ({
