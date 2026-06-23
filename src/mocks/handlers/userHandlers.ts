@@ -394,7 +394,7 @@ export const userHandlers: HttpHandler[] = [
       return badRequest('reasons must be an array.');
     }
 
-    user.role = 'ROLE_WITHDRAWAL';
+    user.role = 'WITHDRAWAL';
 
     return noContent();
   }),
