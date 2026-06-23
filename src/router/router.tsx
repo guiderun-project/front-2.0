@@ -4,6 +4,7 @@ import { lazy, Suspense } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 
 import App from '@/App';
+import { LoaderScreen, PageLayout, type PageLayoutBackground } from '@/components';
 import { BottomNavigationLayout } from '@/router/BottomNavigationLayout';
 import { GuestOnlyRoute } from '@/router/GuestOnlyRoute';
 import { ProtectedRoute } from '@/router/ProtectedRoute';
@@ -116,12 +117,21 @@ const AccountDeletePage = lazy(() =>
   })),
 );
 
+const createRouteLoaderFallback = (
+  background: PageLayoutBackground = 'bg.default',
+): ReactElement => (
+  <PageLayout background={background}>
+    <LoaderScreen />
+  </PageLayout>
+);
+
 const createLazyRouteElement = (
   Page: ComponentType,
   access: LazyRouteAccess = 'public',
+  fallback: ReactElement | null = null,
 ): ReactElement => {
   const pageElement = (
-    <Suspense fallback={null}>
+    <Suspense fallback={fallback}>
       <Page />
     </Suspense>
   );
@@ -152,7 +162,11 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: createLazyRouteElement(MainPage),
+            element: createLazyRouteElement(
+              MainPage,
+              'public',
+              createRouteLoaderFallback('gradient.bg.brand-main'),
+            ),
           },
           {
             path: 'events',
@@ -206,7 +220,11 @@ export const router = createBrowserRouter([
       },
       {
         path: 'events/:eventId',
-        element: createLazyRouteElement(EventDetailRouteProvider),
+        element: createLazyRouteElement(
+          EventDetailRouteProvider,
+          'public',
+          createRouteLoaderFallback('gradient.bg.brand-event'),
+        ),
         children: [
           {
             index: true,

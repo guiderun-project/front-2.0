@@ -12,6 +12,7 @@ export * from "./Graphic";
 export * from "./HiddenText";
 export * from "./Icon";
 export * from "./Input";
+export * from "./Loader";
 export * from "./PageLayout";
 export * from "./Pagination";
 export * from "./Popup";

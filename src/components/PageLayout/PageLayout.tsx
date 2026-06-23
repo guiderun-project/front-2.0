@@ -1,4 +1,4 @@
-import { useEffect, type ComponentPropsWithoutRef, type ReactElement } from 'react';
+import { useLayoutEffect, type ComponentPropsWithoutRef, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
@@ -12,7 +12,9 @@ import {
 type PageLayoutColorBackground = Extract<ColorToken, `bg.${string}`>;
 type PageLayoutGradientBackground = `gradient.${GradientToken}`;
 
-export type PageLayoutBackground = PageLayoutColorBackground | PageLayoutGradientBackground;
+export type PageLayoutBackground =
+  | PageLayoutColorBackground
+  | PageLayoutGradientBackground;
 
 type PageLayoutProps = {
   background?: PageLayoutBackground;
@@ -28,7 +30,7 @@ export const PageLayout = ({
 }: PageLayoutProps): ReactElement => {
   const resolvedBackground = resolvePageLayoutBackground(background);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const root = document.documentElement;
     const previousBackground = root.style.getPropertyValue(APP_WRAPPER_BACKGROUND_VARIABLE);
 

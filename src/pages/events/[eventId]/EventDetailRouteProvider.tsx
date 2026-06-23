@@ -5,7 +5,7 @@ import { Outlet, useParams } from 'react-router-dom';
 
 import { api } from '@/api/services';
 import type { EventDetailResponse } from '@/api/types';
-import { ErrorBoundary } from '@/components';
+import { ErrorBoundary, LoaderScreen } from '@/components';
 import { PageLayout } from '@/components/PageLayout';
 import { useAuth } from '@/contexts';
 import { RoutePlaceholder } from '@/pages/_shared/RoutePlaceholder';
@@ -33,6 +33,14 @@ const EventDetailRouteState = ({
   return (
     <PageLayout background="bg.subtle">
       <RoutePlaceholder title={title} description={description} />
+    </PageLayout>
+  );
+};
+
+const EventDetailRouteLoader = (): ReactElement => {
+  return (
+    <PageLayout background="gradient.bg.brand-event">
+      <LoaderScreen label="이벤트 정보를 불러오는 중이에요." />
     </PageLayout>
   );
 };
@@ -78,12 +86,7 @@ export const EventDetailRouteProvider = (): ReactElement => {
   }
 
   if (!isAuthReady) {
-    return (
-      <EventDetailRouteState
-        title="이벤트 정보를 불러오고 있어요"
-        description="잠시만 기다려주세요."
-      />
-    );
+    return <EventDetailRouteLoader />;
   }
 
   return (
@@ -99,14 +102,7 @@ export const EventDetailRouteProvider = (): ReactElement => {
           }
           onReset={reset}
         >
-          <Suspense
-            fallback={
-              <EventDetailRouteState
-                title="이벤트 정보를 불러오고 있어요"
-                description="잠시만 기다려주세요."
-              />
-            }
-          >
+          <Suspense fallback={<EventDetailRouteLoader />}>
             <EventDetailRouteContent eventId={eventId} viewerKey={viewerKey} />
           </Suspense>
         </ErrorBoundary>

@@ -2,7 +2,12 @@ import type { ReactElement } from "react";
 
 import styled from "@emotion/styled";
 
-import { PageLayout, QueryBoundary, SearchEntry } from "@/components";
+import {
+  LoaderScreen,
+  PageLayout,
+  QueryBoundary,
+  SearchEntry,
+} from "@/components";
 import { APPROVED_ROLES } from "@/constants";
 import { useAuth } from "@/contexts";
 import { APP_PATH } from "@/router/path";
@@ -10,7 +15,6 @@ import { APP_PATH } from "@/router/path";
 import { ActivitySummary } from "@/pages/home/components/ActivitySummary";
 import { HomeHeader } from "@/pages/home/components/HomeHeader";
 import { HomeQuickActions } from "@/pages/home/components/HomeQuickActions";
-import { HomeSectionMessage } from "@/pages/home/components/HomeSectionMessage";
 import { UpcomingEventList } from "@/pages/home/components/UpcomingEventList";
 
 const SUMMARY_LOADING_MESSAGE = "활동 요약을 불러오는 중이에요.";
@@ -22,38 +26,33 @@ export const MainPage = (): ReactElement => {
   const { isAuthReady, user } = useAuth();
   const isApproved = user ? APPROVED_ROLES.has(user.role) : false;
 
+  if (!isAuthReady) {
+    return (
+      <PageLayout background="gradient.bg.brand-main">
+        <LoaderScreen label="사용자 정보를 불러오는 중이에요." />
+      </PageLayout>
+    );
+  }
+
   return (
     <PageLayout background="gradient.bg.brand-main">
       <HomeHeader />
       <Content>
         <SearchEntry to={APP_PATH.EVENT_SEARCH} />
 
-        {isAuthReady ? (
-          <>
-            <QueryBoundary
-              errorMessage={SUMMARY_ERROR_MESSAGE}
-              loadingMessage={SUMMARY_LOADING_MESSAGE}
-            >
-              <ActivitySummary />
-            </QueryBoundary>
-            {isApproved ? <HomeQuickActions /> : null}
-            <QueryBoundary
-              errorMessage={UPCOMING_ERROR_MESSAGE}
-              loadingMessage={UPCOMING_LOADING_MESSAGE}
-            >
-              <UpcomingEventList />
-            </QueryBoundary>
-          </>
-        ) : (
-          <>
-            <HomeSectionMessage role="status">
-              {SUMMARY_LOADING_MESSAGE}
-            </HomeSectionMessage>
-            <HomeSectionMessage role="status">
-              {UPCOMING_LOADING_MESSAGE}
-            </HomeSectionMessage>
-          </>
-        )}
+        <QueryBoundary
+          errorMessage={SUMMARY_ERROR_MESSAGE}
+          loadingMessage={SUMMARY_LOADING_MESSAGE}
+        >
+          <ActivitySummary />
+        </QueryBoundary>
+        {isApproved ? <HomeQuickActions /> : null}
+        <QueryBoundary
+          errorMessage={UPCOMING_ERROR_MESSAGE}
+          loadingMessage={UPCOMING_LOADING_MESSAGE}
+        >
+          <UpcomingEventList />
+        </QueryBoundary>
       </Content>
     </PageLayout>
   );
