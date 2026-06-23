@@ -19,10 +19,6 @@ import { MainPage } from '@/pages';
 import { EventsPage } from '@/pages/events';
 import { EventDetailRouteProvider } from '@/pages/events/[eventId]/EventDetailRouteProvider';
 import { EventDetailPage } from '@/pages/events/[eventId]';
-import { EventApplyPage } from '@/pages/events/[eventId]/apply';
-import { EventAttendancePage } from '@/pages/events/[eventId]/attendance';
-import { EventEditPage } from '@/pages/events/[eventId]/edit';
-import { EventMatchPage } from '@/pages/events/[eventId]/match';
 import { EventSearchPage } from '@/pages/events/search';
 import { MyPage } from '@/pages/my';
 import { MyEditPage } from '@/pages/my/edit';
@@ -63,6 +59,28 @@ const TermsPage = lazy(() =>
 const EventNewPage = lazy(() =>
   import('@/pages/events/new').then(({ EventNewPage }) => ({
     default: EventNewPage,
+  })),
+);
+const EventApplyPage = lazy(() =>
+  import('@/pages/events/[eventId]/apply').then(({ EventApplyPage }) => ({
+    default: EventApplyPage,
+  })),
+);
+const EventAttendancePage = lazy(() =>
+  import('@/pages/events/[eventId]/attendance').then(
+    ({ EventAttendancePage }) => ({
+      default: EventAttendancePage,
+    }),
+  ),
+);
+const EventEditPage = lazy(() =>
+  import('@/pages/events/[eventId]/edit').then(({ EventEditPage }) => ({
+    default: EventEditPage,
+  })),
+);
+const EventMatchPage = lazy(() =>
+  import('@/pages/events/[eventId]/match').then(({ EventMatchPage }) => ({
+    default: EventMatchPage,
   })),
 );
 const EventSupportPage = lazy(() =>
@@ -265,7 +283,7 @@ export const router = createBrowserRouter([
           },
           {
             path: 'apply',
-            element: createRouteElement(
+            element: createLazyRouteElement(
               EventApplyPage,
               'approved',
               createRouteFallback('bg.subtle'),
@@ -273,7 +291,7 @@ export const router = createBrowserRouter([
           },
           {
             path: 'edit',
-            element: createRouteElement(
+            element: createLazyRouteElement(
               EventEditPage,
               'approved',
               createRouteFallback('bg.subtle'),
@@ -281,7 +299,7 @@ export const router = createBrowserRouter([
           },
           {
             path: 'match',
-            element: createRouteElement(
+            element: createLazyRouteElement(
               EventMatchPage,
               'approved',
               createRouteFallback('bg.subtle'),
@@ -289,7 +307,7 @@ export const router = createBrowserRouter([
           },
           {
             path: 'attendance',
-            element: createRouteElement(
+            element: createLazyRouteElement(
               EventAttendancePage,
               'approved',
               createRouteFallback('bg.subtle'),
