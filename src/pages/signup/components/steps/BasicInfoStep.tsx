@@ -6,28 +6,37 @@ import { Input } from '@/components';
 import { RUNNER_TYPE } from '@/constants';
 import { BIRTH_DATE_MAX_LENGTH, formatBirthDateInput } from '@/utils';
 
+import { SIGNUP_FIELD } from '@/pages/signup/constants';
 import { SIGNUP_COPY } from '@/pages/signup/copy';
 import type { SignupFormValues } from '@/pages/signup/types';
 import { StepLayout } from '@/pages/signup/components/StepLayout';
 
 export const BasicInfoStep = (): ReactElement => {
   const { control, watch } = useFormContext<SignupFormValues>();
-  const isGuide = watch('disabilityType') === RUNNER_TYPE.GUIDE;
+  const isGuide = watch(SIGNUP_FIELD.DISABILITY_TYPE) === RUNNER_TYPE.GUIDE;
 
   return (
     <StepLayout title={SIGNUP_COPY.basicInfo.title}>
       <Controller
         control={control}
-        name="name"
-        render={({ field }) => (
-          <Input label="이름" value={field.value} onChange={field.onChange} />
+        name={SIGNUP_FIELD.NAME}
+        render={({ field, fieldState }) => (
+          <Input
+            error={Boolean(fieldState.error)}
+            errorText={fieldState.error?.message}
+            label="이름"
+            value={field.value}
+            onChange={field.onChange}
+          />
         )}
       />
       <Controller
         control={control}
-        name="birthDate"
-        render={({ field }) => (
+        name={SIGNUP_FIELD.BIRTH_DATE}
+        render={({ field, fieldState }) => (
           <Input
+            error={Boolean(fieldState.error)}
+            errorText={fieldState.error?.message}
             inputMode="numeric"
             label="생년월일"
             maxLength={BIRTH_DATE_MAX_LENGTH}
@@ -40,9 +49,11 @@ export const BasicInfoStep = (): ReactElement => {
       />
       <Controller
         control={control}
-        name="phoneNumber"
-        render={({ field }) => (
+        name={SIGNUP_FIELD.PHONE_NUMBER}
+        render={({ field, fieldState }) => (
           <Input
+            error={Boolean(fieldState.error)}
+            errorText={fieldState.error?.message}
             inputMode="numeric"
             label="전화번호"
             value={field.value}
@@ -52,7 +63,7 @@ export const BasicInfoStep = (): ReactElement => {
       />
       <Controller
         control={control}
-        name="snsId"
+        name={SIGNUP_FIELD.SNS_ID}
         render={({ field }) => (
           <Input
             label="인스타그램 아이디 (선택)"
@@ -64,7 +75,7 @@ export const BasicInfoStep = (): ReactElement => {
       {isGuide ? (
         <Controller
           control={control}
-          name="id1365"
+          name={SIGNUP_FIELD.ID_1365}
           render={({ field }) => (
             <Input
               label="1365 (선택)"

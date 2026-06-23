@@ -1,10 +1,13 @@
-import { useEffect, useRef, type ReactElement } from 'react';
+import { useEffect, useRef, useState, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
+import { api } from '@/api/services';
 import { FooterButton, PageLayout, TopNavigation } from '@/components';
+import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
 
 import { Stepper } from '@/pages/signup/components/Stepper';
@@ -18,10 +21,21 @@ import { TermsStep } from '@/pages/signup/components/steps/TermsStep';
 import {
   SIGNUP_FORM_DEFAULT_VALUES,
   SIGNUP_STEPPER_LABELS,
+  SIGNUP_STEP_FIELDS,
   SIGNUP_STEP_STAGE,
 } from '@/pages/signup/constants';
 import { useSignupFunnel } from '@/pages/signup/hooks/useSignupFunnel';
+import { signupSchema } from '@/pages/signup/schema';
 import type { SignupFormValues, SignupStepId } from '@/pages/signup/types';
+import { toSignupRequest } from '@/pages/signup/utils';
+
+// 카카오 OAuth SIGNUP_REQUIRED 응답에서 전달받는 router state
+type SignupLocationState = {
+  signupToken?: string;
+};
+
+// 개발 환경에서 OAuth 없이 /signup 진입 시 사용하는 mock 토큰 (mocks/handlers/authHandlers 와 일치)
+const DEV_FALLBACK_SIGNUP_TOKEN = 'mock-signup-token';
 
 const renderStep = (step: SignupStepId): ReactElement => {
   switch (step) {
@@ -44,10 +58,24 @@ const renderStep = (step: SignupStepId): ReactElement => {
 
 export const SignupPage = (): ReactElement => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { startSession } = useAuth();
   const funnel = useSignupFunnel();
   const methods = useForm<SignupFormValues>({
     defaultValues: SIGNUP_FORM_DEFAULT_VALUES,
+    resolver: zodResolver(signupSchema),
   });
+
+  const signupToken =
+    (location.state as SignupLocationState | null)?.signupToken ??
+    (import.meta.env.DEV ? DEV_FALLBACK_SIGNUP_TOKEN : '');
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  // 가입 성공 시 발급된 accessToken. /signup 은 guest-only 라 제출 직후 startSession 하면
+  // 완료 화면이 뜨기 전에 가드가 HOME 으로 보낸다. 토큰만 보관하고 세션 시작은 완료 화면에서 한다.
+  const [issuedAccessToken, setIssuedAccessToken] = useState<string | null>(
+    null,
+  );
 
   const { step, isFirst, goNext, goPrev } = funnel;
   const stepperStage = SIGNUP_STEP_STAGE[step];
@@ -76,13 +104,49 @@ export const SignupPage = (): ReactElement => {
     goPrev();
   };
 
-  // 약관 동의 후 가입 요청(API)은 추후 연결하고, 지금은 완료 화면으로 전환만 한다.
-  const handlePrimary = () => {
+  // 약관 동의까지 마치면 폼 값을 가입 요청 형태로 변환해 제출하고, 성공 시 세션을 시작한 뒤 완료 화면으로 전환한다.
+  const submitSignup = methods.handleSubmit(async (values) => {
+    if (!signupToken) {
+      window.alert('가입 정보가 만료되었어요. 처음부터 다시 시도해주세요.');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await api.auth.signupPost({
+        signupToken,
+        body: toSignupRequest(values),
+      });
+      setIssuedAccessToken(response.accessToken);
+      goNext();
+    } catch {
+      window.alert('회원가입에 실패했어요. 잠시 후 다시 시도해주세요.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  });
+
+  const handlePrimary = async () => {
     if (isComplete) {
+      // 완료 화면에서 비로소 세션을 시작하고 홈으로 이동한다.
+      if (issuedAccessToken) {
+        await startSession(issuedAccessToken);
+      }
       navigate(APP_PATH.HOME);
       return;
     }
-    goNext();
+
+    if (isTerms) {
+      await submitSignup();
+      return;
+    }
+
+    // 현재 단계의 필드만 검증하고, 통과해야 다음 단계로 이동한다.
+    const isStepValid = await methods.trigger(SIGNUP_STEP_FIELDS[step]);
+    if (isStepValid) {
+      goNext();
+    }
   };
 
   const primaryLabel = isComplete
@@ -122,6 +186,7 @@ export const SignupPage = (): ReactElement => {
 
         <FooterButton>
           <FooterButton.Button
+            disabled={isSubmitting}
             fullWidth
             size="l"
             type="button"

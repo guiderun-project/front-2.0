@@ -154,7 +154,7 @@ export const authHandlers: HttpHandler[] = [
     mockDb.users.push({
       userId: nextUserId,
       name: body.common.name,
-      gender: 'FEMALE',
+      gender: body.common.gender,
       phoneNumber: body.common.phoneNumber,
       birthDate: body.common.birthDate,
       recordDegree: runningInfo.runningGroup,
