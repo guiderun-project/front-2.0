@@ -417,7 +417,6 @@ export const eventHandlers: HttpHandler[] = [
       }
 
       updateEventFromRequest(event, body);
-      addAdditionalQuestions(event.eventId, body.additionalQuestions);
 
       return HttpResponse.json({
         eventId: event.eventId,
