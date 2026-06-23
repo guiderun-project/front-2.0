@@ -1,11 +1,13 @@
-import { useEffect, useRef, type ReactElement } from 'react';
+import { useEffect, useRef, useState, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-import { FooterButton, PageLayout, TopNavigation } from '@/components';
+import { api } from '@/api/services';
+import { FooterButton, PageLayout, Text, TopNavigation } from '@/components';
+import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
 
 import { Stepper } from '@/pages/signup/components/Stepper';
@@ -25,6 +27,15 @@ import {
 import { useSignupFunnel } from '@/pages/signup/hooks/useSignupFunnel';
 import { signupSchema } from '@/pages/signup/schema';
 import type { SignupFormValues, SignupStepId } from '@/pages/signup/types';
+import { toSignupRequest } from '@/pages/signup/utils';
+
+// 카카오 OAuth SIGNUP_REQUIRED 응답에서 전달받는 router state
+type SignupLocationState = {
+  signupToken?: string;
+};
+
+// 개발 환경에서 OAuth 없이 /signup 진입 시 사용하는 mock 토큰 (mocks/handlers/authHandlers 와 일치)
+const DEV_FALLBACK_SIGNUP_TOKEN = 'mock-signup-token';
 
 const renderStep = (step: SignupStepId): ReactElement => {
   switch (step) {
@@ -47,11 +58,20 @@ const renderStep = (step: SignupStepId): ReactElement => {
 
 export const SignupPage = (): ReactElement => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { startSession } = useAuth();
   const funnel = useSignupFunnel();
   const methods = useForm<SignupFormValues>({
     defaultValues: SIGNUP_FORM_DEFAULT_VALUES,
     resolver: zodResolver(signupSchema),
   });
+
+  const signupToken =
+    (location.state as SignupLocationState | null)?.signupToken ??
+    (import.meta.env.DEV ? DEV_FALLBACK_SIGNUP_TOKEN : '');
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const { step, isFirst, goNext, goPrev } = funnel;
   const stepperStage = SIGNUP_STEP_STAGE[step];
@@ -80,13 +100,42 @@ export const SignupPage = (): ReactElement => {
     goPrev();
   };
 
-  // 가입 요청(API)은 추후 연결하고, 지금은 현재 단계 필드를 검증한 뒤 통과하면 다음 단계로 전환한다.
+  // 약관 동의까지 마치면 폼 값을 가입 요청 형태로 변환해 제출하고, 성공 시 세션을 시작한 뒤 완료 화면으로 전환한다.
+  const submitSignup = methods.handleSubmit(async (values) => {
+    if (!signupToken) {
+      setSubmitError('가입 정보가 만료되었어요. 처음부터 다시 시도해주세요.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      const response = await api.auth.signupPost({
+        signupToken,
+        body: toSignupRequest(values),
+      });
+      await startSession(response.accessToken);
+      goNext();
+    } catch {
+      setSubmitError('회원가입에 실패했어요. 잠시 후 다시 시도해주세요.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  });
+
   const handlePrimary = async () => {
     if (isComplete) {
       navigate(APP_PATH.HOME);
       return;
     }
 
+    if (isTerms) {
+      await submitSignup();
+      return;
+    }
+
+    // 현재 단계의 필드만 검증하고, 통과해야 다음 단계로 이동한다.
     const isStepValid = await methods.trigger(SIGNUP_STEP_FIELDS[step]);
     if (isStepValid) {
       goNext();
@@ -128,8 +177,15 @@ export const SignupPage = (): ReactElement => {
 
         <StepArea ref={stepAreaRef}>{renderStep(step)}</StepArea>
 
+        {submitError ? (
+          <SubmitError color="text.danger" font="body-s-m" role="alert">
+            {submitError}
+          </SubmitError>
+        ) : null}
+
         <FooterButton>
           <FooterButton.Button
+            disabled={isSubmitting}
             fullWidth
             size="l"
             type="button"
@@ -147,3 +203,8 @@ export const SignupPage = (): ReactElement => {
 const StepArea = styled.div({
   display: 'contents',
 });
+
+// 제출 실패 안내. 고정 푸터 위 본문 흐름에 배치하고 가로 여백만 맞춘다.
+const SubmitError = styled(Text)(({ theme }) => ({
+  padding: `${theme.spacing.none} ${theme.spacing['2xl']}`,
+}));

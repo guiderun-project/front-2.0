@@ -9,12 +9,20 @@ import { SIGNUP_FIELD } from '@/pages/signup/constants';
 import { SIGNUP_COPY } from '@/pages/signup/copy';
 import type { SignupFormValues } from '@/pages/signup/types';
 import { StepLayout } from '@/pages/signup/components/StepLayout';
+import { deriveRunningGroup, hasRecordInput } from '@/pages/signup/utils';
 
 const HOPE_PREFS_MAX_LENGTH = 100;
 
 export const RecordStep = (): ReactElement => {
   const { control, watch } = useFormContext<SignupFormValues>();
-  const isGuide = watch(SIGNUP_FIELD.DISABILITY_TYPE) === RUNNER_TYPE.GUIDE;
+  const runnerType = watch(SIGNUP_FIELD.DISABILITY_TYPE) ?? RUNNER_TYPE.GUIDE;
+  const isGuide = runnerType === RUNNER_TYPE.GUIDE;
+  const record = watch(SIGNUP_FIELD.RECORD);
+
+  // 입력한 기록이 있을 때만 배정 예정 팀(A~E)을 안내한다.
+  const recordHelperText = hasRecordInput(record)
+    ? `${deriveRunningGroup(record, runnerType)}팀으로 배정될 예정이에요.`
+    : undefined;
 
   return (
     <StepLayout title={SIGNUP_COPY.record.title}>
@@ -22,8 +30,12 @@ export const RecordStep = (): ReactElement => {
         control={control}
         name={SIGNUP_FIELD.RECORD}
         render={({ field }) => (
-          // TODO: 입력한 기록에 따른 배정 팀(A~E) 안내는 유효성 검사 단계에서 helperText 로 연결한다.
-          <TimeInput label="10KM 러닝기록" value={field.value} onChange={field.onChange} />
+          <TimeInput
+            helperText={recordHelperText}
+            label="10KM 러닝기록"
+            value={field.value}
+            onChange={field.onChange}
+          />
         )}
       />
 
