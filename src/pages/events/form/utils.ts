@@ -279,15 +279,12 @@ export const createEventUpdateRequest = ({
   eventType,
   values,
 }: EventRequestParams): EventUpdateRequest => {
-  const additionalQuestions = createAdditionalQuestions(values);
-
   return {
-    ...createBaseEventRequest({ eventType, values, additionalQuestions }),
+    ...createBaseEventRequest({ eventType, values, additionalQuestions: [] }),
     isPrivate: values.isPrivate,
     expectedRunningDistanceKm: parseRunningDistanceValue(
       values.expectedRunningDistanceKm,
     ),
-    additionalQuestions,
   };
 };
 

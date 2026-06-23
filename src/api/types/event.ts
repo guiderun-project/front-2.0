@@ -154,7 +154,6 @@ export type EventUpdateRequest = Omit<
 > & {
   isPrivate: boolean;
   expectedRunningDistanceKm?: number | null;
-  additionalQuestions: AdditionalQuestion[];
 };
 
 export type EventUpdateResponse = EventCreateResponse;

@@ -32,8 +32,11 @@ export const AdditionalSelectOptionFields = ({
     return null;
   }
 
+  const isAddOptionDisabled =
+    options.length >= ADDITIONAL_SELECT_OPTION_MAX_COUNT;
+
   const handleAddOption = () => {
-    if (readOnly || options.length >= ADDITIONAL_SELECT_OPTION_MAX_COUNT) {
+    if (readOnly || isAddOptionDisabled) {
       return;
     }
 
@@ -60,13 +63,14 @@ export const AdditionalSelectOptionFields = ({
 
   return (
     <OptionGroup>
-      <OptionList>
+      <OptionList $readOnly={readOnly}>
         {options.map((_, optionIndex) => (
           <Controller
             key={optionIndex}
             control={form.control}
             name={`additionalQuestions.${questionIndex}.options.${optionIndex}`}
             render={({ field, fieldState }) => {
+              const hasVisibleError = !readOnly && fieldState.invalid;
               const canDeleteOption =
                 !readOnly &&
                 optionIndex >= ADDITIONAL_SELECT_OPTION_DELETABLE_START_INDEX;
@@ -81,17 +85,18 @@ export const AdditionalSelectOptionFields = ({
               };
 
               return (
-                <OptionField>
+                <OptionField $readOnly={readOnly}>
                   <OptionControlRow>
                     <OptionInput
                       ref={field.ref}
-                      $hasError={fieldState.invalid}
+                      $hasError={hasVisibleError}
+                      $readOnly={readOnly}
                       aria-describedby={
-                        fieldState.error
+                        !readOnly && fieldState.error
                           ? `select-option-${questionIndex}-${optionIndex}-error`
                           : undefined
                       }
-                      aria-invalid={fieldState.invalid}
+                      aria-invalid={hasVisibleError || undefined}
                       aria-label={`선택지 ${optionIndex + 1}`}
                       name={field.name}
                       placeholder="선택지를 입력하세요"
@@ -113,7 +118,7 @@ export const AdditionalSelectOptionFields = ({
                       />
                     ) : null}
                   </OptionControlRow>
-                  {fieldState.error ? (
+                  {!readOnly && fieldState.error ? (
                     <FieldError
                       id={`select-option-${questionIndex}-${optionIndex}-error`}
                     >
@@ -126,17 +131,19 @@ export const AdditionalSelectOptionFields = ({
           />
         ))}
       </OptionList>
-      <Button
-        disabled={readOnly || options.length >= ADDITIONAL_SELECT_OPTION_MAX_COUNT}
-        fullWidth
-        level="quaternary"
-        rightIcon={{ icon: 'plus-lined' }}
-        size="m"
-        type="button"
-        onClick={handleAddOption}
-      >
-        항목 추가하기
-      </Button>
+      {readOnly ? null : (
+        <Button
+          disabled={isAddOptionDisabled}
+          fullWidth
+          level="quaternary"
+          rightIcon={{ icon: 'plus-lined' }}
+          size="m"
+          type="button"
+          onClick={handleAddOption}
+        >
+          항목 추가하기
+        </Button>
+      )}
     </OptionGroup>
   );
 };
@@ -146,26 +153,34 @@ const OptionGroup = styled.div(({ theme }) => ({
   gap: theme.spacing.md,
 }));
 
-const OptionList = styled.div(({ theme }) => ({
-  overflow: 'hidden',
-  width: '100%',
-  border: `${theme.pxToRem(1)} solid ${theme.color.border.default}`,
-  borderRadius: theme.radius.md,
-  backgroundColor: theme.color.bg.default,
-}));
+const OptionList = styled.div<{ $readOnly: boolean }>(
+  ({ $readOnly, theme }) => ({
+    overflow: 'hidden',
+    width: '100%',
+    border: `${theme.pxToRem(1)} solid ${theme.color.border.default}`,
+    borderRadius: theme.radius.md,
+    backgroundColor: $readOnly
+      ? theme.color.bg.surface
+      : theme.color.bg.default,
+  }),
+);
 
-const OptionField = styled.div(({ theme }) => ({
-  display: 'grid',
-  gap: theme.spacing.s,
-  minHeight: theme.pxToRem(51),
-  padding: theme.spacing.xl,
-  boxSizing: 'border-box',
-  backgroundColor: theme.color.bg.default,
+const OptionField = styled.div<{ $readOnly: boolean }>(
+  ({ $readOnly, theme }) => ({
+    display: 'grid',
+    gap: theme.spacing.s,
+    minHeight: theme.pxToRem(51),
+    padding: theme.spacing.xl,
+    boxSizing: 'border-box',
+    backgroundColor: $readOnly
+      ? theme.color.bg.surface
+      : theme.color.bg.default,
 
-  '& + &': {
-    borderTop: `${theme.pxToRem(1)} solid ${theme.color.border.default}`,
-  },
-}));
+    '& + &': {
+      borderTop: `${theme.pxToRem(1)} solid ${theme.color.border.default}`,
+    },
+  }),
+);
 
 const OptionControlRow = styled.div(({ theme }) => ({
   display: 'flex',
@@ -173,26 +188,32 @@ const OptionControlRow = styled.div(({ theme }) => ({
   gap: theme.spacing.md,
 }));
 
-const OptionInput = styled.input<{ $hasError: boolean }>(
-  ({ $hasError, theme }) => ({
-    ...theme.typography['body-m-m'],
-    width: '100%',
-    minWidth: 0,
-    padding: 0,
-    border: 0,
-    backgroundColor: 'transparent',
-    color: $hasError ? theme.color.text.danger : theme.color.text.primary,
-    outline: 0,
+const OptionInput = styled.input<{
+  $hasError: boolean;
+  $readOnly: boolean;
+}>(({ $hasError, $readOnly, theme }) => ({
+  ...theme.typography['body-m-m'],
+  width: '100%',
+  minWidth: 0,
+  padding: 0,
+  border: 0,
+  backgroundColor: 'transparent',
+  color: $hasError
+    ? theme.color.text.danger
+    : $readOnly
+      ? theme.color.text.tertiary
+      : theme.color.text.primary,
+  outline: 0,
 
-    '&::placeholder': {
-      color: theme.color.text.tertiary,
-    },
+  '&::placeholder': {
+    color: theme.color.text.tertiary,
+  },
 
-    '&:read-only': {
-      cursor: 'default',
-    },
-  }),
-);
+  '&:read-only': {
+    color: theme.color.text.tertiary,
+    cursor: 'default',
+  },
+}));
 
 const FieldError = styled.p(({ theme }) => ({
   ...theme.typography['body-s-m'],

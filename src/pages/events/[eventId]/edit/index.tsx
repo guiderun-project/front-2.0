@@ -40,7 +40,10 @@ export const EventEditPage = (): ReactElement => {
     (event.viewer?.isOrganizer === true || user.role === USER_ROLES.ADMIN);
   const eventType = event.eventType;
   const formSchema = useMemo(
-    () => createEventFormSchema(eventType),
+    () =>
+      createEventFormSchema(eventType, {
+        validateAdditionalQuestions: false,
+      }),
     [eventType],
   );
   const form = useForm<EventFormValues>({
