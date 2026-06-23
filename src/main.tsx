@@ -12,6 +12,7 @@ import { PageLayout, type PageLayoutBackground } from '@/components/PageLayout';
 import { RunningRecordGate } from '@/components/RunningRecordGate';
 import { ToastProvider } from '@/components/Toast';
 import { AuthProvider } from '@/contexts';
+import { APP_PATH } from '@/router/path';
 import { router } from '@/router/router';
 import { ColorModeProvider } from '@/styles/colorMode';
 import { globalStyles } from '@/styles/globalStyles';
@@ -26,8 +27,12 @@ if (!rootElement) {
 void baseURL;
 
 const root = createRoot(rootElement);
-const EVENT_DETAIL_PATH_PATTERN =
-  /^\/events\/(?!new(?:\/|$)|search(?:\/|$)|supports(?:\/|$))[^/]+(?:\/|$)/;
+const EVENT_DETAIL_PATH_PREFIX = `${APP_PATH.EVENTS}/`;
+const EVENT_DETAIL_RESERVED_PATHS = [
+  APP_PATH.EVENT_NEW,
+  APP_PATH.EVENT_SEARCH,
+  APP_PATH.EVENT_SUPPORT,
+] as const;
 
 type BootstrapLoaderState = {
   background: PageLayoutBackground;
@@ -55,24 +60,34 @@ const enableMocking = async () => {
   });
 };
 
+const isEventDetailPath = (pathname: string) => {
+  if (!pathname.startsWith(EVENT_DETAIL_PATH_PREFIX)) {
+    return false;
+  }
+
+  return EVENT_DETAIL_RESERVED_PATHS.every(
+    (path) => pathname !== path && !pathname.startsWith(`${path}/`),
+  );
+};
+
 const getBootstrapLoaderState = (): BootstrapLoaderState => {
   const { pathname } = window.location;
 
-  if (pathname === '/') {
+  if (pathname === APP_PATH.HOME) {
     return {
       background: 'gradient.bg.brand-main',
       showLoader: true,
     };
   }
 
-  if (pathname === '/intro') {
+  if (pathname === APP_PATH.INTRO) {
     return {
       background: 'gradient.bg.brand-main',
       showLoader: false,
     };
   }
 
-  if (EVENT_DETAIL_PATH_PATTERN.test(pathname)) {
+  if (isEventDetailPath(pathname)) {
     return {
       background: 'gradient.bg.brand-event',
       showLoader: true,
