@@ -21,9 +21,10 @@ export const GenderStep = (): ReactElement => {
       <Controller
         control={control}
         name={SIGNUP_FIELD.GENDER}
-        render={({ field }) => (
+        render={({ field, fieldState }) => (
           <SelectCardGroup<Gender>
             ariaLabel="성별"
+            errorText={fieldState.error?.message}
             options={GENDER_OPTIONS}
             value={field.value}
             onChange={field.onChange}

@@ -1,6 +1,7 @@
 import { useEffect, useRef, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
@@ -18,9 +19,11 @@ import { TermsStep } from '@/pages/signup/components/steps/TermsStep';
 import {
   SIGNUP_FORM_DEFAULT_VALUES,
   SIGNUP_STEPPER_LABELS,
+  SIGNUP_STEP_FIELDS,
   SIGNUP_STEP_STAGE,
 } from '@/pages/signup/constants';
 import { useSignupFunnel } from '@/pages/signup/hooks/useSignupFunnel';
+import { signupSchema } from '@/pages/signup/schema';
 import type { SignupFormValues, SignupStepId } from '@/pages/signup/types';
 
 const renderStep = (step: SignupStepId): ReactElement => {
@@ -47,6 +50,7 @@ export const SignupPage = (): ReactElement => {
   const funnel = useSignupFunnel();
   const methods = useForm<SignupFormValues>({
     defaultValues: SIGNUP_FORM_DEFAULT_VALUES,
+    resolver: zodResolver(signupSchema),
   });
 
   const { step, isFirst, goNext, goPrev } = funnel;
@@ -76,13 +80,17 @@ export const SignupPage = (): ReactElement => {
     goPrev();
   };
 
-  // 약관 동의 후 가입 요청(API)은 추후 연결하고, 지금은 완료 화면으로 전환만 한다.
-  const handlePrimary = () => {
+  // 가입 요청(API)은 추후 연결하고, 지금은 현재 단계 필드를 검증한 뒤 통과하면 다음 단계로 전환한다.
+  const handlePrimary = async () => {
     if (isComplete) {
       navigate(APP_PATH.HOME);
       return;
     }
-    goNext();
+
+    const isStepValid = await methods.trigger(SIGNUP_STEP_FIELDS[step]);
+    if (isStepValid) {
+      goNext();
+    }
   };
 
   const primaryLabel = isComplete

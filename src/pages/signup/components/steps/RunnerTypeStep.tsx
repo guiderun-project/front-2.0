@@ -26,9 +26,10 @@ export const RunnerTypeStep = (): ReactElement => {
       <Controller
         control={control}
         name={SIGNUP_FIELD.DISABILITY_TYPE}
-        render={({ field }) => (
+        render={({ field, fieldState }) => (
           <SelectCardGroup<RunnerType>
             ariaLabel="참여 유형"
+            errorText={fieldState.error?.message}
             options={RUNNER_TYPE_OPTIONS}
             value={field.value}
             onChange={field.onChange}

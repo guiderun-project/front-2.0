@@ -45,6 +45,24 @@ export const SIGNUP_FIELD = {
   AGREEMENTS_PORTRAIT_RIGHTS: 'agreements.portraitRights',
 } as const satisfies Record<string, FieldPath<SignupFormValues>>;
 
+// 각 화면에서 "다음"으로 넘어가기 전에 검증할 필드. 선택 입력(snsId/id1365/partneredViName/record)은 제외한다.
+export const SIGNUP_STEP_FIELDS: Record<
+  SignupStepId,
+  FieldPath<SignupFormValues>[]
+> = {
+  runnerType: [SIGNUP_FIELD.DISABILITY_TYPE],
+  gender: [SIGNUP_FIELD.GENDER],
+  basicInfo: [
+    SIGNUP_FIELD.NAME,
+    SIGNUP_FIELD.BIRTH_DATE,
+    SIGNUP_FIELD.PHONE_NUMBER,
+  ],
+  experience: [SIGNUP_FIELD.HAS_EXPERIENCE],
+  record: [],
+  terms: [SIGNUP_FIELD.AGREEMENTS_PRIVACY, SIGNUP_FIELD.AGREEMENTS_PORTRAIT_RIGHTS],
+  complete: [],
+};
+
 export const SIGNUP_FORM_DEFAULT_VALUES: SignupFormValues = {
   disabilityType: null,
   gender: null,

@@ -24,9 +24,10 @@ export const ExperienceStep = (): ReactElement => {
       <Controller
         control={control}
         name={SIGNUP_FIELD.HAS_EXPERIENCE}
-        render={({ field }) => (
+        render={({ field, fieldState }) => (
           <SelectCardGroup<boolean>
             ariaLabel="러닝 경험 유무"
+            errorText={fieldState.error?.message}
             options={EXPERIENCE_OPTIONS}
             value={field.value}
             onChange={field.onChange}

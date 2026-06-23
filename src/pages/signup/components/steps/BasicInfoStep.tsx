@@ -20,15 +20,23 @@ export const BasicInfoStep = (): ReactElement => {
       <Controller
         control={control}
         name={SIGNUP_FIELD.NAME}
-        render={({ field }) => (
-          <Input label="이름" value={field.value} onChange={field.onChange} />
+        render={({ field, fieldState }) => (
+          <Input
+            error={Boolean(fieldState.error)}
+            errorText={fieldState.error?.message}
+            label="이름"
+            value={field.value}
+            onChange={field.onChange}
+          />
         )}
       />
       <Controller
         control={control}
         name={SIGNUP_FIELD.BIRTH_DATE}
-        render={({ field }) => (
+        render={({ field, fieldState }) => (
           <Input
+            error={Boolean(fieldState.error)}
+            errorText={fieldState.error?.message}
             inputMode="numeric"
             label="생년월일"
             maxLength={BIRTH_DATE_MAX_LENGTH}
@@ -42,8 +50,10 @@ export const BasicInfoStep = (): ReactElement => {
       <Controller
         control={control}
         name={SIGNUP_FIELD.PHONE_NUMBER}
-        render={({ field }) => (
+        render={({ field, fieldState }) => (
           <Input
+            error={Boolean(fieldState.error)}
+            errorText={fieldState.error?.message}
             inputMode="numeric"
             label="전화번호"
             value={field.value}
