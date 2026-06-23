@@ -7,7 +7,7 @@ import { Badge, Icon, RunnerTypeAvatar, Text } from '@/components';
 import { RUNNER_TYPE_LABELS } from '@/constants';
 import { APP_PATH } from '@/router/path';
 
-import { formatDday, formatDdayLabel, type UpcomingMemberEvent } from '../utils';
+import { formatDday, formatDdayLabel, type UpcomingMemberEvent } from '@/pages/home/utils';
 
 type MemberUpcomingEventCardProps = {
   event: UpcomingMemberEvent;
