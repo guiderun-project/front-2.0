@@ -7,13 +7,13 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { APP_PATH } from "@/router/path";
 import { useAuth } from "@/contexts";
 
-import { Icon } from "../Icon";
+import { Icon } from "@/components/Icon";
 import {
   BOTTOM_NAVIGATION_ARIA_LABEL,
   BOTTOM_NAVIGATION_ITEMS,
   BOTTOM_NAVIGATION_OFFSET_PX,
-} from "./BottomNavigation.constants";
-import { LoginRequiredSheet } from "./LoginRequiredSheet";
+} from "@/components/BottomNavigation/BottomNavigation.constants";
+import { LoginRequiredSheet } from "@/components/BottomNavigation/LoginRequiredSheet";
 
 type BottomNavigationItem = (typeof BOTTOM_NAVIGATION_ITEMS)[number];
 
@@ -39,7 +39,7 @@ export const BottomNavigation = ({
 
   const handleLogin = () => {
     setIsLoginSheetOpen(false);
-    navigate(APP_PATH.LOGIN, { state: { from: location } });
+    navigate(APP_PATH.INTRO, { state: { from: location } });
   };
 
   return (
