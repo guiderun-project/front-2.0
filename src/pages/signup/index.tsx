@@ -6,7 +6,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { api } from '@/api/services';
-import { FooterButton, PageLayout, Text, TopNavigation } from '@/components';
+import { FooterButton, PageLayout, TopNavigation } from '@/components';
 import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
 
@@ -71,7 +71,6 @@ export const SignupPage = (): ReactElement => {
     (import.meta.env.DEV ? DEV_FALLBACK_SIGNUP_TOKEN : '');
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
   // 가입 성공 시 발급된 accessToken. /signup 은 guest-only 라 제출 직후 startSession 하면
   // 완료 화면이 뜨기 전에 가드가 HOME 으로 보낸다. 토큰만 보관하고 세션 시작은 완료 화면에서 한다.
   const [issuedAccessToken, setIssuedAccessToken] = useState<string | null>(
@@ -108,12 +107,11 @@ export const SignupPage = (): ReactElement => {
   // 약관 동의까지 마치면 폼 값을 가입 요청 형태로 변환해 제출하고, 성공 시 세션을 시작한 뒤 완료 화면으로 전환한다.
   const submitSignup = methods.handleSubmit(async (values) => {
     if (!signupToken) {
-      setSubmitError('가입 정보가 만료되었어요. 처음부터 다시 시도해주세요.');
+      window.alert('가입 정보가 만료되었어요. 처음부터 다시 시도해주세요.');
       return;
     }
 
     setIsSubmitting(true);
-    setSubmitError(null);
 
     try {
       const response = await api.auth.signupPost({
@@ -123,7 +121,7 @@ export const SignupPage = (): ReactElement => {
       setIssuedAccessToken(response.accessToken);
       goNext();
     } catch {
-      setSubmitError('회원가입에 실패했어요. 잠시 후 다시 시도해주세요.');
+      window.alert('회원가입에 실패했어요. 잠시 후 다시 시도해주세요.');
     } finally {
       setIsSubmitting(false);
     }
@@ -186,12 +184,6 @@ export const SignupPage = (): ReactElement => {
 
         <StepArea ref={stepAreaRef}>{renderStep(step)}</StepArea>
 
-        {submitError ? (
-          <SubmitError color="text.danger" font="body-s-m" role="alert">
-            {submitError}
-          </SubmitError>
-        ) : null}
-
         <FooterButton>
           <FooterButton.Button
             disabled={isSubmitting}
@@ -212,8 +204,3 @@ export const SignupPage = (): ReactElement => {
 const StepArea = styled.div({
   display: 'contents',
 });
-
-// 제출 실패 안내. 고정 푸터 위 본문 흐름에 배치하고 가로 여백만 맞춘다.
-const SubmitError = styled(Text)(({ theme }) => ({
-  padding: `${theme.spacing.none} ${theme.spacing['2xl']}`,
-}));
