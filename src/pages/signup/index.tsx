@@ -1,5 +1,6 @@
-import type { ReactElement } from 'react';
+import { useEffect, useRef, type ReactElement } from 'react';
 
+import styled from '@emotion/styled';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
@@ -52,6 +53,17 @@ export const SignupPage = (): ReactElement => {
   const stepperStage = SIGNUP_STEP_STAGE[step];
   const isComplete = step === 'complete';
   const isTerms = step === 'terms';
+
+  const stepAreaRef = useRef<HTMLDivElement>(null);
+
+  // 단계 전환 시 새 화면의 제목(h1)으로 포커스를 옮겨, 직전 버튼에 남은 포커스를 이동시키고
+  // 키보드·스크린리더 사용자에게 단계 변경을 알린다.
+  useEffect(() => {
+    const heading = stepAreaRef.current?.querySelector<HTMLElement>('h1');
+    if (!heading) return;
+    heading.setAttribute('tabindex', '-1');
+    heading.focus();
+  }, [step]);
 
   const handleClose = () =>
     navigate(isComplete ? APP_PATH.HOME : APP_PATH.INTRO);
@@ -106,7 +118,7 @@ export const SignupPage = (): ReactElement => {
           <Stepper current={stepperStage} steps={SIGNUP_STEPPER_LABELS} />
         ) : null}
 
-        {renderStep(step)}
+        <StepArea ref={stepAreaRef}>{renderStep(step)}</StepArea>
 
         <FooterButton>
           <FooterButton.Button
@@ -122,3 +134,8 @@ export const SignupPage = (): ReactElement => {
     </PageLayout>
   );
 };
+
+// 포커스 대상 h1을 감싸기 위한 래퍼. 레이아웃에는 영향을 주지 않도록 박스를 만들지 않는다.
+const StepArea = styled.div({
+  display: 'contents',
+});
