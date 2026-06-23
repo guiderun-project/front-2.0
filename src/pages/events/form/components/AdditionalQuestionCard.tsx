@@ -52,41 +52,50 @@ export const AdditionalQuestionCard = ({
       <Controller
         control={form.control}
         name={`additionalQuestions.${questionIndex}.title`}
-        render={({ field: titleField, fieldState }) => (
-          <QuestionTitleField>
-            <QuestionTitleInput
-              ref={titleField.ref}
-              $hasError={fieldState.invalid}
-              aria-describedby={fieldState.error ? titleErrorId : undefined}
-              aria-invalid={fieldState.invalid}
-              aria-label={`${title} 내용`}
-              maxLength={ADDITIONAL_QUESTION_TITLE_MAX_LENGTH}
-              name={titleField.name}
-              placeholder="질문을 입력하세요"
-              readOnly={readOnly}
-              value={titleField.value}
-              onBlur={titleField.onBlur}
-              onChange={titleField.onChange}
-            />
-            <InformRow>
-              {fieldState.error ? (
-                <FieldError id={titleErrorId}>
-                  {fieldState.error.message}
-                </FieldError>
-              ) : (
-                <span />
+        render={({ field: titleField, fieldState }) => {
+          const hasVisibleError = !readOnly && fieldState.invalid;
+
+          return (
+            <QuestionTitleField>
+              <QuestionTitleInput
+                ref={titleField.ref}
+                $hasError={hasVisibleError}
+                $readOnly={readOnly}
+                aria-describedby={
+                  !readOnly && fieldState.error ? titleErrorId : undefined
+                }
+                aria-invalid={hasVisibleError || undefined}
+                aria-label={`${title} 내용`}
+                maxLength={ADDITIONAL_QUESTION_TITLE_MAX_LENGTH}
+                name={titleField.name}
+                placeholder="질문을 입력하세요"
+                readOnly={readOnly}
+                value={titleField.value}
+                onBlur={titleField.onBlur}
+                onChange={titleField.onChange}
+              />
+              {readOnly ? null : (
+                <InformRow>
+                  {fieldState.error ? (
+                    <FieldError id={titleErrorId}>
+                      {fieldState.error.message}
+                    </FieldError>
+                  ) : (
+                    <span />
+                  )}
+                  <Counter aria-live="polite">
+                    <Text as="span" color="text.brand" font="body-s-m">
+                      {titleField.value.length}
+                    </Text>
+                    <Text as="span" color="text.tertiary" font="body-s-m">
+                      /{ADDITIONAL_QUESTION_TITLE_MAX_LENGTH}자
+                    </Text>
+                  </Counter>
+                </InformRow>
               )}
-              <Counter aria-live="polite">
-                <Text as="span" color="text.brand" font="body-s-m">
-                  {titleField.value.length}
-                </Text>
-                <Text as="span" color="text.tertiary" font="body-s-m">
-                  /{ADDITIONAL_QUESTION_TITLE_MAX_LENGTH}자
-                </Text>
-              </Counter>
-            </InformRow>
-          </QuestionTitleField>
-        )}
+            </QuestionTitleField>
+          );
+        }}
       />
 
       {questionType === 'SELECT' ? (
@@ -120,37 +129,42 @@ const QuestionTitleField = styled.div(({ theme }) => ({
   gap: theme.spacing.md,
 }));
 
-const QuestionTitleInput = styled.input<{ $hasError: boolean }>(
-  ({ $hasError, theme }) => ({
-    ...theme.typography['body-m-m'],
-    width: '100%',
-    minWidth: 0,
-    minHeight: theme.pxToRem(51),
-    padding: theme.spacing.xl,
-    border: `${theme.pxToRem(1)} solid ${
-      $hasError ? theme.color.border.danger : theme.color.border.default
-    }`,
-    borderRadius: theme.radius.md,
-    boxSizing: 'border-box',
-    backgroundColor: theme.color.bg.default,
-    color: theme.color.text.primary,
-    outline: 0,
+const QuestionTitleInput = styled.input<{
+  $hasError: boolean;
+  $readOnly: boolean;
+}>(({ $hasError, $readOnly, theme }) => ({
+  ...theme.typography['body-m-m'],
+  width: '100%',
+  minWidth: 0,
+  minHeight: theme.pxToRem(51),
+  padding: theme.spacing.xl,
+  border: `${theme.pxToRem(1)} solid ${
+    $hasError ? theme.color.border.danger : theme.color.border.default
+  }`,
+  borderRadius: theme.radius.md,
+  boxSizing: 'border-box',
+  backgroundColor: $readOnly ? theme.color.bg.surface : theme.color.bg.default,
+  color: $readOnly ? theme.color.text.tertiary : theme.color.text.primary,
+  outline: 0,
 
-    '&::placeholder': {
-      color: theme.color.text.tertiary,
-    },
+  '&::placeholder': {
+    color: theme.color.text.tertiary,
+  },
 
-    '&:focus': {
-      borderColor: $hasError
+  '&:focus': {
+    borderColor: $readOnly
+      ? theme.color.border.default
+      : $hasError
         ? theme.color.border.danger
         : theme.color.border.brand,
-    },
+  },
 
-    '&:read-only': {
-      cursor: 'default',
-    },
-  }),
-);
+  '&:read-only': {
+    backgroundColor: theme.color.bg.surface,
+    color: theme.color.text.tertiary,
+    cursor: 'default',
+  },
+}));
 
 const InformRow = styled.div(({ theme }) => ({
   display: 'flex',

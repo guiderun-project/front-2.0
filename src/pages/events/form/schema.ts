@@ -19,6 +19,7 @@ type EventFormSchemaOptions = {
     date: string;
     time: string;
   };
+  validateAdditionalQuestions?: boolean;
 };
 
 const isValidDateValue = (value: string): boolean => {
@@ -90,6 +91,20 @@ const additionalQuestionSchema = z.discriminatedUnion('type', [
   }),
 ]);
 
+const readOnlyAdditionalQuestionSchema = z.discriminatedUnion('type', [
+  z.object({
+    formId: z.string().min(1),
+    type: z.literal('TEXT'),
+    title: z.string(),
+  }),
+  z.object({
+    formId: z.string().min(1),
+    type: z.literal('SELECT'),
+    title: z.string(),
+    options: z.array(z.string()),
+  }),
+]);
+
 const trainingOperationValues = TRAINING_OPERATION_OPTIONS.map(
   (option) => option.value,
 );
@@ -106,6 +121,9 @@ export const createEventFormSchema = (
   eventType: EventType,
   options: EventFormSchemaOptions = {},
 ) => {
+  const shouldValidateAdditionalQuestions =
+    options.validateAdditionalQuestions ?? true;
+
   return z
     .object({
       recruitStartDate: dateValueSchema,
@@ -125,7 +143,11 @@ export const createEventFormSchema = (
         ),
       expectedRunningDistanceKm: runningDistanceSchema,
       isPrivate: z.boolean(),
-      additionalQuestions: z.array(additionalQuestionSchema),
+      additionalQuestions: z.array(
+        shouldValidateAdditionalQuestions
+          ? additionalQuestionSchema
+          : readOnlyAdditionalQuestionSchema,
+      ),
     })
     .superRefine((value, context) => {
       const minimumEventDateTime = options.minimumEventDateTime;
