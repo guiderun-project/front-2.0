@@ -4,9 +4,8 @@ import styled from "@emotion/styled";
 
 import { Graphic, HiddenText, Text } from "@/components";
 import { useAuth } from "@/contexts";
-
-import { useHomeSummary } from "../hooks/useHomeSummary";
-import { getRunnerStageHeadline } from "../utils";
+import { useHomeSummary } from "@/pages/home/hooks/useHomeSummary";
+import { getRunnerStageHeadline } from "@/pages/home/utils";
 
 const formatNumber = (value: number) => value.toLocaleString("ko-KR");
 
