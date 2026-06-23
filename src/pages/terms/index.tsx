@@ -85,7 +85,6 @@ const TermsAccordionItem = ({
         </ChevronIcon>
       </HeaderButton>
       <Panel
-        aria-hidden={!isOpen}
         data-state={isOpen ? "open" : "closed"}
         id={panelId}
         inert={!isOpen ? true : undefined}

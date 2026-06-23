@@ -60,7 +60,7 @@ export const AccountDeletePage = (): ReactElement => {
         }}
       >
         <Content>
-          <ReasonList aria-label="탈퇴 사유" role="radiogroup">
+          <ReasonList aria-label="탈퇴 사유" role="group">
             {WITHDRAWAL_REASON_OPTIONS.map((reason) => {
               const isSelected = selectedReason === reason;
 
@@ -68,8 +68,7 @@ export const AccountDeletePage = (): ReactElement => {
                 <ReasonOption
                   key={reason}
                   $selected={isSelected}
-                  aria-checked={isSelected}
-                  role="radio"
+                  aria-pressed={isSelected}
                   type="button"
                   onClick={() => selectReason(reason)}
                 >

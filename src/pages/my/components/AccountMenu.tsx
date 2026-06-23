@@ -7,6 +7,7 @@ import { Icon, Text } from '@/components';
 type AccountMenuItem = {
   key: string;
   label: string;
+  ariaLabel?: string; // 시각 라벨과 다른 접근성 이름이 필요할 때 사용
   onClick?: () => void;
 };
 
@@ -24,7 +25,12 @@ export const AccountMenu = ({
   onLogout,
 }: AccountMenuProps): ReactElement => {
   const items: AccountMenuItem[] = [
-    { key: 'inquiry', label: '문의하러 가기', onClick: onInquiry },
+    {
+      key: 'inquiry',
+      label: '문의하러 가기',
+      ariaLabel: '문의하러 가기 (새 탭에서 열림)',
+      onClick: onInquiry,
+    },
     { key: 'terms', label: '약관보기', onClick: onViewTerms },
     { key: 'withdraw', label: '탈퇴하기', onClick: onWithdraw },
     { key: 'logout', label: '로그아웃하기', onClick: onLogout },
@@ -35,7 +41,11 @@ export const AccountMenu = ({
       {items.map((item, index) => (
         <Fragment key={item.key}>
           {index > 0 ? <Divider aria-hidden={true} /> : null}
-          <MenuItem type="button" onClick={item.onClick}>
+          <MenuItem
+            aria-label={item.ariaLabel}
+            type="button"
+            onClick={item.onClick}
+          >
             <MenuLabel color="text.primary" font="body-m-sb">
               {item.label}
             </MenuLabel>
