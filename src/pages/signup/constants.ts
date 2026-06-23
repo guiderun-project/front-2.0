@@ -58,7 +58,7 @@ export const SIGNUP_STEP_FIELDS: Record<
     SIGNUP_FIELD.PHONE_NUMBER,
   ],
   experience: [SIGNUP_FIELD.HAS_EXPERIENCE],
-  record: [],
+  record: [SIGNUP_FIELD.RECORD],
   terms: [SIGNUP_FIELD.AGREEMENTS_PRIVACY, SIGNUP_FIELD.AGREEMENTS_PORTRAIT_RIGHTS],
   complete: [],
 };

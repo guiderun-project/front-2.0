@@ -72,6 +72,11 @@ export const SignupPage = (): ReactElement => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  // 가입 성공 시 발급된 accessToken. /signup 은 guest-only 라 제출 직후 startSession 하면
+  // 완료 화면이 뜨기 전에 가드가 HOME 으로 보낸다. 토큰만 보관하고 세션 시작은 완료 화면에서 한다.
+  const [issuedAccessToken, setIssuedAccessToken] = useState<string | null>(
+    null,
+  );
 
   const { step, isFirst, goNext, goPrev } = funnel;
   const stepperStage = SIGNUP_STEP_STAGE[step];
@@ -115,7 +120,7 @@ export const SignupPage = (): ReactElement => {
         signupToken,
         body: toSignupRequest(values),
       });
-      await startSession(response.accessToken);
+      setIssuedAccessToken(response.accessToken);
       goNext();
     } catch {
       setSubmitError('회원가입에 실패했어요. 잠시 후 다시 시도해주세요.');
@@ -126,6 +131,10 @@ export const SignupPage = (): ReactElement => {
 
   const handlePrimary = async () => {
     if (isComplete) {
+      // 완료 화면에서 비로소 세션을 시작하고 홈으로 이동한다.
+      if (issuedAccessToken) {
+        await startSession(issuedAccessToken);
+      }
       navigate(APP_PATH.HOME);
       return;
     }

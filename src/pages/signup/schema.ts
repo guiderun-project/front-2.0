@@ -97,6 +97,21 @@ export const signupSchema = z
       });
     }
 
+    // 러닝 경험이 있으면 10KM 기록은 필수. 경험이 없으면 기록 없이 E팀으로 배정한다.
+    if (values.hasExperience === true) {
+      const totalMinutes =
+        (Number(values.record.hours) || 0) * 60 +
+        (Number(values.record.minutes) || 0);
+
+      if (totalMinutes <= 0) {
+        ctx.addIssue({
+          code: 'custom',
+          message: '10KM 러닝기록을 입력해주세요.',
+          path: ['record'],
+        });
+      }
+    }
+
     if (!values.agreements.privacy) {
       ctx.addIssue({
         code: 'custom',

@@ -77,13 +77,14 @@ export const toSignupRequest = (
     portraitRights: true,
   };
 
-  const runningGroup = deriveRunningGroup(
-    values.record,
-    values.disabilityType ?? RUNNER_TYPE.GUIDE,
-  );
-  const detailRecord = formatDetailRecord(values.record);
   const hopePrefs = emptyToNull(values.hopePrefs);
   const hasExperience = values.hasExperience ?? false;
+
+  // 러닝 경험이 없으면 기록 없이 E팀으로 배정한다. (경험 변경 후 잔여 기록이 새지 않도록 명시적으로 분기)
+  const runningGroup = hasExperience
+    ? deriveRunningGroup(values.record, values.disabilityType ?? RUNNER_TYPE.GUIDE)
+    : 'E';
+  const detailRecord = hasExperience ? formatDetailRecord(values.record) : null;
 
   if (values.disabilityType === RUNNER_TYPE.VI) {
     return {
