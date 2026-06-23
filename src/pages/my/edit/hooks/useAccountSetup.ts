@@ -19,11 +19,13 @@ const isValidPassword = (password: string): boolean =>
 
 type AccountIdStatus = 'unchecked' | 'available' | 'taken';
 
-export const useAccountSetup = () => {
+export const useAccountSetup = (existingAccountId?: string | null) => {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
-  const [accountId, setAccountIdValue] = useState('');
+  const isAccountIdLocked = Boolean(existingAccountId); // 아이디는 변경할 수 없다.
+
+  const [accountId, setAccountIdValue] = useState(existingAccountId ?? '');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [checkedAccountId, setCheckedAccountId] = useState<string | null>(null);
@@ -56,7 +58,7 @@ export const useAccountSetup = () => {
   };
 
   const reset = () => {
-    setAccountIdValue('');
+    setAccountIdValue(existingAccountId ?? '');
     setPassword('');
     setPasswordConfirm('');
     setCheckedAccountId(null);
@@ -113,6 +115,7 @@ export const useAccountSetup = () => {
     passwordConfirm,
     setPasswordConfirm,
     accountIdStatus,
+    isAccountIdLocked,
     isCheckingAccountId: duplicateCheckMutation.isPending,
     checkAccountIdDuplicate,
     hasPasswordError,

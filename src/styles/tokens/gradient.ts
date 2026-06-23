@@ -13,7 +13,7 @@ const gradientModes = {
     bg: {
       subtle: 'linear-gradient(180deg, #F0F3F9 0%, #F6F7F9 100%)',
       'brand-main':
-        'linear-gradient(180deg, var(--primitive-brand-cyan-300, #5ECCF0) -5.6%, var(--primitive-neutral-100, #EEF2F6) 34.51%)',
+        'linear-gradient(180deg, var(--primitive-brand-cyan-300, #5ECCF0) -45px, var(--primitive-neutral-100, #EEF2F6) 280px)',
       'brand-event':
         'linear-gradient(180.00000000000182deg, #B2DCFF 1%, #C7F1FC 15%, #D8EDED 45%, #EEF2F6 100%)',
       'brand-event-overlay':
@@ -34,7 +34,7 @@ const gradientModes = {
     bg: {
       subtle: 'linear-gradient(180deg, #F0F3F9 0%, #F6F7F9 100%)',
       'brand-main':
-        'linear-gradient(180deg, var(--primitive-brand-cyan-800, #0C5B7D) 1.05%, var(--primitive-brand-cyan-950, #06314F) 18.35%, var(--primitive-neutral-900, #151B23) 39.04%)',
+        'linear-gradient(180deg, var(--primitive-brand-cyan-800, #0C5B7D) 9px, var(--primitive-brand-cyan-950, #06314F) 149px, var(--primitive-neutral-900, #151B23) 317px)',
       'brand-event': `linear-gradient(180deg, #0F2342 -1.42%, rgba(15, 35, 66, 0) 22.74%), ${gradientBaseColor.bg['brand-event-overlay']}`,
       'brand-event-overlay':
         'linear-gradient(180.00000000000182deg, #0F2342 1%, rgba(15, 35, 66, 0) 28%)',

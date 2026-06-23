@@ -4,10 +4,10 @@ import styled from "@emotion/styled";
 
 import { Text } from "@/components";
 
-import { useUpcomingEvents } from "../hooks/useUpcomingEvents";
-import { HomeSectionMessage } from "./HomeSectionMessage";
-import { MemberUpcomingEventCard } from "./MemberUpcomingEventCard";
-import { UpcomingEventCard } from "./UpcomingEventCard";
+import { useUpcomingEvents } from "@/pages/home/hooks/useUpcomingEvents";
+import { HomeSectionMessage } from "@/pages/home/components/HomeSectionMessage";
+import { MemberUpcomingEventCard } from "@/pages/home/components/MemberUpcomingEventCard";
+import { UpcomingEventCard } from "@/pages/home/components/UpcomingEventCard";
 
 export const UpcomingEventList = (): ReactElement => {
   const headingId = useId();
