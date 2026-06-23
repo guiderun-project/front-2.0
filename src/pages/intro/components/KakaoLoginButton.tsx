@@ -28,7 +28,7 @@ export const KakaoLoginButton = ({
 
 /* 카카오 브랜드 고정 색상 — 디자인 시스템 토큰 대상이 아니므로 raw 값 사용 */
 const KAKAO_YELLOW = '#fee500';
-const KAKAO_DARK_TEXT = '#000000';
+const KAKAO_DARK_CONTENT_COLOR = '#000000';
 
 const StyledButton = styled.button`
   display: flex;
@@ -39,6 +39,7 @@ const StyledButton = styled.button`
   border: 0;
   border-radius: ${({ theme }) => theme.radius.md};
   background: ${KAKAO_YELLOW};
+  color: ${({ theme }) => theme.color.text.primary};
   overflow: hidden;
   cursor: pointer;
   appearance: none;
@@ -46,6 +47,16 @@ const StyledButton = styled.button`
   &:focus-visible {
     outline: 2px solid ${({ theme }) => theme.color.border.focused};
     outline-offset: ${({ theme }) => theme.spacing.xs};
+  }
+
+  html[data-color-mode='dark'] & {
+    color: ${KAKAO_DARK_CONTENT_COLOR};
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not([data-color-mode='light']) & {
+      color: ${KAKAO_DARK_CONTENT_COLOR};
+    }
   }
 `;
 
@@ -57,7 +68,6 @@ const LogoArea = styled.span`
   gap: 0.73531rem;
   width: 3.75rem;
   padding: 1.02944rem;
-  color: ${({ theme }) => theme.color.text.primary};
 
   svg {
     width: ${({ theme }) => theme.pxToRem(18)};
@@ -72,15 +82,4 @@ const LabelArea = styled.span`
   align-items: center;
   gap: 0.625rem;
   padding: ${({ theme }) => `${theme.spacing.xl} 0.875rem ${theme.spacing.xl} ${theme.spacing.none}`};
-  color: ${({ theme }) => theme.color.text.primary};
-
-  html[data-color-mode='dark'] & {
-    color: ${KAKAO_DARK_TEXT};
-  }
-
-  @media (prefers-color-scheme: dark) {
-    html:not([data-color-mode='light']) & {
-      color: ${KAKAO_DARK_TEXT};
-    }
-  }
 `;
