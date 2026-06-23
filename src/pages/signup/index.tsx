@@ -1,20 +1,46 @@
-import type { ReactElement } from 'react';
+import { useEffect, useRef, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
-import { FooterButton, PageLayout, Text, TopNavigation } from '@/components';
+import { FooterButton, PageLayout, TopNavigation } from '@/components';
 import { APP_PATH } from '@/router/path';
 
 import { Stepper } from '@/pages/signup/components/Stepper';
+import { BasicInfoStep } from '@/pages/signup/components/steps/BasicInfoStep';
+import { CompleteStep } from '@/pages/signup/components/steps/CompleteStep';
+import { ExperienceStep } from '@/pages/signup/components/steps/ExperienceStep';
+import { GenderStep } from '@/pages/signup/components/steps/GenderStep';
+import { RecordStep } from '@/pages/signup/components/steps/RecordStep';
+import { RunnerTypeStep } from '@/pages/signup/components/steps/RunnerTypeStep';
+import { TermsStep } from '@/pages/signup/components/steps/TermsStep';
 import {
   SIGNUP_FORM_DEFAULT_VALUES,
   SIGNUP_STEPPER_LABELS,
   SIGNUP_STEP_STAGE,
 } from '@/pages/signup/constants';
 import { useSignupFunnel } from '@/pages/signup/hooks/useSignupFunnel';
-import type { SignupFormValues } from '@/pages/signup/types';
+import type { SignupFormValues, SignupStepId } from '@/pages/signup/types';
+
+const renderStep = (step: SignupStepId): ReactElement => {
+  switch (step) {
+    case 'runnerType':
+      return <RunnerTypeStep />;
+    case 'gender':
+      return <GenderStep />;
+    case 'basicInfo':
+      return <BasicInfoStep />;
+    case 'experience':
+      return <ExperienceStep />;
+    case 'record':
+      return <RecordStep />;
+    case 'terms':
+      return <TermsStep />;
+    case 'complete':
+      return <CompleteStep />;
+  }
+};
 
 export const SignupPage = (): ReactElement => {
   const navigate = useNavigate();
@@ -27,6 +53,17 @@ export const SignupPage = (): ReactElement => {
   const stepperStage = SIGNUP_STEP_STAGE[step];
   const isComplete = step === 'complete';
   const isTerms = step === 'terms';
+
+  const stepAreaRef = useRef<HTMLDivElement>(null);
+
+  // 단계 전환 시 새 화면의 제목(h1)으로 포커스를 옮겨, 직전 버튼에 남은 포커스를 이동시키고
+  // 키보드·스크린리더 사용자에게 단계 변경을 알린다.
+  useEffect(() => {
+    const heading = stepAreaRef.current?.querySelector<HTMLElement>('h1');
+    if (!heading) return;
+    heading.setAttribute('tabindex', '-1');
+    heading.focus();
+  }, [step]);
 
   const handleClose = () =>
     navigate(isComplete ? APP_PATH.HOME : APP_PATH.INTRO);
@@ -81,15 +118,7 @@ export const SignupPage = (): ReactElement => {
           <Stepper current={stepperStage} steps={SIGNUP_STEPPER_LABELS} />
         ) : null}
 
-        <StepArea>
-          {/* 단계별 입력 화면이 들어갈 자리. 지금은 단계 전환 동작 확인용 임시 화면이다. */}
-          <Text as="h1" font="heading-m-sb">
-            {step}
-          </Text>
-          <Text color="text.tertiary" font="body-s-r">
-            단계 화면 준비 중 (PR2b)
-          </Text>
-        </StepArea>
+        <StepArea ref={stepAreaRef}>{renderStep(step)}</StepArea>
 
         <FooterButton>
           <FooterButton.Button
@@ -106,9 +135,7 @@ export const SignupPage = (): ReactElement => {
   );
 };
 
-const StepArea = styled.div(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: theme.spacing.md,
-  padding: theme.spacing['2xl'],
-}));
+// 포커스 대상 h1을 감싸기 위한 래퍼. 레이아웃에는 영향을 주지 않도록 박스를 만들지 않는다.
+const StepArea = styled.div({
+  display: 'contents',
+});
