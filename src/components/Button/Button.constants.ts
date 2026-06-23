@@ -146,10 +146,6 @@ export const BUTTON_COLOR_TOKENS: Record<ButtonLevel, Record<ButtonStatus, Butto
     },
     disabled: {
       background: 'bg.overlay',
-      border: {
-        color: 'border.subtle',
-        width: 1.4,
-      },
       content: 'text.quaternary',
     },
   },
