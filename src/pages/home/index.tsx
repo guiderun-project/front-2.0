@@ -28,14 +28,14 @@ export const MainPage = (): ReactElement => {
 
   if (!isAuthReady) {
     return (
-      <PageLayout background="gradient.bg.brand-main">
+      <PageLayout background="bg.subtle" gradient="gradient.bg.brand-main">
         <LoaderScreen label="사용자 정보를 불러오는 중이에요." />
       </PageLayout>
     );
   }
 
   return (
-    <PageLayout background="gradient.bg.brand-main">
+    <PageLayout background="bg.subtle" gradient="gradient.bg.brand-main">
       <HomeHeader />
       <Content>
         <SearchEntry to={APP_PATH.EVENT_SEARCH} />
