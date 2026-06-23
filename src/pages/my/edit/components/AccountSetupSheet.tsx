@@ -12,11 +12,13 @@ const PASSWORD_HELPER_TEXT =
 type AccountSetupSheetProps = {
   open: boolean;
   onClose: () => void;
+  accountId?: string | null; // 이미 설정된 아이디. 아이디는 수정할 수 없다.
 };
 
 export const AccountSetupSheet = ({
   open,
   onClose,
+  accountId: existingAccountId,
 }: AccountSetupSheetProps): ReactElement => {
   const {
     accountId,
@@ -26,6 +28,7 @@ export const AccountSetupSheet = ({
     passwordConfirm,
     setPasswordConfirm,
     accountIdStatus,
+    isAccountIdLocked,
     isCheckingAccountId,
     checkAccountIdDuplicate,
     hasPasswordError,
@@ -33,7 +36,7 @@ export const AccountSetupSheet = ({
     canSubmit,
     submit,
     reset,
-  } = useAccountSetup();
+  } = useAccountSetup(existingAccountId);
 
   const handleClose = () => {
     onClose();
@@ -53,12 +56,7 @@ export const AccountSetupSheet = ({
       open={open}
       topBarTitle="아이디 설정"
       footer={
-        <Button
-          disabled={!canSubmit}
-          fullWidth
-          size="l"
-          onClick={handleSubmit}
-        >
+        <Button disabled={!canSubmit} fullWidth size="l" onClick={handleSubmit}>
           확인
         </Button>
       }
@@ -68,17 +66,23 @@ export const AccountSetupSheet = ({
         <Input
           autoComplete="username"
           errorText={
-            accountIdStatus === 'taken' ? '이미 사용 중인 아이디예요' : undefined
+            accountIdStatus === 'taken'
+              ? '이미 사용 중인 아이디예요'
+              : undefined
           }
           helperText={
-            accountIdStatus === 'available' ? '사용 가능한 아이디예요' : undefined
+            accountIdStatus === 'available'
+              ? '사용 가능한 아이디예요'
+              : undefined
           }
           label="아이디"
+          disabled={isAccountIdLocked}
           value={accountId}
           onChange={(event) => setAccountId(event.target.value)}
           trailing={
             <CheckButton
               disabled={
+                isAccountIdLocked ||
                 !accountId ||
                 isCheckingAccountId ||
                 accountIdStatus !== 'unchecked'
