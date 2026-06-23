@@ -1,4 +1,4 @@
-import type { SignupFormValues } from './types';
+import type { SignupFormValues, SignupStepId } from '@/pages/signup/types';
 
 // 회원가입 화면 순서(서브스텝 포함). Stepper 3단계와 약관·완료 화면을 모두 포함한다.
 export const SIGNUP_STEP_IDS = [
@@ -10,8 +10,6 @@ export const SIGNUP_STEP_IDS = [
   'terms',
   'complete',
 ] as const;
-
-export type SignupStepId = (typeof SIGNUP_STEP_IDS)[number];
 
 // Stepper에 노출되는 3단계 라벨
 export const SIGNUP_STEPPER_LABELS = ['참여유형', '기본정보', '러닝경험'] as const;

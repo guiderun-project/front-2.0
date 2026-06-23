@@ -7,14 +7,14 @@ import { useNavigate } from 'react-router-dom';
 import { FooterButton, PageLayout, Text, TopNavigation } from '@/components';
 import { APP_PATH } from '@/router/path';
 
-import { Stepper } from './components/Stepper';
+import { Stepper } from '@/pages/signup/components/Stepper';
 import {
   SIGNUP_FORM_DEFAULT_VALUES,
   SIGNUP_STEPPER_LABELS,
   SIGNUP_STEP_STAGE,
-} from './constants';
-import { useSignupFunnel } from './hooks/useSignupFunnel';
-import type { SignupFormValues } from './types';
+} from '@/pages/signup/constants';
+import { useSignupFunnel } from '@/pages/signup/hooks/useSignupFunnel';
+import type { SignupFormValues } from '@/pages/signup/types';
 
 export const SignupPage = (): ReactElement => {
   const navigate = useNavigate();
@@ -28,7 +28,8 @@ export const SignupPage = (): ReactElement => {
   const isComplete = step === 'complete';
   const isTerms = step === 'terms';
 
-  const handleClose = () => navigate(isComplete ? APP_PATH.HOME : APP_PATH.INTRO);
+  const handleClose = () =>
+    navigate(isComplete ? APP_PATH.HOME : APP_PATH.INTRO);
 
   const handleBack = () => {
     if (isFirst) {
@@ -47,7 +48,11 @@ export const SignupPage = (): ReactElement => {
     goNext();
   };
 
-  const primaryLabel = isComplete ? '서비스 둘러보기' : isTerms ? '신청완료' : '다음';
+  const primaryLabel = isComplete
+    ? '서비스 둘러보기'
+    : isTerms
+      ? '신청완료'
+      : '다음';
 
   return (
     <PageLayout background="bg.default">
@@ -64,7 +69,11 @@ export const SignupPage = (): ReactElement => {
                 }
           }
           right={[
-            { icon: 'close-lined', ariaLabel: '회원가입 닫기', onClick: handleClose },
+            {
+              icon: 'close-lined',
+              ariaLabel: '회원가입 닫기',
+              onClick: handleClose,
+            },
           ]}
         />
 
@@ -83,7 +92,12 @@ export const SignupPage = (): ReactElement => {
         </StepArea>
 
         <FooterButton>
-          <FooterButton.Button fullWidth size="l" type="button" onClick={handlePrimary}>
+          <FooterButton.Button
+            fullWidth
+            size="l"
+            type="button"
+            onClick={handlePrimary}
+          >
             {primaryLabel}
           </FooterButton.Button>
         </FooterButton>

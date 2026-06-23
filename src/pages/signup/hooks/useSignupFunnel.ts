@@ -1,8 +1,9 @@
 import { useCallback, useState } from 'react';
 
-import { SIGNUP_STEP_IDS, type SignupStepId } from '../constants';
+import { SIGNUP_STEP_IDS } from '@/pages/signup/constants';
+import type { SignupStepId } from '@/pages/signup/types';
 
-export type SignupFunnel = {
+type SignupFunnel = {
   step: SignupStepId;
   isFirst: boolean;
   goNext: () => void;

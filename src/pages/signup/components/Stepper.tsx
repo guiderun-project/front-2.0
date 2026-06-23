@@ -4,7 +4,7 @@ import styled from '@emotion/styled';
 
 import { HiddenText, Text } from '@/components';
 
-export type StepperProps = {
+type StepperProps = {
   steps: readonly string[]; // 단계 라벨 목록 (표시 순서대로)
   current: number; // 현재 단계 (1-based)
   className?: string;
