@@ -76,7 +76,7 @@ export const authHandlers: HttpHandler[] = [
         accessToken: 'mock-access-token',
         user: {
           userId: mockKakaoUserId,
-          role: 'ROLE_USER',
+          role: 'USER',
           disabilityType: 'VI',
         },
       },
@@ -160,7 +160,7 @@ export const authHandlers: HttpHandler[] = [
       recordDegree: runningInfo.runningGroup,
       snsId: body.common.snsId,
       id1365: body.disabilityType === 'GUIDE' ? body.guide.id1365 ?? null : null,
-      role: 'ROLE_WAIT',
+      role: 'WAIT',
       type: body.disabilityType,
       accountId: null,
       password: 'password123!',
@@ -175,7 +175,7 @@ export const authHandlers: HttpHandler[] = [
       {
         userId: nextUserId,
         accessToken: 'mock-access-token',
-        role: 'ROLE_WAIT',
+        role: 'WAIT',
         disabilityType: body.disabilityType,
       },
       {

@@ -89,7 +89,7 @@ export type SignupPostInput = {
 export type SignupPostResponse = {
   userId: string;
   accessToken: string;
-  role: 'ROLE_WAIT';
+  role: 'WAIT';
   disabilityType: DisabilityType;
 };
 
