@@ -11,7 +11,7 @@ import {
   formatDdayLabel,
   formatGuestEventDate,
   type UpcomingGuestEvent,
-} from "../utils";
+} from "@/pages/home/utils";
 
 type UpcomingEventCardProps = {
   event: UpcomingGuestEvent;

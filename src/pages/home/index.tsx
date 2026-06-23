@@ -12,10 +12,10 @@ import { APPROVED_ROLES } from "@/constants";
 import { useAuth } from "@/contexts";
 import { APP_PATH } from "@/router/path";
 
-import { ActivitySummary } from "./components/ActivitySummary";
-import { HomeHeader } from "./components/HomeHeader";
-import { HomeQuickActions } from "./components/HomeQuickActions";
-import { UpcomingEventList } from "./components/UpcomingEventList";
+import { ActivitySummary } from "@/pages/home/components/ActivitySummary";
+import { HomeHeader } from "@/pages/home/components/HomeHeader";
+import { HomeQuickActions } from "@/pages/home/components/HomeQuickActions";
+import { UpcomingEventList } from "@/pages/home/components/UpcomingEventList";
 
 const SUMMARY_LOADING_MESSAGE = "활동 요약을 불러오는 중이에요.";
 const SUMMARY_ERROR_MESSAGE = "활동 요약을 불러오지 못했어요.";

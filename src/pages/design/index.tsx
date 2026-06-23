@@ -536,18 +536,18 @@ const RUNNER_TYPE_AVATAR_SIZES = [
 ] as const;
 
 const RUNNER_TYPE_AVATAR_EXAMPLES = [
-  { label: "시각장애러너", type: "vi" },
-  { label: "가이드러너", type: "guide" },
+  { label: "시각장애러너", type: "VI" },
+  { label: "가이드러너", type: "GUIDE" },
 ] as const;
 
 const RUNNER_TYPE_AVATAR_CODE_EXAMPLES = [
   {
     label: "Default size",
-    code: `<RunnerTypeAvatar type="vi" />`,
+    code: `<RunnerTypeAvatar type="VI" />`,
   },
   {
     label: "XL guide",
-    code: `<RunnerTypeAvatar type="guide" size="xl" />`,
+    code: `<RunnerTypeAvatar type="GUIDE" size="xl" />`,
   },
 ] as const;
 
