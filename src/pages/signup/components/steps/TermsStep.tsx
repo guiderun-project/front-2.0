@@ -5,18 +5,19 @@ import { useFormContext } from 'react-hook-form';
 
 import { CheckBox, Text } from '@/components';
 
+import { SIGNUP_FIELD } from '@/pages/signup/constants';
 import { SIGNUP_COPY } from '@/pages/signup/copy';
 import type { SignupFormValues } from '@/pages/signup/types';
 import { StepLayout } from '@/pages/signup/components/StepLayout';
 
 export const TermsStep = (): ReactElement => {
   const { watch, setValue } = useFormContext<SignupFormValues>();
-  const agreements = watch('agreements');
+  const agreements = watch(SIGNUP_FIELD.AGREEMENTS);
   const allChecked = agreements.privacy && agreements.portraitRights;
 
   const toggleAll = () => {
     const next = !allChecked;
-    setValue('agreements', { privacy: next, portraitRights: next });
+    setValue(SIGNUP_FIELD.AGREEMENTS, { privacy: next, portraitRights: next });
   };
 
   return (
@@ -32,7 +33,9 @@ export const TermsStep = (): ReactElement => {
         <ItemRow>
           <CheckBox
             checked={agreements.privacy}
-            onChange={(event) => setValue('agreements.privacy', event.target.checked)}
+            onChange={(event) =>
+              setValue(SIGNUP_FIELD.AGREEMENTS_PRIVACY, event.target.checked)
+            }
           />
           <Text color="text.secondary" font="body-s-m">
             개인정보 제공 및 활용 동의 (필수)
@@ -41,7 +44,9 @@ export const TermsStep = (): ReactElement => {
         <ItemRow>
           <CheckBox
             checked={agreements.portraitRights}
-            onChange={(event) => setValue('agreements.portraitRights', event.target.checked)}
+            onChange={(event) =>
+              setValue(SIGNUP_FIELD.AGREEMENTS_PORTRAIT_RIGHTS, event.target.checked)
+            }
           />
           <Text color="text.secondary" font="body-s-m">
             초상권 활용 동의 (필수)
