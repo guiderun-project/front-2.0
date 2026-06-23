@@ -2,9 +2,11 @@ import type { ReactElement } from 'react';
 
 import { Controller, useFormContext } from 'react-hook-form';
 
+import type { Gender } from '@/api/types';
+
 import { SIGNUP_FIELD } from '@/pages/signup/constants';
 import { SIGNUP_COPY } from '@/pages/signup/copy';
-import type { Gender, SignupFormValues } from '@/pages/signup/types';
+import type { SignupFormValues } from '@/pages/signup/types';
 import { SelectCardGroup } from '@/pages/signup/components/SelectCardGroup';
 import { StepLayout } from '@/pages/signup/components/StepLayout';
 

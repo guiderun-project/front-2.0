@@ -1,10 +1,10 @@
+import type { Gender } from '@/api/types';
 import type { TimeValue } from '@/components';
 import type { RUNNER_TYPE } from '@/constants';
 
 import type { SIGNUP_STEP_IDS } from '@/pages/signup/constants';
 
 export type RunnerType = (typeof RUNNER_TYPE)[keyof typeof RUNNER_TYPE];
-export type Gender = 'MALE' | 'FEMALE';
 
 // 회원가입 화면 순서 식별자(서브스텝 포함)
 export type SignupStepId = (typeof SIGNUP_STEP_IDS)[number];
