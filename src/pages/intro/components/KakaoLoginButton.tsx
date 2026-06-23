@@ -18,7 +18,7 @@ export const KakaoLoginButton = ({
         <KakaoSymbol aria-hidden={true} />
       </LogoArea>
       <LabelArea>
-        <Text align="center" color="text.primary" font="body-m-sb">
+        <Text align="center" font="body-m-sb">
           카카오 계정으로 로그인
         </Text>
       </LabelArea>
@@ -28,6 +28,7 @@ export const KakaoLoginButton = ({
 
 /* 카카오 브랜드 고정 색상 — 디자인 시스템 토큰 대상이 아니므로 raw 값 사용 */
 const KAKAO_YELLOW = '#fee500';
+const KAKAO_DARK_TEXT = '#000000';
 
 const StyledButton = styled.button`
   display: flex;
@@ -71,4 +72,15 @@ const LabelArea = styled.span`
   align-items: center;
   gap: 0.625rem;
   padding: ${({ theme }) => `${theme.spacing.xl} 0.875rem ${theme.spacing.xl} ${theme.spacing.none}`};
+  color: ${({ theme }) => theme.color.text.primary};
+
+  html[data-color-mode='dark'] & {
+    color: ${KAKAO_DARK_TEXT};
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not([data-color-mode='light']) & {
+      color: ${KAKAO_DARK_TEXT};
+    }
+  }
 `;
