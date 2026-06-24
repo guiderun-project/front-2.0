@@ -50,7 +50,9 @@ const toneBackground = (theme: Theme, tone: ActionTone) =>
     ? theme.colorPrimitive.accent.teal.a16
     : theme.colorPrimitive.cyan['400-a12'];
 
-const ActionLink = styled(Link)<{ $tone: ActionTone }>(
+const ActionLink = styled(Link, {
+  shouldForwardProp: (propName) => propName !== '$tone',
+})<{ $tone: ActionTone }>(
   ({ $tone, theme }) => css`
     display: flex;
     padding: ${theme.spacing.xl};
