@@ -102,7 +102,7 @@ export const useEventDetailPage = () => {
   };
 
   const handleLogin = () => {
-    navigate(APP_PATH.LOGIN, { state: { from: location } });
+    navigate(APP_PATH.INTRO, { state: { from: location } });
   };
 
   const handleCopyLink = () => {
