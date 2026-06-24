@@ -8,6 +8,8 @@ interface ImportMetaEnv {
   readonly VITE_KAKAO_REDIRECT_URI?: string;
   readonly VITE_ENABLE_MSW?: 'true' | 'false';
   readonly VITE_MOCK_AUTHENTICATED?: 'true' | 'false';
+  readonly VITE_POSTHOG_PROJECT_TOKEN?: string;
+  readonly VITE_POSTHOG_HOST?: string;
 }
 
 interface ImportMeta {
