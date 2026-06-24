@@ -1727,3 +1727,19 @@ export const createPage = (page: number, size: number, totalCount: number) => {
     hasNext: page * size < totalCount,
   };
 };
+
+export const createZeroBasedPage = (
+  page: number,
+  size: number,
+  totalCount: number,
+) => {
+  const totalPages = Math.ceil(totalCount / size);
+
+  return {
+    page,
+    size,
+    totalCount,
+    totalPages,
+    hasNext: page < totalPages - 1,
+  };
+};

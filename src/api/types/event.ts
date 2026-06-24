@@ -56,7 +56,7 @@ export type EventListGetRequest = {
 export type EventListGetResponse = {
   items: Array<{
     id: number;
-    recruitStatus: 'RECRUIT_UPCOMING' | 'RECRUIT_OPEN' | 'RECRUIT_CLOSE';
+    recruitStatus: Exclude<RecruitStatus, 'RECRUIT_END'>;
     name: string;
     type: EventType;
     dateText: string;

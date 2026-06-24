@@ -16,7 +16,7 @@ import type {
   UserWithdrawalDeleteRequest,
 } from '@/api/types/user';
 import {
-  createPage,
+  createZeroBasedPage,
   findEvent,
   findUser,
   getCurrentUser,
@@ -45,11 +45,11 @@ const toActivityEventItem = (event: MockEvent) => {
 
 const createActivityEventsResponse = (events: MockEvent[], page: number) => {
   const size = 10;
-  const startIndex = (page - 1) * size;
+  const startIndex = page * size;
 
   return {
     items: events.slice(startIndex, startIndex + size).map(toActivityEventItem),
-    pagination: createPage(page, size, events.length),
+    pagination: createZeroBasedPage(page, size, events.length),
   };
 };
 
@@ -167,7 +167,7 @@ export const userHandlers: HttpHandler[] = [
       'relation',
       MY_ACTIVITY_EVENT_RELATION_FILTERS.TOTAL,
     ) as MyActivityEventsQuery['relation'];
-    const page = getSearchNumber(request, 'page', 1);
+    const page = getSearchNumber(request, 'page', 0);
     const participatedEvents = mockDb.forms
       .filter((form) => form.userId === user.userId && form.status === 'APPLIED')
       .map((form) => findEvent(form.eventId))
@@ -205,7 +205,7 @@ export const userHandlers: HttpHandler[] = [
       'sort',
       MY_ACTIVITY_PARTNER_SORTS.RECENT,
     ) as MyActivityPartnersQuery['sort'];
-    const page = getSearchNumber(request, 'page', 1);
+    const page = getSearchNumber(request, 'page', 0);
     const partnerEvents = new Map<
       string,
       {
@@ -277,9 +277,9 @@ export const userHandlers: HttpHandler[] = [
         return sort === MY_ACTIVITY_PARTNER_SORTS.OLD
           ? left.sortDate.localeCompare(right.sortDate)
           : right.sortDate.localeCompare(left.sortDate);
-      });
+    });
     const size = 5;
-    const startIndex = (page - 1) * size;
+    const startIndex = page * size;
 
     return HttpResponse.json({
       items: partners.slice(startIndex, startIndex + size).map((partner) => ({
@@ -289,7 +289,7 @@ export const userHandlers: HttpHandler[] = [
         eventCount: partner.eventCount,
         events: partner.events,
       })),
-      pagination: createPage(page, size, partners.length),
+      pagination: createZeroBasedPage(page, size, partners.length),
     });
   }),
 

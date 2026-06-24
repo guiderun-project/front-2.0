@@ -2,6 +2,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 
 import { api } from '@/api/services';
 import type { MyActivityPartnerSort } from '@/api/types';
+import { toBackendPage } from '@/utils';
 
 import { myActivityQueryKeys } from './queryKeys';
 
@@ -13,5 +14,9 @@ type UseMyActivityPartnersParams = {
 export const useMyActivityPartners = (params: UseMyActivityPartnersParams) =>
   useSuspenseQuery({
     queryKey: myActivityQueryKeys.partners(params),
-    queryFn: () => api.user.activityPartnersGet(params),
+    queryFn: () =>
+      api.user.activityPartnersGet({
+        ...params,
+        page: toBackendPage(params.page),
+      }),
   });
