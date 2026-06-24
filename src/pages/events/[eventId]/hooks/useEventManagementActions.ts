@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
 import { api } from '@/api/services';
+import { useToast } from '@/components';
 import { APP_PATH } from '@/router/path';
 
 import { eventDetailQueryKeys } from '../queryKeys';
@@ -28,17 +29,27 @@ export const useEventManagementActions = ({
 }: UseEventManagementActionsParams) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
 
   const closeRecruitmentMutation = useMutation({
     mutationFn: () => api.event.closePatch({ eventId }),
     onSuccess: () => {
       onClose();
+      showToast({
+        type: 'success',
+        icon: 'check-lined',
+        content: '모집을 마감했어요.',
+      });
       void queryClient.invalidateQueries({
         queryKey: eventDetailQueryKeys.detailRoot(eventId),
       });
     },
     onError: () => {
-      window.alert('모집 마감에 실패했어요.');
+      showToast({
+        type: 'error',
+        icon: 'alert-circle-filled',
+        content: '모집 마감에 실패했어요.',
+      });
     },
   });
   const deleteEventMutation = useMutation({

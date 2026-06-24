@@ -163,6 +163,7 @@ export const EventDetailPage = (): ReactElement => {
         eventId={eventId}
         eventName={event.name}
         open={isManagementSheetOpen}
+        recruitStatus={event.recruitStatus}
         onClose={closeManagementSheet}
       />
       <ApplicantFormSheet

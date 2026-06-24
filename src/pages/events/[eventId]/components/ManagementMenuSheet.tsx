@@ -3,6 +3,7 @@ import { useState, type ReactElement } from 'react';
 import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
 
+import type { RecruitStatus } from '@/api/types';
 import {
   BottomSheet,
   ConfirmPopup,
@@ -19,6 +20,7 @@ type ManagementMenuSheetProps = {
   eventId: number;
   eventName: string;
   open: boolean;
+  recruitStatus: RecruitStatus;
   onClose: () => void;
 };
 
@@ -28,9 +30,12 @@ export const ManagementMenuSheet = ({
   eventName,
   onClose,
   open,
+  recruitStatus,
 }: ManagementMenuSheetProps): ReactElement => {
   const navigate = useNavigate();
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const shouldShowCloseRecruitmentAction =
+    recruitStatus !== 'RECRUIT_CLOSE' && recruitStatus !== 'RECRUIT_END';
   const {
     closeRecruitment,
     deleteEvent,
@@ -81,21 +86,23 @@ export const ManagementMenuSheet = ({
     <>
       <BottomSheet ariaLabel="이벤트 관리 메뉴" open={open} onClose={onClose}>
         <ManagementMenuList>
-          <ManagementMenuItem
-            disabled={isManagementMutating}
-            type="button"
-            onClick={handleCloseRecruitment}
-          >
-            <Icon
-              aria-hidden={true}
-              color="icon.secondary"
-              icon="user-x-lined"
-              size={20}
-            />
-            <Text color="text.primary" font="body-m-m">
-              모집 마감하기
-            </Text>
-          </ManagementMenuItem>
+          {shouldShowCloseRecruitmentAction ? (
+            <ManagementMenuItem
+              disabled={isManagementMutating}
+              type="button"
+              onClick={handleCloseRecruitment}
+            >
+              <Icon
+                aria-hidden={true}
+                color="icon.secondary"
+                icon="user-x-lined"
+                size={20}
+              />
+              <Text color="text.primary" font="body-m-m">
+                모집 마감하기
+              </Text>
+            </ManagementMenuItem>
+          ) : null}
           <ManagementMenuItem
             disabled={isManagementMutating}
             type="button"
