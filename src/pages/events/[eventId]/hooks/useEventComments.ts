@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 
 import { api } from '@/api/services';
 import { useAuth } from '@/contexts';
+import { FIRST_BACKEND_PAGE } from '@/utils';
 
 import { eventDetailQueryKeys } from '../queryKeys';
 import { isApprovedUser } from '../utils';
@@ -19,7 +20,8 @@ export const useEventComments = () => {
 
   const commentsQuery = useQuery({
     queryKey: commentsQueryKey,
-    queryFn: () => api.comment.listGet({ eventId, page: 1, size: 10 }),
+    queryFn: () =>
+      api.comment.listGet({ eventId, page: FIRST_BACKEND_PAGE, size: 10 }),
     enabled: isValidEventId && canAccessComments,
   });
   const createCommentMutation = useMutation({
