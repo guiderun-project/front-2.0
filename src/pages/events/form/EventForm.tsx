@@ -1,9 +1,9 @@
-import type { ReactElement } from 'react';
+import type { ReactElement } from "react";
 
-import styled from '@emotion/styled';
-import { Controller, type UseFormReturn } from 'react-hook-form';
+import styled from "@emotion/styled";
+import { Controller, type UseFormReturn } from "react-hook-form";
 
-import type { EventType } from '@/api/types';
+import type { EventType } from "@/api/types";
 import {
   CheckBox,
   ConfirmPopup,
@@ -13,12 +13,12 @@ import {
   Select,
   Text,
   Textarea,
-} from '@/components';
+} from "@/components";
 
-import { AdditionalQuestionEditor } from './components/AdditionalQuestionEditor';
-import { MaskedDateInput } from './components/MaskedDateInput';
-import { MaskedTimeInput } from './components/MaskedTimeInput';
-import { RunningDistanceInput } from './components/RunningDistanceInput';
+import { AdditionalQuestionEditor } from "./components/AdditionalQuestionEditor";
+import { MaskedDateInput } from "./components/MaskedDateInput";
+import { MaskedTimeInput } from "./components/MaskedTimeInput";
+import { RunningDistanceInput } from "./components/RunningDistanceInput";
 import {
   EVENT_CONTENT_MAX_LENGTH,
   EVENT_FORM_MODES,
@@ -26,8 +26,8 @@ import {
   TRAINING_OPERATION_OPTIONS,
   type EventFormMode,
   type TrainingOperationType,
-} from './constants';
-import type { EventFormValues } from './schema';
+} from "./constants";
+import type { EventFormValues } from "./schema";
 
 type EventFormProps = {
   eventType: EventType;
@@ -59,10 +59,10 @@ export const EventForm = ({
   submitDisabled = false,
 }: EventFormProps): ReactElement => {
   const resolvedSubmitLabel =
-    mode === EVENT_FORM_MODES.EDIT ? '수정완료' : '모임 만들기';
+    mode === EVENT_FORM_MODES.EDIT ? "수정완료" : "모임 만들기";
   const resolvedSecondaryAction = onDelete
     ? {
-        label: '삭제하기',
+        label: "삭제하기",
         onClick: onDelete,
         disabled: isDeleting || isSubmitting,
       }
@@ -74,8 +74,8 @@ export const EventForm = ({
         title={EVENT_FORM_TITLES[eventType]}
         topNavigation={{
           left: {
-            ariaLabel: '이전 화면으로 이동',
-            icon: 'chevron-left-lined',
+            ariaLabel: "이전 화면으로 이동",
+            icon: "chevron-left-lined",
             onClick: onBack,
           },
         }}
@@ -104,7 +104,7 @@ export const EventForm = ({
                 )}
               />
 
-              {eventType === 'TRAINING' ? (
+              {eventType === "TRAINING" ? (
                 <Controller
                   control={form.control}
                   name="operationType"
@@ -118,7 +118,7 @@ export const EventForm = ({
                       sheetTitle="모임 운영방식"
                       triggerRef={field.ref}
                       value={
-                        field.value === 'GENERAL' || field.value === 'GROUP'
+                        field.value === "GENERAL" || field.value === "GROUP"
                           ? field.value
                           : undefined
                       }
@@ -137,7 +137,7 @@ export const EventForm = ({
                     errorText={fieldState.error?.message}
                     label="모임 상세 내용(선택)"
                     maxLength={EVENT_CONTENT_MAX_LENGTH}
-                    placeholder="모임 상세 내용(선택)"
+                    placeholder="모임 상세 내용을 입력해주세요."
                     value={field.value}
                     onBlur={field.onBlur}
                     onChange={field.onChange}
@@ -162,7 +162,9 @@ export const EventForm = ({
                       </Text>
                     </PrivateLabel>
                     <PrivateHelper color="text.tertiary" font="body-s-m">
-                      {'비공개 모임는 전체 목록에서는 보이지 않고,\n특정 링크를 통해서만 접근할 수 있어요.'}
+                      {
+                        "비공개 모임는 전체 목록에서는 보이지 않고,\n특정 링크를 통해서만 접근할 수 있어요."
+                      }
                     </PrivateHelper>
                   </PrivateField>
                 )}
@@ -310,7 +312,7 @@ export const EventForm = ({
             />
           </FormSection>
 
-          <FooterButton ratio={resolvedSecondaryAction ? '35:65' : undefined}>
+          <FooterButton ratio={resolvedSecondaryAction ? "35:65" : undefined}>
             {resolvedSecondaryAction ? (
               <FooterButton.Button
                 disabled={resolvedSecondaryAction.disabled}
@@ -342,8 +344,8 @@ export const EventForm = ({
         open={confirmOpen}
         title={
           mode === EVENT_FORM_MODES.CREATE
-            ? '모임 만들기를 그만할까요?'
-            : '모임 수정을 그만할까요?'
+            ? "모임 만들기를 그만할까요?"
+            : "모임 수정을 그만할까요?"
         }
         onCancel={onCancelBack}
         onConfirm={onConfirmBack}
@@ -353,49 +355,49 @@ export const EventForm = ({
 };
 
 const Form = styled.form(({ theme }) => ({
-  display: 'grid',
-  paddingTop: theme.spacing['4xl'],
+  display: "grid",
+  paddingTop: theme.spacing["4xl"],
 }));
 
 const FormSection = styled.section(({ theme }) => ({
-  display: 'grid',
+  display: "grid",
   gap: theme.spacing.lg,
-  paddingInline: theme.spacing['2xl'],
+  paddingInline: theme.spacing["2xl"],
 }));
 
 const SectionHeader = styled.div({
-  display: 'grid',
+  display: "grid",
 });
 
 const FieldStack = styled.div(({ theme }) => ({
-  display: 'grid',
+  display: "grid",
   gap: theme.spacing.lg,
-  width: '100%',
+  width: "100%",
 }));
 
 const TwoColumnFields = styled.div(({ theme }) => ({
-  display: 'grid',
-  gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+  display: "grid",
+  gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
   gap: theme.spacing.md,
 }));
 
 const PrivateField = styled.div(({ theme }) => ({
-  display: 'grid',
+  display: "grid",
   gap: theme.spacing.sm,
 }));
 
 const PrivateLabel = styled.label(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
+  display: "flex",
+  alignItems: "center",
   gap: theme.spacing.md,
 }));
 
 const PrivateHelper = styled(Text)({
-  whiteSpace: 'pre-line',
+  whiteSpace: "pre-line",
 });
 
 const Divider = styled.div(({ theme }) => ({
   height: theme.spacing.lg,
-  marginBlock: theme.spacing['2xl'],
+  marginBlock: theme.spacing["2xl"],
   background: theme.color.border.subtle,
 }));
