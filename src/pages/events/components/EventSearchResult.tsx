@@ -38,22 +38,6 @@ export const EventSearchResult = ({
   const { items } = data;
   const { totalCount, totalPages } = data.pagination;
 
-  if (items.length === 0) {
-    return (
-      <SearchEmpty role="status">
-        <Icon
-          aria-hidden={true}
-          color="icon.tertiary"
-          icon="alert-circle-filled"
-          size={64}
-        />
-        <Text color="text.tertiary" font="body-m-m">
-          검색 결과가 없어요
-        </Text>
-      </SearchEmpty>
-    );
-  }
-
   return (
     <>
       <EventResultHeader
@@ -64,12 +48,26 @@ export const EventSearchResult = ({
         onRecruitChange={onRecruitChange}
         onTypeChange={onTypeChange}
       />
-      <EventResultList
-        items={items}
-        page={page}
-        totalPages={totalPages}
-        onPageChange={onPageChange}
-      />
+      {items.length === 0 ? (
+        <SearchEmpty role="status">
+          <Icon
+            aria-hidden={true}
+            color="icon.tertiary"
+            icon="alert-circle-filled"
+            size={64}
+          />
+          <Text color="text.tertiary" font="body-m-m">
+            검색 결과가 없어요
+          </Text>
+        </SearchEmpty>
+      ) : (
+        <EventResultList
+          items={items}
+          page={page}
+          totalPages={totalPages}
+          onPageChange={onPageChange}
+        />
+      )}
     </>
   );
 };

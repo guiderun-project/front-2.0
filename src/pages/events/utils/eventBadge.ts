@@ -44,7 +44,10 @@ const EVENT_BADGE_CONFIGS = {
     variant: 'soft',
     tone: 'gray',
   },
-} as const satisfies Record<EventType | RecruitStatus, EventBadgeConfig>;
+} as const satisfies Record<
+  EventType | RecruitStatus,
+  EventBadgeConfig
+>;
 
 export const getEventTypeBadgeConfig = (eventType: EventType) => {
   return EVENT_BADGE_CONFIGS[eventType];
