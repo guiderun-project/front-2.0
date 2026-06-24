@@ -1,6 +1,7 @@
-import { StrictMode } from 'react';
+import { StrictMode, type ReactNode } from 'react';
 
 import { Global, ThemeProvider } from '@emotion/react';
+import { PostHogProvider } from '@posthog/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
@@ -37,6 +38,11 @@ const EVENT_DETAIL_RESERVED_PATHS = [
   APP_PATH.EVENT_SEARCH,
   APP_PATH.EVENT_SUPPORT,
 ] as const;
+const postHogProjectToken = import.meta.env.VITE_POSTHOG_PROJECT_TOKEN;
+const postHogOptions = {
+  api_host: import.meta.env.VITE_POSTHOG_HOST,
+  defaults: '2026-05-30',
+} as const;
 
 type BootstrapLoaderState = {
   background: PageLayoutBackground;
@@ -125,6 +131,18 @@ const renderBootstrapLoader = () => {
   );
 };
 
+const renderWithPostHogProvider = (children: ReactNode) => {
+  if (!postHogProjectToken) {
+    return children;
+  }
+
+  return (
+    <PostHogProvider apiKey={postHogProjectToken} options={postHogOptions}>
+      {children}
+    </PostHogProvider>
+  );
+};
+
 const bootstrap = async () => {
   renderBootstrapLoader();
 
@@ -132,20 +150,22 @@ const bootstrap = async () => {
 
   root.render(
     <StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <ThemeProvider theme={theme}>
-            <Global styles={globalStyles} />
-            <ColorModeProvider>
-              <ToastProvider>
-                <RouterProvider router={router} />
-                <BirthDateGate />
-                <RunningRecordGate />
-              </ToastProvider>
-            </ColorModeProvider>
-          </ThemeProvider>
-        </AuthProvider>
-      </QueryClientProvider>
+      {renderWithPostHogProvider(
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <ThemeProvider theme={theme}>
+              <Global styles={globalStyles} />
+              <ColorModeProvider>
+                <ToastProvider>
+                  <RouterProvider router={router} />
+                  <BirthDateGate />
+                  <RunningRecordGate />
+                </ToastProvider>
+              </ColorModeProvider>
+            </ThemeProvider>
+          </AuthProvider>
+        </QueryClientProvider>,
+      )}
     </StrictMode>,
   );
 };
