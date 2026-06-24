@@ -1,6 +1,5 @@
 import { Suspense, lazy, type ComponentPropsWithoutRef, type ReactElement } from 'react';
 
-import { keyframes } from '@emotion/react';
 import styled from '@emotion/styled';
 
 import loadingDark from '@/assets/lotties/loading_dark.json';
@@ -26,7 +25,7 @@ export const Loader = ({
     <LoaderWrapper role="status" aria-live="polite" {...props}>
       <HiddenText>{label}</HiddenText>
       <LoaderAnimation aria-hidden={true}>
-        <Suspense fallback={<LoaderAnimationFallback />}>
+        <Suspense fallback={null}>
           <Lottie
             key={colorMode}
             animationData={animationData}
@@ -77,25 +76,6 @@ const LoaderAnimation = styled.div(({ theme }) => ({
   placeItems: 'center',
   width: theme.pxToRem(58),
   height: theme.pxToRem(58),
-}));
-
-const loaderFallbackSpin = keyframes({
-  to: {
-    transform: 'rotate(360deg)',
-  },
-});
-
-const LoaderAnimationFallback = styled.div(({ theme }) => ({
-  width: theme.pxToRem(36),
-  height: theme.pxToRem(36),
-  border: `${theme.pxToRem(3)} solid ${theme.color.border.subtle}`,
-  borderRadius: theme.radius.full,
-  borderTopColor: theme.color.icon.brand,
-  animation: `${loaderFallbackSpin} 700ms linear infinite`,
-
-  '@media (prefers-reduced-motion: reduce)': {
-    animation: 'none',
-  },
 }));
 
 const LoaderScreenContainer = styled.div(({ theme }) => ({
