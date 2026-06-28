@@ -26,7 +26,7 @@ export const EventDetailCta = ({
   });
 
   return (
-    <FooterButton ratio={ratio}>
+    <FooterButton background="subtle" ratio={ratio}>
       {buttons.map(({ action, label, level, onClick, disabled }) => (
         <FooterButton.Button
           key={`${action}-${label}`}
