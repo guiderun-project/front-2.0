@@ -3,7 +3,8 @@ import { Fragment, useId, useState, type ReactElement } from 'react';
 import styled from '@emotion/styled';
 
 import type { MatchingWaitingParticipant } from '@/api/types';
-import { Icon, Text } from '@/components';
+import { HiddenText, Icon, Text } from '@/components';
+import { RUNNER_TYPE_LABELS } from '@/constants';
 
 type ParticipantAdditionalInfoAccordionProps = {
   participant: MatchingWaitingParticipant;
@@ -41,6 +42,8 @@ export const ParticipantAdditionalInfoAccordion = ({
   const [isOpen, setIsOpen] = useState(false);
   const panelId = useId();
   const items = getAdditionalInfoItems(participant);
+  const buttonDescription =
+    `${RUNNER_TYPE_LABELS[participant.type]} ${participant.name} 추가 정보`;
 
   if (items.length === 0) {
     return null;
@@ -58,7 +61,8 @@ export const ParticipantAdditionalInfoAccordion = ({
         type="button"
         onClick={handleToggle}
       >
-        <Text color="text.primary" font="detail-m-m">
+        <HiddenText>{buttonDescription}</HiddenText>
+        <Text aria-hidden={true} color="text.primary" font="detail-m-m">
           추가 정보
         </Text>
         <ChevronIcon $isOpen={isOpen}>

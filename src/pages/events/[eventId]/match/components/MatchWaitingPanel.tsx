@@ -45,12 +45,16 @@ export const MatchWaitingPanel = ({
         return (
           <GroupSection key={group.runningGroup} $hasDivider={index > 0}>
             <GroupHeader>
-              <Text as="h2" color="text.primary" font="body-l-sb">
-                {groupLabel}
-              </Text>
-              <Text color="text.tertiary" font="body-m-m">
-                {group.totalCount}명
-              </Text>
+              <GroupHeading>
+                <GroupHeadingText role="text">
+                  <Text as="span" color="text.primary" font="body-l-sb">
+                    {groupLabel}
+                  </Text>{' '}
+                  <GroupCountText color="text.tertiary" font="body-m-m">
+                    {group.totalCount}명
+                  </GroupCountText>
+                </GroupHeadingText>
+              </GroupHeading>
             </GroupHeader>
             <ParticipantList>
               {group.participants.map((participant) => (
@@ -94,6 +98,18 @@ const GroupHeader = styled.div(({ theme }) => ({
   alignItems: 'center',
   gap: theme.spacing.md,
   minWidth: 0,
+}));
+
+const GroupHeading = styled.h2({
+  margin: 0,
+});
+
+const GroupHeadingText = styled.span({
+  display: 'inline',
+});
+
+const GroupCountText = styled(Text)(({ theme }) => ({
+  marginLeft: theme.spacing.md,
 }));
 
 const ParticipantList = styled.ul(({ theme }) => ({

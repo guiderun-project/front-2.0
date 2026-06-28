@@ -10,7 +10,7 @@ export const AttendanceLeadDescription = ({
   waitingCount,
 }: AttendanceLeadDescriptionProps): ReactNode => {
   return (
-    <Text as="span" color="text.tertiary" font="body-m-sb">
+    <Text as="span" color="text.tertiary" font="body-m-sb" role="text">
       현재{' '}
       <Text as="span" color="text.brand" font="body-m-sb">
         {waitingCount}명

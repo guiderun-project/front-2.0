@@ -1,7 +1,8 @@
-import { useId, type ReactElement } from 'react';
+import type { ReactElement } from 'react';
 
 import type { AttendanceParticipant } from '@/api/types';
-import { Button } from '@/components';
+import { Button, HiddenText } from '@/components';
+import { RUNNER_TYPE_LABELS } from '@/constants';
 
 import { ParticipantCard } from './ParticipantCard';
 import { ParticipantInfo } from './ParticipantInfo';
@@ -21,22 +22,23 @@ export const ParticipantActionCard = ({
   status,
   onAction,
 }: ParticipantActionCardProps): ReactElement => {
-  const participantInfoId = useId();
   const actionLabel = status === 'waiting' ? '출석하기' : '출석취소';
+  const actionDescription =
+    `${RUNNER_TYPE_LABELS[participant.type]} ${participant.name} ${actionLabel}`;
 
   return (
     <ParticipantCard>
-      <ParticipantInfo id={participantInfoId} participant={participant} />
+      <ParticipantInfo participant={participant} />
       <Button
         disabled={disabled}
-        aria-describedby={participantInfoId}
         level={status === 'waiting' ? 'primary' : 'quaternary'}
         size="s"
         onClick={() => {
           onAction(participant);
         }}
       >
-        {actionLabel}
+        <HiddenText>{actionDescription}</HiddenText>
+        <span aria-hidden={true}>{actionLabel}</span>
       </Button>
     </ParticipantCard>
   );
