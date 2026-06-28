@@ -5,6 +5,9 @@ import styled from '@emotion/styled';
 import { IconButton, type IconName } from '../Icon';
 import { Text } from '../Text';
 
+const TOP_NAVIGATION_ICON_SIZE = 24;
+const TOP_NAVIGATION_BUTTON_SIZE = 32;
+
 export type TopNavigationIconButtonProps = {
   icon: IconName;
   ariaLabel: string;
@@ -70,9 +73,9 @@ const TopNavigationIconButton = ({
     <StyledIconButton
       aria-label={ariaLabel}
       icon={icon}
-      iconSize={24}
+      iconSize={TOP_NAVIGATION_ICON_SIZE}
       shape="square"
-      size={24}
+      size={TOP_NAVIGATION_BUTTON_SIZE}
       type={type}
       {...buttonProps}
     />
@@ -95,8 +98,8 @@ const LeftSlot = styled.div`
   flex: 0 0 auto;
   align-items: center;
   justify-content: flex-start;
-  width: ${({ theme }) => theme.pxToRem(24)};
-  height: ${({ theme }) => theme.pxToRem(24)};
+  width: ${({ theme }) => theme.pxToRem(TOP_NAVIGATION_BUTTON_SIZE)};
+  height: ${({ theme }) => theme.pxToRem(TOP_NAVIGATION_BUTTON_SIZE)};
 `;
 
 const RightSlot = styled.div`
@@ -105,7 +108,7 @@ const RightSlot = styled.div`
   align-items: center;
   justify-content: flex-end;
   gap: ${({ theme }) => theme.spacing.xl};
-  min-height: ${({ theme }) => theme.pxToRem(24)};
+  min-height: ${({ theme }) => theme.pxToRem(TOP_NAVIGATION_BUTTON_SIZE)};
 `;
 
 const Title = styled(Text)({
