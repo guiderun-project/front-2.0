@@ -1,6 +1,6 @@
 import type { ReactElement } from 'react';
 
-import { formatPageTitle } from './pageTitleUtils';
+import { formatPageTitle } from './title';
 
 type PageTitleProps = {
   title?: string;
