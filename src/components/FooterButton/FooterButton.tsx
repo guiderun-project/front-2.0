@@ -1,5 +1,6 @@
 import {
   Children,
+  type ComponentPropsWithoutRef,
   isValidElement,
   useEffect,
   useRef,
@@ -10,13 +11,38 @@ import {
 import styled from '@emotion/styled';
 
 import { Button, ButtonGroup } from '../Button';
-import type { FooterButtonBackground, FooterButtonProps } from './FooterButton.types';
+import { Icon } from '../Icon';
+import { Text } from '../Text';
+import type {
+  FooterButtonBackground,
+  FooterButtonNoticeProps,
+  FooterButtonProps,
+} from './FooterButton.types';
 
 const DEFAULT_BACKGROUND = 'footer' satisfies FooterButtonBackground;
 const DEFAULT_RESERVE_SPACE = true;
 
 const isFooterButtonElement = (child: ReactNode): child is ReactElement =>
   isValidElement(child) && child.type === Button;
+
+const FooterButtonNotice = ({
+  children,
+  ...props
+}: FooterButtonNoticeProps): ReactElement => {
+  return (
+    <NoticeContainer {...props}>
+      <Icon aria-hidden={true} color="icon.tertiary" icon="lock-filled" size={20} />
+      <NoticeText as="p" color="text.secondary" font="body-m-sb">
+        {children}
+      </NoticeText>
+    </NoticeContainer>
+  );
+};
+
+const isFooterButtonNoticeElement = (
+  child: ReactNode,
+): child is ReactElement<ComponentPropsWithoutRef<typeof FooterButtonNotice>> =>
+  isValidElement(child) && child.type === FooterButtonNotice;
 
 const FooterButtonRoot = ({
   background = DEFAULT_BACKGROUND,
@@ -27,8 +53,12 @@ const FooterButtonRoot = ({
 }: FooterButtonProps): ReactElement | null => {
   const footerRef = useRef<HTMLElement>(null);
   const spacerRef = useRef<HTMLDivElement>(null);
-  const buttons = Children.toArray(children).filter(isFooterButtonElement);
+  const footerItems = Children.toArray(children);
+  const buttons = footerItems.filter(isFooterButtonElement);
+  const notices = footerItems.filter(isFooterButtonNoticeElement);
   const buttonCount = buttons.length;
+  const hasNotice = notices.length === 1 && buttonCount === 0;
+  const hasButtons = notices.length === 0 && buttonCount >= 1 && buttonCount <= 2;
 
   useEffect(() => {
     if (!reserveSpace) {
@@ -61,7 +91,7 @@ const FooterButtonRoot = ({
     };
   }, [reserveSpace]);
 
-  if (buttonCount < 1 || buttonCount > 2) {
+  if (!hasNotice && !hasButtons) {
     return null;
   }
 
@@ -69,7 +99,7 @@ const FooterButtonRoot = ({
     <>
       {reserveSpace ? <Spacer ref={spacerRef} aria-hidden="true" /> : null}
       <FixedArea ref={footerRef} $background={background} {...props}>
-        <ButtonGroup ratio={ratio}>{buttons}</ButtonGroup>
+        {hasNotice ? notices[0] : <ButtonGroup ratio={ratio}>{buttons}</ButtonGroup>}
       </FixedArea>
     </>
   );
@@ -99,4 +129,28 @@ const FixedArea = styled.footer<{ $background: FooterButtonBackground }>(
   }),
 );
 
-export const FooterButton = Object.assign(FooterButtonRoot, { Button });
+const NoticeContainer = styled.div(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  boxSizing: 'border-box',
+  width: '100%',
+  gap: theme.spacing.md,
+  overflow: 'hidden',
+  padding: `${theme.spacing.sm} ${theme.spacing['3xl']}`,
+  borderRadius: theme.radius.full,
+}));
+
+const NoticeText = styled(Text)({
+  display: 'block',
+  overflow: 'hidden',
+  minWidth: 0,
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+  wordBreak: 'break-word',
+});
+
+export const FooterButton = Object.assign(FooterButtonRoot, {
+  Button,
+  Notice: FooterButtonNotice,
+});

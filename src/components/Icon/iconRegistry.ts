@@ -20,6 +20,7 @@ import HomeLinedIcon from "@/assets/icons/home-lined.svg?react";
 import LinkLinedIcon from "@/assets/icons/link-lined.svg?react";
 import ListFilledIcon from "@/assets/icons/list-filled.svg?react";
 import ListLinedIcon from "@/assets/icons/list-lined.svg?react";
+import LockFilledIcon from "@/assets/icons/lock-filled.svg?react";
 import LockLinedIcon from "@/assets/icons/lock-lined.svg?react";
 import MapLinedIcon from "@/assets/icons/map-lined.svg?react";
 import MoonFilledIcon from "@/assets/icons/moon-filled.svg?react";
@@ -60,6 +61,7 @@ export const iconRegistry = {
   "link-lined": LinkLinedIcon,
   "list-filled": ListFilledIcon,
   "list-lined": ListLinedIcon,
+  "lock-filled": LockFilledIcon,
   "lock-lined": LockLinedIcon,
   "map-lined": MapLinedIcon,
   "moon-filled": MoonFilledIcon,

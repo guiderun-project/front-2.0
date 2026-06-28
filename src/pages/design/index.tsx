@@ -338,6 +338,7 @@ const ICON_EXAMPLES: ReadonlyArray<{ icon: IconName; color?: ColorToken }> = [
   { icon: "link-lined", color: "text.brand" },
   { icon: "list-filled" },
   { icon: "list-lined" },
+  { icon: "lock-filled", color: "icon.secondary" },
   { icon: "map-lined", color: "text.brand" },
   { icon: "more-vertical-lined" },
   { icon: "plus-lined", color: "text.brand" },

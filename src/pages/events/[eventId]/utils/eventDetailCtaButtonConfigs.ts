@@ -1,7 +1,7 @@
 import type { RecruitStatus } from '@/api/types';
 import type { ButtonLevel } from '@/components';
 
-export type EventDetailCtaAction =
+export type EventDetailCtaButtonAction =
   | 'apply'
   | 'cancelApplication'
   | 'editApplication'
@@ -10,11 +10,20 @@ export type EventDetailCtaAction =
   | 'disabled';
 
 export type EventDetailCtaButtonConfig = {
-  action: EventDetailCtaAction;
+  action: EventDetailCtaButtonAction;
   label: string;
   level?: ButtonLevel;
   disabled?: boolean;
 };
+
+export type EventDetailCtaNoticeConfig = {
+  action: 'notice';
+  label: string;
+};
+
+export type EventDetailCtaConfig =
+  | EventDetailCtaButtonConfig
+  | EventDetailCtaNoticeConfig;
 
 type EventDetailCtaParams = {
   canManageEvent: boolean;
@@ -28,6 +37,16 @@ const EVENT_UPCOMING_DISABLED_BUTTON = {
   disabled: true,
   label: '이벤트가 곧 열릴 예정이에요',
 } satisfies EventDetailCtaButtonConfig;
+
+const EVENT_CLOSED_NOTICE = {
+  action: 'notice',
+  label: '모임 신청이 마감되었어요',
+} satisfies EventDetailCtaNoticeConfig;
+
+const EVENT_UPCOMING_NOTICE = {
+  action: 'notice',
+  label: '모임이 곧 열릴 예정이에요',
+} satisfies EventDetailCtaNoticeConfig;
 
 const EVENT_DATE_STARTED_MANAGEMENT_BUTTONS = [
   {
@@ -46,7 +65,7 @@ export const getEventDetailCtaButtonConfigs = ({
   isEventDateStarted,
   isApplied,
   recruitStatus,
-}: EventDetailCtaParams): EventDetailCtaButtonConfig[] => {
+}: EventDetailCtaParams): EventDetailCtaConfig[] => {
   if (canManageEvent) {
     return getManagementCtaButtonConfigs({
       isEventDateStarted,
@@ -122,7 +141,7 @@ const getParticipantCtaButtonConfigs = ({
 }: Omit<
   EventDetailCtaParams,
   'canManageEvent' | 'isEventDateStarted'
->): EventDetailCtaButtonConfig[] => {
+>): EventDetailCtaConfig[] => {
   switch (recruitStatus) {
     case 'RECRUIT_OPEN':
       if (isApplied) {
@@ -141,22 +160,10 @@ const getParticipantCtaButtonConfigs = ({
 
       return [{ action: 'apply', label: '참여 신청하기' }];
     case 'RECRUIT_CLOSE':
-      return [
-        {
-          action: 'disabled',
-          disabled: true,
-          label: '현재 참여신청이 불가해요',
-        },
-      ];
+      return [EVENT_CLOSED_NOTICE];
     case 'RECRUIT_UPCOMING':
-      return [EVENT_UPCOMING_DISABLED_BUTTON];
+      return [EVENT_UPCOMING_NOTICE];
     case 'RECRUIT_END':
-      return [
-        {
-          action: 'disabled',
-          disabled: true,
-          label: '이벤트 신청이 마감되었어요',
-        },
-      ];
+      return [EVENT_CLOSED_NOTICE];
   }
 };
