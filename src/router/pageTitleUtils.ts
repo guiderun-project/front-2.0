@@ -1,5 +1,9 @@
 export const APP_TITLE = '가이드런프로젝트';
 
+export const ROUTE_PAGE_TITLES = {
+  MAIN: '메인',
+} as const;
+
 export type PageTitleText<TTitle extends string | undefined = undefined> =
   TTitle extends string ? `${TTitle} | ${typeof APP_TITLE}` : typeof APP_TITLE;
 

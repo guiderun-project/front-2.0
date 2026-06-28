@@ -12,6 +12,7 @@ import {
 } from '@/components';
 import { BottomNavigationLayout } from '@/router/BottomNavigationLayout';
 import { PageTitle } from '@/router/PageTitle';
+import { ROUTE_PAGE_TITLES } from '@/router/pageTitleUtils';
 import { GuestOnlyRoute } from '@/router/GuestOnlyRoute';
 import { ProtectedRoute } from '@/router/ProtectedRoute';
 import { NotFoundPage } from '@/pages/NotFoundPage';
@@ -184,7 +185,7 @@ export const router = createBrowserRouter([
               MainPage,
               'public',
               createRouteFallback('bg.subtle', 'gradient.bg.brand-main'),
-              '홈화면',
+              ROUTE_PAGE_TITLES.MAIN,
             ),
           },
           {
