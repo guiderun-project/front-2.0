@@ -21,6 +21,8 @@ const gradientModes = {
         'linear-gradient(180.00000000000182deg, #0F2342 1%, rgba(15, 35, 66, 0) 28%)',
       footer:
         'linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, var(--color-bg-default) 17.308%)',
+      'footer-subtle':
+        'linear-gradient(180deg, rgba(238, 242, 246, 0) 0%, var(--color-bg-subtle) 17.31%)',
     },
     feedback: {
       toastSweep: {
@@ -42,6 +44,8 @@ const gradientModes = {
         'linear-gradient(180.00000000000182deg, #0F2342 1%, rgba(15, 35, 66, 0) 28%)',
       footer:
         'linear-gradient(180deg, rgba(14, 19, 25, 0) 0%, var(--color-bg-default) 17.308%)',
+      'footer-subtle':
+        'linear-gradient(180deg, rgba(21, 27, 35, 0) 0%, var(--color-bg-subtle) 17.31%)',
     },
     feedback: {
       toastSweep: {
@@ -61,6 +65,7 @@ export const gradient = {
     'brand-event': 'var(--gradient-bg-brand-event)',
     'brand-event-overlay': 'var(--gradient-bg-brand-event-overlay)',
     footer: 'var(--gradient-bg-footer)',
+    'footer-subtle': 'var(--gradient-bg-footer-subtle)',
   },
   feedback: {
     toastSweep: {
@@ -76,6 +81,7 @@ export const gradientTokenMap = {
   'bg.brand-event': 'var(--gradient-bg-brand-event)',
   'bg.brand-event-overlay': 'var(--gradient-bg-brand-event-overlay)',
   'bg.footer': 'var(--gradient-bg-footer)',
+  'bg.footer-subtle': 'var(--gradient-bg-footer-subtle)',
   'feedback.toastSweep.success': 'var(--gradient-feedback-toastSweep-success)',
   'feedback.toastSweep.error': 'var(--gradient-feedback-toastSweep-error)',
 } as const;

@@ -210,6 +210,12 @@ const FOOTER_BUTTON_CODE_EXAMPLES = [
   <FooterButton.Button size="l">바로 신청</FooterButton.Button>
 </FooterButton>`,
   },
+  {
+    label: "Subtle background",
+    code: `<FooterButton background="subtle">
+  <FooterButton.Button size="l">신청하기</FooterButton.Button>
+</FooterButton>`,
+  },
 ] as const;
 
 const TEXT_EXAMPLES: ReadonlyArray<{

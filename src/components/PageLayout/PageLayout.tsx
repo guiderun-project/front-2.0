@@ -42,6 +42,7 @@ const GRADIENT_FALLBACK_BACKGROUNDS = {
   'bg.brand-event': 'bg.brand-event',
   'bg.brand-event-overlay': 'bg.brand-event',
   'bg.footer': 'bg.default',
+  'bg.footer-subtle': 'bg.subtle',
 } as const satisfies Partial<Record<PageLayoutGradientToken, PageLayoutColorBackground>>;
 
 type PageLayoutBackgroundLayers = {
