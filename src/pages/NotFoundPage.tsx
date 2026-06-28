@@ -1,13 +1,18 @@
 import styled from '@emotion/styled';
 import { Link } from 'react-router-dom';
 
+import { PageTitle } from '@/router/PageTitle';
+
 export const NotFoundPage = () => {
   return (
-    <Wrapper>
-      <Title>Route not found</Title>
-      <Copy>The v2 shell only exposes the root and auth namespaces for now.</Copy>
-      <BackLink to="/">Return home</BackLink>
-    </Wrapper>
+    <>
+      <PageTitle title="페이지를 찾을 수 없음" />
+      <Wrapper>
+        <Title>Route not found</Title>
+        <Copy>The v2 shell only exposes the root and auth namespaces for now.</Copy>
+        <BackLink to="/">Return home</BackLink>
+      </Wrapper>
+    </>
   );
 };
 

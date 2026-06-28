@@ -11,6 +11,7 @@ import {
   type PageLayoutGradientBackground,
 } from '@/components';
 import { BottomNavigationLayout } from '@/router/BottomNavigationLayout';
+import { PageTitle } from '@/router/PageTitle';
 import { GuestOnlyRoute } from '@/router/GuestOnlyRoute';
 import { ProtectedRoute } from '@/router/ProtectedRoute';
 import { NotFoundPage } from '@/pages/NotFoundPage';
@@ -128,18 +129,36 @@ const withRouteAccess = (
   return pageElement;
 };
 
+const withPageTitle = (
+  pageElement: ReactElement,
+  title?: string,
+): ReactElement => {
+  if (!title) {
+    return pageElement;
+  }
+
+  return (
+    <>
+      <PageTitle title={title} />
+      {pageElement}
+    </>
+  );
+};
+
 const createRouteElement = (
   Page: ComponentType,
   access: LazyRouteAccess = 'public',
   fallback: ReactElement | null = null,
+  title?: string,
 ): ReactElement => {
-  return withRouteAccess(<Page />, access, fallback);
+  return withRouteAccess(withPageTitle(<Page />, title), access, fallback);
 };
 
 const createLazyRouteElement = (
   Page: ComponentType,
   access: LazyRouteAccess = 'public',
   fallback: ReactElement | null = null,
+  title?: string,
 ): ReactElement => {
   const pageElement = (
     <Suspense fallback={fallback}>
@@ -147,7 +166,7 @@ const createLazyRouteElement = (
     </Suspense>
   );
 
-  return withRouteAccess(pageElement, access, fallback);
+  return withRouteAccess(withPageTitle(pageElement, title), access, fallback);
 };
 
 export const router = createBrowserRouter([
@@ -165,6 +184,7 @@ export const router = createBrowserRouter([
               MainPage,
               'public',
               createRouteFallback('bg.subtle', 'gradient.bg.brand-main'),
+              '홈화면',
             ),
           },
           {
@@ -173,6 +193,7 @@ export const router = createBrowserRouter([
               EventsPage,
               'public',
               createRouteFallback('bg.default'),
+              '전체 모임',
             ),
           },
           {
@@ -181,6 +202,7 @@ export const router = createBrowserRouter([
               DesignPage,
               'public',
               createRouteFallback('bg.subtle'),
+              '디자인 시스템',
             ),
           },
           {
@@ -189,6 +211,7 @@ export const router = createBrowserRouter([
               MyPage,
               'authenticated',
               createRouteFallback('bg.subtle'),
+              '마이페이지',
             ),
           },
         ],
@@ -199,6 +222,7 @@ export const router = createBrowserRouter([
           EventSearchPage,
           'public',
           createRouteFallback('bg.default'),
+          '모임 검색',
         ),
       },
       {
@@ -207,6 +231,7 @@ export const router = createBrowserRouter([
           FormDesignPage,
           'public',
           createRouteFallback('bg.subtle'),
+          '폼 디자인',
         ),
       },
       {
@@ -215,6 +240,7 @@ export const router = createBrowserRouter([
           IntroPage,
           'public',
           createRouteFallback('bg.subtle', 'gradient.bg.brand-main'),
+          '시작하기',
         ),
       },
       {
@@ -223,6 +249,7 @@ export const router = createBrowserRouter([
           KakaoOAuthPage,
           'public',
           createRouteFallback('bg.subtle'),
+          '로그인 처리',
         ),
       },
       {
@@ -231,6 +258,7 @@ export const router = createBrowserRouter([
           LoginPage,
           'guest-only',
           createRouteFallback('bg.default'),
+          '로그인',
         ),
       },
       {
@@ -239,6 +267,7 @@ export const router = createBrowserRouter([
           SignupPage,
           'guest-only',
           createRouteFallback('bg.subtle'),
+          '회원가입',
         ),
       },
       {
@@ -255,6 +284,7 @@ export const router = createBrowserRouter([
           TermsPage,
           'public',
           createRouteFallback('bg.subtle'),
+          '약관',
         ),
       },
       {
@@ -263,6 +293,7 @@ export const router = createBrowserRouter([
           EventNewPage,
           'approved',
           createRouteFallback('bg.subtle'),
+          '모임 만들기',
         ),
       },
       {
@@ -321,6 +352,7 @@ export const router = createBrowserRouter([
           EventSupportPage,
           'public',
           createRouteFallback('bg.subtle'),
+          '이동지원 연락처',
         ),
       },
       {
@@ -329,6 +361,7 @@ export const router = createBrowserRouter([
           MyEventsPage,
           'authenticated',
           createRouteFallback('bg.subtle'),
+          '나의 활동',
         ),
       },
       {
@@ -345,6 +378,7 @@ export const router = createBrowserRouter([
           AccountDeletePage,
           'authenticated',
           createRouteFallback('bg.subtle'),
+          '회원 탈퇴',
         ),
       },
       {

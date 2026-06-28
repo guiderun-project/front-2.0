@@ -3,6 +3,7 @@ import type { ReactElement } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { ACCOUNT_FIND_TYPE, type AccountFindType } from '@/constants';
+import { PageTitle } from '@/router/PageTitle';
 
 import { FindId } from './FindId';
 import { FindPassword } from './FindPassword';
@@ -15,6 +16,13 @@ const resolveType = (value: string | null): AccountFindType =>
 export const AccountFindPage = (): ReactElement => {
   const [searchParams] = useSearchParams();
   const type = resolveType(searchParams.get('type'));
+  const title =
+    type === ACCOUNT_FIND_TYPE.PASSWORD ? '비밀번호 찾기' : '아이디 찾기';
 
-  return type === ACCOUNT_FIND_TYPE.PASSWORD ? <FindPassword /> : <FindId />;
+  return (
+    <>
+      <PageTitle title={title} />
+      {type === ACCOUNT_FIND_TYPE.PASSWORD ? <FindPassword /> : <FindId />}
+    </>
+  );
 };
