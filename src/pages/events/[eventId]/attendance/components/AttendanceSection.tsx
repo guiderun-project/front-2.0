@@ -22,12 +22,16 @@ export const AttendanceSection = ({
   return (
     <SectionContainer $hasDivider={hasDivider} aria-labelledby={titleId}>
       <SectionHeader>
-        <Text as="h2" color="text.primary" font="body-l-sb" id={titleId}>
-          {title}
-        </Text>
-        <Text color="text.tertiary" font="body-m-m">
-          {count}명
-        </Text>
+        <SectionHeading id={titleId}>
+          <SectionHeadingText role="text">
+            <Text as="span" color="text.primary" font="body-l-sb">
+              {title}
+            </Text>{' '}
+            <SectionCountText color="text.tertiary" font="body-m-m">
+              {count}명
+            </SectionCountText>
+          </SectionHeadingText>
+        </SectionHeading>
       </SectionHeader>
       {children}
     </SectionContainer>
@@ -49,4 +53,16 @@ const SectionHeader = styled.div(({ theme }) => ({
   alignItems: 'center',
   gap: theme.spacing.md,
   minWidth: 0,
+}));
+
+const SectionHeading = styled.h2({
+  margin: 0,
+});
+
+const SectionHeadingText = styled.span({
+  display: 'inline',
+});
+
+const SectionCountText = styled(Text)(({ theme }) => ({
+  marginLeft: theme.spacing.md,
 }));
