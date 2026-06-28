@@ -3,7 +3,7 @@ import { useId, useState, type ReactElement } from 'react';
 import styled from '@emotion/styled';
 
 import type { MatchingUser, RunningGroup } from '@/api/types';
-import { Badge, Icon, Text } from '@/components';
+import { Badge, HiddenText, Icon, Text } from '@/components';
 import type { AppTheme } from '@/styles/theme';
 
 import type {
@@ -143,17 +143,21 @@ type ParticipantSlotVariant = 'matched' | 'unmatched';
 
 const MatchingResultRow = ({ row }: MatchingResultRowProps): ReactElement => {
   return (
-    <MatchingRowItem aria-label={row.accessibilityLabel} role="listitem">
-      <MatchingRowVisual aria-hidden={true}>
+    <MatchingRowItem>
+      <MatchingRowVisual>
         <ParticipantSlot $variant={row.vi ? 'matched' : 'unmatched'}>
           {row.vi ? (
             <ProfileAvatar name={row.vi.name} type={row.vi.type} />
           ) : (
-            <UnmatchedSlot />
+            <UnmatchedSlot label="시각장애러너 매칭되지 않음" />
           )}
         </ParticipantSlot>
 
-        <LinkIconCircle>
+        {row.vi && row.guides.length > 0 ? (
+          <HiddenText>의 가이드러너</HiddenText>
+        ) : null}
+
+        <LinkIconCircle aria-hidden={true}>
           <Icon
             aria-hidden={true}
             color="icon.secondary"
@@ -176,7 +180,7 @@ const MatchingResultRow = ({ row }: MatchingResultRowProps): ReactElement => {
               ))}
             </GuideList>
           ) : (
-            <UnmatchedSlot />
+            <UnmatchedSlot label="가이드러너 매칭되지 않음" />
           )}
         </ParticipantSlot>
       </MatchingRowVisual>
@@ -184,13 +188,16 @@ const MatchingResultRow = ({ row }: MatchingResultRowProps): ReactElement => {
   );
 };
 
-const UnmatchedSlot = (): ReactElement => {
+const UnmatchedSlot = ({ label }: { label: string }): ReactElement => {
   return (
-    <QuestionMarkChip>
-      <QuestionMark color="text.tertiary" font="heading-s-m">
-        ?
-      </QuestionMark>
-    </QuestionMarkChip>
+    <>
+      <QuestionMarkChip aria-hidden={true}>
+        <QuestionMark color="text.tertiary" font="heading-s-m">
+          ?
+        </QuestionMark>
+      </QuestionMarkChip>
+      <HiddenText>{label}</HiddenText>
+    </>
   );
 };
 
@@ -388,13 +395,16 @@ const GroupHeader = styled.div(({ theme }) => ({
   gap: theme.spacing.md,
 }));
 
-const MatchingRows = styled.div(({ theme }) => ({
+const MatchingRows = styled.ul(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   gap: theme.spacing.md,
+  margin: 0,
+  padding: 0,
+  listStyle: 'none',
 }));
 
-const MatchingRowItem = styled.div({
+const MatchingRowItem = styled.li({
   minWidth: 0,
 });
 

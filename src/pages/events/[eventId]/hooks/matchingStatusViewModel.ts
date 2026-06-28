@@ -8,7 +8,6 @@ import type {
 type MatchingStatusRowType = 'matched' | 'unmatchedVi' | 'unmatchedGuide';
 
 export type MatchingStatusViewRow = {
-  accessibilityLabel: string;
   guides: MatchingUser[];
   id: string;
   type: MatchingStatusRowType;
@@ -51,7 +50,6 @@ const createViewRows = (
   if (row.vi && row.guides.length > 0) {
     return [
       {
-        accessibilityLabel: `${row.vi.name}의 가이드러너 ${formatGuideNames(row.guides)}`,
         guides: row.guides,
         id: `${rowKey}-${row.vi.userId}`,
         type: 'matched',
@@ -63,7 +61,6 @@ const createViewRows = (
   if (row.vi) {
     return [
       {
-        accessibilityLabel: `${row.vi.name} 매칭되지 않음`,
         guides: [],
         id: `${rowKey}-${row.vi.userId}`,
         type: 'unmatchedVi',
@@ -73,14 +70,9 @@ const createViewRows = (
   }
 
   return row.guides.map((guide) => ({
-    accessibilityLabel: `${guide.name} 매칭되지 않음`,
     guides: [guide],
     id: `${rowKey}-${guide.userId}`,
     type: 'unmatchedGuide',
     vi: null,
   }));
-};
-
-const formatGuideNames = (guides: MatchingUser[]) => {
-  return guides.map((guide) => guide.name).join(', ');
 };
