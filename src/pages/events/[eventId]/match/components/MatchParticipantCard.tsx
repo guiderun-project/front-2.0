@@ -4,7 +4,8 @@ import styled from '@emotion/styled';
 
 import { EVENT_CATEGORIES, EVENT_TYPES } from '@/api/constants';
 import type { MatchingWaitingParticipant, RunningGroup } from '@/api/types';
-import { Badge, Button, RunnerTypeAvatar, Text } from '@/components';
+import { Badge, Button, HiddenText, RunnerTypeAvatar, Text } from '@/components';
+import { RUNNER_TYPE_LABELS } from '@/constants';
 
 import type { EventGroupLabelContext } from '../../utils';
 import { ParticipantAdditionalInfoAccordion } from './ParticipantAdditionalInfoAccordion';
@@ -65,6 +66,8 @@ export const MatchParticipantCard = ({
   onToggle,
 }: MatchParticipantCardProps): ReactElement => {
   const actionLabel = isSelected ? '취소하기' : '선택하기';
+  const actionDescription =
+    `${RUNNER_TYPE_LABELS[participant.type]} ${participant.name} ${actionLabel}`;
   const participantMeta = getParticipantMeta(
     applicationGroup,
     eventGroupLabelContext,
@@ -106,7 +109,8 @@ export const MatchParticipantCard = ({
             onToggle(participant);
           }}
         >
-          {actionLabel}
+          <HiddenText>{actionDescription}</HiddenText>
+          <span aria-hidden={true}>{actionLabel}</span>
         </SelectButton>
       </CardHeader>
       <ParticipantAdditionalInfoAccordion participant={participant} />

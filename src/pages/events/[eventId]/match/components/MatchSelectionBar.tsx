@@ -4,7 +4,7 @@ import { keyframes } from '@emotion/react';
 import styled from '@emotion/styled';
 
 import type { MatchingWaitingParticipant } from '@/api/types';
-import { IconButton, Text } from '@/components';
+import { HiddenText, IconButton, Text } from '@/components';
 
 type MatchSelectionBarProps = {
   canCreateMatching: boolean;
@@ -30,13 +30,21 @@ export const MatchSelectionBar = ({
   }
 
   const actionText = canCreateMatching ? '이대로 매칭하기' : '파트너를 선택해주세요';
+  const actionDescription = canCreateMatching
+    ? '선택된 참가자로 매칭하기'
+    : '파트너를 선택해주세요';
   const isActionDisabled = !canCreateMatching || isCreatingMatching;
+  const selectionDescription = getSelectionDescription(
+    selectedVi,
+    selectedGuides,
+  );
 
   return (
     <FixedSelectionArea>
       <SelectionPanel aria-label="선택된 매칭 참가자">
         <SelectionContent>
-          <SelectionItems>
+          <HiddenText>{selectionDescription}</HiddenText>
+          <SelectionItems aria-hidden={true}>
             <SelectionItem
               isPlaceholder={selectedVi === null}
               label="시각장애러너"
@@ -74,11 +82,26 @@ export const MatchSelectionBar = ({
           type="button"
           onClick={onCreateMatching}
         >
-          {actionText}
+          <HiddenText>{actionDescription}</HiddenText>
+          <span aria-hidden={true}>{actionText}</span>
         </SelectionActionButton>
       </SelectionPanel>
     </FixedSelectionArea>
   );
+};
+
+const getSelectionDescription = (
+  selectedVi: MatchingWaitingParticipant | null,
+  selectedGuides: MatchingWaitingParticipant[],
+) => {
+  const viDescription = selectedVi
+    ? `시각장애러너 ${selectedVi.name}`
+    : '시각장애러너 선택전';
+  const guideDescription = selectedGuides.length > 0
+    ? `가이드러너 ${selectedGuides.map((guide) => guide.name).join(', ')}`
+    : '가이드러너 선택전';
+
+  return `${viDescription}, ${guideDescription}`;
 };
 
 type SelectionItemProps = {
