@@ -11,6 +11,8 @@ import {
   BIRTH_DATE_MAX_LENGTH,
   formatBirthDateInput,
   formatISODateToBirthDateInput,
+  isValidKoreanPhone,
+  normalizePhoneDigits,
   toBirthDateISO,
 } from '@/utils';
 
@@ -35,7 +37,7 @@ export const useMyEdit = () => {
       birthDate: personalInfo.birthDate
         ? formatISODateToBirthDateInput(personalInfo.birthDate)
         : '',
-      phoneNumber: personalInfo.phoneNumber ?? '',
+      phoneNumber: normalizePhoneDigits(personalInfo.phoneNumber ?? ''),
       snsId: personalInfo.snsId ?? '',
       id1365: personalInfo.id1365 ?? '',
     }),
@@ -54,6 +56,8 @@ export const useMyEdit = () => {
   const birthDateISO = toBirthDateISO(values.birthDate);
   const hasBirthDateError =
     values.birthDate.length === BIRTH_DATE_MAX_LENGTH && birthDateISO === null;
+  const hasPhoneError =
+    values.phoneNumber.length > 0 && !isValidKoreanPhone(values.phoneNumber);
 
   const buildRequestBody = (): UpdatePersonalInfoRequest | null => {
     const phoneNumber = values.phoneNumber.trim();
@@ -94,7 +98,8 @@ export const useMyEdit = () => {
     },
   });
 
-  const canSubmit = buildRequestBody() !== null && isDirty && !isPending;
+  const canSubmit =
+    buildRequestBody() !== null && isDirty && !isPending && !hasPhoneError;
 
   /** 변경된 정보를 저장한다. 성공하면 true, 실패하면 false 를 반환한다. */
   const submit = async (): Promise<boolean> => {
@@ -118,11 +123,13 @@ export const useMyEdit = () => {
     accountId: personalInfo.accountId,
     setBirthDate: (value: string) =>
       setField('birthDate', formatBirthDateInput(value)),
-    setPhoneNumber: (value: string) => setField('phoneNumber', value),
+    setPhoneNumber: (value: string) =>
+      setField('phoneNumber', normalizePhoneDigits(value)),
     setSnsId: (value: string) => setField('snsId', value),
     setId1365: (value: string) => setField('id1365', value),
     canEditId1365,
     hasBirthDateError,
+    hasPhoneError,
     isDirty,
     canSubmit,
     isSubmitting: isPending,

@@ -5,7 +5,8 @@ import type {
   SmsVerificationExtendResponse,
   SmsVerificationIssueResponse,
 } from '@/api/types/auth';
-import { formatRemainingTime, onlyDigits } from '@/pages/account-find/utils';
+import { formatRemainingTime } from '@/pages/account-find/utils';
+import { normalizePhoneDigits } from '@/utils';
 
 // SMS 인증 제한시간 기본값(초). 서버 응답이 없을 때의 폴백으로만 사용한다.
 const DEFAULT_TIMER_SECONDS = 180;
@@ -69,11 +70,11 @@ export const usePhoneCertification = (): UsePhoneCertificationReturn => {
   };
 
   const handlePhoneChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setPhoneNum(onlyDigits(event.target.value));
+    setPhoneNum(normalizePhoneDigits(event.target.value));
   };
 
   const handleCertCodeChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setCertCode(onlyDigits(event.target.value));
+    setCertCode(event.target.value.replace(/\D/g, ''));
   };
 
   const sendCode = (response?: SmsVerificationIssueResponse) => {

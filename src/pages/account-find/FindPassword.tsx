@@ -16,11 +16,11 @@ import {
 } from '@/components';
 import { usePhoneCertification } from '@/pages/account-find/usePhoneCertification';
 import {
-  isValidKoreanPhone,
   isValidNewPassword,
   NEW_PASSWORD_GUIDE,
 } from '@/pages/account-find/utils';
 import { APP_PATH } from '@/router/path';
+import { isValidKoreanPhone, PHONE_DIGIT_LENGTH } from '@/utils';
 
 const FIND_PASSWORD_PHASE = {
   VERIFY: 'verify',
@@ -231,6 +231,7 @@ export const FindPassword = (): ReactElement => {
               errorText={verifyError || undefined}
               inputMode="numeric"
               label="전화번호"
+              maxLength={PHONE_DIGIT_LENGTH}
               placeholder="-없이 숫자만 입력해주세요"
               value={phoneNum}
               onChange={(event) => {
