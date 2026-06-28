@@ -4,7 +4,12 @@ import { Controller, useFormContext } from 'react-hook-form';
 
 import { Input } from '@/components';
 import { RUNNER_TYPE } from '@/constants';
-import { BIRTH_DATE_MAX_LENGTH, formatBirthDateInput } from '@/utils';
+import {
+  BIRTH_DATE_MAX_LENGTH,
+  formatBirthDateInput,
+  PHONE_NUMBER_MAX_LENGTH,
+  formatPhoneInput,
+} from '@/utils';
 
 import { SIGNUP_FIELD } from '@/pages/signup/constants';
 import { SIGNUP_COPY } from '@/pages/signup/copy';
@@ -56,8 +61,11 @@ export const BasicInfoStep = (): ReactElement => {
             errorText={fieldState.error?.message}
             inputMode="numeric"
             label="전화번호"
+            maxLength={PHONE_NUMBER_MAX_LENGTH}
             value={field.value}
-            onChange={field.onChange}
+            onChange={(event) =>
+              field.onChange(formatPhoneInput(event.target.value))
+            }
           />
         )}
       />
