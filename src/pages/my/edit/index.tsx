@@ -2,7 +2,7 @@ import type { ReactElement } from 'react';
 
 import { useSearchParams } from 'react-router-dom';
 
-import { PageTitle } from '@/router/PageTitle';
+import { PageTitle } from '@/components';
 
 import { MY_EDIT_INFO, MY_EDIT_INFO_PARAM } from './constants';
 import { ProfileEditView } from './ProfileEditView';

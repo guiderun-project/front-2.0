@@ -2,8 +2,8 @@ import type { ReactElement } from 'react';
 
 import { useSearchParams } from 'react-router-dom';
 
+import { PageTitle } from '@/components';
 import { ACCOUNT_FIND_TYPE, type AccountFindType } from '@/constants';
-import { PageTitle } from '@/router/PageTitle';
 
 import { FindId } from './FindId';
 import { FindPassword } from './FindPassword';

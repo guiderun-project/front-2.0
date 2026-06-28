@@ -1,6 +1,10 @@
 import type { ReactElement } from 'react';
 
-import { formatPageTitle } from './title';
+const APP_TITLE = '가이드런프로젝트';
+
+const formatPageTitle = (title?: string): string => {
+  return title ? `${title} | ${APP_TITLE}` : APP_TITLE;
+};
 
 type PageTitleProps = {
   title?: string;

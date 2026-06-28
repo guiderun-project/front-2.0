@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { isRouteErrorResponse, Link, useRouteError } from 'react-router-dom';
 
-import { PageTitle } from '@/router/PageTitle';
+import { PageTitle } from '@/components';
 
 const getMessage = (error: unknown) => {
   if (isRouteErrorResponse(error)) {

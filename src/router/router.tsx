@@ -7,11 +7,11 @@ import App from '@/App';
 import {
   LoaderScreen,
   PageLayout,
+  PageTitle,
   type PageLayoutBackground,
   type PageLayoutGradientBackground,
 } from '@/components';
 import { BottomNavigationLayout } from '@/router/BottomNavigationLayout';
-import { PageTitle } from '@/router/PageTitle';
 import { ROUTE_PAGE_TITLES } from '@/router/title';
 import { GuestOnlyRoute } from '@/router/GuestOnlyRoute';
 import { ProtectedRoute } from '@/router/ProtectedRoute';

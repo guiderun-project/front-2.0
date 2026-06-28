@@ -5,12 +5,11 @@ import { Outlet, useLocation, useParams } from 'react-router-dom';
 
 import { api } from '@/api/services';
 import type { EventDetailResponse } from '@/api/types';
-import { ErrorBoundary, LoaderScreen } from '@/components';
+import { ErrorBoundary, LoaderScreen, PageTitle } from '@/components';
 import { PageLayout } from '@/components/PageLayout';
 import { useAuth } from '@/contexts';
 import { RoutePlaceholder } from '@/pages/_shared/RoutePlaceholder';
 import { APP_PATH } from '@/router/path';
-import { PageTitle } from '@/router/PageTitle';
 
 import {
   EventDetailRouteContext,

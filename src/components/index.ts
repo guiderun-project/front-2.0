@@ -14,6 +14,7 @@ export * from "./Icon";
 export * from "./Input";
 export * from "./Loader";
 export * from "./PageLayout";
+export * from "./PageTitle";
 export * from "./Pagination";
 export * from "./Popup";
 export * from "./QueryBoundary";
