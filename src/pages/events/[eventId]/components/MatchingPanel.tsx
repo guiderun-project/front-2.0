@@ -4,6 +4,7 @@ import styled from '@emotion/styled';
 
 import type { MatchingUser, RunningGroup } from '@/api/types';
 import { Badge, HiddenText, Icon, Text } from '@/components';
+import { RUNNER_TYPE_LABELS } from '@/constants';
 import type { AppTheme } from '@/styles/theme';
 
 import type {
@@ -86,14 +87,16 @@ const MatchingGroupCard = ({
 
   return (
     <GroupCard>
-      <GroupHeader>
-        <Text as="h2" color="text.primary" font="heading-s-sb">
-          {groupLabel}
-        </Text>
-        <Text color="text.tertiary" font="body-m-m">
-          {group.totalCount}명
-        </Text>
-      </GroupHeader>
+      <GroupHeading>
+        <GroupHeadingText role="text">
+          <Text as="span" color="text.primary" font="heading-s-sb">
+            {groupLabel}
+          </Text>{' '}
+          <GroupCountText color="text.tertiary" font="body-m-m">
+            {group.totalCount}명
+          </GroupCountText>
+        </GroupHeadingText>
+      </GroupHeading>
       <MatchingRows
         aria-label={`${groupLabel} 매칭 결과`}
         role="list"
@@ -115,11 +118,12 @@ const MyPartnerSummary = ({
 }: MyPartnerSummaryProps): ReactElement => {
   return (
     <MyPartnerCard>
-      <Text color="text.tertiary" font="body-m-m">
+      <HiddenText>{getMyPartnerSummaryDescription(partners)}</HiddenText>
+      <Text aria-hidden={true} color="text.tertiary" font="body-m-m">
         내 파트너
       </Text>
       {partners.length > 0 ? (
-        <PartnerList>
+        <PartnerList aria-hidden={true}>
           {partners.map((partner) => (
             <PartnerItem key={partner.userId}>
               <ProfileAvatar name={partner.name} type={partner.type} />
@@ -127,12 +131,22 @@ const MyPartnerSummary = ({
           ))}
         </PartnerList>
       ) : (
-        <Badge size="s" tone="gray">
+        <Badge aria-hidden={true} size="s" tone="gray">
           대기중
         </Badge>
       )}
     </MyPartnerCard>
   );
+};
+
+const getMyPartnerSummaryDescription = (partners: MatchingUser[]) => {
+  if (partners.length === 0) {
+    return '내 파트너 대기중';
+  }
+
+  return `내 파트너 ${partners
+    .map((partner) => `${RUNNER_TYPE_LABELS[partner.type]} ${partner.name}`)
+    .join(', ')}`;
 };
 
 type MatchingResultRowProps = {
@@ -144,18 +158,15 @@ type ParticipantSlotVariant = 'matched' | 'unmatched';
 const MatchingResultRow = ({ row }: MatchingResultRowProps): ReactElement => {
   return (
     <MatchingRowItem>
-      <MatchingRowVisual>
+      <HiddenText>{getMatchingRowDescription(row)}</HiddenText>
+      <MatchingRowVisual aria-hidden={true}>
         <ParticipantSlot $variant={row.vi ? 'matched' : 'unmatched'}>
           {row.vi ? (
             <ProfileAvatar name={row.vi.name} type={row.vi.type} />
           ) : (
-            <UnmatchedSlot label="시각장애러너 매칭되지 않음" />
+            <UnmatchedSlot />
           )}
         </ParticipantSlot>
-
-        {row.vi && row.guides.length > 0 ? (
-          <HiddenText>의 가이드러너</HiddenText>
-        ) : null}
 
         <LinkIconCircle aria-hidden={true}>
           <Icon
@@ -180,7 +191,7 @@ const MatchingResultRow = ({ row }: MatchingResultRowProps): ReactElement => {
               ))}
             </GuideList>
           ) : (
-            <UnmatchedSlot label="가이드러너 매칭되지 않음" />
+            <UnmatchedSlot />
           )}
         </ParticipantSlot>
       </MatchingRowVisual>
@@ -188,16 +199,33 @@ const MatchingResultRow = ({ row }: MatchingResultRowProps): ReactElement => {
   );
 };
 
-const UnmatchedSlot = ({ label }: { label: string }): ReactElement => {
+const getMatchingRowDescription = (row: MatchingStatusViewRow) => {
+  if (row.vi && row.guides.length > 0) {
+    return `${row.vi.name}의 가이드러너 ${formatMatchingUserNames(row.guides)}`;
+  }
+
+  if (row.vi) {
+    return `시각장애러너 ${row.vi.name} 매칭되지 않음`;
+  }
+
+  if (row.guides.length > 0) {
+    return `가이드러너 ${formatMatchingUserNames(row.guides)} 매칭되지 않음`;
+  }
+
+  return '시각장애러너 매칭되지 않음, 가이드러너 매칭되지 않음';
+};
+
+const formatMatchingUserNames = (users: MatchingUser[]) => {
+  return users.map((user) => user.name).join(', ');
+};
+
+const UnmatchedSlot = (): ReactElement => {
   return (
-    <>
-      <QuestionMarkChip aria-hidden={true}>
-        <QuestionMark color="text.tertiary" font="heading-s-m">
-          ?
-        </QuestionMark>
-      </QuestionMarkChip>
-      <HiddenText>{label}</HiddenText>
-    </>
+    <QuestionMarkChip>
+      <QuestionMark color="text.tertiary" font="heading-s-m">
+        ?
+      </QuestionMark>
+    </QuestionMarkChip>
   );
 };
 
@@ -389,10 +417,16 @@ const GroupCard = styled.article(({ theme }) => ({
   backgroundColor: theme.color.bg.elevated,
 }));
 
-const GroupHeader = styled.div(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  gap: theme.spacing.md,
+const GroupHeading = styled.h2({
+  margin: 0,
+});
+
+const GroupHeadingText = styled.span({
+  display: 'inline',
+});
+
+const GroupCountText = styled(Text)(({ theme }) => ({
+  marginLeft: theme.spacing.md,
 }));
 
 const MatchingRows = styled.ul(({ theme }) => ({
