@@ -7,7 +7,13 @@ import type {
   MatchingCompletedRow,
   MatchingUser,
 } from '@/api/types';
-import { ConfirmPopup, Icon, RunnerTypeAvatar, Text } from '@/components';
+import {
+  ConfirmPopup,
+  HiddenText,
+  Icon,
+  RunnerTypeAvatar,
+  Text,
+} from '@/components';
 
 import {
   getEventGroupDisplayLabel,
@@ -127,9 +133,13 @@ const CompletedMatchingCard = ({
   row,
   onRequestCancelMatching,
 }: CompletedMatchingCardProps): ReactElement => {
+  const matchingDescription = getCompletedMatchingDescription(row);
+  const cancelDescription = `${matchingDescription} 매칭취소`;
+
   return (
     <CompletedCard>
-      <CompletedRow>
+      <HiddenText>{matchingDescription}</HiddenText>
+      <CompletedRow aria-hidden={true}>
         <ParticipantName user={row.vi} />
         <RelationText color="text.secondary" font="body-m-m">
           의 가이드러너
@@ -153,11 +163,31 @@ const CompletedMatchingCard = ({
           onRequestCancelMatching(row);
         }}
       >
-        매칭취소
-        <Icon aria-hidden={true} color="icon.secondary" icon="delete-lined" size={14} />
+        <HiddenText>{cancelDescription}</HiddenText>
+        <span aria-hidden={true}>매칭취소</span>
+        <Icon
+          aria-hidden={true}
+          color="icon.secondary"
+          icon="delete-lined"
+          size={14}
+        />
       </CancelButton>
     </CompletedCard>
   );
+};
+
+const getCompletedMatchingDescription = (row: MatchingCompletedRow) => {
+  if (row.guides.length === 0) {
+    return `${row.vi.name}의 가이드러너 없음`;
+  }
+
+  return `${row.vi.name}의 가이드러너 ${formatMatchingUserNames(
+    row.guides,
+  )}`;
+};
+
+const formatMatchingUserNames = (users: MatchingUser[]) => {
+  return users.map((user) => user.name).join(', ');
 };
 
 type ParticipantNameProps = {
