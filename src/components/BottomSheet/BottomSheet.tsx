@@ -122,7 +122,7 @@ export const BottomSheet = ({
                     aria-label="닫기"
                     icon="delete-lined"
                     iconSize={24}
-                    size={24}
+                    size={32}
                     onClick={handleClose}
                   />
                 ) : null}
