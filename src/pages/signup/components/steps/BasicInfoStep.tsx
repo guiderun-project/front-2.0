@@ -7,8 +7,7 @@ import { RUNNER_TYPE } from '@/constants';
 import {
   BIRTH_DATE_MAX_LENGTH,
   formatBirthDateInput,
-  PHONE_NUMBER_MAX_LENGTH,
-  formatPhoneInput,
+  PHONE_DIGIT_LENGTH,
 } from '@/utils';
 
 import { SIGNUP_FIELD } from '@/pages/signup/constants';
@@ -61,10 +60,10 @@ export const BasicInfoStep = (): ReactElement => {
             errorText={fieldState.error?.message}
             inputMode="numeric"
             label="전화번호"
-            maxLength={PHONE_NUMBER_MAX_LENGTH}
+            maxLength={PHONE_DIGIT_LENGTH}
             value={field.value}
             onChange={(event) =>
-              field.onChange(formatPhoneInput(event.target.value))
+              field.onChange(event.target.value.replace(/\D/g, '').slice(0, PHONE_DIGIT_LENGTH))
             }
           />
         )}

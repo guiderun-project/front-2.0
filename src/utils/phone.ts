@@ -1,14 +1,9 @@
-export const PHONE_NUMBER_MAX_LENGTH = 13; // "010-1234-5678"
+export const PHONE_DIGIT_LENGTH = 11;
 
-const PHONE_DIGIT_LENGTH = 11;
+/** 한국 휴대전화 번호 형식인지 검사한다. 숫자만 있는 문자열을 입력으로 받는다. (01X + 7~8자리) */
+export const isValidKoreanPhone = (digits: string): boolean =>
+  /^01[0-9]\d{7,8}$/.test(digits);
 
-/** 입력값에서 숫자만 추출해 "010-XXXX-XXXX"(11자리) 또는 "016-XXX-XXXX"(10자리) 형태로 만든다. */
-export const formatPhoneInput = (raw: string): string => {
-  const digits = raw.replace(/\D/g, '').slice(0, PHONE_DIGIT_LENGTH);
-
-  if (digits.length <= 3) return digits;
-  // 11자리: 3-4-4, 10자리: 3-3-4
-  const midEnd = digits.length === PHONE_DIGIT_LENGTH ? 7 : 6;
-  if (digits.length <= midEnd) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
-  return `${digits.slice(0, 3)}-${digits.slice(3, midEnd)}-${digits.slice(midEnd)}`;
-};
+/** 입력값에서 숫자 이외 문자를 제거하고 최대 11자리로 제한한다. */
+export const normalizePhoneDigits = (value: string): string =>
+  value.replace(/\D/g, '').slice(0, PHONE_DIGIT_LENGTH);
