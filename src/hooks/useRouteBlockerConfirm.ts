@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
-import { useBlocker } from "react-router-dom";
+import { useEffect, useRef } from 'react';
+import { useBlocker } from 'react-router-dom';
 
 export type UseRouteBlockerConfirmOptions = {
   /** 라우트 이탈 차단 활성화 여부 */
@@ -28,13 +28,13 @@ export const useRouteBlockerConfirm = ({
       e.preventDefault();
     };
 
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [enabled]);
 
   useEffect(() => {
     const run = async () => {
-      if (blocker.state !== "blocked") return;
+      if (blocker.state !== 'blocked') return;
       if (isConfirmingRef.current) return;
       isConfirmingRef.current = true;
 

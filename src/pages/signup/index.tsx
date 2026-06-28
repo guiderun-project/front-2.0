@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useRef, useState, type ReactElement } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactElement,
+} from 'react';
 
 import styled from '@emotion/styled';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -6,7 +12,12 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { api } from '@/api/services';
-import { ConfirmPopup, FooterButton, PageLayout, TopNavigation } from '@/components';
+import {
+  ConfirmPopup,
+  FooterButton,
+  PageLayout,
+  TopNavigation,
+} from '@/components';
 import { useAuth } from '@/contexts';
 import { useRouteBlockerConfirm } from '@/hooks/useRouteBlockerConfirm';
 import { APP_PATH } from '@/router/path';
@@ -71,6 +82,18 @@ export const SignupPage = (): ReactElement => {
     (location.state as SignupLocationState | null)?.signupToken ??
     (import.meta.env.DEV ? DEV_FALLBACK_SIGNUP_TOKEN : '');
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  // 가입 성공 시 발급된 accessToken. /signup 은 guest-only 라 제출 직후 startSession 하면
+  // 완료 화면이 뜨기 전에 가드가 HOME 으로 보낸다. 토큰만 보관하고 세션 시작은 완료 화면에서 한다.
+  const [issuedAccessToken, setIssuedAccessToken] = useState<string | null>(
+    null,
+  );
+
+  const { step, isFirst, goNext, goPrev } = funnel;
+  const stepperStage = SIGNUP_STEP_STAGE[step];
+  const isComplete = step === 'complete';
+  const isTerms = step === 'terms';
+
   const [isExitConfirmOpen, setIsExitConfirmOpen] = useState(false);
   const exitResolverRef = useRef<((v: boolean) => void) | null>(null);
 
@@ -83,19 +106,10 @@ export const SignupPage = (): ReactElement => {
     [],
   );
 
-  useRouteBlockerConfirm({ enabled: !isComplete, onConfirm: handleExitConfirm });
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  // 가입 성공 시 발급된 accessToken. /signup 은 guest-only 라 제출 직후 startSession 하면
-  // 완료 화면이 뜨기 전에 가드가 HOME 으로 보낸다. 토큰만 보관하고 세션 시작은 완료 화면에서 한다.
-  const [issuedAccessToken, setIssuedAccessToken] = useState<string | null>(
-    null,
-  );
-
-  const { step, isFirst, goNext, goPrev } = funnel;
-  const stepperStage = SIGNUP_STEP_STAGE[step];
-  const isComplete = step === 'complete';
-  const isTerms = step === 'terms';
+  useRouteBlockerConfirm({
+    enabled: !isComplete,
+    onConfirm: handleExitConfirm,
+  });
 
   const stepAreaRef = useRef<HTMLDivElement>(null);
 
