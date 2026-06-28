@@ -134,7 +134,7 @@ const CompletedMatchingCard = ({
   onRequestCancelMatching,
 }: CompletedMatchingCardProps): ReactElement => {
   const matchingDescription = getCompletedMatchingDescription(row);
-  const cancelDescription = `${matchingDescription} 매칭취소`;
+  const cancelDescription = `${row.vi.name}님의 매칭취소`;
 
   return (
     <CompletedCard>
