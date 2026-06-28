@@ -18,7 +18,7 @@ export const EventDetailCta = ({
   event,
   onRestrictedAccess,
 }: EventDetailCtaProps): ReactElement => {
-  const { buttons, ratio } = useEventDetailCta({
+  const { ctaItems, ratio } = useEventDetailCta({
     canAccessProtectedTabs,
     canManageEvent,
     event,
@@ -27,17 +27,23 @@ export const EventDetailCta = ({
 
   return (
     <FooterButton background="subtle" ratio={ratio}>
-      {buttons.map(({ action, label, level, onClick, disabled }) => (
-        <FooterButton.Button
-          key={`${action}-${label}`}
-          disabled={disabled}
-          level={level}
-          size="l"
-          onClick={onClick}
-        >
-          {label}
-        </FooterButton.Button>
-      ))}
+      {ctaItems.map((item) =>
+        item.action === 'notice' ? (
+          <FooterButton.Notice key={`${item.action}-${item.label}`}>
+            {item.label}
+          </FooterButton.Notice>
+        ) : (
+          <FooterButton.Button
+            key={`${item.action}-${item.label}`}
+            disabled={item.disabled}
+            level={item.level}
+            size="l"
+            onClick={item.onClick}
+          >
+            {item.label}
+          </FooterButton.Button>
+        ),
+      )}
     </FooterButton>
   );
 };

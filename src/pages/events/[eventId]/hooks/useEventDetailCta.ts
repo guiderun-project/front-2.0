@@ -9,6 +9,8 @@ import {
   getEventDetailCtaButtonConfigs,
   hasEventDateStarted,
   type EventDetailCtaButtonConfig,
+  type EventDetailCtaConfig,
+  type EventDetailCtaNoticeConfig,
 } from '../utils/eventDetailCtaButtonConfigs';
 
 type UseEventDetailCtaParams = {
@@ -22,12 +24,20 @@ type EventDetailCtaButton = EventDetailCtaButtonConfig & {
   onClick?: () => void;
 };
 
+type EventDetailCtaNotice = EventDetailCtaNoticeConfig;
+
+type EventDetailCtaItem = EventDetailCtaButton | EventDetailCtaNotice;
+
 type UseEventDetailCtaResult = {
-  buttons: EventDetailCtaButton[];
+  ctaItems: EventDetailCtaItem[];
   ratio?: ButtonGroupRatio;
 };
 
 const MAX_TIMEOUT_DELAY_MS = 2_147_483_647;
+
+const isEventDetailCtaButtonConfig = (
+  config: EventDetailCtaConfig,
+): config is EventDetailCtaButtonConfig => config.action !== 'notice';
 
 export const useEventDetailCta = ({
   canAccessProtectedTabs,
@@ -84,13 +94,21 @@ export const useEventDetailCta = ({
     ],
   );
 
-  const buttons = buttonConfigs.map<EventDetailCtaButton>((button) => ({
-    ...button,
-    ...getEventDetailCtaActionProps(button),
-  }));
+  const ctaItems = buttonConfigs.map<EventDetailCtaItem>((config) => {
+    if (!isEventDetailCtaButtonConfig(config)) {
+      return config;
+    }
+
+    return {
+      ...config,
+      ...getEventDetailCtaActionProps(config),
+    };
+  });
+
+  const buttonCount = ctaItems.filter(isEventDetailCtaButtonConfig).length;
 
   return {
-    buttons,
-    ratio: buttons.length === 2 ? '35:65' : undefined,
+    ctaItems,
+    ratio: buttonCount === 2 ? '35:65' : undefined,
   };
 };

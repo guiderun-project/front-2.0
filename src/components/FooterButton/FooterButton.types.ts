@@ -10,3 +10,7 @@ export type FooterButtonProps = {
   ratio?: ButtonGroupRatio;
   reserveSpace?: boolean;
 } & Omit<ComponentPropsWithoutRef<'footer'>, 'children'>;
+
+export type FooterButtonNoticeProps = {
+  children: ReactNode;
+} & Omit<ComponentPropsWithoutRef<'div'>, 'children'>;
