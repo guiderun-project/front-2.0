@@ -3,7 +3,8 @@ import type { ReactElement } from 'react';
 import styled from '@emotion/styled';
 
 import type { EventApplicant, EventApplicantListResponse } from '@/api/types';
-import { Badge, Icon, RunnerTypeAvatar, Text } from '@/components';
+import { Badge, HiddenText, Icon, RunnerTypeAvatar, Text } from '@/components';
+import { RUNNER_TYPE_LABELS } from '@/constants';
 
 import { getEventGroupDisplayLabel, type EventGroupLabelContext } from '../utils';
 import { PanelState } from './PanelState';
@@ -43,10 +44,11 @@ export const ApplicantsPanel = ({
   return (
     <ProtectedPanelSection>
       <SummaryCard>
-        <SummaryLabel color="text.tertiary" font="body-m-m">
+        <HiddenText>{getSummaryDescription(summary)}</HiddenText>
+        <SummaryLabel aria-hidden={true} color="text.tertiary" font="body-m-m">
           신청인원
         </SummaryLabel>
-        <SummaryContent>
+        <SummaryContent aria-hidden={true}>
           <Text color="text.primary" font="body-l-sb">
             총 {summary.totalCount}명
           </Text>
@@ -84,14 +86,16 @@ export const ApplicantsPanel = ({
               key={group.runningGroup}
               $hasDivider={index < groups.length - 1}
             >
-              <GroupHeader>
-                <Text as="h2" color="text.primary" font="body-l-b">
-                  {groupLabel}
-                </Text>
-                <Text color="text.tertiary" font="body-m-m">
-                  {totalCount}명
-                </Text>
-              </GroupHeader>
+              <GroupHeading>
+                <GroupHeadingText role="text">
+                  <Text as="span" color="text.primary" font="body-l-b">
+                    {groupLabel}
+                  </Text>{' '}
+                  <GroupCountText color="text.tertiary" font="body-m-m">
+                    {totalCount}명
+                  </GroupCountText>
+                </GroupHeadingText>
+              </GroupHeading>
               <PersonList>
                 {applicants.map((applicant) => (
                   <ApplicantRow
@@ -118,8 +122,9 @@ const ApplicantRow = ({
   applicant,
   onApplicantClick,
 }: ApplicantRowProps): ReactElement => {
+  const description = getApplicantDescription(applicant, Boolean(onApplicantClick));
   const content = (
-    <PersonRowContent>
+    <PersonRowContent aria-hidden={true}>
       <ProfileAvatar name={applicant.name} type={applicant.type} />
       {applicant.isFirstParticipation ? (
         <Badge size="s" tone="cyan">
@@ -138,9 +143,10 @@ const ApplicantRow = ({
           onApplicantClick(applicant.userId);
         }}
       >
+        <HiddenText>{description}</HiddenText>
         {content}
         <Icon
-          aria-label="신청서 상세 보기"
+          aria-hidden={true}
           color="icon.secondary"
           icon="chevron-right-lined"
           size={20}
@@ -149,7 +155,30 @@ const ApplicantRow = ({
     );
   }
 
-  return <PersonRow>{content}</PersonRow>;
+  return (
+    <PersonRow>
+      <HiddenText>{description}</HiddenText>
+      {content}
+    </PersonRow>
+  );
+};
+
+const getSummaryDescription = (
+  summary: EventApplicantListResponse['summary'],
+) => {
+  return `신청인원 총 ${summary.totalCount}명, 시각장애러너 ${summary.viCount}명, 가이드러너 ${summary.guideCount}명`;
+};
+
+const getApplicantDescription = (
+  applicant: EventApplicant,
+  hasApplicantDetail: boolean,
+) => {
+  const participationDescription = applicant.isFirstParticipation
+    ? ', 첫참여'
+    : '';
+  const detailDescription = hasApplicantDetail ? ', 신청서 상세 보기' : '';
+
+  return `${RUNNER_TYPE_LABELS[applicant.type]} ${applicant.name}${participationDescription}${detailDescription}`;
 };
 
 const ProtectedPanelSection = styled.section(({ theme }) => ({
@@ -224,10 +253,16 @@ const GroupSection = styled.section<{ $hasDivider: boolean }>(
   }),
 );
 
-const GroupHeader = styled.div(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  gap: theme.spacing.md,
+const GroupHeading = styled.h2({
+  margin: 0,
+});
+
+const GroupHeadingText = styled.span({
+  display: 'inline',
+});
+
+const GroupCountText = styled(Text)(({ theme }) => ({
+  marginLeft: theme.spacing.md,
 }));
 
 const PersonList = styled.div(({ theme }) => ({
