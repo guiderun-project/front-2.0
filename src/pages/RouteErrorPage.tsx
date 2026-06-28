@@ -1,6 +1,8 @@
 import styled from '@emotion/styled';
 import { isRouteErrorResponse, Link, useRouteError } from 'react-router-dom';
 
+import { PageTitle } from '@/components';
+
 const getMessage = (error: unknown) => {
   if (isRouteErrorResponse(error)) {
     return `${error.status} ${error.statusText}`;
@@ -17,13 +19,16 @@ export const RouteErrorPage = () => {
   const error = useRouteError();
 
   return (
-    <Wrapper>
-      <Card>
-        <Title>Routing error</Title>
-        <Copy>{getMessage(error)}</Copy>
-        <BackLink to="/">Return home</BackLink>
-      </Card>
-    </Wrapper>
+    <>
+      <PageTitle title="페이지 오류" />
+      <Wrapper>
+        <Card>
+          <Title>Routing error</Title>
+          <Copy>{getMessage(error)}</Copy>
+          <BackLink to="/">Return home</BackLink>
+        </Card>
+      </Wrapper>
+    </>
   );
 };
 
