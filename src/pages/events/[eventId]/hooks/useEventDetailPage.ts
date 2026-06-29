@@ -49,6 +49,7 @@ export const useEventDetailPage = () => {
   const canManageEvent =
     user !== null &&
     (event.viewer?.isOrganizer === true || user.role === USER_ROLES.ADMIN);
+  const canExtractAttendanceList = user?.role === USER_ROLES.ADMIN;
 
   const openRestrictedSheet = () => {
     setIsRestrictedSheetOpen(true);
@@ -122,6 +123,7 @@ export const useEventDetailPage = () => {
   return {
     activeTab,
     canAccessProtectedTabs,
+    canExtractAttendanceList,
     canManageEvent,
     closeManagementSheet,
     closeRestrictedSheet,

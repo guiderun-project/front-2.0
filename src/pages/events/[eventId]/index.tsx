@@ -25,6 +25,7 @@ export const EventDetailPage = (): ReactElement => {
   const {
     activeTab,
     canAccessProtectedTabs,
+    canExtractAttendanceList,
     canManageEvent,
     closeManagementSheet,
     closeRestrictedSheet,
@@ -159,6 +160,7 @@ export const EventDetailPage = (): ReactElement => {
         onLogin={handleLogin}
       />
       <ManagementMenuSheet
+        canExtractAttendanceList={canExtractAttendanceList}
         eventDate={event.schedule.date}
         eventId={eventId}
         eventName={event.name}
