@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 import { Icon, PageLayout, Text, TopNavigation } from "@/components";
 
-import { TERMS_SECTIONS, type TermsSection } from "./constants";
+import { TERMS_SECTIONS, type BodyBlock, type TermsSection } from "./constants";
 
 export const TermsPage = (): ReactElement => {
   const navigate = useNavigate();
@@ -63,14 +63,48 @@ const TermsAccordionItem = ({
       >
         <PanelInner $isOpen={isOpen}>
           <Divider aria-hidden={true} />
-          <Text color="text.tertiary" font="body-s-m">
-            {section.body}
-          </Text>
+          <BodyRenderer blocks={section.body} />
         </PanelInner>
       </Panel>
     </Card>
   );
 };
+
+const BodyRenderer = ({ blocks }: { blocks: BodyBlock[] }): ReactElement => (
+  <BodyContent>
+    {blocks.map((block, i) => {
+      if (block.type === "paragraph") {
+        return (
+          <Text key={i} color="text.tertiary" font="body-s-m">
+            {block.text}
+          </Text>
+        );
+      }
+      return (
+        <OrderedList key={i}>
+          {block.items.map((item, j) => (
+            <li key={j}>
+              <Text color="text.tertiary" font="body-s-m">
+                {item.text}
+              </Text>
+              {item.bullets && item.bullets.length > 0 && (
+                <UnorderedList>
+                  {item.bullets.map((bullet, k) => (
+                    <li key={k}>
+                      <Text color="text.tertiary" font="body-s-m">
+                        {bullet}
+                      </Text>
+                    </li>
+                  ))}
+                </UnorderedList>
+              )}
+            </li>
+          ))}
+        </OrderedList>
+      );
+    })}
+  </BodyContent>
+);
 
 const Content = styled.div(({ theme }) => ({
   display: "flex",
@@ -151,7 +185,6 @@ const PanelInner = styled.div<{ $isOpen: boolean }>(({ $isOpen, theme }) => ({
     ? `0 ${theme.spacing["2xl"]} ${theme.spacing["3xl"]}`
     : `0 ${theme.spacing["2xl"]}`,
   transition: "padding 180ms ease-out",
-  whiteSpace: "pre-line",
 
   "@media (prefers-reduced-motion: reduce)": {
     transition: "none",
@@ -164,4 +197,39 @@ const Divider = styled.hr(({ theme }) => ({
   margin: 0,
   border: 0,
   borderTop: `1px solid ${theme.color.border.subtle}`,
+}));
+
+const BodyContent = styled.div(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  gap: theme.spacing.lg,
+}));
+
+const OrderedList = styled.ol(({ theme }) => ({
+  ...theme.typography["body-s-m"],
+  color: theme.color.text.tertiary,
+  margin: 0,
+  paddingLeft: theme.spacing["2xl"],
+  listStyleType: "decimal",
+
+  "& > li": {
+    paddingLeft: theme.spacing.xs,
+  },
+
+  "& > li + li": {
+    marginTop: theme.spacing.md,
+  },
+}));
+
+const UnorderedList = styled.ul(({ theme }) => ({
+  ...theme.typography["body-s-m"],
+  color: theme.color.text.tertiary,
+  margin: 0,
+  marginTop: theme.spacing.sm,
+  paddingLeft: theme.spacing.xl,
+  listStyleType: "disc",
+
+  "& > li + li": {
+    marginTop: theme.spacing.sm,
+  },
 }));
