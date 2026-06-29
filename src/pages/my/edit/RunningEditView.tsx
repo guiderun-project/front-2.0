@@ -7,12 +7,11 @@ import {
   ConfirmPopup,
   FooterButton,
   FormPageLayout,
-  Input,
   PageLayout,
   QueryBoundary,
   Select,
-  Text,
   Textarea,
+  TimeInput,
   type SelectOptions,
 } from '@/components';
 import { TRAINING_RECORD_LABELS, type RunnerRecordGroup } from '@/constants';
@@ -60,8 +59,7 @@ const MyRunningEditContent = (): ReactElement => {
     values,
     userType,
     setRecordDegree,
-    setDistance,
-    setTime,
+    setRecord,
     setHopePrefs,
     isDirty,
     canSubmit,
@@ -103,30 +101,11 @@ const MyRunningEditContent = (): ReactElement => {
         onChange={setRecordDegree}
       />
 
-      <RecordRow>
-        <RecordField
-          inputMode="decimal"
-          label="러닝거리"
-          trailing={
-            <Unit color="text.primary" font="body-l-m">
-              KM
-            </Unit>
-          }
-          value={values.distance}
-          onChange={(event) => setDistance(event.target.value)}
-        />
-        <RecordField
-          inputMode="numeric"
-          label="시간"
-          trailing={
-            <Unit color="text.primary" font="body-l-m">
-              분
-            </Unit>
-          }
-          value={values.time}
-          onChange={(event) => setTime(event.target.value)}
-        />
-      </RecordRow>
+      <TimeInput
+        label="10KM 러닝기록"
+        value={values.record}
+        onChange={setRecord}
+      />
 
       <Textarea
         label="희망사항"
@@ -173,17 +152,3 @@ const Fields = styled.div(({ theme }) => ({
   padding: theme.spacing['2xl'],
   paddingTop: theme.spacing['4xl'],
 }));
-
-const RecordRow = styled.div(({ theme }) => ({
-  display: 'flex',
-  gap: theme.spacing.md,
-}));
-
-const RecordField = styled(Input)({
-  flex: 1,
-  minWidth: 0,
-});
-
-const Unit = styled(Text)({
-  flexShrink: 0,
-});
