@@ -26,5 +26,6 @@ export type SignupFormValues = {
   agreements: {
     privacy: boolean;
     portraitRights: boolean;
+    safety: boolean;
   };
 };

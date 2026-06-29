@@ -47,6 +47,7 @@ export const signupSchema = z
     agreements: z.object({
       privacy: z.boolean(),
       portraitRights: z.boolean(),
+      safety: z.boolean(),
     }),
   })
   .superRefine((values, ctx) => {

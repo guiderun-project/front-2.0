@@ -17,7 +17,8 @@ const SECTION_CONFIG: Record<
   {
     field:
       | typeof SIGNUP_FIELD.AGREEMENTS_PRIVACY
-      | typeof SIGNUP_FIELD.AGREEMENTS_PORTRAIT_RIGHTS;
+      | typeof SIGNUP_FIELD.AGREEMENTS_PORTRAIT_RIGHTS
+      | typeof SIGNUP_FIELD.AGREEMENTS_SAFETY;
     agreementKey: keyof SignupFormValues['agreements'];
   }
 > = {
@@ -26,6 +27,7 @@ const SECTION_CONFIG: Record<
     field: SIGNUP_FIELD.AGREEMENTS_PORTRAIT_RIGHTS,
     agreementKey: 'portraitRights',
   },
+  safety: { field: SIGNUP_FIELD.AGREEMENTS_SAFETY, agreementKey: 'safety' },
 };
 
 export const TermsStep = (): ReactElement => {
@@ -35,13 +37,15 @@ export const TermsStep = (): ReactElement => {
     formState: { errors },
   } = useFormContext<SignupFormValues>();
   const agreements = watch(SIGNUP_FIELD.AGREEMENTS);
-  const allChecked = agreements.privacy && agreements.portraitRights;
+  const allChecked =
+    agreements.privacy && agreements.portraitRights && agreements.safety;
 
   // 체크 시 검증 에러를 즉시 해제하기 위해 shouldValidate 로 재검증한다.
   const setAgreement = (
     name:
       | typeof SIGNUP_FIELD.AGREEMENTS_PRIVACY
-      | typeof SIGNUP_FIELD.AGREEMENTS_PORTRAIT_RIGHTS,
+      | typeof SIGNUP_FIELD.AGREEMENTS_PORTRAIT_RIGHTS
+      | typeof SIGNUP_FIELD.AGREEMENTS_SAFETY,
     checked: boolean,
   ) => setValue(name, checked, { shouldValidate: true });
 
@@ -49,7 +53,7 @@ export const TermsStep = (): ReactElement => {
     const next = !allChecked;
     setValue(
       SIGNUP_FIELD.AGREEMENTS,
-      { privacy: next, portraitRights: next },
+      { privacy: next, portraitRights: next, safety: next },
       { shouldValidate: true },
     );
   };
