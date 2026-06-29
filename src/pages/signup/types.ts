@@ -1,6 +1,6 @@
 import type { Gender } from '@/api/types';
 import type { TimeValue } from '@/components';
-import type { RUNNER_TYPE } from '@/constants';
+import type { RUNNER_TYPE, RunnerRecordGroup } from '@/constants';
 
 import type { SIGNUP_STEP_IDS } from '@/pages/signup/constants';
 
@@ -21,6 +21,7 @@ export type SignupFormValues = {
   hasExperience: boolean | null; // 러닝/가이드 경험 유무
   partneredViName: string; // GUIDE 전용
   record: TimeValue; // 10KM 러닝기록 (시:분:초)
+  recordDegree: RunnerRecordGroup; // 러닝 그룹(A~E). 10KM 기록 기반 자동 기본값이며 수정 가능
   hopePrefs: string;
   agreements: {
     privacy: boolean;

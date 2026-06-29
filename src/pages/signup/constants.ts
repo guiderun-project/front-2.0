@@ -39,6 +39,7 @@ export const SIGNUP_FIELD = {
   HAS_EXPERIENCE: 'hasExperience',
   PARTNERED_VI_NAME: 'partneredViName',
   RECORD: 'record',
+  RECORD_DEGREE: 'recordDegree',
   HOPE_PREFS: 'hopePrefs',
   AGREEMENTS: 'agreements',
   AGREEMENTS_PRIVACY: 'agreements.privacy',
@@ -74,6 +75,7 @@ export const SIGNUP_FORM_DEFAULT_VALUES: SignupFormValues = {
   hasExperience: null,
   partneredViName: '',
   record: { hours: '', minutes: '', seconds: '' },
+  recordDegree: 'E',
   hopePrefs: '',
   agreements: {
     privacy: false,

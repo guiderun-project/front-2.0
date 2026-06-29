@@ -1,4 +1,5 @@
 import type { RunningGroup, UserType } from '@/api/types';
+import type { TimeValue } from '@/components';
 
 export const RUNNER_TYPE = {
   VI: 'VI',
@@ -31,4 +32,45 @@ export const TRAINING_RECORD_LABELS: Record<
     D: '60분~',
     E: '기록 없음',
   },
+};
+
+// 시/분/초 중 하나라도 입력되어 있으면 10KM 기록이 있다고 본다.
+export const hasRunningRecord = (record: TimeValue): boolean =>
+  record.hours !== '' || record.minutes !== '' || record.seconds !== '';
+
+// TRAINING_RECORD_LABELS(10KM 기록 구간) 기준 그룹 상한(분, 이하 포함). 초과 시 D, 기록 없음은 E.
+const RUNNING_GROUP_MAX_MINUTES: Record<
+  UserType,
+  ReadonlyArray<{ group: RunnerRecordGroup; maxMinutes: number }>
+> = {
+  VI: [
+    { group: 'A', maxMinutes: 50 },
+    { group: 'B', maxMinutes: 56 },
+    { group: 'C', maxMinutes: 65 },
+  ],
+  GUIDE: [
+    { group: 'A', maxMinutes: 45 },
+    { group: 'B', maxMinutes: 52 },
+    { group: 'C', maxMinutes: 59 },
+  ],
+};
+
+// 10KM 러닝기록(시:분:초)을 러닝 그룹(A~E)으로 환산한다. 기록이 없으면 E.
+export const deriveRunningGroup = (
+  record: TimeValue,
+  type: UserType,
+): RunnerRecordGroup => {
+  if (!hasRunningRecord(record)) {
+    return 'E';
+  }
+
+  const hours = Number(record.hours) || 0;
+  const minutes = Number(record.minutes) || 0;
+  const totalMinutes = hours * 60 + minutes;
+
+  const found = RUNNING_GROUP_MAX_MINUTES[type].find(
+    ({ maxMinutes }) => totalMinutes <= maxMinutes,
+  );
+
+  return found?.group ?? 'D';
 };

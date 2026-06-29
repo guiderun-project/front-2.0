@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { RUNNER_TYPE } from '@/constants';
+import { RUNNER_TYPE, hasRunningRecord } from '@/constants';
 
 // "YYYY.MM.DD" (formatBirthDateInput 출력 형식)
 const BIRTH_DATE_PATTERN = /^\d{4}\.\d{2}\.\d{2}$/;
@@ -42,6 +42,7 @@ export const signupSchema = z
     hasExperience: z.boolean().nullable(),
     partneredViName: z.string(),
     record: timeValueSchema,
+    recordDegree: z.enum(['A', 'B', 'C', 'D', 'E']),
     hopePrefs: z.string(),
     agreements: z.object({
       privacy: z.boolean(),
@@ -97,19 +98,13 @@ export const signupSchema = z
       });
     }
 
-    // 러닝 경험이 있으면 10KM 기록은 필수. 경험이 없으면 기록 없이 E팀으로 배정한다.
-    if (values.hasExperience === true) {
-      const totalMinutes =
-        (Number(values.record.hours) || 0) * 60 +
-        (Number(values.record.minutes) || 0);
-
-      if (totalMinutes <= 0) {
-        ctx.addIssue({
-          code: 'custom',
-          message: '10KM 러닝기록을 입력해주세요.',
-          path: ['record'],
-        });
-      }
+    // 10KM 기록은 경험 유무와 무관하게 항상 필수. 기록이 없으면 0이라도 입력해야 한다(0 허용).
+    if (!hasRunningRecord(values.record)) {
+      ctx.addIssue({
+        code: 'custom',
+        message: '10KM 러닝기록을 입력해주세요.',
+        path: ['record'],
+      });
     }
 
     if (!values.agreements.privacy) {

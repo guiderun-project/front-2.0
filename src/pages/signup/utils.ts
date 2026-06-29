@@ -1,53 +1,12 @@
 import type { TimeValue } from '@/components';
 import type { SignupCommonInfo, SignupPostRequest } from '@/api/types';
-import { RUNNER_TYPE, type RunnerRecordGroup } from '@/constants';
+import { RUNNER_TYPE, hasRunningRecord } from '@/constants';
 
-import type { RunnerType, SignupFormValues } from '@/pages/signup/types';
-
-// TRAINING_RECORD_LABELS(10KM 기록 구간) 기준 그룹 상한(분, 이하 포함). 초과 시 D, 기록 없음은 E.
-const RUNNING_GROUP_MAX_MINUTES: Record<
-  RunnerType,
-  ReadonlyArray<{ group: RunnerRecordGroup; maxMinutes: number }>
-> = {
-  [RUNNER_TYPE.VI]: [
-    { group: 'A', maxMinutes: 50 },
-    { group: 'B', maxMinutes: 56 },
-    { group: 'C', maxMinutes: 65 },
-  ],
-  [RUNNER_TYPE.GUIDE]: [
-    { group: 'A', maxMinutes: 45 },
-    { group: 'B', maxMinutes: 52 },
-    { group: 'C', maxMinutes: 59 },
-  ],
-};
-
-// 입력값이 하나라도 있으면 기록이 있다고 본다.
-export const hasRecordInput = (record: TimeValue): boolean =>
-  record.hours !== '' || record.minutes !== '' || record.seconds !== '';
-
-// 10KM 러닝기록(시:분:초)을 러닝 그룹(A~E)으로 환산한다. 기록이 없으면 E.
-export const deriveRunningGroup = (
-  record: TimeValue,
-  runnerType: RunnerType,
-): RunnerRecordGroup => {
-  if (!hasRecordInput(record)) {
-    return 'E';
-  }
-
-  const hours = Number(record.hours) || 0;
-  const minutes = Number(record.minutes) || 0;
-  const totalMinutes = hours * 60 + minutes;
-
-  const found = RUNNING_GROUP_MAX_MINUTES[runnerType].find(
-    ({ maxMinutes }) => totalMinutes <= maxMinutes,
-  );
-
-  return found?.group ?? 'D';
-};
+import type { SignupFormValues } from '@/pages/signup/types';
 
 // 기록 입력을 API 전송용 "HH:MM:SS" 문자열로 만든다. 기록이 없으면 null.
 const formatDetailRecord = (record: TimeValue): string | null => {
-  if (!hasRecordInput(record)) {
+  if (!hasRunningRecord(record)) {
     return null;
   }
 
@@ -80,11 +39,10 @@ export const toSignupRequest = (
   const hopePrefs = emptyToNull(values.hopePrefs);
   const hasExperience = values.hasExperience ?? false;
 
-  // 러닝 경험이 없으면 기록 없이 E팀으로 배정한다. (경험 변경 후 잔여 기록이 새지 않도록 명시적으로 분기)
-  const runningGroup = hasExperience
-    ? deriveRunningGroup(values.record, values.disabilityType ?? RUNNER_TYPE.GUIDE)
-    : 'E';
-  const detailRecord = hasExperience ? formatDetailRecord(values.record) : null;
+  // 러닝 그룹은 사용자가 고른 값을 그대로 보낸다. (10KM 기록 기반 자동 기본값 + 수정 가능)
+  const runningGroup = values.recordDegree;
+  // 10KM 기록은 항상 필수 입력이므로 경험 유무와 무관하게 전송한다. (0 입력 시 "00:00:00")
+  const detailRecord = formatDetailRecord(values.record);
 
   if (values.disabilityType === RUNNER_TYPE.VI) {
     return {

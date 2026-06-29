@@ -1,30 +1,50 @@
-import type { ReactElement } from 'react';
+import { useEffect, useRef, type ReactElement } from 'react';
 
-import styled from '@emotion/styled';
 import { Controller, useFormContext } from 'react-hook-form';
 
-import { Input, Text, Textarea, TimeInput } from '@/components';
-import { RUNNER_TYPE } from '@/constants';
+import { Input, Select, Textarea, TimeInput, type SelectOptions } from '@/components';
+import {
+  RUNNER_TYPE,
+  TRAINING_RECORD_LABELS,
+  deriveRunningGroup,
+  type RunnerRecordGroup,
+} from '@/constants';
 
 import { SIGNUP_FIELD } from '@/pages/signup/constants';
 import { SIGNUP_COPY } from '@/pages/signup/copy';
 import type { SignupFormValues } from '@/pages/signup/types';
 import { StepLayout } from '@/pages/signup/components/StepLayout';
-import { deriveRunningGroup, hasRecordInput } from '@/pages/signup/utils';
 
 const HOPE_PREFS_MAX_LENGTH = 100;
 
+const RECORD_GROUPS: readonly RunnerRecordGroup[] = ['A', 'B', 'C', 'D', 'E'];
+
 export const RecordStep = (): ReactElement => {
-  const { control, watch } = useFormContext<SignupFormValues>();
+  const { control, watch, setValue } = useFormContext<SignupFormValues>();
   const runnerType = watch(SIGNUP_FIELD.DISABILITY_TYPE) ?? RUNNER_TYPE.GUIDE;
   const isGuide = runnerType === RUNNER_TYPE.GUIDE;
   const hasExperience = watch(SIGNUP_FIELD.HAS_EXPERIENCE);
   const record = watch(SIGNUP_FIELD.RECORD);
 
-  // 입력한 기록이 있을 때만 배정 예정 팀(A~E)을 안내한다.
-  const recordHelperText = hasRecordInput(record)
-    ? `${deriveRunningGroup(record, runnerType)}팀으로 배정될 예정이에요.`
-    : undefined;
+  // 러닝 그룹은 10KM 기록으로 자동 채우되, 사용자가 직접 바꾸면 그 값을 유지한다.
+  const isGroupEditedRef = useRef(false);
+
+  useEffect(() => {
+    if (isGroupEditedRef.current) {
+      return;
+    }
+
+    setValue(SIGNUP_FIELD.RECORD_DEGREE, deriveRunningGroup(record, runnerType), {
+      shouldDirty: false,
+    });
+  }, [record, runnerType, setValue]);
+
+  const recordGroupOptions: SelectOptions<RunnerRecordGroup> = RECORD_GROUPS.map(
+    (group) => ({
+      value: group,
+      label: `${group} ${TRAINING_RECORD_LABELS[runnerType][group]}`,
+    }),
+  );
 
   return (
     <StepLayout title={SIGNUP_COPY.record.title}>
@@ -34,7 +54,6 @@ export const RecordStep = (): ReactElement => {
         render={({ field, fieldState }) => (
           <TimeInput
             errorText={fieldState.error?.message}
-            helperText={recordHelperText}
             label="10KM 러닝기록"
             value={field.value}
             onChange={field.onChange}
@@ -42,12 +61,22 @@ export const RecordStep = (): ReactElement => {
         )}
       />
 
-      {/* TODO: 10KM 러닝기록에 따라 기본값 설정, 드롭다운으로 교체  */}
-      <TeamStatusField aria-disabled="true">
-        <Text color="text.secondary" font="heading-s-m">
-          E팀으로 배정될 예정이에요
-        </Text>
-      </TeamStatusField>
+      <Controller
+        control={control}
+        name={SIGNUP_FIELD.RECORD_DEGREE}
+        render={({ field }) => (
+          <Select
+            label="러닝 그룹"
+            options={recordGroupOptions}
+            sheetTitle="러닝 그룹"
+            value={field.value}
+            onChange={(value) => {
+              isGroupEditedRef.current = true;
+              field.onChange(value);
+            }}
+          />
+        )}
+      />
 
       {isGuide && hasExperience ? (
         <Controller
@@ -78,12 +107,3 @@ export const RecordStep = (): ReactElement => {
     </StepLayout>
   );
 };
-
-const TeamStatusField = styled.div(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  padding: theme.spacing.xl,
-  borderRadius: theme.radius.md,
-  border: `1px solid ${theme.color.border.default}`,
-  backgroundColor: theme.color.bg.subtle,
-}));
