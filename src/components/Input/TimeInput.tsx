@@ -25,28 +25,9 @@ const SEGMENTS: ReadonlyArray<{ key: SegmentKey; label: string }> = [
   { key: "seconds", label: "초" },
 ];
 
-// TimeInput behaves like a right-to-left shift register: every typed digit
-// enters at the seconds ones-place and pushes the existing digits left
-// (초 → 분 → 시), no matter which segment is focused. The canonical state is the
-// raw typed-digit string (max 6). Segments are filled from the right with no
-// leading-zero padding, so a segment that has not been reached yet stays empty
-// and keeps showing the "--" placeholder.
-const TIME_DIGITS = 6;
-
-const toDigits = (time: TimeValue): string =>
-  time.hours + time.minutes + time.seconds;
-
-const fromDigits = (digits: string): TimeValue => ({
-  hours: digits.slice(0, -4),
-  minutes: digits.slice(-4, -2),
-  seconds: digits.slice(-2),
-});
-
-const pushDigit = (time: TimeValue, digit: string): TimeValue =>
-  fromDigits((toDigits(time) + digit).slice(-TIME_DIGITS));
-
-const popDigit = (time: TimeValue): TimeValue =>
-  fromDigits(toDigits(time).slice(0, -1));
+// 각 칸(시/분/초)은 자기 값(최대 2자리)을 앞에서부터 채운다. 한 칸이 다 차면
+// 다음 칸으로 포커스를 옮겨 연속 입력을 지원하고, 빈 칸에서 Backspace 시 이전 칸으로 이동한다.
+const MAX_SEGMENT_LENGTH = 2;
 
 export const TimeInput = ({
   label,
@@ -81,23 +62,34 @@ export const TimeInput = ({
   };
 
   const handleSegmentChange =
-    (key: SegmentKey) =>
+    (index: number, key: SegmentKey) =>
     (event: ChangeEvent<HTMLInputElement>): void => {
-      const raw = event.target.value.replace(/\D/g, "");
-      const previous = current[key];
-      if (raw.length > previous.length) {
-        // A digit was typed: append the newest one to the shift register.
-        commit(pushDigit(current, raw.slice(-1)));
-      } else if (raw.length < previous.length) {
-        // A digit was deleted: drop the rightmost digit and shift right.
-        commit(popDigit(current));
+      const next = event.target.value
+        .replace(/\D/g, "")
+        .slice(0, MAX_SEGMENT_LENGTH);
+      commit({ ...current, [key]: next });
+
+      if (next.length === MAX_SEGMENT_LENGTH && index < SEGMENTS.length - 1) {
+        segmentRefs.current[index + 1]?.focus();
       }
+    };
+
+  const handleSegmentKeyDown =
+    (index: number, key: SegmentKey) =>
+    (event: React.KeyboardEvent<HTMLInputElement>): void => {
+      if (event.key !== "Backspace" || current[key] !== "" || index === 0) {
+        return;
+      }
+
+      event.preventDefault();
+      const previousKey = SEGMENTS[index - 1].key;
+      commit({ ...current, [previousKey]: current[previousKey].slice(0, -1) });
+      segmentRefs.current[index - 1]?.focus();
     };
 
   const handleSegmentFocus = (
     event: React.FocusEvent<HTMLInputElement>,
   ): void => {
-    // Keep the caret at the end so each keystroke appends to the register.
     const input = event.currentTarget;
     const end = input.value.length;
     input.setSelectionRange(end, end);
@@ -106,11 +98,17 @@ export const TimeInput = ({
   const handleBoxPointerDown = (
     event: React.PointerEvent<HTMLDivElement>,
   ): void => {
-    if (event.target === event.currentTarget) {
-      event.preventDefault();
-      // Focus the seconds (rightmost) segment — entry always starts there.
-      segmentRefs.current[SEGMENTS.length - 1]?.focus();
+    if (event.target !== event.currentTarget) {
+      return;
     }
+
+    event.preventDefault();
+    const firstIncompleteIndex = SEGMENTS.findIndex(
+      (segment) => current[segment.key].length < MAX_SEGMENT_LENGTH,
+    );
+    const targetIndex =
+      firstIncompleteIndex === -1 ? SEGMENTS.length - 1 : firstIncompleteIndex;
+    segmentRefs.current[targetIndex]?.focus();
   };
 
   return (
@@ -135,8 +133,10 @@ export const TimeInput = ({
                 aria-invalid={hasError || undefined}
                 aria-label={segment.label}
                 inputMode="numeric"
-                onChange={handleSegmentChange(segment.key)}
+                maxLength={MAX_SEGMENT_LENGTH}
+                onChange={handleSegmentChange(index, segment.key)}
                 onFocus={handleSegmentFocus}
+                onKeyDown={handleSegmentKeyDown(index, segment.key)}
                 placeholder={SEGMENT_PLACEHOLDER}
                 ref={(node) => {
                   segmentRefs.current[index] = node;
