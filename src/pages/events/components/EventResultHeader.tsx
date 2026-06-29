@@ -51,7 +51,7 @@ export const EventResultHeader = ({
             icon="chevron-down-lined"
             options={TYPE_FILTER_OPTIONS}
             placeholder="유형"
-            sheetTitle="유형"
+            sheetTitle="유형 선택"
             value={typeFilter}
             onChange={onTypeChange}
           />
@@ -60,7 +60,7 @@ export const EventResultHeader = ({
             icon="chevron-down-lined"
             options={RECRUIT_FILTER_OPTIONS}
             placeholder="모집구분"
-            sheetTitle="모집구분"
+            sheetTitle="모집구분 선택"
             value={recruitFilter}
             onChange={onRecruitChange}
           />
