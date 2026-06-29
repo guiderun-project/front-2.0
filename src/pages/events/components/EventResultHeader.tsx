@@ -25,8 +25,8 @@ const RECRUIT_FILTER_OPTIONS: SelectOptions<RecruitStatusFilter> = [
 type EventResultHeaderProps = {
   totalCount: number;
   showFilters: boolean;
-  typeFilter: EventListTypeFilter;
-  recruitFilter: RecruitStatusFilter;
+  typeFilter: EventListTypeFilter | undefined;
+  recruitFilter: RecruitStatusFilter | undefined;
   onTypeChange: (value: EventListTypeFilter) => void;
   onRecruitChange: (value: RecruitStatusFilter) => void;
 };

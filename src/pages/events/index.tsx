@@ -2,11 +2,7 @@ import { useState, useTransition, type Key, type ReactElement } from "react";
 
 import styled from "@emotion/styled";
 
-import {
-  EVENT_LIST_TABS,
-  EVENT_LIST_TYPE_FILTERS,
-  RECRUIT_STATUS_FILTERS,
-} from "@/api/constants/common";
+import { EVENT_LIST_TABS } from "@/api/constants/common";
 import type {
   EventListTab,
   EventListTypeFilter,
@@ -22,12 +18,8 @@ const ERROR_MESSAGE = "모임을 불러오지 못했어요.";
 
 export const EventsPage = (): ReactElement => {
   const [tab, setTab] = useState<EventListTab>(EVENT_LIST_TABS.UPCOMING);
-  const [typeFilter, setTypeFilter] = useState<EventListTypeFilter>(
-    EVENT_LIST_TYPE_FILTERS.TOTAL,
-  );
-  const [recruitFilter, setRecruitFilter] = useState<RecruitStatusFilter>(
-    RECRUIT_STATUS_FILTERS.ALL,
-  );
+  const [typeFilter, setTypeFilter] = useState<EventListTypeFilter>();
+  const [recruitFilter, setRecruitFilter] = useState<RecruitStatusFilter>();
   const [page, setPage] = useState(1);
   const [, startTransition] = useTransition();
 

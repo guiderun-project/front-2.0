@@ -10,10 +10,6 @@ import {
 import styled from "@emotion/styled";
 import { useNavigate } from "react-router-dom";
 
-import {
-  EVENT_LIST_TYPE_FILTERS,
-  RECRUIT_STATUS_FILTERS,
-} from "@/api/constants/common";
 import type { EventListTypeFilter, RecruitStatusFilter } from "@/api/types";
 import { Icon, PageLayout, QueryBoundary } from "@/components";
 
@@ -27,12 +23,8 @@ export const EventSearchPage = (): ReactElement => {
   const navigate = useNavigate();
   const [keyword, setKeyword] = useState("");
   const deferredKeyword = useDeferredValue(keyword);
-  const [typeFilter, setTypeFilter] = useState<EventListTypeFilter>(
-    EVENT_LIST_TYPE_FILTERS.TOTAL,
-  );
-  const [recruitFilter, setRecruitFilter] = useState<RecruitStatusFilter>(
-    RECRUIT_STATUS_FILTERS.ALL,
-  );
+  const [typeFilter, setTypeFilter] = useState<EventListTypeFilter>();
+  const [recruitFilter, setRecruitFilter] = useState<RecruitStatusFilter>();
   const [page, setPage] = useState(1);
   const [, startTransition] = useTransition();
 

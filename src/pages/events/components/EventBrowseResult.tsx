@@ -20,8 +20,8 @@ import { EventResultList } from "./EventResultList";
 
 type EventBrowseResultProps = {
   tab: EventListTab;
-  typeFilter: EventListTypeFilter;
-  recruitFilter: RecruitStatusFilter;
+  typeFilter: EventListTypeFilter | undefined;
+  recruitFilter: RecruitStatusFilter | undefined;
   page: number;
   onTypeChange: (value: EventListTypeFilter) => void;
   onRecruitChange: (value: RecruitStatusFilter) => void;
@@ -40,8 +40,12 @@ export const EventBrowseResult = ({
   const isUpcoming = tab === EVENT_LIST_TABS.UPCOMING;
   const { data } = useBrowseEvents({
     tab,
-    type: isUpcoming ? typeFilter : EVENT_LIST_TYPE_FILTERS.TOTAL,
-    recruitStatus: isUpcoming ? recruitFilter : RECRUIT_STATUS_FILTERS.ALL,
+    type: isUpcoming
+      ? typeFilter ?? EVENT_LIST_TYPE_FILTERS.TOTAL
+      : EVENT_LIST_TYPE_FILTERS.TOTAL,
+    recruitStatus: isUpcoming
+      ? recruitFilter ?? RECRUIT_STATUS_FILTERS.ALL
+      : RECRUIT_STATUS_FILTERS.ALL,
     page,
   });
 

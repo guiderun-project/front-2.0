@@ -2,6 +2,10 @@ import type { ReactElement } from "react";
 
 import styled from "@emotion/styled";
 
+import {
+  EVENT_LIST_TYPE_FILTERS,
+  RECRUIT_STATUS_FILTERS,
+} from "@/api/constants/common";
 import type { EventListTypeFilter, RecruitStatusFilter } from "@/api/types";
 import { Icon, Text } from "@/components";
 
@@ -11,8 +15,8 @@ import { EventResultList } from "./EventResultList";
 
 type EventSearchResultProps = {
   keyword: string;
-  typeFilter: EventListTypeFilter;
-  recruitFilter: RecruitStatusFilter;
+  typeFilter: EventListTypeFilter | undefined;
+  recruitFilter: RecruitStatusFilter | undefined;
   page: number;
   onTypeChange: (value: EventListTypeFilter) => void;
   onRecruitChange: (value: RecruitStatusFilter) => void;
@@ -30,8 +34,8 @@ export const EventSearchResult = ({
 }: EventSearchResultProps): ReactElement => {
   const { data } = useSearchEvents({
     keyword,
-    type: typeFilter,
-    recruitStatus: recruitFilter,
+    type: typeFilter ?? EVENT_LIST_TYPE_FILTERS.TOTAL,
+    recruitStatus: recruitFilter ?? RECRUIT_STATUS_FILTERS.ALL,
     page,
   });
 
