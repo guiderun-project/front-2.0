@@ -1,5 +1,6 @@
 import {
   useDeferredValue,
+  useRef,
   useState,
   useTransition,
   type ChangeEvent,
@@ -10,12 +11,8 @@ import {
 import styled from "@emotion/styled";
 import { useNavigate } from "react-router-dom";
 
-import {
-  EVENT_LIST_TYPE_FILTERS,
-  RECRUIT_STATUS_FILTERS,
-} from "@/api/constants/common";
 import type { EventListTypeFilter, RecruitStatusFilter } from "@/api/types";
-import { Icon, PageLayout, QueryBoundary } from "@/components";
+import { Icon, IconButton, PageLayout, QueryBoundary } from "@/components";
 
 import { EventSearchResult } from "../components/EventSearchResult";
 
@@ -25,20 +22,23 @@ const ERROR_MESSAGE = "모임을 불러오지 못했어요.";
 
 export const EventSearchPage = (): ReactElement => {
   const navigate = useNavigate();
+  const inputRef = useRef<HTMLInputElement>(null);
   const [keyword, setKeyword] = useState("");
   const deferredKeyword = useDeferredValue(keyword);
-  const [typeFilter, setTypeFilter] = useState<EventListTypeFilter>(
-    EVENT_LIST_TYPE_FILTERS.TOTAL,
-  );
-  const [recruitFilter, setRecruitFilter] = useState<RecruitStatusFilter>(
-    RECRUIT_STATUS_FILTERS.ALL,
-  );
+  const [typeFilter, setTypeFilter] = useState<EventListTypeFilter>();
+  const [recruitFilter, setRecruitFilter] = useState<RecruitStatusFilter>();
   const [page, setPage] = useState(1);
   const [, startTransition] = useTransition();
 
   const handleKeywordChange = (event: ChangeEvent<HTMLInputElement>) => {
     setKeyword(event.target.value);
     setPage(1);
+  };
+
+  const handleClearKeyword = () => {
+    setKeyword("");
+    setPage(1);
+    inputRef.current?.focus();
   };
 
   const handleTypeChange = (value: EventListTypeFilter) => {
@@ -75,14 +75,26 @@ export const EventSearchPage = (): ReactElement => {
             size={20}
           />
           <SearchInput
+            ref={inputRef}
             autoFocus
             aria-label="이벤트 검색"
             enterKeyHint="search"
             placeholder={SEARCH_PLACEHOLDER}
-            type="search"
+            type="text"
             value={keyword}
             onChange={handleKeywordChange}
           />
+          {keyword ? (
+            <ClearButton
+              aria-label="검색어 지우기"
+              color="icon.tertiary"
+              icon="delete-filled"
+              iconSize={24}
+              size={24}
+              type="button"
+              onClick={handleClearKeyword}
+            />
+          ) : null}
         </SearchField>
         <CancelButton type="button" onClick={() => navigate(-1)}>
           취소
@@ -109,8 +121,8 @@ export const EventSearchPage = (): ReactElement => {
 const SearchHeader = styled.form(({ theme }) => ({
   display: "flex",
   alignItems: "center",
-  gap: theme.spacing.md,
-  padding: `${theme.spacing.lg} ${theme.spacing["2xl"]}`,
+  gap: theme.spacing.xl,
+  padding: `${theme.spacing.lg} ${theme.spacing["2xl"]} ${theme.spacing.none}`,
 }));
 
 const SearchField = styled.div(({ theme }) => ({
@@ -128,6 +140,10 @@ const SearchField = styled.div(({ theme }) => ({
     outlineOffset: theme.spacing.xs,
   },
 }));
+
+const ClearButton = styled(IconButton)({
+  flexShrink: 0,
+});
 
 const SearchInput = styled.input(({ theme }) => ({
   flex: "1 1 auto",

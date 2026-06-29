@@ -1,4 +1,4 @@
-import { useId, type ReactElement } from "react";
+import type { ReactElement } from "react";
 
 import styled from "@emotion/styled";
 
@@ -10,7 +10,6 @@ import { getRunnerStageHeadline } from "@/pages/home/utils";
 const formatNumber = (value: number) => value.toLocaleString("ko-KR");
 
 export const ActivitySummary = (): ReactElement => {
-  const headingId = useId();
   const { user } = useAuth();
   const {
     data: { mySummary, publicSummary },
@@ -22,10 +21,13 @@ export const ActivitySummary = (): ReactElement => {
     );
 
     return (
-      <Section aria-labelledby={headingId}>
+      <Section>
         <HeadlineRow>
-          <Headline id={headingId}>
-            <NameLine>
+          <Headline>
+            <HiddenText>
+              {`${user.name}님${stageHeadline.connector} ${stageHeadline.body}`}
+            </HiddenText>
+            <NameLine aria-hidden={true}>
               <Text as="span" color="text.primary" font="heading-m-sb">
                 {user.name}님
               </Text>
@@ -33,7 +35,12 @@ export const ActivitySummary = (): ReactElement => {
                 {stageHeadline.connector}
               </Text>
             </NameLine>
-            <HeadlineBody as="span" color="text.primary" font="heading-m-r">
+            <HeadlineBody
+              aria-hidden={true}
+              as="span"
+              color="text.primary"
+              font="heading-m-r"
+            >
               {stageHeadline.body}
             </HeadlineBody>
           </Headline>
@@ -71,10 +78,11 @@ export const ActivitySummary = (): ReactElement => {
   }
 
   return (
-    <Section aria-labelledby={headingId}>
+    <Section>
       <HeadlineRow>
-        <Headline id={headingId}>
-          <TitleLine>
+        <Headline>
+          <HiddenText>올해도 러너들은 열심히 달리고 있어요</HiddenText>
+          <TitleLine aria-hidden={true}>
             <Text as="span" color="text.primary" font="heading-m-r">
               올해도
             </Text>
@@ -82,7 +90,12 @@ export const ActivitySummary = (): ReactElement => {
               러너들은
             </Text>
           </TitleLine>
-          <Text as="span" color="text.primary" font="heading-m-r">
+          <Text
+            aria-hidden={true}
+            as="span"
+            color="text.primary"
+            font="heading-m-r"
+          >
             열심히 달리고 있어요
           </Text>
         </Headline>

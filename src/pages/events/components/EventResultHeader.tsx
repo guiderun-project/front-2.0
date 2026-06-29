@@ -25,8 +25,8 @@ const RECRUIT_FILTER_OPTIONS: SelectOptions<RecruitStatusFilter> = [
 type EventResultHeaderProps = {
   totalCount: number;
   showFilters: boolean;
-  typeFilter: EventListTypeFilter;
-  recruitFilter: RecruitStatusFilter;
+  typeFilter: EventListTypeFilter | undefined;
+  recruitFilter: RecruitStatusFilter | undefined;
   onTypeChange: (value: EventListTypeFilter) => void;
   onRecruitChange: (value: RecruitStatusFilter) => void;
 };
@@ -51,7 +51,7 @@ export const EventResultHeader = ({
             icon="chevron-down-lined"
             options={TYPE_FILTER_OPTIONS}
             placeholder="유형"
-            sheetTitle="유형"
+            sheetTitle="유형 선택"
             value={typeFilter}
             onChange={onTypeChange}
           />
@@ -60,7 +60,7 @@ export const EventResultHeader = ({
             icon="chevron-down-lined"
             options={RECRUIT_FILTER_OPTIONS}
             placeholder="모집구분"
-            sheetTitle="모집구분"
+            sheetTitle="모집구분 선택"
             value={recruitFilter}
             onChange={onRecruitChange}
           />
