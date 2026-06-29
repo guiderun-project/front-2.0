@@ -28,30 +28,28 @@ export const RecordStep = (): ReactElement => {
 
   return (
     <StepLayout title={SIGNUP_COPY.record.title}>
-      {hasExperience === false ? (
-        // 러닝 경험이 없으면 기록을 받지 않고 E팀 배정을 안내한다.
-        <TeamStatusField aria-disabled="true">
-          <Text color="text.secondary" font="heading-s-m">
-            E팀으로 배정될 예정이에요
-          </Text>
-        </TeamStatusField>
-      ) : (
-        <Controller
-          control={control}
-          name={SIGNUP_FIELD.RECORD}
-          render={({ field, fieldState }) => (
-            <TimeInput
-              errorText={fieldState.error?.message}
-              helperText={recordHelperText}
-              label="10KM 러닝기록"
-              value={field.value}
-              onChange={field.onChange}
-            />
-          )}
-        />
-      )}
+      <Controller
+        control={control}
+        name={SIGNUP_FIELD.RECORD}
+        render={({ field, fieldState }) => (
+          <TimeInput
+            errorText={fieldState.error?.message}
+            helperText={recordHelperText}
+            label="10KM 러닝기록"
+            value={field.value}
+            onChange={field.onChange}
+          />
+        )}
+      />
 
-      {isGuide ? (
+      {/* TODO: 10KM 러닝기록에 따라 기본값 설정, 드롭다운으로 교체  */}
+      <TeamStatusField aria-disabled="true">
+        <Text color="text.secondary" font="heading-s-m">
+          E팀으로 배정될 예정이에요
+        </Text>
+      </TeamStatusField>
+
+      {isGuide && hasExperience ? (
         <Controller
           control={control}
           name={SIGNUP_FIELD.PARTNERED_VI_NAME}
@@ -81,7 +79,6 @@ export const RecordStep = (): ReactElement => {
   );
 };
 
-// 경험 없음일 때 10KM 기록 입력 대신 노출하는 읽기 전용 배정 안내 필드. (Figma node 2171-3615)
 const TeamStatusField = styled.div(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
