@@ -89,8 +89,8 @@ export const EventSearchPage = (): ReactElement => {
               aria-label="검색어 지우기"
               color="icon.tertiary"
               icon="delete-filled"
-              iconSize={20}
-              size={20}
+              iconSize={24}
+              size={24}
               type="button"
               onClick={handleClearKeyword}
             />
