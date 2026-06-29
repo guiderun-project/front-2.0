@@ -1,9 +1,10 @@
-import { type ReactElement } from 'react';
+import { useCallback, useRef, useState, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
 
 import {
+  ConfirmPopup,
   FooterButton,
   FormPageLayout,
   Input,
@@ -15,6 +16,7 @@ import {
   type SelectOptions,
 } from '@/components';
 import { TRAINING_RECORD_LABELS, type RunnerRecordGroup } from '@/constants';
+import { useRouteBlockerConfirm } from '@/hooks/useRouteBlockerConfirm';
 import { APP_PATH } from '@/router/path';
 
 import { HOPE_PREFS_MAX_LENGTH, useRunningEdit } from './hooks/useRunningEdit';
@@ -52,6 +54,8 @@ export const RunningEditView = (): ReactElement => {
 
 const MyRunningEditContent = (): ReactElement => {
   const navigate = useNavigate();
+  const [isExitConfirmOpen, setIsExitConfirmOpen] = useState(false);
+  const exitResolverRef = useRef<((v: boolean) => void) | null>(null);
   const {
     values,
     userType,
@@ -59,9 +63,21 @@ const MyRunningEditContent = (): ReactElement => {
     setDistance,
     setTime,
     setHopePrefs,
+    isDirty,
     canSubmit,
     submit,
   } = useRunningEdit();
+
+  const handleExitConfirm = useCallback(
+    () =>
+      new Promise<boolean>((resolve) => {
+        exitResolverRef.current = resolve;
+        setIsExitConfirmOpen(true);
+      }),
+    [],
+  );
+
+  useRouteBlockerConfirm({ enabled: isDirty, onConfirm: handleExitConfirm });
 
   const recordGroupOptions: SelectOptions<RunnerRecordGroup> =
     RECORD_GROUPS.map((group) => ({
@@ -129,6 +145,23 @@ const MyRunningEditContent = (): ReactElement => {
           정보 수정 완료
         </FooterButton.Button>
       </FooterButton>
+
+      <ConfirmPopup
+        cancelText="아니요"
+        confirmText="네, 그만할게요"
+        description="지금까지 입력한 정보는 저장되지 않아요."
+        open={isExitConfirmOpen}
+        title="수정을 그만할까요?"
+        onCancel={() => {
+          exitResolverRef.current?.(false);
+          setIsExitConfirmOpen(false);
+        }}
+        onConfirm={() => {
+          exitResolverRef.current?.(true);
+          setIsExitConfirmOpen(false);
+        }}
+        onOpenChange={setIsExitConfirmOpen}
+      />
     </Fields>
   );
 };

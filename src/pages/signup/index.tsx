@@ -1,4 +1,10 @@
-import { useEffect, useRef, useState, type ReactElement } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactElement,
+} from 'react';
 
 import styled from '@emotion/styled';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -6,8 +12,14 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { api } from '@/api/services';
-import { FooterButton, PageLayout, TopNavigation } from '@/components';
+import {
+  ConfirmPopup,
+  FooterButton,
+  PageLayout,
+  TopNavigation,
+} from '@/components';
 import { useAuth } from '@/contexts';
+import { useRouteBlockerConfirm } from '@/hooks/useRouteBlockerConfirm';
 import { APP_PATH } from '@/router/path';
 
 import { Stepper } from '@/pages/signup/components/Stepper';
@@ -81,6 +93,23 @@ export const SignupPage = (): ReactElement => {
   const stepperStage = SIGNUP_STEP_STAGE[step];
   const isComplete = step === 'complete';
   const isTerms = step === 'terms';
+
+  const [isExitConfirmOpen, setIsExitConfirmOpen] = useState(false);
+  const exitResolverRef = useRef<((v: boolean) => void) | null>(null);
+
+  const handleExitConfirm = useCallback(
+    () =>
+      new Promise<boolean>((resolve) => {
+        exitResolverRef.current = resolve;
+        setIsExitConfirmOpen(true);
+      }),
+    [],
+  );
+
+  useRouteBlockerConfirm({
+    enabled: !isComplete,
+    onConfirm: handleExitConfirm,
+  });
 
   const stepAreaRef = useRef<HTMLDivElement>(null);
 
@@ -183,6 +212,23 @@ export const SignupPage = (): ReactElement => {
         ) : null}
 
         <StepArea ref={stepAreaRef}>{renderStep(step)}</StepArea>
+
+        <ConfirmPopup
+          cancelText="아니요"
+          confirmText="네, 그만할게요"
+          description="지금까지 입력한 정보는 저장되지 않아요."
+          open={isExitConfirmOpen}
+          title="가입을 그만할까요?"
+          onCancel={() => {
+            exitResolverRef.current?.(false);
+            setIsExitConfirmOpen(false);
+          }}
+          onConfirm={() => {
+            exitResolverRef.current?.(true);
+            setIsExitConfirmOpen(false);
+          }}
+          onOpenChange={setIsExitConfirmOpen}
+        />
 
         <FooterButton>
           <FooterButton.Button

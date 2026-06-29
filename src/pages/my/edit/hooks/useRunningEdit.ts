@@ -121,6 +121,7 @@ export const useRunningEdit = () => {
       setField('distance', formatDistanceInput(value)),
     setTime: (value: string) => setField('time', value.replace(/\D/g, '')),
     setHopePrefs: (value: string) => setField('hopePrefs', value),
+    isDirty,
     canSubmit,
     isSubmitting: isPending,
     submit,

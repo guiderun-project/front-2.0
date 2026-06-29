@@ -1,10 +1,11 @@
-import { useState, type ReactElement } from 'react';
+import { useCallback, useRef, useState, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
 
 import {
   Button,
+  ConfirmPopup,
   FooterButton,
   FormPageLayout,
   Input,
@@ -12,6 +13,7 @@ import {
   QueryBoundary,
   Text,
 } from '@/components';
+import { useRouteBlockerConfirm } from '@/hooks/useRouteBlockerConfirm';
 import { APP_PATH } from '@/router/path';
 import { BIRTH_DATE_MAX_LENGTH } from '@/utils';
 
@@ -50,6 +52,8 @@ export const ProfileEditView = (): ReactElement => {
 const MyEditContent = (): ReactElement => {
   const navigate = useNavigate();
   const [isAccountSheetOpen, setIsAccountSheetOpen] = useState(false);
+  const [isExitConfirmOpen, setIsExitConfirmOpen] = useState(false);
+  const exitResolverRef = useRef<((v: boolean) => void) | null>(null);
   const {
     values,
     accountId,
@@ -59,9 +63,21 @@ const MyEditContent = (): ReactElement => {
     setId1365,
     canEditId1365,
     hasBirthDateError,
+    isDirty,
     canSubmit,
     submit,
   } = useMyEdit();
+
+  const handleExitConfirm = useCallback(
+    () =>
+      new Promise<boolean>((resolve) => {
+        exitResolverRef.current = resolve;
+        setIsExitConfirmOpen(true);
+      }),
+    [],
+  );
+
+  useRouteBlockerConfirm({ enabled: isDirty, onConfirm: handleExitConfirm });
 
   // 이미 아이디가 있으면 로그인 정보 설정 섹션을 노출하지 않는다.
   const hasAccountId = Boolean(accountId);
@@ -151,6 +167,23 @@ const MyEditContent = (): ReactElement => {
         accountId={accountId}
         open={isAccountSheetOpen}
         onClose={() => setIsAccountSheetOpen(false)}
+      />
+
+      <ConfirmPopup
+        cancelText="아니요"
+        confirmText="네, 그만할게요"
+        description="지금까지 입력한 정보는 저장되지 않아요."
+        open={isExitConfirmOpen}
+        title="수정을 그만할까요?"
+        onCancel={() => {
+          exitResolverRef.current?.(false);
+          setIsExitConfirmOpen(false);
+        }}
+        onConfirm={() => {
+          exitResolverRef.current?.(true);
+          setIsExitConfirmOpen(false);
+        }}
+        onOpenChange={setIsExitConfirmOpen}
       />
     </>
   );
