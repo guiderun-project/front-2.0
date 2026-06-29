@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, type ReactElement } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, useFormState, useWatch } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { ConfirmPopup, CONFIRM_POPUP_VARIANT, PageLayout } from '@/components';
 import { USER_ROLES } from '@/constants/roles';
@@ -27,7 +27,9 @@ import {
 import { useEventEditMutations } from './useEventEditMutations';
 
 export const EventEditPage = (): ReactElement => {
+  const location = useLocation();
   const navigate = useNavigate();
+  const isInitialEntryRef = useRef(location.key === 'default');
   const { user } = useAuth();
   const { event, eventId, isValidEventId } = useEventDetailRoute();
   const [isBackConfirmOpen, setIsBackConfirmOpen] = useState(false);
@@ -137,13 +139,22 @@ export const EventEditPage = (): ReactElement => {
     touchedFields.endTime,
   ]);
 
+  const navigateBackToDetail = () => {
+    if (!isInitialEntryRef.current) {
+      navigate(-1);
+      return;
+    }
+
+    navigate(APP_PATH.EVENT_DETAIL(eventId), { replace: true });
+  };
+
   const handleBack = () => {
     if (isDirty) {
       setIsBackConfirmOpen(true);
       return;
     }
 
-    navigate(APP_PATH.EVENT_DETAIL(eventId));
+    navigateBackToDetail();
   };
 
   const handleCancelBack = () => {
@@ -151,7 +162,7 @@ export const EventEditPage = (): ReactElement => {
   };
 
   const handleConfirmBack = () => {
-    navigate(APP_PATH.EVENT_DETAIL(eventId));
+    navigateBackToDetail();
   };
 
   const handleSubmit = (values: EventFormValues) => {

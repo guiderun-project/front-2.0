@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState, type ReactElement } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactElement } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import styled from '@emotion/styled';
 import { useForm, useFormState, useWatch } from 'react-hook-form';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
 import type { EventType } from '@/api/types';
 import { BottomSheet, Button, PageLayout } from '@/components';
@@ -28,7 +28,9 @@ import {
 import { useEventCreateMutation } from './useEventCreateMutation';
 
 export const EventNewPage = (): ReactElement => {
+  const location = useLocation();
   const navigate = useNavigate();
+  const isInitialEntryRef = useRef(location.key === 'default');
   const [searchParams, setSearchParams] = useSearchParams();
   const [isBackConfirmOpen, setIsBackConfirmOpen] = useState(false);
   const [createdDate] = useState(() => getTodayDateValue());
@@ -108,8 +110,17 @@ export const EventNewPage = (): ReactElement => {
     );
   };
 
+  const navigateBackToHome = () => {
+    if (!isInitialEntryRef.current) {
+      navigate(-1);
+      return;
+    }
+
+    navigate(APP_PATH.HOME, { replace: true });
+  };
+
   const handleCloseTypeSheet = () => {
-    navigate(APP_PATH.HOME);
+    navigateBackToHome();
   };
 
   const handleBack = () => {
@@ -118,7 +129,7 @@ export const EventNewPage = (): ReactElement => {
       return;
     }
 
-    navigate(APP_PATH.HOME);
+    navigateBackToHome();
   };
 
   const handleCancelBack = () => {
@@ -126,7 +137,7 @@ export const EventNewPage = (): ReactElement => {
   };
 
   const handleConfirmBack = () => {
-    navigate(APP_PATH.HOME);
+    navigateBackToHome();
   };
 
   const handleSubmit = (values: EventFormValues) => {

@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { api } from '@/api/services';
 import type { MyEventApplyGetResponse } from '@/api/types';
@@ -51,7 +51,9 @@ const getMyFormOrNull = async (
 };
 
 export const useEventApplyPage = () => {
+  const location = useLocation();
   const navigate = useNavigate();
+  const isInitialEntryRef = useRef(location.key === 'default');
   const queryClient = useQueryClient();
   const { isAuthReady, user } = useAuth();
   const { showToast } = useToast();
@@ -112,6 +114,19 @@ export const useEventApplyPage = () => {
     setIsSubmitLocked(false);
   };
 
+  const navigateBackToDetail = () => {
+    if (!isInitialEntryRef.current) {
+      navigate(-1);
+      return;
+    }
+
+    navigate(APP_PATH.EVENT_DETAIL(eventId), { replace: true });
+  };
+
+  const handleViewEvent = () => {
+    navigate(APP_PATH.EVENT_DETAIL(eventId), { replace: true });
+  };
+
   const createMutation = useMutation({
     mutationFn: (values: EventApplyFormValues) => {
       if (!user) {
@@ -157,7 +172,7 @@ export const useEventApplyPage = () => {
     },
     onSuccess: () => {
       void invalidateEventQueries();
-      navigate(APP_PATH.EVENT_DETAIL(eventId));
+      handleViewEvent();
       window.setTimeout(() => {
         showToast({
           type: 'success',
@@ -172,7 +187,7 @@ export const useEventApplyPage = () => {
   });
 
   const handleBack = () => {
-    navigate(APP_PATH.EVENT_DETAIL(eventId));
+    navigateBackToDetail();
   };
 
   const handleSubmit = (values: EventApplyFormValues) => {
@@ -216,6 +231,7 @@ export const useEventApplyPage = () => {
     eventId,
     form,
     handleBack,
+    handleViewEvent,
     handleSubmit,
     isAuthReady,
     isCompleted,

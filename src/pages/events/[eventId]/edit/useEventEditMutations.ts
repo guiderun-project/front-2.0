@@ -40,7 +40,7 @@ export const useEventEditMutations = ({
       void queryClient.invalidateQueries({
         queryKey: eventDetailQueryKeys.root,
       });
-      navigate(APP_PATH.EVENT_DETAIL(eventId));
+      navigate(APP_PATH.EVENT_DETAIL(eventId), { replace: true });
       window.setTimeout(() => {
         showToast({
           type: 'success',

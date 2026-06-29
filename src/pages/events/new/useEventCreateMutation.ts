@@ -33,7 +33,7 @@ export const useEventCreateMutation = ({
       void queryClient.invalidateQueries({
         queryKey: eventDetailQueryKeys.root,
       });
-      navigate(APP_PATH.EVENT_DETAIL(response.eventId));
+      navigate(APP_PATH.EVENT_DETAIL(response.eventId), { replace: true });
     },
     onError: () => {
       window.alert('모임 만들기에 실패했어요.');
