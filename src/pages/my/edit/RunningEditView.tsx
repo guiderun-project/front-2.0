@@ -61,6 +61,7 @@ const MyRunningEditContent = (): ReactElement => {
     setRecordDegree,
     setRecord,
     setHopePrefs,
+    recordError,
     isDirty,
     canSubmit,
     submit,
@@ -93,6 +94,12 @@ const MyRunningEditContent = (): ReactElement => {
 
   return (
     <Fields>
+      <TimeInput
+        errorText={recordError}
+        label="10KM 러닝기록"
+        value={values.record}
+        onChange={setRecord}
+      />
       <Select
         label="러닝 그룹"
         options={recordGroupOptions}
@@ -100,13 +107,6 @@ const MyRunningEditContent = (): ReactElement => {
         value={values.recordDegree}
         onChange={setRecordDegree}
       />
-
-      <TimeInput
-        label="10KM 러닝기록"
-        value={values.record}
-        onChange={setRecord}
-      />
-
       <Textarea
         label="희망사항"
         maxLength={HOPE_PREFS_MAX_LENGTH}
