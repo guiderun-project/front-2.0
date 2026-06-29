@@ -12,6 +12,7 @@ export const EventApplyPage = (): ReactElement => {
     event,
     form,
     handleBack,
+    handleViewEvent,
     handleSubmit,
     isAuthReady,
     isCompleted,
@@ -72,8 +73,8 @@ export const EventApplyPage = (): ReactElement => {
     return (
       <EventApplyCompleted
         event={event}
-        onBack={handleBack}
-        onViewEvent={handleBack}
+        onBack={handleViewEvent}
+        onViewEvent={handleViewEvent}
       />
     );
   }

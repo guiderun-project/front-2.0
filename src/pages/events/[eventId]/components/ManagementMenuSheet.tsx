@@ -16,6 +16,7 @@ import { APP_PATH } from '@/router/path';
 import { useEventManagementActions } from '../hooks/useEventManagementActions';
 
 type ManagementMenuSheetProps = {
+  canExtractAttendanceList: boolean;
   eventDate: string;
   eventId: number;
   eventName: string;
@@ -25,6 +26,7 @@ type ManagementMenuSheetProps = {
 };
 
 export const ManagementMenuSheet = ({
+  canExtractAttendanceList,
   eventDate,
   eventId,
   eventName,
@@ -133,21 +135,23 @@ export const ManagementMenuSheet = ({
               모집 게시글 삭제하기
             </Text>
           </ManagementMenuItem>
-          <ManagementMenuItem
-            disabled={isManagementMutating}
-            type="button"
-            onClick={handleAttendance}
-          >
-            <Icon
-              aria-hidden={true}
-              color="icon.secondary"
-              icon="download-lined"
-              size={20}
-            />
-            <Text color="text.primary" font="body-m-m">
-              출석 인원 명단 추출
-            </Text>
-          </ManagementMenuItem>
+          {canExtractAttendanceList ? (
+            <ManagementMenuItem
+              disabled={isManagementMutating}
+              type="button"
+              onClick={handleAttendance}
+            >
+              <Icon
+                aria-hidden={true}
+                color="icon.secondary"
+                icon="download-lined"
+                size={20}
+              />
+              <Text color="text.primary" font="body-m-m">
+                출석 인원 명단 추출
+              </Text>
+            </ManagementMenuItem>
+          ) : null}
         </ManagementMenuList>
       </BottomSheet>
       <ConfirmPopup
