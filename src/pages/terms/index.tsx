@@ -5,35 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 import { Icon, PageLayout, Text, TopNavigation } from "@/components";
 
-type TermsSection = {
-  key: string;
-  title: string;
-  body: string; // 줄바꿈으로 구분된 약관 본문
-};
-
-const TERMS_SECTIONS: TermsSection[] = [
-  {
-    key: "privacy",
-    title: "개인정보 제공 및 활용 동의",
-    body: [
-      "1. 개인정보 수집, 이용 목적:  참가자를 대상으로 안내성 SMS 발송, 기타 행사를 위한 매칭 등 프로그램 진행을 위해 활용",
-      "2. 수집하려는 개인정보 항목:  인적사항(성함, 성별, 나이, 휴대폰 번호, 거주지, 기록, 가이드 러닝 경험 유무, SNS, 카카오톡 아이디",
-      "3. 개인 정보의 보유 및 이용 기간:  서비스 가입 시 부터 안내 시까지",
-      "4. 동의 거부 시 프로그램 참여가 불가한 점 양해 부탁드립니다.",
-    ].join("\n"),
-  },
-  {
-    key: "portrait",
-    title: "초상권 활용동의",
-    body: [
-      "1. 수집 이용 및 제공의 목적 :  SNS 업로드를 통한 홍보 및 기타 채널을 통한 홍보",
-      "2. 초상권 보유 및 이용기간 :  홍보한 게시물 삭제시까지",
-      "3. 초상권 2차 사용 :  온라인 및 오프라인 홍보물 제작 및 게시",
-      "4. 초상권 활용 동의에 거부할 권리가 있으며, 거부 시 교육 홍보물 제작에서 제외되거나 모자이크 처리됩니다.",
-      "5. 인격을 침해하지 않는 범위 내에서 저작물에 대한 편집 및 후보정이 이루어질 예정입니다.",
-    ].join("\n"),
-  },
-];
+import { TERMS_SECTIONS, type TermsSection } from "./constants";
 
 export const TermsPage = (): ReactElement => {
   const navigate = useNavigate();
