@@ -1,17 +1,6 @@
-/** 입력값에서 숫자 이외 문자를 제거한다. */
-export const onlyDigits = (value: string): string =>
-  value.replace(/[^0-9]/g, '');
-
 /** 새 비밀번호 입력 안내 문구. 규칙 위반 시 errorText, 입력 유도 시 helperText로 공용 사용한다. */
 export const NEW_PASSWORD_GUIDE =
   '영문, 특수문자를 포함해 8자 이상 32자 미만 입력해주세요';
-
-/**
- * 한국 휴대전화 번호 형식인지 검사한다.
- * onlyDigits로 정제된 숫자 문자열을 입력으로 받는다. (01X + 7~8자리)
- */
-export const isValidKoreanPhone = (digits: string): boolean =>
-  /^01[0-9]\d{7,8}$/.test(digits);
 
 /** 새 비밀번호 규칙: 영문·특수문자를 포함하고 8자 이상 32자 미만이어야 한다. */
 export const isValidNewPassword = (value: string): boolean =>

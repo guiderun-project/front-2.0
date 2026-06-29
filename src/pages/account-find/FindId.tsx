@@ -15,8 +15,9 @@ import {
 } from '@/components';
 import { ACCOUNT_FIND_TYPE } from '@/constants';
 import { usePhoneCertification } from '@/pages/account-find/usePhoneCertification';
-import { formatJoinDate, isValidKoreanPhone } from '@/pages/account-find/utils';
+import { formatJoinDate } from '@/pages/account-find/utils';
 import { APP_PATH } from '@/router/path';
+import { isValidKoreanPhone, PHONE_DIGIT_LENGTH } from '@/utils';
 
 const FIND_ID_PHASE = {
   VERIFY: 'verify',
@@ -183,6 +184,7 @@ export const FindId = (): ReactElement => {
               errorText={phoneError || undefined}
               inputMode="numeric"
               label="전화번호"
+              maxLength={PHONE_DIGIT_LENGTH}
               placeholder="-없이 숫자만 입력해주세요"
               value={phoneNum}
               onChange={(event) => {

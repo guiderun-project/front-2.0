@@ -15,7 +15,7 @@ import {
 } from '@/components';
 import { useRouteBlockerConfirm } from '@/hooks/useRouteBlockerConfirm';
 import { APP_PATH } from '@/router/path';
-import { BIRTH_DATE_MAX_LENGTH } from '@/utils';
+import { BIRTH_DATE_MAX_LENGTH, PHONE_DIGIT_LENGTH } from '@/utils';
 
 import { AccountSetupSheet } from './components/AccountSetupSheet';
 import { useMyEdit } from './hooks/useMyEdit';
@@ -63,6 +63,7 @@ const MyEditContent = (): ReactElement => {
     setId1365,
     canEditId1365,
     hasBirthDateError,
+    hasPhoneError,
     isDirty,
     canSubmit,
     submit,
@@ -107,8 +108,11 @@ const MyEditContent = (): ReactElement => {
           onChange={(event) => setBirthDate(event.target.value)}
         />
         <Input
+          error={hasPhoneError}
+          errorText={hasPhoneError ? '올바른 전화번호를 입력해주세요.' : undefined}
           inputMode="numeric"
           label="전화번호"
+          maxLength={PHONE_DIGIT_LENGTH}
           value={values.phoneNumber}
           onChange={(event) => setPhoneNumber(event.target.value)}
         />

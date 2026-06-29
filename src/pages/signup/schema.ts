@@ -4,7 +4,7 @@ import { RUNNER_TYPE } from '@/constants';
 
 // "YYYY.MM.DD" (formatBirthDateInput 출력 형식)
 const BIRTH_DATE_PATTERN = /^\d{4}\.\d{2}\.\d{2}$/;
-// 하이픈 없는 휴대폰 번호(01X + 7~8자리)
+// 숫자만 있는 휴대폰 번호 (01X + 7~8자리)
 const PHONE_PATTERN = /^01[0-9]\d{7,8}$/;
 
 const isValidBirthDate = (value: string): boolean => {
