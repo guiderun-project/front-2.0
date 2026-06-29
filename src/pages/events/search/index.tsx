@@ -122,7 +122,7 @@ const SearchHeader = styled.form(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   gap: theme.spacing.xl,
-  padding: `${theme.spacing.lg} ${theme.spacing["2xl"]}`,
+  padding: `${theme.spacing.lg} ${theme.spacing["2xl"]} ${theme.spacing.none}`,
 }));
 
 const SearchField = styled.div(({ theme }) => ({
