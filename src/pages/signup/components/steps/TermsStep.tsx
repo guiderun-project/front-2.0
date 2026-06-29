@@ -3,7 +3,9 @@ import type { ReactElement } from 'react';
 import styled from '@emotion/styled';
 import { useFormContext } from 'react-hook-form';
 
-import { CheckBox, Text } from '@/components';
+import { CheckBox, Icon, Text } from '@/components';
+
+import { APP_PATH } from '@/router/path';
 
 import { TERMS_SECTIONS } from '@/pages/terms/constants';
 
@@ -73,15 +75,29 @@ export const TermsStep = (): ReactElement => {
           if (!config) return null;
           return (
             <ItemRow key={section.key}>
-              <CheckBox
-                checked={agreements[config.agreementKey]}
-                onChange={(event) =>
-                  setAgreement(config.field, event.target.checked)
-                }
-              />
-              <Text color="text.secondary" font="body-s-m">
-                {section.title}{section.required && ' (필수)'}
-              </Text>
+              <ItemLabel>
+                <CheckBox
+                  checked={agreements[config.agreementKey]}
+                  onChange={(event) =>
+                    setAgreement(config.field, event.target.checked)
+                  }
+                />
+                <Text color="text.secondary" font="body-s-m">
+                  {section.title}{section.required && ' (필수)'}
+                </Text>
+              </ItemLabel>
+              <DetailLink
+                aria-label={`${section.title} 약관 상세 보기 (새 탭)`}
+                href={APP_PATH.TERMS}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <Icon
+                  color="icon.secondary"
+                  icon="external-link-lined"
+                  size={20}
+                />
+              </DetailLink>
             </ItemRow>
           );
         })}
@@ -115,9 +131,23 @@ const ItemList = styled.div(({ theme }) => ({
   padding: `${theme.spacing.none} ${theme.spacing.xl}`,
 }));
 
-const ItemRow = styled.label(({ theme }) => ({
+const ItemRow = styled.div(({ theme }) => ({
   display: 'flex',
+  alignItems: 'center',
+  gap: theme.spacing.lg,
+}));
+
+const ItemLabel = styled.label(({ theme }) => ({
+  display: 'flex',
+  flex: '1 1 0',
+  minWidth: 0,
   alignItems: 'center',
   gap: theme.spacing.lg,
   cursor: 'pointer',
 }));
+
+const DetailLink = styled.a({
+  display: 'inline-flex',
+  flexShrink: 0,
+  cursor: 'pointer',
+});
