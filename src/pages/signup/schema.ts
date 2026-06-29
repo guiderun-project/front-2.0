@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { RUNNER_TYPE, hasRunningRecord } from '@/constants';
+import { RUNNER_TYPE, isRunningRecordComplete } from '@/constants';
 
 // "YYYY.MM.DD" (formatBirthDateInput 출력 형식)
 const BIRTH_DATE_PATTERN = /^\d{4}\.\d{2}\.\d{2}$/;
@@ -98,8 +98,8 @@ export const signupSchema = z
       });
     }
 
-    // 10KM 기록은 경험 유무와 무관하게 항상 필수. 기록이 없으면 0이라도 입력해야 한다(0 허용).
-    if (!hasRunningRecord(values.record)) {
+    // 10KM 기록은 경험 유무와 무관하게 항상 필수. 시·분·초 6자리를 모두 입력해야 한다(0 허용).
+    if (!isRunningRecordComplete(values.record)) {
       ctx.addIssue({
         code: 'custom',
         message: '10KM 러닝기록을 입력해주세요.',

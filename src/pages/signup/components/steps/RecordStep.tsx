@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactElement } from 'react';
+import { useEffect, type ReactElement } from 'react';
 
 import { Controller, useFormContext } from 'react-hook-form';
 
@@ -7,6 +7,7 @@ import {
   RUNNER_TYPE,
   TRAINING_RECORD_LABELS,
   deriveRunningGroup,
+  isRunningRecordComplete,
   type RunnerRecordGroup,
 } from '@/constants';
 
@@ -26,11 +27,9 @@ export const RecordStep = (): ReactElement => {
   const hasExperience = watch(SIGNUP_FIELD.HAS_EXPERIENCE);
   const record = watch(SIGNUP_FIELD.RECORD);
 
-  // 러닝 그룹은 10KM 기록으로 자동 채우되, 사용자가 직접 바꾸면 그 값을 유지한다.
-  const isGroupEditedRef = useRef(false);
-
+  // 6글자가 다 채워지면 러닝 그룹을 기록에 맞춰 동기화한다. (이후 수동 수정도 다음 기록 입력에 덮인다)
   useEffect(() => {
-    if (isGroupEditedRef.current) {
+    if (!isRunningRecordComplete(record)) {
       return;
     }
 
@@ -70,10 +69,7 @@ export const RecordStep = (): ReactElement => {
             options={recordGroupOptions}
             sheetTitle="러닝 그룹"
             value={field.value}
-            onChange={(value) => {
-              isGroupEditedRef.current = true;
-              field.onChange(value);
-            }}
+            onChange={field.onChange}
           />
         )}
       />

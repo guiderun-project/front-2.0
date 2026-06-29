@@ -38,6 +38,12 @@ export const TRAINING_RECORD_LABELS: Record<
 export const hasRunningRecord = (record: TimeValue): boolean =>
   record.hours !== '' || record.minutes !== '' || record.seconds !== '';
 
+// 시·분·초가 모두 2자리(=6글자)로 채워졌는지. 부분 입력은 잘못된 값이라 완성 시점에만 그룹을 환산한다.
+export const isRunningRecordComplete = (record: TimeValue): boolean =>
+  record.hours.length === 2 &&
+  record.minutes.length === 2 &&
+  record.seconds.length === 2;
+
 // TRAINING_RECORD_LABELS(10KM 기록 구간) 기준 그룹 상한(분, 이하 포함). 초과 시 D, 기록 없음은 E.
 const RUNNING_GROUP_MAX_MINUTES: Record<
   UserType,
@@ -55,18 +61,18 @@ const RUNNING_GROUP_MAX_MINUTES: Record<
   ],
 };
 
-// 10KM 러닝기록(시:분:초)을 러닝 그룹(A~E)으로 환산한다. 기록이 없으면 E.
+// 10KM 러닝기록(시:분:초)을 러닝 그룹(A~E)으로 환산한다. 기록이 없거나 0이면 E(기록 없음).
 export const deriveRunningGroup = (
   record: TimeValue,
   type: UserType,
 ): RunnerRecordGroup => {
-  if (!hasRunningRecord(record)) {
-    return 'E';
-  }
-
   const hours = Number(record.hours) || 0;
   const minutes = Number(record.minutes) || 0;
   const totalMinutes = hours * 60 + minutes;
+
+  if (totalMinutes <= 0) {
+    return 'E';
+  }
 
   const found = RUNNING_GROUP_MAX_MINUTES[type].find(
     ({ maxMinutes }) => totalMinutes <= maxMinutes,

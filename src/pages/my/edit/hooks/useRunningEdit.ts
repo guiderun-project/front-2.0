@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts';
 import {
   deriveRunningGroup,
   hasRunningRecord,
+  isRunningRecordComplete,
   type RunnerRecordGroup,
 } from '@/constants';
 import { useMyPage } from '@/pages/my/hooks/useMyPage';
@@ -56,9 +57,6 @@ export const useRunningEdit = () => {
   const { runningInfo } = data;
   const userType = runningInfo.type;
 
-  // 사용자가 러닝 그룹을 직접 바꿨는지 추적한다. 바꿨다면 기록 변경에 따른 자동 갱신을 멈춘다.
-  const isRecordDegreeEditedRef = useRef(false);
-
   const initialValues = useMemo<RunningEditFormValues>(
     () => ({
       recordDegree: runningInfo.recordDegree as RunnerRecordGroup,
@@ -101,13 +99,13 @@ export const useRunningEdit = () => {
     },
   });
 
-  // 10KM 기록은 필수. 기록이 없으면 0이라도 입력해야 한다(0 허용).
-  const isRecordFilled = hasRunningRecord(values.record);
-  const recordError = isRecordFilled
+  // 10KM 기록은 필수. 시·분·초 6자리를 모두 입력해야 한다(0 허용).
+  const isRecordComplete = isRunningRecordComplete(values.record);
+  const recordError = isRecordComplete
     ? undefined
     : '10KM 러닝기록을 입력해주세요.';
 
-  const canSubmit = isDirty && isRecordFilled && !isPending;
+  const canSubmit = isDirty && isRecordComplete && !isPending;
 
   /** 변경된 러닝 정보를 저장한다. 성공하면 true, 실패하면 false 를 반환한다. */
   const submit = async (): Promise<boolean> => {
@@ -131,18 +129,16 @@ export const useRunningEdit = () => {
   return {
     values,
     userType,
-    setRecordDegree: (value: RunnerRecordGroup) => {
-      isRecordDegreeEditedRef.current = true;
-      setField('recordDegree', value);
-    },
-    // 그룹을 직접 바꾸기 전까지는 10KM 기록으로 러닝 그룹 기본값을 자동 갱신한다.
+    setRecordDegree: (value: RunnerRecordGroup) =>
+      setField('recordDegree', value),
+    // 6글자가 다 채워지면 러닝 그룹을 기록에 맞춰 동기화한다. (이후 수동 수정도 다음 기록 입력에 덮인다)
     setRecord: (value: TimeValue) =>
       setValues((prev) => ({
         ...prev,
         record: value,
-        recordDegree: isRecordDegreeEditedRef.current
-          ? prev.recordDegree
-          : deriveRunningGroup(value, userType),
+        recordDegree: isRunningRecordComplete(value)
+          ? deriveRunningGroup(value, userType)
+          : prev.recordDegree,
       })),
     setHopePrefs: (value: string) => setField('hopePrefs', value),
     recordError,
