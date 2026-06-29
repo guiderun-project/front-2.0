@@ -10,7 +10,7 @@ import type { SelectOption, SelectOptions, SelectProps } from './Select.types';
 
 const DEFAULT_CONFIRM_TEXT = '확인';
 const SELECT_TRIGGER_ICON_SIZE = 24;
-const SELECT_CHECK_ICON_SIZE = 32;
+const SELECT_CHECK_ICON_SIZE = 24;
 const SELECT_TRIGGER_CONTENT_HEIGHT = 40;
 const SELECT_TRIGGER_FILLED_LABEL_TOP = -2;
 const SELECT_TRIGGER_VALUE_TOP = 21;
@@ -200,7 +200,11 @@ const SelectCheckList = <TValue extends string>({
               ) : null}
             </SelectOptionText>
             <SelectCheckIcon $selected={isSelected} aria-hidden="true">
-              <Icon color="icon.brand" icon="check-lined" size={SELECT_CHECK_ICON_SIZE} />
+              <Icon
+                color="icon.brand"
+                icon="check-thick-lined"
+                size={SELECT_CHECK_ICON_SIZE}
+              />
             </SelectCheckIcon>
           </SelectOptionButton>
         );
