@@ -32,6 +32,9 @@ export const formatDday = (dDay: number): string =>
 export const formatDdayLabel = (dDay: number): string =>
   dDay <= 0 ? "오늘" : `${dDay}일 뒤`;
 
+export const getDdayBadgeVariant = (dDay: number): "solid" | "soft" =>
+  dDay <= 0 ? "solid" : "soft";
+
 type RunnerStageHeadline = {
   connector: string;
   body: string;
