@@ -41,6 +41,9 @@ export const fieldControlStyles = (theme: Theme, multiline = false) =>
     background: 'transparent',
     color: theme.color.text.primary,
     caretColor: theme.color.text.brand,
+    '&[aria-invalid="true"]': {
+      caretColor: theme.color.text.danger,
+    },
     '&:placeholder-shown': {
       caretColor: 'transparent',
     },

@@ -305,6 +305,10 @@ const FieldBox = styled.div(({ theme }) => ({
     color: theme.color.text.danger,
   },
 
+  "[data-error='true'] & [data-caret]": {
+    backgroundColor: theme.color.text.danger,
+  },
+
   "@media (prefers-reduced-motion: reduce)": {
     transition: "none",
   },
