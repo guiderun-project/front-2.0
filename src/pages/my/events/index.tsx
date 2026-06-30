@@ -149,7 +149,7 @@ const Page = styled(PageLayout)({
 const TabNav = styled.nav(({ theme }) => ({
   display: "flex",
   alignItems: "center",
-  gap: theme.spacing.xl,
+  gap: theme.spacing.none,
   padding: theme.spacing["2xl"],
 }));
 
