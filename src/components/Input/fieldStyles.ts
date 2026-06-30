@@ -9,14 +9,13 @@ export const COUNTER_TOTAL_TYPOGRAPHY = 'detail-m-r' satisfies TypographyToken;
 
 export const FIELD_MIN_HEIGHT = 74;
 export const MULTILINE_FIELD_MIN_HEIGHT = 124;
-export const CONTROL_TOP_SPACE = 20;
-export const FLOATED_LABEL_SCALE = 0.7;
+export const CONTROL_TOP_SPACE = 23;
 export const CLEAR_ICON_SIZE = 24;
 export const DEFAULT_CLEAR_LABEL = '입력 내용 지우기';
 const CARET_BAR_OFFSET = 6;
 export const CARET_BAR_WIDTH = 2;
 export const CARET_BAR_HEIGHT = 18;
-export const MULTILINE_CARET_BAR_HEIGHT = 22;
+export const MULTILINE_CARET_BAR_HEIGHT = 18;
 
 export const typographyStyle = (theme: Theme, token: TypographyToken) => {
   const value = theme.typography[token];
@@ -42,6 +41,9 @@ export const fieldControlStyles = (theme: Theme, multiline = false) =>
     background: 'transparent',
     color: theme.color.text.primary,
     caretColor: theme.color.text.brand,
+    '&[aria-invalid="true"]': {
+      caretColor: theme.color.text.danger,
+    },
     '&:placeholder-shown': {
       caretColor: 'transparent',
     },

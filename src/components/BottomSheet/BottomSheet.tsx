@@ -12,6 +12,7 @@ import { IconButton } from '@/components/Icon';
 import { Text } from '@/components/Text';
 
 import type { BottomSheetHeading } from './BottomSheet.types';
+import { useKeyboardInset } from './useKeyboardInset';
 
 const DEFAULT_MAX_HEIGHT = 'calc(100dvh - 48px)';
 
@@ -70,6 +71,7 @@ export const BottomSheet = ({
   open,
   topBarTitle,
 }: BottomSheetProps): ReactElement => {
+  const keyboardInset = useKeyboardInset(open);
   const topBarTitleId = useId();
   const headingTitleId = useId();
   const headingDescriptionId = useId();
@@ -101,6 +103,7 @@ export const BottomSheet = ({
       isDismissable={!isBackdropCloseDisabled}
       isKeyboardDismissDisabled={isEscapeCloseDisabled}
       isOpen={open}
+      style={keyboardInset ? { paddingBottom: `${keyboardInset}px` } : undefined}
       onOpenChange={handleOpenChange}
     >
       <Positioner>
@@ -109,7 +112,11 @@ export const BottomSheet = ({
           aria-label={labelledById ? undefined : ariaLabel}
           aria-labelledby={labelledById}
         >
-          <Sheet $maxHeight={maxHeight} className={className}>
+          <Sheet
+            $keyboardInset={keyboardInset}
+            $maxHeight={maxHeight}
+            className={className}
+          >
             {hasTopBar ? (
               <TopBar>
                 {hasTopBarTitle ? (
@@ -274,17 +281,21 @@ const Dialog = styled(AriaDialog)({
   outline: 'none',
 });
 
-const Sheet = styled.div<{ $maxHeight: string }>(({ $maxHeight, theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  width: '100%',
-  maxHeight: $maxHeight,
-  overflow: 'hidden',
-  borderTopLeftRadius: theme.pxToRem(20),
-  borderTopRightRadius: theme.pxToRem(20),
-  backgroundColor: theme.color.bg.default,
-  boxShadow: theme.effect['bottom-shadow'],
-}));
+const Sheet = styled.div<{ $maxHeight: string; $keyboardInset: number }>(
+  ({ $keyboardInset, $maxHeight, theme }) => ({
+    display: 'flex',
+    flexDirection: 'column',
+    width: '100%',
+    maxHeight: $keyboardInset
+      ? `calc(${$maxHeight} - ${$keyboardInset}px)`
+      : $maxHeight,
+    overflow: 'hidden',
+    borderTopLeftRadius: theme.pxToRem(20),
+    borderTopRightRadius: theme.pxToRem(20),
+    backgroundColor: theme.color.bg.default,
+    boxShadow: theme.effect['bottom-shadow'],
+  }),
+);
 
 const TopBar = styled.header(({ theme }) => ({
   display: 'flex',
