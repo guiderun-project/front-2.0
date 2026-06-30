@@ -10,6 +10,8 @@ import {
 
 import styled from '@emotion/styled';
 
+import { useKeyboardInset } from '@/hooks/useKeyboardInset';
+
 import { Button, ButtonGroup } from '../Button';
 import { Icon } from '../Icon';
 import { Text } from '../Text';
@@ -53,6 +55,7 @@ const FooterButtonRoot = ({
 }: FooterButtonProps): ReactElement | null => {
   const footerRef = useRef<HTMLElement>(null);
   const spacerRef = useRef<HTMLDivElement>(null);
+  const keyboardInset = useKeyboardInset(true);
   const footerItems = Children.toArray(children);
   const buttons = footerItems.filter(isFooterButtonElement);
   const notices = footerItems.filter(isFooterButtonNoticeElement);
@@ -98,7 +101,12 @@ const FooterButtonRoot = ({
   return (
     <>
       {reserveSpace ? <Spacer ref={spacerRef} aria-hidden="true" /> : null}
-      <FixedArea ref={footerRef} $background={background} {...props}>
+      <FixedArea
+        ref={footerRef}
+        $background={background}
+        $keyboardInset={keyboardInset}
+        {...props}
+      >
         {hasNotice ? notices[0] : <ButtonGroup ratio={ratio}>{buttons}</ButtonGroup>}
       </FixedArea>
     </>
@@ -110,11 +118,14 @@ const Spacer = styled.div({
   pointerEvents: 'none',
 });
 
-const FixedArea = styled.footer<{ $background: FooterButtonBackground }>(
-  ({ $background, theme }) => ({
+const FixedArea = styled.footer<{
+  $background: FooterButtonBackground;
+  $keyboardInset: number;
+}>(
+  ({ $background, $keyboardInset, theme }) => ({
     position: 'fixed',
     right: '50%',
-    bottom: 0,
+    bottom: $keyboardInset ? `${$keyboardInset}px` : 0,
     zIndex: theme.zIndex.footer,
     display: 'grid',
     boxSizing: 'border-box',
