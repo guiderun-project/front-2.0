@@ -262,7 +262,9 @@ const FieldBox = styled.div(({ theme }) => ({
   },
 
   '&[data-multiline="true"] [data-caret]': {
-    top: theme.pxToRem(CONTROL_TOP_SPACE),
+    top: theme.pxToRem(
+      CONTROL_TOP_SPACE + (24 - MULTILINE_CARET_BAR_HEIGHT) / 2,
+    ),
     bottom: "auto",
     height: theme.pxToRem(MULTILINE_CARET_BAR_HEIGHT),
   },
