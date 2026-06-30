@@ -10,9 +10,9 @@ import {
 
 import { IconButton } from '@/components/Icon';
 import { Text } from '@/components/Text';
+import { useKeyboardInset } from '@/hooks/useKeyboardInset';
 
 import type { BottomSheetHeading } from './BottomSheet.types';
-import { useKeyboardInset } from './useKeyboardInset';
 
 const DEFAULT_MAX_HEIGHT = 'calc(100dvh - 48px)';
 

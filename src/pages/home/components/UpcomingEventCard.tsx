@@ -10,6 +10,7 @@ import {
   formatDday,
   formatDdayLabel,
   formatGuestEventDate,
+  getDdayBadgeVariant,
   type UpcomingGuestEvent,
 } from "@/pages/home/utils";
 
@@ -28,7 +29,7 @@ export const UpcomingEventCard = ({
       <RowLink aria-label={ariaLabel} to={APP_PATH.EVENT_DETAIL(event.id)}>
         <RowMain>
           <TitleLine>
-            <Badge size="s" tone="cyan" variant="solid">
+            <Badge size="s" tone="cyan" variant={getDdayBadgeVariant(event.dDay)}>
               {formatDday(event.dDay)}
             </Badge>
             <RowName color="text.primary" font="body-l-sb">

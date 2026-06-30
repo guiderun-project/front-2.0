@@ -7,7 +7,12 @@ import { Badge, Icon, RunnerTypeAvatar, Text } from '@/components';
 import { RUNNER_TYPE_LABELS } from '@/constants';
 import { APP_PATH } from '@/router/path';
 
-import { formatDday, formatDdayLabel, type UpcomingMemberEvent } from '@/pages/home/utils';
+import {
+  formatDday,
+  formatDdayLabel,
+  getDdayBadgeVariant,
+  type UpcomingMemberEvent,
+} from '@/pages/home/utils';
 
 type MemberUpcomingEventCardProps = {
   event: UpcomingMemberEvent;
@@ -27,7 +32,7 @@ export const MemberUpcomingEventCard = ({
     <CardItem>
       <CardLink aria-label={ariaLabel} to={APP_PATH.EVENT_DETAIL(event.id)}>
         <TitleRow>
-          <Badge size="s" tone="cyan" variant="solid">
+          <Badge size="s" tone="cyan" variant={getDdayBadgeVariant(event.dDay)}>
             {formatDday(event.dDay)}
           </Badge>
           <CardName color="text.primary" font="body-l-sb">
