@@ -10,7 +10,6 @@ export const COUNTER_TOTAL_TYPOGRAPHY = 'detail-m-r' satisfies TypographyToken;
 export const FIELD_MIN_HEIGHT = 74;
 export const MULTILINE_FIELD_MIN_HEIGHT = 124;
 export const CONTROL_TOP_SPACE = 23;
-export const FLOATED_LABEL_SCALE = 0.7;
 export const CLEAR_ICON_SIZE = 24;
 export const DEFAULT_CLEAR_LABEL = '입력 내용 지우기';
 const CARET_BAR_OFFSET = 6;

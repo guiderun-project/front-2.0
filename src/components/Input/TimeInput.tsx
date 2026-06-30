@@ -1,12 +1,11 @@
 import type { ChangeEvent, ReactElement } from "react";
-import { useId, useRef, useState } from "react";
+import { Fragment, useId, useRef, useState } from "react";
 
 import styled from "@emotion/styled";
 
 import {
   CONTROL_TOP_SPACE,
   FIELD_MIN_HEIGHT,
-  FLOATED_LABEL_SCALE,
   INFO_TYPOGRAPHY,
   LABEL_TYPOGRAPHY,
   typographyStyle,
@@ -127,7 +126,7 @@ export const TimeInput = ({
           role="group"
         >
           {SEGMENTS.map((segment, index) => (
-            <SegmentSlot key={segment.key}>
+            <Fragment key={segment.key}>
               {index > 0 && <Separator aria-hidden="true">:</Separator>}
               <Segment
                 aria-invalid={hasError || undefined}
@@ -143,7 +142,7 @@ export const TimeInput = ({
                 }}
                 value={current[segment.key]}
               />
-            </SegmentSlot>
+            </Fragment>
           ))}
         </SegmentRow>
       </FieldBox>
@@ -190,9 +189,10 @@ const FieldBox = styled.div(({ theme }) => ({
   '&:focus-within [data-floating-label], &[data-filled="true"] [data-floating-label]':
     {
       top: theme.spacing.lg,
-      transform: `translateY(0) scale(${FLOATED_LABEL_SCALE})`,
+      transform: "translateY(0)",
       transformOrigin: "left top",
       color: theme.color.text.tertiary,
+      ...typographyStyle(theme, INFO_TYPOGRAPHY),
     },
 
   "&:focus-within [data-floating-label]": {
@@ -239,7 +239,8 @@ const FloatingLabel = styled.span(({ theme }) => ({
   pointerEvents: "none",
   color: theme.color.text.tertiary,
   ...typographyStyle(theme, LABEL_TYPOGRAPHY),
-  transition: "transform 120ms ease, color 120ms ease, top 120ms ease",
+  transition:
+    "transform 120ms ease, color 120ms ease, top 120ms ease, font-size 120ms ease, line-height 120ms ease, letter-spacing 120ms ease",
 
   "@media (prefers-reduced-motion: reduce)": {
     transition: "color 120ms ease",
@@ -249,20 +250,18 @@ const FloatingLabel = styled.span(({ theme }) => ({
 const SegmentRow = styled.div(({ theme }) => ({
   display: "flex",
   alignItems: "center",
+  gap: theme.spacing.s,
   width: "100%",
   paddingTop: theme.pxToRem(CONTROL_TOP_SPACE),
 }));
 
-const SegmentSlot = styled.div({
-  display: "flex",
-  flex: 1,
-  minWidth: 0,
-  alignItems: "center",
-});
-
 const Separator = styled.span(({ theme }) => ({
+  display: "flex",
   flexShrink: 0,
-  padding: `0 ${theme.spacing.sm}`,
+  alignItems: "center",
+  justifyContent: "center",
+  width: theme.spacing.sm,
+  height: theme.pxToRem(24),
   color: theme.color.text.tertiary,
   ...typographyStyle(theme, LABEL_TYPOGRAPHY),
 }));
@@ -271,7 +270,7 @@ const Segment = styled.input(({ theme }) => ({
   flex: 1,
   minWidth: 0,
   margin: 0,
-  padding: `0 ${theme.spacing.xs}`,
+  padding: 0,
   border: 0,
   outline: "none",
   borderRadius: theme.radius.s,
@@ -287,6 +286,10 @@ const Segment = styled.input(({ theme }) => ({
 
   "&:focus": {
     backgroundColor: theme.color.bg.subtle,
+  },
+
+  '&[aria-invalid="true"]': {
+    caretColor: theme.color.text.danger,
   },
 }));
 
