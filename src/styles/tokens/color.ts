@@ -271,7 +271,7 @@ export const semanticColorAliases = {
       'brand-subtle': 'primitive.cyan.600',
       'brand-soft2': 'primitive.cyan.400-a20',
       'brand-surface': 'primitive.cyan.800',
-      'brand-event': 'primitive.neutral.875',
+      'brand-event': 'primitive.neutral.900',
       'light-soft': 'primitive.neutral.0-a8',
       'dim-soft': 'primitive.neutral.950-a42',
       overlay: 'primitive.neutral.0-a8',

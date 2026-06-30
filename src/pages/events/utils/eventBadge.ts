@@ -35,7 +35,7 @@ const EVENT_BADGE_CONFIGS = {
     tone: 'cyan2',
   },
   RECRUIT_CLOSE: {
-    label: '모집완료',
+    label: '모집마감',
     variant: 'soft',
     tone: 'gray',
   },
