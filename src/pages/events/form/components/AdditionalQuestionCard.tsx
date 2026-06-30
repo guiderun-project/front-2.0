@@ -84,7 +84,11 @@ export const AdditionalQuestionCard = ({
                     <span />
                   )}
                   <Counter aria-live="polite">
-                    <Text as="span" color="text.brand" font="body-s-m">
+                    <Text
+                      as="span"
+                      color={hasVisibleError ? 'text.danger' : 'text.brand'}
+                      font="body-s-m"
+                    >
                       {titleField.value.length}
                     </Text>
                     <Text as="span" color="text.tertiary" font="body-s-m">
@@ -138,7 +142,7 @@ const QuestionTitleInput = styled.input<{
   minWidth: 0,
   minHeight: theme.pxToRem(51),
   padding: theme.spacing.xl,
-  border: `${theme.pxToRem(1)} solid ${
+  border: `${$hasError ? theme.pxToRem(2) : theme.pxToRem(1)} solid ${
     $hasError ? theme.color.border.danger : theme.color.border.default
   }`,
   borderRadius: theme.radius.md,
@@ -146,12 +150,14 @@ const QuestionTitleInput = styled.input<{
   backgroundColor: $readOnly ? theme.color.bg.surface : theme.color.bg.default,
   color: $readOnly ? theme.color.text.tertiary : theme.color.text.primary,
   outline: 0,
+  transition: 'border-color 140ms ease-out, border-width 140ms ease-out',
 
   '&::placeholder': {
     color: theme.color.text.tertiary,
   },
 
   '&:focus': {
+    borderWidth: $readOnly ? theme.pxToRem(1) : theme.pxToRem(2),
     borderColor: $readOnly
       ? theme.color.border.default
       : $hasError
@@ -163,6 +169,10 @@ const QuestionTitleInput = styled.input<{
     backgroundColor: theme.color.bg.surface,
     color: theme.color.text.tertiary,
     cursor: 'default',
+  },
+
+  '@media (prefers-reduced-motion: reduce)': {
+    transition: 'none',
   },
 }));
 
