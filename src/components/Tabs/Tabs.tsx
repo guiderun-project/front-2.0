@@ -3,7 +3,6 @@ import { createContext, useContext, useEffect, useMemo, useRef } from 'react';
 
 import styled from '@emotion/styled';
 import {
-  SelectionIndicator,
   Tab as AriaTab,
   TabList as AriaTabList,
   TabPanel as AriaTabPanel,
@@ -103,7 +102,7 @@ const TabsTab = ({ children, ...props }: TabsTabProps): ReactElement => {
   return (
     <StyledTab ref={tabRef} $layout={layout} {...props}>
       <TabLabel>{children}</TabLabel>
-      <ActiveIndicator />
+      <ActiveIndicator aria-hidden={true} />
     </StyledTab>
   );
 };
@@ -241,16 +240,23 @@ const TabLabel = styled.span(({ theme }) => {
   };
 });
 
-const ActiveIndicator = styled(SelectionIndicator)(({ theme }) => ({
+const ActiveIndicator = styled.span(({ theme }) => ({
   position: 'absolute',
   bottom: theme.pxToRem(-1),
   left: 0,
   width: '100%',
-  height: theme.pxToRem(2),
+  height: '2px',
   backgroundColor: theme.color.border.primary,
+  opacity: 0,
   pointerEvents: 'none',
-  transition:
-    'translate 180ms cubic-bezier(0.2, 0, 0, 1), width 180ms cubic-bezier(0.2, 0, 0, 1)',
+  transform: 'scaleX(0)',
+  transformOrigin: 'center',
+  transition: 'opacity 140ms ease-out, transform 180ms cubic-bezier(0.2, 0, 0, 1)',
+
+  '[data-selected] > &': {
+    opacity: 1,
+    transform: 'scaleX(1)',
+  },
 
   '@media (prefers-reduced-motion: reduce)': {
     transition: 'none',
