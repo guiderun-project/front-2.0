@@ -21,7 +21,6 @@ import {
   COUNTER_TOTAL_TYPOGRAPHY,
   DEFAULT_CLEAR_LABEL,
   FIELD_MIN_HEIGHT,
-  FLOATED_LABEL_SCALE,
   INFO_TYPOGRAPHY,
   LABEL_TYPOGRAPHY,
   MULTILINE_CARET_BAR_HEIGHT,
@@ -285,9 +284,10 @@ const FieldBox = styled.div(({ theme }) => ({
 
   '&:focus-within label, &[data-filled="true"] label': {
     top: 0,
-    transform: `translateY(0) scale(${FLOATED_LABEL_SCALE})`,
+    transform: "translateY(0)",
     transformOrigin: "left top",
     color: theme.color.text.tertiary,
+    ...typographyStyle(theme, INFO_TYPOGRAPHY),
   },
 
   "&:focus-within label": {
@@ -344,7 +344,8 @@ const FloatingLabel = styled.label(({ theme }) => ({
   pointerEvents: "none",
   color: theme.color.text.tertiary,
   ...typographyStyle(theme, LABEL_TYPOGRAPHY),
-  transition: "transform 120ms ease, color 120ms ease, top 120ms ease",
+  transition:
+    "transform 120ms ease, color 120ms ease, top 120ms ease, font-size 120ms ease, line-height 120ms ease, letter-spacing 120ms ease",
 
   "@media (prefers-reduced-motion: reduce)": {
     transition: "color 120ms ease",
