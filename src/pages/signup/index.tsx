@@ -77,6 +77,7 @@ export const SignupPage = (): ReactElement => {
   const methods = useForm<SignupFormValues>({
     defaultValues: SIGNUP_FORM_DEFAULT_VALUES,
     resolver: zodResolver(signupSchema),
+    mode: 'onChange',
   });
   const [
     selectedRunnerType,
@@ -171,9 +172,8 @@ export const SignupPage = (): ReactElement => {
     }
   });
 
-  const handlePrimary = async () => {
+  const handleClickFooterButton = async () => {
     if (isCompleteStep) {
-      // 완료 화면에서 비로소 세션을 시작하고 홈으로 이동한다.
       if (issuedAccessToken) {
         await startSession(issuedAccessToken);
       }
@@ -257,7 +257,7 @@ export const SignupPage = (): ReactElement => {
             fullWidth
             size="l"
             type="button"
-            onClick={handlePrimary}
+            onClick={handleClickFooterButton}
           >
             {primaryLabel}
           </FooterButton.Button>
