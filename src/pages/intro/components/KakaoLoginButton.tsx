@@ -18,7 +18,7 @@ export const KakaoLoginButton = ({
         <KakaoSymbol aria-hidden={true} />
       </LogoArea>
       <LabelArea>
-        <Text align="center" font="body-m-sb">
+        <Text align="center" font="body-l-sb">
           카카오 계정으로 로그인
         </Text>
       </LabelArea>
@@ -31,13 +31,16 @@ const KAKAO_YELLOW = '#fee500';
 const KAKAO_DARK_CONTENT_COLOR = '#000000';
 
 const StyledButton = styled.button`
-  display: flex;
-  align-items: stretch;
+  display: grid;
+  grid-template-columns: ${({ theme }) => theme.pxToRem(54)} minmax(0, 1fr) ${({ theme }) => theme.pxToRem(54)};
+  align-items: center;
   align-self: stretch;
-  gap: ${({ theme }) => theme.spacing.none};
+  width: 100%;
+  height: ${({ theme }) => theme.pxToRem(54)};
   padding: ${({ theme }) => theme.spacing.none};
   border: 0;
   border-radius: ${({ theme }) => theme.radius.md};
+  box-sizing: border-box;
   background: ${KAKAO_YELLOW};
   color: ${({ theme }) => theme.color.text.primary};
   overflow: hidden;
@@ -62,24 +65,20 @@ const StyledButton = styled.button`
 
 const LogoArea = styled.span`
   display: flex;
-  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  align-items: flex-start;
-  gap: 0.73531rem;
-  width: 3.75rem;
-  padding: 1.02944rem;
+  width: 100%;
+  height: 100%;
 
   svg {
-    width: ${({ theme }) => theme.pxToRem(18)};
-    height: ${({ theme }) => theme.pxToRem(18)};
+    width: ${({ theme }) => theme.pxToRem(24)};
+    height: ${({ theme }) => theme.pxToRem(24)};
   }
 `;
 
 const LabelArea = styled.span`
   display: flex;
-  flex: 1 0 0;
-  justify-content: center;
   align-items: center;
-  gap: 0.625rem;
-  padding: ${({ theme }) => `${theme.spacing.xl} 0.875rem ${theme.spacing.xl} ${theme.spacing.none}`};
+  justify-content: center;
+  min-width: 0;
 `;
