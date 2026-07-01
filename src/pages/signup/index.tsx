@@ -8,7 +8,7 @@ import {
 
 import styled from '@emotion/styled';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { FormProvider, useForm } from 'react-hook-form';
+import { FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { api } from '@/api/services';
@@ -31,6 +31,7 @@ import { RecordStep } from '@/pages/signup/components/steps/RecordStep';
 import { RunnerTypeStep } from '@/pages/signup/components/steps/RunnerTypeStep';
 import { TermsStep } from '@/pages/signup/components/steps/TermsStep';
 import {
+  SIGNUP_FIELD,
   SIGNUP_FORM_DEFAULT_VALUES,
   SIGNUP_STEPPER_LABELS,
   SIGNUP_STEP_FIELDS,
@@ -76,6 +77,21 @@ export const SignupPage = (): ReactElement => {
   const methods = useForm<SignupFormValues>({
     defaultValues: SIGNUP_FORM_DEFAULT_VALUES,
     resolver: zodResolver(signupSchema),
+    mode: 'onChange',
+  });
+  const [
+    selectedRunnerType,
+    selectedGender,
+    selectedHasExperience,
+    agreements,
+  ] = useWatch({
+    control: methods.control,
+    name: [
+      SIGNUP_FIELD.DISABILITY_TYPE,
+      SIGNUP_FIELD.GENDER,
+      SIGNUP_FIELD.HAS_EXPERIENCE,
+      SIGNUP_FIELD.AGREEMENTS,
+    ],
   });
 
   const signupToken =
@@ -91,8 +107,8 @@ export const SignupPage = (): ReactElement => {
 
   const { step, isFirst, goNext, goPrev } = funnel;
   const stepperStage = SIGNUP_STEP_STAGE[step];
-  const isComplete = step === 'complete';
-  const isTerms = step === 'terms';
+  const isCompleteStep = step === 'complete';
+  const isTermsStep = step === 'terms';
 
   const [isExitConfirmOpen, setIsExitConfirmOpen] = useState(false);
   const exitResolverRef = useRef<((v: boolean) => void) | null>(null);
@@ -107,7 +123,7 @@ export const SignupPage = (): ReactElement => {
   );
 
   useRouteBlockerConfirm({
-    enabled: !isComplete,
+    enabled: !isCompleteStep,
     onConfirm: handleExitConfirm,
   });
 
@@ -123,7 +139,7 @@ export const SignupPage = (): ReactElement => {
   }, [step]);
 
   const handleClose = () =>
-    navigate(isComplete ? APP_PATH.HOME : APP_PATH.INTRO);
+    navigate(isCompleteStep ? APP_PATH.HOME : APP_PATH.INTRO);
 
   const handleBack = () => {
     if (isFirst) {
@@ -156,9 +172,8 @@ export const SignupPage = (): ReactElement => {
     }
   });
 
-  const handlePrimary = async () => {
-    if (isComplete) {
-      // 완료 화면에서 비로소 세션을 시작하고 홈으로 이동한다.
+  const handleClickFooterButton = async () => {
+    if (isCompleteStep) {
       if (issuedAccessToken) {
         await startSession(issuedAccessToken);
       }
@@ -166,7 +181,7 @@ export const SignupPage = (): ReactElement => {
       return;
     }
 
-    if (isTerms) {
+    if (isTermsStep) {
       await submitSignup();
       return;
     }
@@ -178,11 +193,17 @@ export const SignupPage = (): ReactElement => {
     }
   };
 
-  const primaryLabel = isComplete
+  const primaryLabel = isCompleteStep
     ? '서비스 둘러보기'
-    : isTerms
+    : isTermsStep
       ? '신청완료'
       : '다음';
+  const isFooterButtonDisabled =
+    isSubmitting ||
+    (step === 'runnerType' && selectedRunnerType === null) ||
+    (step === 'gender' && selectedGender === null) ||
+    (step === 'experience' && selectedHasExperience === null) ||
+    (isTermsStep && (!agreements.privacy || !agreements.portraitRights));
 
   return (
     <PageLayout background="bg.default">
@@ -190,7 +211,7 @@ export const SignupPage = (): ReactElement => {
         <TopNavigation
           aria-label="회원가입 내비게이션"
           left={
-            isComplete
+            isCompleteStep
               ? undefined
               : {
                   icon: 'chevron-left-lined',
@@ -232,11 +253,11 @@ export const SignupPage = (): ReactElement => {
 
         <FooterButton>
           <FooterButton.Button
-            disabled={isSubmitting}
+            disabled={isFooterButtonDisabled}
             fullWidth
             size="l"
             type="button"
-            onClick={handlePrimary}
+            onClick={handleClickFooterButton}
           >
             {primaryLabel}
           </FooterButton.Button>
