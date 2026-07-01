@@ -79,7 +79,7 @@ export const BirthDateSheet = ({
           errorText={errorText}
           helperText={BIRTH_DATE_HELPER_TEXT}
           inputMode="numeric"
-          label="생년월일"
+          label="생년월일 8자리"
           maxLength={BIRTH_DATE_MAX_LENGTH}
           value={birthDate}
           onChange={(event) => {
