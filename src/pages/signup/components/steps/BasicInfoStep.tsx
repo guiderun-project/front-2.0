@@ -42,7 +42,7 @@ export const BasicInfoStep = (): ReactElement => {
             error={Boolean(fieldState.error)}
             errorText={fieldState.error?.message}
             inputMode="numeric"
-            label="생년월일"
+            label="생년월일 8자리"
             maxLength={BIRTH_DATE_MAX_LENGTH}
             value={field.value}
             onChange={(event) =>

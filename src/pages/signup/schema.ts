@@ -78,7 +78,7 @@ export const signupSchema = z
     if (!isValidBirthDate(values.birthDate)) {
       ctx.addIssue({
         code: 'custom',
-        message: '생년월일을 정확히 입력해주세요.',
+        message: '올바른 생년월일을 입력해주세요.',
         path: ['birthDate'],
       });
     }

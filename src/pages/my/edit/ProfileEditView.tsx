@@ -102,7 +102,7 @@ const MyEditContent = (): ReactElement => {
             hasBirthDateError ? '올바른 생년월일을 입력해주세요.' : undefined
           }
           inputMode="numeric"
-          label="생년월일"
+          label="생년월일 8자리"
           maxLength={BIRTH_DATE_MAX_LENGTH}
           value={values.birthDate}
           onChange={(event) => setBirthDate(event.target.value)}
