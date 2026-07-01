@@ -78,7 +78,7 @@ const ProgressBar = styled.div<{ $filled: boolean }>(({ $filled, theme }) => ({
   borderRadius: theme.pxToRem(50),
   backgroundColor: $filled
     ? theme.color.bg['brand-primary']
-    : theme.color.bg['light-strong'],
+    : theme.color.bg.overlay,
   transition: 'background-color 180ms ease-out',
 
   '@media (prefers-reduced-motion: reduce)': {
