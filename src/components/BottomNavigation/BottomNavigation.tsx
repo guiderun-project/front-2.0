@@ -54,38 +54,31 @@ export const BottomNavigation = ({
             const isActive = index === activeIndex;
             const isGuestRestricted =
               item.to === APP_PATH.MY && !isAuthenticated;
-
-            if (isGuestRestricted) {
-              return (
-                <NavigationButton
-                  key={item.to}
-                  type="button"
-                  onClick={() => {
-                    setIsLoginSheetOpen(true);
-                  }}
-                >
-                  <Icon
-                    aria-hidden="true"
-                    color="icon.tertiary"
-                    icon={item.inactiveIcon}
-                    size={24}
-                  />
-                  <NavigationLabel $isActive={false}>
-                    {item.label}
-                  </NavigationLabel>
-                </NavigationButton>
-              );
-            }
+            const isItemActive = isGuestRestricted ? false : isActive;
 
             return (
-              <NavigationLink end={item.end} key={item.to} to={item.to}>
+              <NavigationLink
+                aria-expanded={isGuestRestricted ? isLoginSheetOpen : undefined}
+                aria-haspopup={isGuestRestricted ? "dialog" : undefined}
+                end={item.end}
+                key={item.to}
+                to={item.to}
+                onClick={(event) => {
+                  if (!isGuestRestricted) {
+                    return;
+                  }
+
+                  event.preventDefault();
+                  setIsLoginSheetOpen(true);
+                }}
+              >
                 <Icon
                   aria-hidden="true"
-                  color={isActive ? "icon.primary" : "icon.tertiary"}
-                  icon={isActive ? item.activeIcon : item.inactiveIcon}
+                  color={isItemActive ? "icon.primary" : "icon.tertiary"}
+                  icon={isItemActive ? item.activeIcon : item.inactiveIcon}
                   size={24}
                 />
-                <NavigationLabel $isActive={isActive}>
+                <NavigationLabel $isActive={isItemActive}>
                   {item.label}
                 </NavigationLabel>
               </NavigationLink>
@@ -236,17 +229,6 @@ const navigationItemStyles = (theme: Theme) => css`
 
 const NavigationLink = styled(NavLink)(({ theme }) =>
   navigationItemStyles(theme),
-);
-
-// 비로그인 마이페이지처럼 이동 대신 동작(시트 열기)을 하는 항목용. 링크와 동일한 외형.
-const NavigationButton = styled.button(
-  ({ theme }) => css`
-    ${navigationItemStyles(theme)};
-    border: 0;
-    background: transparent;
-    cursor: pointer;
-    font: inherit;
-  `,
 );
 
 const NavigationLabel = styled.span<{ $isActive: boolean }>(
