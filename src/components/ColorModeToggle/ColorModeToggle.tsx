@@ -1,4 +1,4 @@
-import type { ComponentPropsWithoutRef, ReactElement } from 'react';
+import { useId, type ComponentPropsWithoutRef, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
@@ -55,6 +55,8 @@ export const ColorModeToggle = ({
   ...props
 }: ColorModeToggleProps): ReactElement => {
   const { colorMode, setColorMode } = useColorMode();
+  const groupId = useId();
+  const groupName = `color-mode-${groupId}`;
 
   const handleSelectColorMode = (mode: ColorMode) => {
     if (disabled || mode === colorMode) {
@@ -65,7 +67,13 @@ export const ColorModeToggle = ({
   };
 
   return (
-    <ToggleRoot $disabled={disabled} aria-label={ariaLabel} role="group" {...props}>
+    <ToggleRoot
+      $disabled={disabled}
+      aria-disabled={disabled || undefined}
+      aria-label={ariaLabel}
+      role="radiogroup"
+      {...props}
+    >
       <ToggleIndicator $value={colorMode} aria-hidden={true} />
       {COLOR_MODE_OPTIONS.map(({ icon, label, mode }) => {
         const isSelected = mode === colorMode;
@@ -74,18 +82,24 @@ export const ColorModeToggle = ({
           <ToggleOption
             key={mode}
             $color={isSelected ? 'text.primary' : INACTIVE_COLOR_BY_MODE[colorMode].text}
-            aria-label={`${label} 모드`}
-            aria-pressed={isSelected}
-            disabled={disabled}
-            type="button"
-            onClick={() => handleSelectColorMode(mode)}
+            $disabled={disabled}
           >
-            <Icon
-              color={isSelected ? 'icon.primary' : INACTIVE_COLOR_BY_MODE[colorMode].icon}
-              icon={isSelected ? icon.selected : icon.default}
-              size={16}
+            <ToggleInput
+              checked={isSelected}
+              disabled={disabled}
+              name={groupName}
+              type="radio"
+              value={mode}
+              onChange={() => handleSelectColorMode(mode)}
             />
-            <HiddenText>{label}</HiddenText>
+            <ToggleControl>
+              <Icon
+                color={isSelected ? 'icon.primary' : INACTIVE_COLOR_BY_MODE[colorMode].icon}
+                icon={isSelected ? icon.selected : icon.default}
+                size={16}
+              />
+              <HiddenText>{`${label} 모드`}</HiddenText>
+            </ToggleControl>
           </ToggleOption>
         );
       })}
@@ -131,7 +145,7 @@ const ToggleIndicator = styled.span<{ $value: ColorMode }>`
     box-shadow 120ms ease;
 `;
 
-const ToggleOption = styled.button<{ $color: ColorToken }>`
+const ToggleOption = styled.label<{ $color: ColorToken; $disabled: boolean }>`
   position: relative;
   z-index: 1;
   display: inline-flex;
@@ -145,29 +159,44 @@ const ToggleOption = styled.button<{ $color: ColorToken }>`
   border-radius: ${({ theme }) => theme.radius.full};
   color: ${({ $color }) => resolveColorToken($color)};
   background: transparent;
-  cursor: pointer;
+  cursor: ${({ $disabled }) => ($disabled ? 'not-allowed' : 'pointer')};
   transition:
     color 120ms ease,
     transform 120ms ease;
 
-  &:active:not(:disabled) {
-    transform: scale(0.98);
-  }
-
-  &:focus-visible {
-    outline: 2px solid ${({ theme }) => theme.color.border.focused};
-    outline-offset: ${({ theme }) => theme.spacing.xs};
-  }
-
-  &:disabled {
-    cursor: not-allowed;
+  &:active {
+    transform: ${({ $disabled }) => ($disabled ? 'none' : 'scale(0.98)')};
   }
 
   @media (prefers-reduced-motion: reduce) {
     transition: none;
 
-    &:active:not(:disabled) {
+    &:active {
       transform: none;
     }
   }
+`;
+
+const ToggleInput = styled.input`
+  position: absolute;
+  inset: 0;
+  z-index: ${({ theme }) => theme.zIndex.control};
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: inherit;
+  opacity: 0;
+  touch-action: manipulation;
+
+  &:focus-visible + span {
+    outline: 2px solid ${({ theme }) => theme.color.border.focused};
+    outline-offset: ${({ theme }) => theme.spacing.xs};
+  }
+`;
+
+const ToggleControl = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
 `;

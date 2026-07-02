@@ -18,7 +18,7 @@ export const SearchEntry = ({
   to,
 }: SearchEntryProps): ReactElement => {
   return (
-    <SearchLink to={to}>
+    <SearchLink aria-label={`${placeholder} 검색하러 가기`} to={to}>
       <Icon
         aria-hidden={true}
         color="icon.secondary"
