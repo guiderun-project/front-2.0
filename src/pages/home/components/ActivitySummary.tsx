@@ -19,6 +19,9 @@ export const ActivitySummary = (): ReactElement => {
     const stageHeadline = getRunnerStageHeadline(
       mySummary.totalParticipationCount,
     );
+    const participationCount = formatNumber(mySummary.totalParticipationCount);
+    const runningDistanceKm = formatNumber(mySummary.totalRunningDistanceKm);
+    const metricsLabel = `지금까지 함께한 모임 총 ${participationCount}회, 누적 ${runningDistanceKm}킬로미터`;
 
     return (
       <Section>
@@ -50,32 +53,24 @@ export const ActivitySummary = (): ReactElement => {
         </HeadlineRow>
 
         <Metrics>
-          <Text
-            aria-hidden={true}
-            as="span"
-            color="text.primary"
-            font="display-l"
-          >
-            총 {formatNumber(mySummary.totalParticipationCount)}회
-          </Text>
-          <MetricDot aria-hidden={true} />
-          <Text
-            aria-hidden={true}
-            as="span"
-            color="text.brand"
-            font="display-l"
-          >
-            {formatNumber(mySummary.totalRunningDistanceKm)}KM
-          </Text>
-          <HiddenText>
-            지금까지 함께한 모임 총{" "}
-            {formatNumber(mySummary.totalParticipationCount)}회, 누적{" "}
-            {formatNumber(mySummary.totalRunningDistanceKm)}킬로미터
-          </HiddenText>
+          <HiddenText>{metricsLabel}</HiddenText>
+          <VisibleMetrics aria-hidden={true}>
+            <Text as="span" color="text.primary" font="display-l">
+              총 {participationCount}회
+            </Text>
+            <MetricDot />
+            <Text as="span" color="text.brand" font="display-l">
+              {runningDistanceKm}KM
+            </Text>
+          </VisibleMetrics>
         </Metrics>
       </Section>
     );
   }
+
+  const eventCount = formatNumber(publicSummary.totalEventCount);
+  const runningDistanceKm = formatNumber(publicSummary.totalRunningDistanceKm);
+  const metricsLabel = `올해 러너들이 함께한 모임 총 ${eventCount}회, 누적 ${runningDistanceKm}킬로미터`;
 
   return (
     <Section>
@@ -105,23 +100,16 @@ export const ActivitySummary = (): ReactElement => {
       </HeadlineRow>
 
       <Metrics>
-        <Text
-          aria-hidden={true}
-          as="span"
-          color="text.primary"
-          font="display-l"
-        >
-          총 {formatNumber(publicSummary.totalEventCount)}회
-        </Text>
-        <MetricDot aria-hidden={true} />
-        <Text aria-hidden={true} as="span" color="text.brand" font="display-l">
-          {formatNumber(publicSummary.totalRunningDistanceKm)}KM
-        </Text>
-        <HiddenText>
-          올해 러너들이 함께한 모임 총{" "}
-          {formatNumber(publicSummary.totalEventCount)}회, 누적{" "}
-          {formatNumber(publicSummary.totalRunningDistanceKm)}킬로미터
-        </HiddenText>
+        <HiddenText>{metricsLabel}</HiddenText>
+        <VisibleMetrics aria-hidden={true}>
+          <Text as="span" color="text.primary" font="display-l">
+            총 {eventCount}회
+          </Text>
+          <MetricDot />
+          <Text as="span" color="text.brand" font="display-l">
+            {runningDistanceKm}KM
+          </Text>
+        </VisibleMetrics>
       </Metrics>
     </Section>
   );
@@ -181,6 +169,12 @@ const Metrics = styled.div(({ theme }) => ({
   justifyContent: "flex-end",
   gap: theme.spacing.md,
   width: "100%",
+}));
+
+const VisibleMetrics = styled.span(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  gap: theme.spacing.md,
 }));
 
 const MetricDot = styled.span(({ theme }) => ({
