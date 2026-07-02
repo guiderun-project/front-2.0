@@ -1,44 +1,71 @@
 import styled from '@emotion/styled';
 import { Link } from 'react-router-dom';
 
-import { PageTitle } from '@/components';
+import { Icon, PageLayout, PageTitle, Text } from '@/components';
 
 export const NotFoundPage = () => {
   return (
     <>
       <PageTitle title="페이지를 찾을 수 없음" />
-      <Wrapper>
-        <Title>Route not found</Title>
-        <Copy>The v2 shell only exposes the root and auth namespaces for now.</Copy>
-        <BackLink to="/">Return home</BackLink>
-      </Wrapper>
+      <PageLayout background="bg.subtle">
+        <Content aria-labelledby="not-found-title">
+          <Icon
+            aria-hidden={true}
+            color="icon.tertiary"
+            icon="alert-circle-filled"
+            size={64}
+          />
+          <CopyGroup>
+            <Text
+              align="center"
+              as="h1"
+              font="heading-m-b"
+              id="not-found-title"
+            >
+              페이지를 찾을 수 없어요
+            </Text>
+            <Text align="center" as="p" color="text.secondary" font="body-m-m">
+              주소가 잘못되었거나 페이지가 이동되었을 수 있어요.
+            </Text>
+          </CopyGroup>
+          <BackLink to="/">홈으로 이동</BackLink>
+        </Content>
+      </PageLayout>
     </>
   );
 };
 
-const Wrapper = styled.section`
-  display: grid;
-  gap: 14px;
-  padding: ${({ theme }) => theme.spacing['4xl']} 28px;
-  border-radius: 32px;
-  background: ${({ theme }) => theme.color.bg.elevated};
-  border: 1px solid ${({ theme }) => theme.color.border.subtle};
-`;
+const Content = styled.section(({ theme }) => ({
+  display: 'flex',
+  minHeight: '100dvh',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: theme.spacing['2xl'],
+  boxSizing: 'border-box',
+  padding: `${theme.spacing['6xl']} ${theme.spacing['2xl']}`,
+}));
 
-const Title = styled.h2`
-  margin: 0;
-  font-size: 2rem;
-`;
+const CopyGroup = styled.div(({ theme }) => ({
+  display: 'grid',
+  gap: theme.spacing.md,
+  maxWidth: theme.pxToRem(320),
+}));
 
-const Copy = styled.p`
-  margin: 0;
-  color: ${({ theme }) => theme.color.text.secondary};
-`;
+const BackLink = styled(Link)(({ theme }) => ({
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  minHeight: theme.pxToRem(48),
+  padding: `${theme.spacing.none} ${theme.spacing['2xl']}`,
+  borderRadius: theme.radius.sm,
+  backgroundColor: theme.color.bg['brand-primary'],
+  color: theme.color.text.inverse,
+  textDecoration: 'none',
+  ...theme.typography['body-m-sb'],
 
-const BackLink = styled(Link)`
-  width: fit-content;
-  padding: 10px ${({ theme }) => theme.spacing.xl};
-  border-radius: ${({ theme }) => theme.radius.full};
-  background: ${({ theme }) => theme.color.text.primary};
-  color: ${({ theme }) => theme.color.text.inverse};
-`;
+  '&:focus-visible': {
+    outline: `${theme.pxToRem(2)} solid ${theme.color.border.focused}`,
+    outlineOffset: theme.spacing.xs,
+  },
+}));
