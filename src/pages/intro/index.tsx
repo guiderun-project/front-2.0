@@ -3,12 +3,20 @@ import type { ReactElement } from 'react';
 import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
 
-import { Button, Graphic, Icon, PageLayout, Text } from '@/components';
+import {
+  Button,
+  Graphic,
+  HiddenText,
+  Icon,
+  PageLayout,
+  Text,
+} from '@/components';
 import { APP_PATH } from '@/router/path';
 
 import { KakaoLoginButton } from './components/KakaoLoginButton';
 
 const GUIDERUN_LANDING_URL = 'https://about.guiderun.org/';
+const INTRO_DESCRIPTION = '첫 방문이라면, 먼저 카카오톡 회원가입이 필요해요';
 
 export const IntroPage = (): ReactElement => {
   const navigate = useNavigate();
@@ -42,7 +50,13 @@ export const IntroPage = (): ReactElement => {
           <Text align="center" as="h1" font="heading-m-sb">
             함께 연결된 안전한 러닝
           </Text>
-          <Text align="center" color="text.tertiary" font="body-m-m">
+          <HiddenText>{INTRO_DESCRIPTION}</HiddenText>
+          <Text
+            aria-hidden={true}
+            align="center"
+            color="text.tertiary"
+            font="body-m-m"
+          >
             첫 방문이라면,
             <br />
             먼저 카카오톡 회원가입이 필요해요
