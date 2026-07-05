@@ -1,6 +1,7 @@
 import type { ComponentType, SVGProps } from "react";
 
 import AlertCircleFilledIcon from "@/assets/icons/alert-circle-filled.svg?react";
+import AttendanceLinedIcon from "@/assets/icons/attendance-lined.svg?react";
 import CalendarLinedIcon from "@/assets/icons/calendar-lined.svg?react";
 import ChevronDownLinedIcon from "@/assets/icons/chevron-down-lined.svg?react";
 import ChevronLeftLinedIcon from "@/assets/icons/chevron-left-lined.svg?react";
@@ -23,6 +24,7 @@ import ListLinedIcon from "@/assets/icons/list-lined.svg?react";
 import LockFilledIcon from "@/assets/icons/lock-filled.svg?react";
 import LockLinedIcon from "@/assets/icons/lock-lined.svg?react";
 import MapLinedIcon from "@/assets/icons/map-lined.svg?react";
+import MatchLinedIcon from "@/assets/icons/match-lined.svg?react";
 import MoonFilledIcon from "@/assets/icons/moon-filled.svg?react";
 import MoonLinedIcon from "@/assets/icons/moon-lined.svg?react";
 import MoreVerticalLinedIcon from "@/assets/icons/more-vertical-lined.svg?react";
@@ -42,6 +44,7 @@ type SvgIconComponent = ComponentType<SVGProps<SVGSVGElement>>;
 
 export const iconRegistry = {
   "alert-circle-filled": AlertCircleFilledIcon,
+  "attendance-lined": AttendanceLinedIcon,
   "calendar-lined": CalendarLinedIcon,
   "chevron-down-lined": ChevronDownLinedIcon,
   "chevron-left-lined": ChevronLeftLinedIcon,
@@ -64,6 +67,7 @@ export const iconRegistry = {
   "lock-filled": LockFilledIcon,
   "lock-lined": LockLinedIcon,
   "map-lined": MapLinedIcon,
+  "match-lined": MatchLinedIcon,
   "moon-filled": MoonFilledIcon,
   "moon-lined": MoonLinedIcon,
   "more-vertical-lined": MoreVerticalLinedIcon,
