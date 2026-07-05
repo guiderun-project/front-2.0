@@ -3,7 +3,14 @@ import { useState, type ReactElement } from 'react';
 import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
 
-import { BottomSheet, Button, PageLayout, Text, TopNavigation } from '@/components';
+import {
+  BottomSheet,
+  Button,
+  HiddenText,
+  PageLayout,
+  Text,
+  TopNavigation,
+} from '@/components';
 import { APP_PATH } from '@/router/path';
 
 import {
@@ -40,9 +47,12 @@ export const EventSupportPage = (): ReactElement => {
 
       <HeroSection>
         <HeroTitle as="h1" color="text.primary" font="heading-m-sb">
-          이동 지원이 필요한 지역을
-          <br />
-          선택해주세요
+          <HiddenText>이동 지원이 필요한 지역을 선택해주세요</HiddenText>
+          <span aria-hidden={true}>
+            이동 지원이 필요한 지역을
+            <br />
+            선택해주세요
+          </span>
         </HeroTitle>
         <HeroDescription as="p" color="text.secondary" font="body-m-m">
           지역별 KTX 및 이동지원센터 연락처를 알려드려요
