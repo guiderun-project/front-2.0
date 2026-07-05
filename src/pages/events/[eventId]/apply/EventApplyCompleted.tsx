@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react';
+import { useEffect, useRef, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
@@ -12,6 +12,7 @@ import {
   TopNavigation,
 } from '@/components';
 
+import { focusFirstHeading } from './focusFirstHeading';
 import { createGoogleCalendarEventUrl } from './googleCalendar';
 
 type EventApplyCompletedProps = {
@@ -25,6 +26,12 @@ export const EventApplyCompleted = ({
   onBack,
   onViewEvent,
 }: EventApplyCompletedProps): ReactElement => {
+  const completedContentRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    focusFirstHeading(completedContentRef.current);
+  }, []);
+
   const handleAddGoogleCalendar = () => {
     const calendarUrl = createGoogleCalendarEventUrl(event);
     const calendarWindow = window.open('', '_blank');
@@ -55,7 +62,7 @@ export const EventApplyCompleted = ({
             },
           ]}
         />
-        <CompletedContent>
+        <CompletedContent ref={completedContentRef}>
           <Graphic aria-hidden={true} color="icon.primary" graphic="congrats" />
           <Text as="h1" align="center" color="text.primary" font="heading-m-sb">
             참여 신청이 완료됐어요!
