@@ -3,6 +3,7 @@ import { useId, useState, type ReactElement } from 'react';
 import styled from '@emotion/styled';
 
 import { BottomSheet } from '@/components/BottomSheet';
+import { HiddenText } from '@/components/HiddenText';
 import { Icon } from '@/components/Icon';
 import { Text } from '@/components/Text';
 
@@ -14,6 +15,7 @@ const SELECT_CHECK_ICON_SIZE = 24;
 const SELECT_TRIGGER_CONTENT_HEIGHT = 40;
 const SELECT_TRIGGER_FILLED_LABEL_TOP = -2;
 const SELECT_TRIGGER_VALUE_TOP = 21;
+const REQUIRED_LABEL_TEXT = '(필수)';
 
 type SelectCheckListProps<TValue extends string> = {
   options: SelectOptions<TValue>;
@@ -36,6 +38,7 @@ export const Select = <TValue extends string = string>({
   options,
   placeholder,
   renderTrigger,
+  required = false,
   sheetTitle,
   triggerRef,
   value,
@@ -48,9 +51,13 @@ export const Select = <TValue extends string = string>({
   const isConfirmDisabled = pendingValue === undefined || pendingValue === value;
   const hasError = Boolean(errorText);
   const errorId = `${reactId}-error`;
+  const triggerBaseAccessibleName = ariaLabel ?? label;
+  const triggerRequiredAccessibleName = required
+    ? `${triggerBaseAccessibleName} ${REQUIRED_LABEL_TEXT}`
+    : triggerBaseAccessibleName;
   const triggerAccessibleName = selectedOption
-    ? `${ariaLabel ?? label}, 현재 선택: ${selectedOption.label}`
-    : ariaLabel ?? label;
+    ? `${triggerRequiredAccessibleName}, 현재 선택: ${selectedOption.label}`
+    : triggerRequiredAccessibleName;
 
   const handleOpen = () => {
     if (disabled) {
@@ -117,6 +124,7 @@ export const Select = <TValue extends string = string>({
             <SelectTriggerContent data-filled={selectedOption ? 'true' : undefined}>
               <SelectTriggerLabel>
                 {selectedOption ? label : placeholder ?? label}
+                {required ? <HiddenText>{REQUIRED_LABEL_TEXT}</HiddenText> : null}
               </SelectTriggerLabel>
               <SelectTriggerValue
                 aria-hidden={selectedOption ? undefined : true}
