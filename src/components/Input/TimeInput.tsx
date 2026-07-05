@@ -28,6 +28,10 @@ const SEGMENTS: ReadonlyArray<{ key: SegmentKey; label: string }> = [
 // 다음 칸으로 포커스를 옮겨 연속 입력을 지원하고, 빈 칸에서 Backspace 시 이전 칸으로 이동한다.
 const MAX_SEGMENT_LENGTH = 2;
 
+// 분/초는 0~59만 유효하다. (시는 상한을 두지 않는다.)
+const MINUTE_SECOND_MAX = 59;
+const CAPPED_SEGMENT_KEYS: ReadonlySet<SegmentKey> = new Set(["minutes", "seconds"]);
+
 export const TimeInput = ({
   label,
   helperText,
@@ -63,12 +67,29 @@ export const TimeInput = ({
   const handleSegmentChange =
     (index: number, key: SegmentKey) =>
     (event: ChangeEvent<HTMLInputElement>): void => {
-      const next = event.target.value
+      const digits = event.target.value
         .replace(/\D/g, "")
         .slice(0, MAX_SEGMENT_LENGTH);
+
+      // 분/초는 0~59만 허용한다. 십의 자리는 0~5만 유효하므로 첫 자리가 6~9면
+      // 그 자체로 완성된 값(6~9초/분)으로 보고 다음 칸으로 넘기고, 두 자리 값이
+      // 59를 넘으면 59로 맞춘다. (에러 메시지 없이 입력 자체를 제한)
+      let next = digits;
+      let isComplete = digits.length === MAX_SEGMENT_LENGTH;
+
+      if (CAPPED_SEGMENT_KEYS.has(key)) {
+        const maxTensDigit = Math.floor(MINUTE_SECOND_MAX / 10); // 5
+        if (digits.length === 1 && Number(digits) > maxTensDigit) {
+          isComplete = true;
+        } else if (Number(digits) > MINUTE_SECOND_MAX) {
+          next = String(MINUTE_SECOND_MAX);
+          isComplete = true;
+        }
+      }
+
       commit({ ...current, [key]: next });
 
-      if (next.length === MAX_SEGMENT_LENGTH && index < SEGMENTS.length - 1) {
+      if (isComplete && index < SEGMENTS.length - 1) {
         segmentRefs.current[index + 1]?.focus();
       }
     };

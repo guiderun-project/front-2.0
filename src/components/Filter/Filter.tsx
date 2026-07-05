@@ -31,6 +31,7 @@ export const Filter = <TValue extends string = string>(
     className,
     disabled = false,
     icon,
+    neutralValue,
     onChange,
     options,
     placeholder,
@@ -38,13 +39,18 @@ export const Filter = <TValue extends string = string>(
     variant = 'line',
   } = props;
   const selectedOption = findSelectedOption(options, value);
+  // A neutral value ("전체") keeps its option selected in the sheet but shows
+  // the placeholder (category name) on the trigger, so the applied category
+  // stays identifiable.
+  const isNeutral = value !== undefined && value === neutralValue;
+  const triggerOption = isNeutral ? undefined : selectedOption;
 
   if (props.mode === 'cycle') {
     const nextOption = findNextEnabledOption(options, value);
     const isTriggerDisabled = disabled || !nextOption;
     const label = getTriggerLabel({
       placeholder,
-      selectedOption,
+      selectedOption: triggerOption,
     });
 
     const handleCycle = () => {
@@ -90,7 +96,7 @@ export const Filter = <TValue extends string = string>(
           label={getTriggerLabel({
             fallback: typeof props.sheetTitle === 'string' ? props.sheetTitle : undefined,
             placeholder,
-            selectedOption,
+            selectedOption: isNeutral ? undefined : selectedOption,
           })}
           mode="sheet"
           variant={variant}

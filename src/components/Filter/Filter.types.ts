@@ -16,6 +16,13 @@ type FilterBaseProps<TValue extends string> = {
   variant?: FilterVariant;
   disabled?: boolean;
   placeholder?: string;
+  /**
+   * Value that represents "no active filter" (e.g. the `전체` option). When
+   * `value` equals it, the trigger shows the `placeholder` (category name)
+   * instead of that option's label, while the option stays selected inside the
+   * sheet.
+   */
+  neutralValue?: TValue;
   ariaLabel?: string;
   className?: string;
 };
