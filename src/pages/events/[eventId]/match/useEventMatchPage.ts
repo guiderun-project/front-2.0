@@ -13,6 +13,7 @@ import type {
   UserType,
 } from '@/api/types';
 import { api } from '@/api/services';
+import { useToast } from '@/components';
 import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
 
@@ -38,6 +39,8 @@ type CancelMatchingInput = {
 type CancelMatchingOptions = {
   onSuccess?: () => void;
 };
+
+const MATCHING_COMPLETE_MESSAGE = '매칭을 완료했어요.';
 
 type SelectionAnnouncementInput = {
   participant: MatchingWaitingParticipant;
@@ -114,6 +117,7 @@ export const useEventMatchPermission = () => {
 
 export const useEventMatchPage = (eventId: number) => {
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState<MatchTabId>('waiting');
   const [announcement, setAnnouncement] = useState('');
   const [selectedViId, setSelectedViId] = useState<string | null>(null);
@@ -203,10 +207,16 @@ export const useEventMatchPage = (eventId: number) => {
           viId,
         },
         eventId,
-      }),
+    }),
     onSuccess: async () => {
       clearSelection();
-      setAnnouncement('매칭을 완료했어요.');
+      setAnnouncement(MATCHING_COMPLETE_MESSAGE);
+      showToast({
+        type: 'success',
+        icon: 'check-thick-lined',
+        content: MATCHING_COMPLETE_MESSAGE,
+        announce: false,
+      });
       await invalidateMatchingQueries();
     },
     onError: () => {
@@ -222,10 +232,6 @@ export const useEventMatchPage = (eventId: number) => {
       api.matching.cancelDelete({ eventId, viId }),
     onMutate: ({ viId }) => {
       setCancelingViId(viId);
-    },
-    onSuccess: async (_, matching) => {
-      setAnnouncement(`${matching.viName}님의 매칭을 취소했어요.`);
-      await invalidateMatchingQueries();
     },
     onError: (_, matching) => {
       setAnnouncement(`${matching.viName}님의 매칭 취소에 실패했어요.`);
@@ -287,7 +293,21 @@ export const useEventMatchPage = (eventId: number) => {
 
     cancelMutation.mutate(
       { viId: row.vi.userId, viName: row.vi.name },
-      options,
+      {
+        onSuccess: (_, matching) => {
+          const successMessage = `${matching.viName}님의 매칭을 취소했어요.`;
+
+          options?.onSuccess?.();
+          setAnnouncement(successMessage);
+          showToast({
+            type: 'error',
+            icon: 'delete-lined',
+            content: successMessage,
+            announce: false,
+          });
+          void invalidateMatchingQueries();
+        },
+      },
     );
   };
 
