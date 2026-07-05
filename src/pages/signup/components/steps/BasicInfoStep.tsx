@@ -10,7 +10,10 @@ import {
   PHONE_DIGIT_LENGTH,
 } from '@/utils';
 
-import { SIGNUP_FIELD } from '@/pages/signup/constants';
+import {
+  SIGNUP_FIELD,
+  SIGNUP_NAME_MAX_LENGTH,
+} from '@/pages/signup/constants';
 import { SIGNUP_COPY } from '@/pages/signup/copy';
 import type { SignupFormValues } from '@/pages/signup/types';
 import { StepLayout } from '@/pages/signup/components/StepLayout';
@@ -29,7 +32,7 @@ export const BasicInfoStep = (): ReactElement => {
             error={Boolean(fieldState.error)}
             errorText={fieldState.error?.message}
             label="이름"
-            maxLength={8}
+            maxLength={SIGNUP_NAME_MAX_LENGTH}
             value={field.value}
             onChange={field.onChange}
           />
