@@ -27,6 +27,11 @@ export const DetailPanel = ({
   onKakaoShare,
 }: DetailPanelProps): ReactElement => {
   const navigate = useNavigate();
+  const scheduleDateLabel = formatKoreanDate(event.schedule.date);
+  const scheduleTimeLabel = formatTimeRange(
+    event.schedule.startTime,
+    event.schedule.endTime,
+  );
 
   const handleSupportClick = () => {
     navigate(APP_PATH.EVENT_SUPPORT);
@@ -45,14 +50,12 @@ export const DetailPanel = ({
           </DetailInfoRow>
           <DetailInfoRow label="훈련일자">
             <StackedValue>
-              <Text color="text.primary" font="body-m-m">
-                {formatKoreanDate(event.schedule.date)}
+              <HiddenText>{`${scheduleDateLabel} ${scheduleTimeLabel}`}</HiddenText>
+              <Text aria-hidden={true} color="text.primary" font="body-m-m">
+                {scheduleDateLabel}
               </Text>
-              <Text color="text.primary" font="body-m-m">
-                {formatTimeRange(
-                  event.schedule.startTime,
-                  event.schedule.endTime,
-                )}
+              <Text aria-hidden={true} color="text.primary" font="body-m-m">
+                {scheduleTimeLabel}
               </Text>
             </StackedValue>
           </DetailInfoRow>
@@ -77,7 +80,8 @@ export const DetailPanel = ({
           {hasExpectedRunningDistance ? (
             <DetailInfoRow label="예상 러닝거리">
               <Text color="text.primary" font="body-m-m">
-                {event.expectedRunningDistanceKm}KM
+                <HiddenText>{`${event.expectedRunningDistanceKm} KM`}</HiddenText>
+                <span aria-hidden={true}>{event.expectedRunningDistanceKm}KM</span>
               </Text>
             </DetailInfoRow>
           ) : null}
