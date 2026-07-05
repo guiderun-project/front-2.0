@@ -12,7 +12,6 @@ import { ParticipantAdditionalInfoAccordion } from './ParticipantAdditionalInfoA
 
 type MatchParticipantCardProps = {
   applicationGroup: RunningGroup;
-  disabled: boolean;
   eventGroupLabelContext: EventGroupLabelContext;
   isSelected: boolean;
   participant: MatchingWaitingParticipant;
@@ -59,7 +58,6 @@ const getOriginalRunningGroupText = (
 
 export const MatchParticipantCard = ({
   applicationGroup,
-  disabled,
   eventGroupLabelContext,
   isSelected,
   participant,
@@ -101,7 +99,6 @@ export const MatchParticipantCard = ({
           </InfoTextGroup>
         </ParticipantInfo>
         <SelectButton
-          disabled={disabled}
           level={isSelected ? 'quaternary' : 'primary'}
           size="s"
           type="button"

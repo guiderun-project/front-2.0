@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import {
   useMutation,
@@ -39,10 +39,41 @@ type CancelMatchingOptions = {
   onSuccess?: () => void;
 };
 
+type SelectionAnnouncementInput = {
+  participant: MatchingWaitingParticipant;
+  selectedGuideIds: string[];
+  selectedViId: string | null;
+};
+
 const getParticipantType = (
   participant: MatchingWaitingParticipant | undefined,
 ): UserType | null => {
   return participant?.type ?? null;
+};
+
+const getSelectionAnnouncement = ({
+  participant,
+  selectedGuideIds,
+  selectedViId,
+}: SelectionAnnouncementInput): string => {
+  const isSelected =
+    participant.type === 'VI'
+      ? selectedViId === participant.userId
+      : selectedGuideIds.includes(participant.userId);
+
+  if (!isSelected) {
+    return `${participant.name}님의 선택을 취소했습니다.`;
+  }
+
+  if (selectedViId === null) {
+    return `${participant.name}님을 선택했습니다. 시각장애러너 파트너를 선택해주세요.`;
+  }
+
+  if (selectedGuideIds.length === 0) {
+    return `${participant.name}님을 선택했습니다. 가이드러너 파트너를 선택해주세요.`;
+  }
+
+  return `${participant.name}님을 선택했습니다. 이대로 매칭하기를 눌러주세요.`;
 };
 
 export const useEventMatchRoute = () => {
@@ -88,6 +119,7 @@ export const useEventMatchPage = (eventId: number) => {
   const [selectedViId, setSelectedViId] = useState<string | null>(null);
   const [selectedGuideIds, setSelectedGuideIds] = useState<string[]>([]);
   const [cancelingViId, setCancelingViId] = useState<string | null>(null);
+  const isCreatingMatchingGuardRef = useRef(false);
 
   const [waitingQuery, completedQuery] = useSuspenseQueries({
     queries: [
@@ -151,6 +183,7 @@ export const useEventMatchPage = (eventId: number) => {
   const clearSelection = () => {
     setSelectedViId(null);
     setSelectedGuideIds([]);
+    setAnnouncement('선택한 참가자를 모두 해제했습니다.');
   };
 
   const invalidateMatchingQueries = async () => {
@@ -179,6 +212,9 @@ export const useEventMatchPage = (eventId: number) => {
     onError: () => {
       setAnnouncement('매칭에 실패했어요.');
     },
+    onSettled: () => {
+      isCreatingMatchingGuardRef.current = false;
+    },
   });
 
   const cancelMutation = useMutation({
@@ -200,29 +236,41 @@ export const useEventMatchPage = (eventId: number) => {
   });
 
   const toggleParticipant = (participant: MatchingWaitingParticipant) => {
-    if (createMutation.isPending) {
-      return;
-    }
-
     if (participant.type === 'VI') {
-      setSelectedViId((currentViId) =>
-        currentViId === participant.userId ? null : participant.userId,
+      const nextSelectedViId =
+        selectedViId === participant.userId ? null : participant.userId;
+
+      setSelectedViId(nextSelectedViId);
+      setAnnouncement(
+        getSelectionAnnouncement({
+          participant,
+          selectedGuideIds,
+          selectedViId: nextSelectedViId,
+        }),
       );
       return;
     }
 
-    setSelectedGuideIds((currentGuideIds) =>
-      currentGuideIds.includes(participant.userId)
-        ? currentGuideIds.filter((guideId) => guideId !== participant.userId)
-        : [...currentGuideIds, participant.userId],
+    const nextSelectedGuideIds = selectedGuideIds.includes(participant.userId)
+      ? selectedGuideIds.filter((guideId) => guideId !== participant.userId)
+      : [...selectedGuideIds, participant.userId];
+
+    setSelectedGuideIds(nextSelectedGuideIds);
+    setAnnouncement(
+      getSelectionAnnouncement({
+        participant,
+        selectedGuideIds: nextSelectedGuideIds,
+        selectedViId,
+      }),
     );
   };
 
   const createMatching = () => {
-    if (!canCreateMatching || !selectedVi || createMutation.isPending) {
+    if (!canCreateMatching || !selectedVi || isCreatingMatchingGuardRef.current) {
       return;
     }
 
+    isCreatingMatchingGuardRef.current = true;
     createMutation.mutate({
       guideIds: selectedGuides.map((guide) => guide.userId),
       viId: selectedVi.userId,

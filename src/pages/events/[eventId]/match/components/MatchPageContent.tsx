@@ -55,7 +55,6 @@ export const MatchPageContent = ({
     createMatching,
     hasVisibleSelectionBar,
     isCancelingMatching,
-    isCreatingMatching,
     pageState,
     selectedGuides,
     selectedUserIds,
@@ -84,7 +83,6 @@ export const MatchPageContent = ({
           <Tabs.Panel id={MATCH_TAB_ID.WAITING}>
             <TabPanelContent>
               <MatchWaitingPanel
-                disabledParticipantAction={isCreatingMatching}
                 eventGroupLabelContext={eventGroupLabelContext}
                 selectedUserIds={selectedUserIds}
                 waiting={pageState.waiting}
@@ -108,7 +106,6 @@ export const MatchPageContent = ({
       {hasVisibleSelectionBar ? (
         <MatchSelectionBar
           canCreateMatching={canCreateMatching}
-          isCreatingMatching={isCreatingMatching}
           selectedGuides={selectedGuides}
           selectedVi={selectedVi}
           onClear={clearSelection}
