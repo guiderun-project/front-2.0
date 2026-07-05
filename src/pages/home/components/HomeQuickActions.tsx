@@ -26,7 +26,7 @@ export const HomeQuickActions = (): ReactElement => {
       <ActionLink $tone="cyan" to={APP_PATH.EVENT_NEW}>
         <ActionLabel>
           <Text color="text.primary" font="body-l-sb">
-            이벤트 만들기
+            모임 만들기
           </Text>
           <Text color="text.tertiary" font="detail-m-r">
             러닝 모임 만들어보기
