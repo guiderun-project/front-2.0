@@ -1,24 +1,27 @@
-import { useId, useState, type ReactElement } from 'react';
+import { useId, useState, type ReactElement } from "react";
 
-import styled from '@emotion/styled';
+import styled from "@emotion/styled";
 
-import type { MatchingUser, RunningGroup } from '@/api/types';
-import { Badge, HiddenText, Icon, Text } from '@/components';
-import { RUNNER_TYPE_LABELS } from '@/constants';
-import type { AppTheme } from '@/styles/theme';
+import type { MatchingUser, RunningGroup } from "@/api/types";
+import { Badge, HiddenText, Icon, Text } from "@/components";
+import { RUNNER_TYPE_LABELS } from "@/constants";
+import type { AppTheme } from "@/styles/theme";
 
 import type {
   MatchingStatusViewModel,
   MatchingStatusViewRow,
-} from '../hooks/matchingStatusViewModel';
-import { getEventGroupDisplayLabel, type EventGroupLabelContext } from '../utils';
-import { PanelState } from './PanelState';
-import { ProfileAvatar } from './ProfileAvatar';
+} from "../hooks/matchingStatusViewModel";
+import {
+  getEventGroupDisplayLabel,
+  type EventGroupLabelContext,
+} from "../utils";
+import { PanelState } from "./PanelState";
+import { ProfileAvatar } from "./ProfileAvatar";
 
 type MatchingPanelProps = {
   data?: MatchingStatusViewModel;
-  eventCategory: EventGroupLabelContext['eventCategory'];
-  eventType: EventGroupLabelContext['eventType'];
+  eventCategory: EventGroupLabelContext["eventCategory"];
+  eventType: EventGroupLabelContext["eventType"];
   isError: boolean;
   isPending: boolean;
   showMyPartnerSummary: boolean;
@@ -70,9 +73,9 @@ export const MatchingPanel = ({
 };
 
 type MatchingGroupCardProps = {
-  eventCategory: EventGroupLabelContext['eventCategory'];
-  eventType: EventGroupLabelContext['eventType'];
-  group: MatchingStatusViewModel['groups'][number];
+  eventCategory: EventGroupLabelContext["eventCategory"];
+  eventType: EventGroupLabelContext["eventType"];
+  group: MatchingStatusViewModel["groups"][number];
 };
 
 const MatchingGroupCard = ({
@@ -91,16 +94,13 @@ const MatchingGroupCard = ({
         <GroupHeadingText role="text">
           <Text as="span" color="text.primary" font="heading-s-sb">
             {groupLabel}
-          </Text>{' '}
+          </Text>{" "}
           <GroupCountText color="text.tertiary" font="body-m-m">
             {group.totalCount}명
           </GroupCountText>
         </GroupHeadingText>
       </GroupHeading>
-      <MatchingRows
-        aria-label={`${groupLabel} 매칭 결과`}
-        role="list"
-      >
+      <MatchingRows aria-label={`${groupLabel} 매칭 결과`} role="list">
         {group.rows.map((row) => (
           <MatchingResultRow key={row.id} row={row} />
         ))}
@@ -141,26 +141,26 @@ const MyPartnerSummary = ({
 
 const getMyPartnerSummaryDescription = (partners: MatchingUser[]) => {
   if (partners.length === 0) {
-    return '내 파트너 대기중';
+    return "내 파트너 대기중";
   }
 
   return `내 파트너 ${partners
     .map((partner) => `${RUNNER_TYPE_LABELS[partner.type]} ${partner.name}`)
-    .join(', ')}`;
+    .join(", ")}`;
 };
 
 type MatchingResultRowProps = {
   row: MatchingStatusViewRow;
 };
 
-type ParticipantSlotVariant = 'matched' | 'unmatched';
+type ParticipantSlotVariant = "matched" | "unmatched";
 
 const MatchingResultRow = ({ row }: MatchingResultRowProps): ReactElement => {
   return (
     <MatchingRowItem>
       <HiddenText>{getMatchingRowDescription(row)}</HiddenText>
       <MatchingRowVisual aria-hidden={true}>
-        <ParticipantSlot $variant={row.vi ? 'matched' : 'unmatched'}>
+        <ParticipantSlot $variant={row.vi ? "matched" : "unmatched"}>
           {row.vi ? (
             <ProfileAvatar name={row.vi.name} type={row.vi.type} />
           ) : (
@@ -178,7 +178,7 @@ const MatchingResultRow = ({ row }: MatchingResultRowProps): ReactElement => {
         </LinkIconCircle>
 
         <ParticipantSlot
-          $variant={row.guides.length > 0 ? 'matched' : 'unmatched'}
+          $variant={row.guides.length > 0 ? "matched" : "unmatched"}
         >
           {row.guides.length > 0 ? (
             <GuideList>
@@ -212,11 +212,11 @@ const getMatchingRowDescription = (row: MatchingStatusViewRow) => {
     return `가이드러너 ${formatMatchingUserNames(row.guides)} 매칭되지 않음`;
   }
 
-  return '시각장애러너 매칭되지 않음, 가이드러너 매칭되지 않음';
+  return "시각장애러너 매칭되지 않음, 가이드러너 매칭되지 않음";
 };
 
 const formatMatchingUserNames = (users: MatchingUser[]) => {
-  return users.map((user) => user.name).join(', ');
+  return users.map((user) => user.name).join(", ");
 };
 
 const UnmatchedSlot = (): ReactElement => {
@@ -256,7 +256,7 @@ const MatchingCriteriaAccordion = ({
         <ChevronIcon $isOpen={isOpen}>
           <Icon
             aria-hidden={true}
-            color="icon.secondary"
+            color="icon.primary"
             icon="chevron-down-lined"
             size={20}
           />
@@ -265,7 +265,7 @@ const MatchingCriteriaAccordion = ({
 
       <CriteriaPanel
         aria-hidden={!isOpen}
-        data-state={isOpen ? 'open' : 'closed'}
+        data-state={isOpen ? "open" : "closed"}
         id={contentId}
         inert={!isOpen ? true : undefined}
       >
@@ -305,32 +305,32 @@ const MatchingCriteriaAccordion = ({
   );
 };
 
-type CriteriaGroup = Extract<RunningGroup, 'A' | 'B' | 'C' | 'D' | 'E'>;
+type CriteriaGroup = Extract<RunningGroup, "A" | "B" | "C" | "D" | "E">;
 
 const MATCHING_CRITERIA: Array<{
   group: CriteriaGroup;
   guide: string;
   vi: string;
 }> = [
-  { group: 'A', vi: '~50분', guide: '~45분' },
-  { group: 'B', vi: '51~56분', guide: '46~52분' },
-  { group: 'C', vi: '57~65분', guide: '53~59분' },
-  { group: 'D', vi: '66분~', guide: '60분~' },
-  { group: 'E', vi: '기록 없음', guide: '기록 없음' },
+  { group: "A", vi: "~50분", guide: "~45분" },
+  { group: "B", vi: "51~56분", guide: "46~52분" },
+  { group: "C", vi: "57~65분", guide: "53~59분" },
+  { group: "D", vi: "66분~", guide: "60분~" },
+  { group: "E", vi: "기록 없음", guide: "기록 없음" },
 ];
 
 const MATCHING_CRITERIA_COLUMNS = [
   {
-    type: 'vi',
-    title: '시각장애러너',
+    type: "vi",
+    title: "시각장애러너",
     items: MATCHING_CRITERIA.map(({ group, vi }) => ({
       group,
       value: vi,
     })),
   },
   {
-    type: 'guide',
-    title: '가이드러너',
+    type: "guide",
+    title: "가이드러너",
     items: MATCHING_CRITERIA.map(({ group, guide }) => ({
       group,
       value: guide,
@@ -339,18 +339,18 @@ const MATCHING_CRITERIA_COLUMNS = [
 ] as const;
 
 const MATCHING_CRITERIA_NOTES = [
-  '클래스 참여 시, 배정된 팀을 기준으로 파트너 매칭이 이루어지며, 함께 운동하시던 파트너와 다시 함께 훈련을 희망하신다면 우선적으로 매칭 합니다.',
-  '일반적으로 가이드러너가 시각장애러너보다 1.5배 빠른 조깅이 가능한 경우 안정된 훈련이 가능합니다.',
-  '미성년자 러너의 경우, 서브 파트너 주자로 성인 러너(보호자 가능)와 함께 될 수 있으면 동성 파트너로만 매칭합니다.',
-  '미리 매칭이 공지 되었을지라도 상황에 따라 현장에서 변동될 수 있습니다.',
+  "클래스 참여 시, 배정된 팀을 기준으로 파트너 매칭이 이루어지며, 함께 운동하시던 파트너와 다시 함께 훈련을 희망하신다면 우선적으로 매칭 합니다.",
+  "일반적으로 가이드러너가 시각장애러너보다 1.5배 빠른 조깅이 가능한 경우 안정된 훈련이 가능합니다.",
+  "미성년자 러너의 경우, 서브 파트너 주자로 성인 러너(보호자 가능)와 함께 될 수 있으면 동성 파트너로만 매칭합니다.",
+  "미리 매칭이 공지 되었을지라도 상황에 따라 현장에서 변동될 수 있습니다.",
 ];
 
 const CRITERIA_GROUP_COLOR_KEY = {
-  A: 'team-a',
-  B: 'team-b',
-  C: 'team-c',
-  D: 'team-d',
-  E: 'team-e',
+  A: "team-a",
+  B: "team-b",
+  C: "team-c",
+  D: "team-d",
+  E: "team-e",
 } as const;
 
 const getCriteriaGroupColor = (theme: AppTheme, group: CriteriaGroup) => {
@@ -358,59 +358,59 @@ const getCriteriaGroupColor = (theme: AppTheme, group: CriteriaGroup) => {
 };
 
 const PanelRoot = styled.section({
-  display: 'flex',
-  flexDirection: 'column',
-  width: '100%',
+  display: "flex",
+  flexDirection: "column",
+  width: "100%",
 });
 
 const ResultsSection = styled.div(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
+  display: "flex",
+  flexDirection: "column",
   gap: theme.spacing.lg,
-  width: '100%',
-  padding: `${theme.spacing['3xl']} ${theme.spacing['2xl']} ${theme.spacing['2xl']}`,
-  boxSizing: 'border-box',
+  width: "100%",
+  padding: `${theme.spacing["3xl"]} ${theme.spacing["2xl"]} ${theme.spacing["2xl"]}`,
+  boxSizing: "border-box",
 }));
 
 const MyPartnerCard = styled.article(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: theme.spacing['3xl'],
-  width: '100%',
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: theme.spacing["3xl"],
+  width: "100%",
   minWidth: 0,
   padding: theme.spacing.xl,
   borderRadius: theme.pxToRem(20),
   backgroundColor: theme.color.bg.elevated,
-  boxSizing: 'border-box',
+  boxSizing: "border-box",
 }));
 
 const PartnerList = styled.div(({ theme }) => ({
-  display: 'flex',
-  flexWrap: 'wrap',
-  alignItems: 'flex-end',
+  display: "flex",
+  flexWrap: "wrap",
+  alignItems: "flex-end",
   gap: theme.spacing.md,
-  justifyContent: 'flex-end',
+  justifyContent: "flex-end",
   minWidth: 0,
 }));
 
 const PartnerItem = styled.div(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'flex-end',
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "flex-end",
   gap: theme.spacing.md,
   minWidth: 0,
 }));
 
 const GroupList = styled.div(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
+  display: "flex",
+  flexDirection: "column",
   gap: theme.spacing.lg,
 }));
 
 const GroupCard = styled.article(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
+  display: "flex",
+  flexDirection: "column",
   gap: theme.spacing.lg,
   padding: theme.spacing.xl,
   borderRadius: theme.radius.xl,
@@ -422,7 +422,7 @@ const GroupHeading = styled.h2({
 });
 
 const GroupHeadingText = styled.span({
-  display: 'inline',
+  display: "inline",
 });
 
 const GroupCountText = styled(Text)(({ theme }) => ({
@@ -430,12 +430,12 @@ const GroupCountText = styled(Text)(({ theme }) => ({
 }));
 
 const MatchingRows = styled.ul(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
+  display: "flex",
+  flexDirection: "column",
   gap: theme.spacing.md,
   margin: 0,
   padding: 0,
-  listStyle: 'none',
+  listStyle: "none",
 }));
 
 const MatchingRowItem = styled.li({
@@ -443,204 +443,203 @@ const MatchingRowItem = styled.li({
 });
 
 const MatchingRowVisual = styled.div(({ theme }) => ({
-  position: 'relative',
-  display: 'grid',
-  gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)',
-  alignItems: 'stretch',
+  position: "relative",
+  display: "grid",
+  gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)",
+  alignItems: "stretch",
   gap: theme.spacing.md,
   minWidth: 0,
 }));
 
 const ParticipantSlot = styled.div<{ $variant: ParticipantSlotVariant }>(
   ({ $variant, theme }) => ({
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
     minWidth: 0,
     minHeight: theme.pxToRem(48),
     padding: theme.spacing.lg,
-    border: $variant === 'unmatched'
-      ? `${theme.pxToRem(1.2)} dashed ${theme.color.border.strong}`
-      : `${theme.pxToRem(1.2)} solid transparent`,
+    border:
+      $variant === "unmatched"
+        ? `${theme.pxToRem(1.2)} dashed ${theme.color.border.strong}`
+        : `${theme.pxToRem(1.2)} solid transparent`,
     borderRadius: theme.radius.lg,
     backgroundColor:
-      $variant === 'unmatched'
-        ? theme.color.bg.surface
-        : theme.color.bg.subtle,
-    boxSizing: 'border-box',
+      $variant === "unmatched" ? theme.color.bg.surface : theme.color.bg.subtle,
+    boxSizing: "border-box",
   }),
 );
 
 const GuideList = styled.div(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
   gap: theme.spacing.md,
   minWidth: 0,
 }));
 
 const LinkIconCircle = styled.span(({ theme }) => ({
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
+  position: "absolute",
+  top: "50%",
+  left: "50%",
   zIndex: 1,
-  display: 'inline-grid',
-  placeItems: 'center',
+  display: "inline-grid",
+  placeItems: "center",
   width: theme.pxToRem(28),
   height: theme.pxToRem(28),
   borderRadius: theme.radius.full,
   backgroundColor: theme.color.bg.default,
-  transform: 'translate(-50%, -50%)',
+  transform: "translate(-50%, -50%)",
 }));
 
 const QuestionMarkChip = styled.span(({ theme }) => ({
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
   width: theme.pxToRem(24),
   height: theme.pxToRem(24),
   borderRadius: theme.radius.full,
-  backgroundColor: theme.color.bg['dim-soft'],
-  overflow: 'hidden',
+  backgroundColor: theme.color.bg["dim-soft"],
+  overflow: "hidden",
   flexShrink: 0,
 }));
 
 const QuestionMark = styled(Text)({
-  textAlign: 'center',
+  textAlign: "center",
 });
 
 const SectionDivider = styled.div(({ theme }) => ({
-  width: '100%',
+  width: "100%",
   height: theme.spacing.lg,
   backgroundColor: theme.color.border.subtle,
 }));
 
 const CriteriaSection = styled.section(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  width: '100%',
-  padding: `${theme.spacing.none} ${theme.spacing.none} ${theme.spacing['4xl']}`,
-  boxSizing: 'border-box',
+  display: "flex",
+  flexDirection: "column",
+  width: "100%",
+  padding: `${theme.spacing.none} ${theme.spacing.none} ${theme.spacing["4xl"]}`,
+  boxSizing: "border-box",
 }));
 
 const CriteriaHeaderButton = styled.button(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
   gap: theme.spacing.lg,
-  width: '100%',
+  width: "100%",
   minHeight: theme.pxToRem(68),
-  padding: `${theme.spacing['3xl']} ${theme.spacing['2xl']}`,
+  padding: `${theme.spacing["3xl"]} ${theme.spacing["2xl"]}`,
   border: 0,
-  backgroundColor: 'transparent',
-  cursor: 'pointer',
-  textAlign: 'left',
-  touchAction: 'manipulation',
-  WebkitTapHighlightColor: 'transparent',
+  backgroundColor: "transparent",
+  cursor: "pointer",
+  textAlign: "left",
+  touchAction: "manipulation",
+  WebkitTapHighlightColor: "transparent",
 
-  '&:focus-visible': {
+  "&:focus-visible": {
     outline: `2px solid ${theme.color.border.focused}`,
     outlineOffset: `-${theme.spacing.xs}`,
   },
 }));
 
 const ChevronIcon = styled.span<{ $isOpen: boolean }>(({ $isOpen }) => ({
-  display: 'inline-flex',
-  transition: 'transform 180ms ease-out',
-  transform: $isOpen ? 'rotate(0deg)' : 'rotate(-90deg)',
+  display: "inline-flex",
+  transition: "transform 180ms ease-out",
+  transform: $isOpen ? "rotate(0deg)" : "rotate(-90deg)",
 
-  '@media (prefers-reduced-motion: reduce)': {
-    transition: 'none',
+  "@media (prefers-reduced-motion: reduce)": {
+    transition: "none",
   },
 }));
 
 const CriteriaPanel = styled.div({
-  display: 'grid',
-  gridTemplateRows: '0fr',
+  display: "grid",
+  gridTemplateRows: "0fr",
   opacity: 0,
-  overflow: 'hidden',
-  visibility: 'hidden',
+  overflow: "hidden",
+  visibility: "hidden",
   transition:
-    'grid-template-rows 180ms ease-out, opacity 180ms ease-out, visibility 0ms linear 180ms',
+    "grid-template-rows 180ms ease-out, opacity 180ms ease-out, visibility 0ms linear 180ms",
 
   '&[data-state="open"]': {
-    gridTemplateRows: '1fr',
+    gridTemplateRows: "1fr",
     opacity: 1,
-    visibility: 'visible',
+    visibility: "visible",
     transition:
-      'grid-template-rows 180ms ease-out, opacity 180ms ease-out, visibility 0ms linear 0ms',
+      "grid-template-rows 180ms ease-out, opacity 180ms ease-out, visibility 0ms linear 0ms",
   },
 
-  '@media (prefers-reduced-motion: reduce)': {
-    transition: 'none',
+  "@media (prefers-reduced-motion: reduce)": {
+    transition: "none",
   },
 });
 
 const CriteriaPanelInner = styled.div({
   minHeight: 0,
-  overflow: 'hidden',
+  overflow: "hidden",
 });
 
 const CriteriaContent = styled.div(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
+  display: "flex",
+  flexDirection: "column",
   gap: theme.spacing.xl,
   padding: `${theme.spacing.none} ${theme.spacing.xl}`,
 }));
 
 const CriteriaCard = styled.div(({ theme }) => ({
-  display: 'grid',
-  gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+  display: "grid",
+  gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
   gap: theme.spacing.xs,
-  alignItems: 'start',
-  width: '100%',
-  padding: `${theme.spacing.lg} ${theme.spacing.lg} ${theme.spacing['3xl']}`,
+  alignItems: "start",
+  width: "100%",
+  padding: `${theme.spacing.lg} ${theme.spacing.lg} ${theme.spacing["3xl"]}`,
   borderRadius: theme.radius.xl,
   backgroundColor: theme.color.bg.elevated,
-  boxSizing: 'border-box',
+  boxSizing: "border-box",
 }));
 
 const CriteriaColumn = styled.div(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
   gap: theme.spacing.lg,
   minWidth: 0,
 }));
 
 const CriteriaColumnHeader = styled(Text)(({ theme }) => ({
-  width: '100%',
+  width: "100%",
   padding: `${theme.spacing.lg} ${theme.spacing.none}`,
-  textAlign: 'center',
-  whiteSpace: 'nowrap',
+  textAlign: "center",
+  whiteSpace: "nowrap",
 }));
 
 const CriteriaList = styled.ul(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'flex-start',
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "flex-start",
   gap: theme.spacing.xl,
   margin: 0,
   padding: `${theme.spacing.none} ${theme.spacing.none} ${theme.spacing.none} ${theme.spacing.md}`,
-  listStyle: 'none',
+  listStyle: "none",
 }));
 
 const CriteriaItem = styled.li(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'flex-start',
+  display: "flex",
+  alignItems: "flex-start",
   gap: theme.spacing.md,
   minWidth: 0,
 }));
 
 const CriteriaGroupLetter = styled.span<{ $group: CriteriaGroup }>(
   ({ $group, theme }) => {
-    const typography = theme.typography['body-l-b'];
+    const typography = theme.typography["body-l-b"];
 
     return {
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
       color: getCriteriaGroupColor(theme, $group),
       width: theme.pxToRem(20),
       height: theme.pxToRem(20),
@@ -654,25 +653,25 @@ const CriteriaGroupLetter = styled.span<{ $group: CriteriaGroup }>(
 );
 
 const CriteriaValue = styled(Text)({
-  whiteSpace: 'nowrap',
+  whiteSpace: "nowrap",
 });
 
 const CriteriaNotes = styled.ul(({ theme }) => {
-  const typography = theme.typography['detail-m-r'];
+  const typography = theme.typography["detail-m-r"];
 
   return {
-    display: 'flex',
-    flexDirection: 'column',
+    display: "flex",
+    flexDirection: "column",
     gap: theme.spacing.md,
     margin: 0,
-    paddingInlineStart: theme.spacing['2xl'],
+    paddingInlineStart: theme.spacing["2xl"],
     color: theme.color.text.tertiary,
     fontFamily: typography.fontFamily,
     fontSize: typography.fontSize,
     fontWeight: typography.fontWeight,
     letterSpacing: typography.letterSpacing,
     lineHeight: typography.lineHeight,
-    wordBreak: 'keep-all',
-    overflowWrap: 'anywhere',
+    wordBreak: "keep-all",
+    overflowWrap: "anywhere",
   };
 });
