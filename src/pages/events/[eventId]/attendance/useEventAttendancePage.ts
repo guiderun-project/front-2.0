@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import {
   useMutation,
@@ -58,9 +58,7 @@ export const useEventAttendancePage = (eventId: number) => {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const [announcement, setAnnouncement] = useState('');
-  const [updatingParticipantIds, setUpdatingParticipantIds] = useState<
-    ReadonlySet<string>
-  >(() => new Set());
+  const updatingParticipantIdsRef = useRef(new Set<string>());
 
   const [attendanceQuery, canceledApplicantsQuery] = useSuspenseQueries({
     queries: [
@@ -81,33 +79,31 @@ export const useEventAttendancePage = (eventId: number) => {
     });
   };
 
-  const addUpdatingParticipant = (userId: string) => {
-    setUpdatingParticipantIds((previousIds) => {
-      const nextIds = new Set(previousIds);
-      nextIds.add(userId);
+  const startParticipantUpdate = (userId: string): boolean => {
+    if (updatingParticipantIdsRef.current.has(userId)) {
+      return false;
+    }
 
-      return nextIds;
-    });
+    updatingParticipantIdsRef.current.add(userId);
+    return true;
   };
 
-  const removeUpdatingParticipant = (userId: string) => {
-    setUpdatingParticipantIds((previousIds) => {
-      const nextIds = new Set(previousIds);
-      nextIds.delete(userId);
-
-      return nextIds;
-    });
+  const finishParticipantUpdate = (userId: string) => {
+    updatingParticipantIdsRef.current.delete(userId);
   };
 
   const attendMutation = useMutation({
     mutationFn: ({ userId }: AttendanceMutationInput) =>
       api.attendance.attendPost({ eventId, userId }),
     onSuccess: async (_, participant) => {
-      setAnnouncement('');
+      const successMessage = `${participant.participantName}님 출석을 완료했어요`;
+
+      setAnnouncement(successMessage);
       showToast({
         type: 'success',
         icon: 'check-thick-lined',
-        content: `${participant.participantName}님 출석을 완료했어요`,
+        content: successMessage,
+        announce: false,
       });
       await invalidateAttendanceStatus();
     },
@@ -115,7 +111,7 @@ export const useEventAttendancePage = (eventId: number) => {
       setAnnouncement(`${participant.participantName}님 출석 처리에 실패했어요.`);
     },
     onSettled: (_, __, participant) => {
-      removeUpdatingParticipant(participant.userId);
+      finishParticipantUpdate(participant.userId);
     },
   });
 
@@ -123,11 +119,14 @@ export const useEventAttendancePage = (eventId: number) => {
     mutationFn: ({ userId }: AttendanceMutationInput) =>
       api.attendance.attendDelete({ eventId, userId }),
     onSuccess: async (_, participant) => {
-      setAnnouncement('');
+      const successMessage = `${participant.participantName}님 출석을 취소했어요`;
+
+      setAnnouncement(successMessage);
       showToast({
         type: 'error',
         icon: 'delete-lined',
-        content: `${participant.participantName}님 출석을 취소했어요`,
+        content: successMessage,
+        announce: false,
       });
       await invalidateAttendanceStatus();
     },
@@ -135,16 +134,15 @@ export const useEventAttendancePage = (eventId: number) => {
       setAnnouncement(`${participant.participantName}님 출석 취소에 실패했어요.`);
     },
     onSettled: (_, __, participant) => {
-      removeUpdatingParticipant(participant.userId);
+      finishParticipantUpdate(participant.userId);
     },
   });
 
   const attendParticipant = (participant: AttendanceParticipant) => {
-    if (updatingParticipantIds.has(participant.userId)) {
+    if (!startParticipantUpdate(participant.userId)) {
       return;
     }
 
-    addUpdatingParticipant(participant.userId);
     attendMutation.mutate({
       participantName: participant.name,
       userId: participant.userId,
@@ -152,11 +150,10 @@ export const useEventAttendancePage = (eventId: number) => {
   };
 
   const cancelAttendance = (participant: AttendanceParticipant) => {
-    if (updatingParticipantIds.has(participant.userId)) {
+    if (!startParticipantUpdate(participant.userId)) {
       return;
     }
 
-    addUpdatingParticipant(participant.userId);
     cancelAttendanceMutation.mutate({
       participantName: participant.name,
       userId: participant.userId,
@@ -174,6 +171,5 @@ export const useEventAttendancePage = (eventId: number) => {
     attendancePageState,
     attendParticipant,
     cancelAttendance,
-    updatingParticipantIds,
   };
 };

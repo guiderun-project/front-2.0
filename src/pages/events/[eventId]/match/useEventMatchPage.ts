@@ -207,7 +207,7 @@ export const useEventMatchPage = (eventId: number) => {
           viId,
         },
         eventId,
-    }),
+      }),
     onSuccess: async () => {
       clearSelection();
       setAnnouncement(MATCHING_COMPLETE_MESSAGE);
