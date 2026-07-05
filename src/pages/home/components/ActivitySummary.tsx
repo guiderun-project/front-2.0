@@ -145,8 +145,9 @@ const TitleLine = styled.span(({ theme }) => ({
 }));
 
 const NameLine = styled.span({
-  display: "flex",
-  alignItems: "flex-end",
+  whiteSpace: "normal",
+  wordBreak: "keep-all",
+  overflowWrap: "anywhere",
 });
 
 const HeadlineBody = styled(Text)({

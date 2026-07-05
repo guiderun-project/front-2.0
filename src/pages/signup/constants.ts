@@ -16,6 +16,9 @@ export const SIGNUP_STEP_IDS = [
 // Stepper에 노출되는 3단계 라벨
 export const SIGNUP_STEPPER_LABELS = ['참여유형', '기본정보', '러닝경험'] as const;
 
+// 이름 입력 필드 최대 글자수
+export const SIGNUP_NAME_MAX_LENGTH = 8;
+
 // 각 화면이 속한 Stepper 단계(1-based). 약관·완료 화면은 Stepper를 노출하지 않으므로 null.
 export const SIGNUP_STEP_STAGE: Record<SignupStepId, number | null> = {
   runnerType: 1,
