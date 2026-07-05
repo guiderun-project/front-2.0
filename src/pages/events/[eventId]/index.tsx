@@ -26,7 +26,9 @@ export const EventDetailPage = (): ReactElement => {
     activeTab,
     canAccessProtectedTabs,
     canExtractAttendanceList,
-    canManageEvent,
+    canManageEventActions,
+    canManagePost,
+    canOpenManagementSheet,
     closeManagementSheet,
     closeRestrictedSheet,
     event,
@@ -38,11 +40,13 @@ export const EventDetailPage = (): ReactElement => {
     handleTabSelectionChange,
     isApprovalPending,
     isAuthenticated,
+    isOrganizer,
     isManagementSheetOpen,
     isRestrictedSheetOpen,
     isValidEventId,
     openManagementSheet,
     openRestrictedSheet,
+    shouldShowOperationActionsInMenu,
   } = useEventDetailPage();
   const matchingStatus = useEventMatchingStatus({
     eventId,
@@ -57,7 +61,7 @@ export const EventDetailPage = (): ReactElement => {
     selectedApplicantId,
   } = useEventApplicants({
     activeTab,
-    canViewApplicantForm: canManageEvent,
+    canViewApplicantForm: canManageEventActions,
     canViewApplicants: canAccessProtectedTabs,
     eventId,
   });
@@ -72,7 +76,7 @@ export const EventDetailPage = (): ReactElement => {
       ariaLabel: '카카오톡 공유하기 새창 열림',
       onClick: handleKakaoShare,
     },
-    ...(canManageEvent
+    ...(canOpenManagementSheet
       ? [
           {
             icon: 'more-vertical-lined',
@@ -129,7 +133,9 @@ export const EventDetailPage = (): ReactElement => {
               eventType={event.eventType}
               isError={applicantsQuery.isError}
               isPending={applicantsQuery.isPending}
-              onApplicantClick={canManageEvent ? openApplicantForm : undefined}
+              onApplicantClick={
+                canManageEventActions ? openApplicantForm : undefined
+              }
             />
           </Tabs.Panel>
           <Tabs.Panel id="matching">
@@ -147,8 +153,8 @@ export const EventDetailPage = (): ReactElement => {
 
       <EventDetailCta
         canAccessProtectedTabs={canAccessProtectedTabs}
-        canManageEvent={canManageEvent}
         event={event}
+        isEventOrganizer={isOrganizer}
         onRestrictedAccess={openRestrictedSheet}
       />
 
@@ -161,11 +167,13 @@ export const EventDetailPage = (): ReactElement => {
       />
       <ManagementMenuSheet
         canExtractAttendanceList={canExtractAttendanceList}
+        canManagePost={canManagePost}
         eventDate={event.schedule.date}
         eventId={eventId}
         eventName={event.name}
         open={isManagementSheetOpen}
         recruitStatus={event.recruitStatus}
+        showOperationActions={shouldShowOperationActionsInMenu}
         onClose={closeManagementSheet}
       />
       <ApplicantFormSheet

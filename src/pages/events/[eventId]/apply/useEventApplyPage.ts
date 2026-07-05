@@ -73,7 +73,7 @@ export const useEventApplyPage = () => {
   const myForm = myFormQuery.data ?? null;
   const isEditMode = myForm !== null;
   const ineligibleMessage =
-    user ? getEventApplyIneligibleMessage(event, user) : null;
+    user ? getEventApplyIneligibleMessage(event) : null;
   const defaultValues = useMemo(() => {
     if (!user) {
       return EMPTY_EVENT_APPLY_FORM_VALUES;
@@ -133,7 +133,7 @@ export const useEventApplyPage = () => {
         throw new Error('Event application context is missing.');
       }
 
-      const eligibilityError = getEventApplyIneligibleMessage(event, user);
+      const eligibilityError = getEventApplyIneligibleMessage(event);
 
       if (eligibilityError) {
         throw new Error(eligibilityError);
@@ -159,7 +159,7 @@ export const useEventApplyPage = () => {
         throw new Error('Event application context is missing.');
       }
 
-      const eligibilityError = getEventApplyIneligibleMessage(event, user);
+      const eligibilityError = getEventApplyIneligibleMessage(event);
 
       if (eligibilityError) {
         throw new Error(eligibilityError);
@@ -199,7 +199,7 @@ export const useEventApplyPage = () => {
       return;
     }
 
-    const eligibilityError = getEventApplyIneligibleMessage(event, user);
+    const eligibilityError = getEventApplyIneligibleMessage(event);
 
     if (eligibilityError) {
       window.alert(eligibilityError);
