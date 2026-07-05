@@ -547,7 +547,7 @@ const CriteriaHeaderButton = styled.button(({ theme }) => ({
 const ChevronIcon = styled.span<{ $isOpen: boolean }>(({ $isOpen }) => ({
   display: "inline-flex",
   transition: "transform 180ms ease-out",
-  transform: $isOpen ? "rotate(0deg)" : "rotate(-90deg)",
+  transform: $isOpen ? "rotate(0deg)" : "rotate(90deg)",
 
   "@media (prefers-reduced-motion: reduce)": {
     transition: "none",
