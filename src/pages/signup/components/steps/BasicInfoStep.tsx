@@ -29,6 +29,7 @@ export const BasicInfoStep = (): ReactElement => {
             error={Boolean(fieldState.error)}
             errorText={fieldState.error?.message}
             label="이름"
+            maxLength={8}
             value={field.value}
             onChange={field.onChange}
           />
@@ -63,7 +64,11 @@ export const BasicInfoStep = (): ReactElement => {
             maxLength={PHONE_DIGIT_LENGTH}
             value={field.value}
             onChange={(event) =>
-              field.onChange(event.target.value.replace(/\D/g, '').slice(0, PHONE_DIGIT_LENGTH))
+              field.onChange(
+                event.target.value
+                  .replace(/\D/g, '')
+                  .slice(0, PHONE_DIGIT_LENGTH),
+              )
             }
           />
         )}
