@@ -1,8 +1,12 @@
 import type { ReactElement } from 'react';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import styled from '@emotion/styled';
-import { Controller, type UseFormReturn } from 'react-hook-form';
+import {
+  Controller,
+  type SubmitErrorHandler,
+  type UseFormReturn,
+} from 'react-hook-form';
 
 import type { EventDetailResponse, UserInfoGetResponse } from '@/api/types';
 import {
@@ -29,6 +33,10 @@ import {
   type EventApplyGroupValue,
 } from './constants';
 import type { EventApplyFormValues } from './schema';
+import {
+  getFirstInvalidEventApplyFieldName,
+  type EventApplyInvalidFocusFieldName,
+} from './validationFocus';
 
 type EventApplyFormProps = {
   event: EventDetailResponse;
@@ -57,6 +65,50 @@ export const EventApplyForm = ({
     () => createPrimarySelectOptions(event, user),
     [event, user],
   );
+  const [invalidFocusRequest, setInvalidFocusRequest] = useState<{
+    id: number;
+    fieldName?: EventApplyInvalidFocusFieldName;
+  }>({ id: 0 });
+
+  useEffect(() => {
+    const fieldName = invalidFocusRequest.fieldName;
+
+    if (!fieldName) {
+      return undefined;
+    }
+
+    const activeElement = document.activeElement;
+
+    if (activeElement instanceof HTMLElement) {
+      activeElement.blur();
+    }
+
+    const animationFrameId = window.requestAnimationFrame(() => {
+      form.setFocus(fieldName);
+    });
+
+    return () => {
+      window.cancelAnimationFrame(animationFrameId);
+    };
+  }, [form, invalidFocusRequest]);
+
+  const handleInvalidSubmit: SubmitErrorHandler<EventApplyFormValues> = (
+    errors,
+  ) => {
+    const invalidFieldName = getFirstInvalidEventApplyFieldName({
+      additionalQuestions: event.additionalQuestions,
+      errors,
+    });
+
+    if (!invalidFieldName) {
+      return;
+    }
+
+    setInvalidFocusRequest((previous) => ({
+      id: previous.id + 1,
+      fieldName: invalidFieldName,
+    }));
+  };
 
   return (
     <PageLayout background="bg.subtle">
@@ -84,7 +136,10 @@ export const EventApplyForm = ({
           ],
         }}
       >
-        <Form noValidate onSubmit={form.handleSubmit(onSubmit)}>
+        <Form
+          noValidate
+          onSubmit={form.handleSubmit(onSubmit, handleInvalidSubmit)}
+        >
           <FormSection>
             <SectionHeader>
               <Text as="h2" color="text.secondary" font="body-m-sb">
@@ -102,6 +157,7 @@ export const EventApplyForm = ({
                     label={primarySelectLabel}
                     options={primarySelectOptions}
                     placeholder={primarySelectLabel}
+                    required
                     sheetTitle={primarySelectLabel}
                     triggerRef={field.ref}
                     value={field.value}
