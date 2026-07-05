@@ -13,7 +13,6 @@ import type {
   UserType,
 } from '@/api/types';
 import { api } from '@/api/services';
-import { USER_ROLES } from '@/constants/roles';
 import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
 
@@ -22,6 +21,7 @@ import { matchQueryKeys } from './queryKeys';
 import { useEventDetailRoute } from '../EventDetailRouteContext';
 import { eventDetailQueryKeys } from '../queryKeys';
 import type { EventGroupLabelContext } from '../utils';
+import { canManageEventOperations } from '../utils/eventDetailPermissions';
 
 export type MatchTabId = 'waiting' | 'completed';
 
@@ -76,9 +76,7 @@ export const useEventMatchPermission = () => {
   };
 
   return {
-    canManageMatching:
-      user !== null &&
-      (event.viewer?.isOrganizer === true || user.role === USER_ROLES.ADMIN),
+    canManageMatching: canManageEventOperations({ event, user }),
     eventGroupLabelContext,
   };
 };

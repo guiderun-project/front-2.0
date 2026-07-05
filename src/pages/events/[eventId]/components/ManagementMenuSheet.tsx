@@ -1,4 +1,4 @@
-import { useState, type ReactElement } from 'react';
+import { useEffect, useState, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
@@ -14,30 +14,53 @@ import {
 import { APP_PATH } from '@/router/path';
 
 import { useEventManagementActions } from '../hooks/useEventManagementActions';
+import {
+  getEventDateStartTimestamp,
+  hasEventDateStarted,
+} from '../utils/eventDetailCtaButtonConfigs';
+
+const MAX_TIMEOUT_DELAY_MS = 2_147_483_647;
 
 type ManagementMenuSheetProps = {
   canExtractAttendanceList: boolean;
+  canManagePost: boolean;
   eventDate: string;
   eventId: number;
   eventName: string;
   open: boolean;
   recruitStatus: RecruitStatus;
+  showOperationActions: boolean;
   onClose: () => void;
 };
 
 export const ManagementMenuSheet = ({
   canExtractAttendanceList,
+  canManagePost,
   eventDate,
   eventId,
   eventName,
   onClose,
   open,
   recruitStatus,
+  showOperationActions,
 }: ManagementMenuSheetProps): ReactElement => {
   const navigate = useNavigate();
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [currentTime, setCurrentTime] = useState(() => Date.now());
+  const isEventDateStarted =
+    recruitStatus !== 'RECRUIT_UPCOMING' &&
+    hasEventDateStarted(eventDate, currentTime);
   const shouldShowCloseRecruitmentAction =
-    recruitStatus !== 'RECRUIT_CLOSE' && recruitStatus !== 'RECRUIT_END';
+    canManagePost &&
+    recruitStatus !== 'RECRUIT_CLOSE' &&
+    recruitStatus !== 'RECRUIT_END';
+  const shouldShowMatchingAction =
+    showOperationActions && recruitStatus !== 'RECRUIT_UPCOMING';
+  const shouldShowAttendanceAction =
+    showOperationActions &&
+    (isEventDateStarted ||
+      recruitStatus === 'RECRUIT_CLOSE' ||
+      recruitStatus === 'RECRUIT_END');
   const {
     closeRecruitment,
     deleteEvent,
@@ -54,6 +77,29 @@ export const ManagementMenuSheet = ({
     },
   });
 
+  useEffect(() => {
+    const eventDateStartTimestamp = getEventDateStartTimestamp(eventDate);
+
+    if (
+      eventDateStartTimestamp === null ||
+      currentTime >= eventDateStartTimestamp
+    ) {
+      return;
+    }
+
+    const delay = Math.min(
+      eventDateStartTimestamp - currentTime,
+      MAX_TIMEOUT_DELAY_MS,
+    );
+    const timeoutId = window.setTimeout(() => {
+      setCurrentTime(Date.now());
+    }, delay);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [currentTime, eventDate]);
+
   const handleEdit = () => {
     onClose();
     navigate(APP_PATH.EVENT_EDIT(eventId));
@@ -61,6 +107,16 @@ export const ManagementMenuSheet = ({
 
   const handleAttendance = () => {
     downloadAttendanceCsv();
+  };
+
+  const handleMatchManagement = () => {
+    onClose();
+    navigate(APP_PATH.EVENT_MATCH(eventId));
+  };
+
+  const handleAttendanceManagement = () => {
+    onClose();
+    navigate(APP_PATH.EVENT_ATTENDANCE(eventId));
   };
 
   const handleCloseRecruitment = () => {
@@ -88,6 +144,40 @@ export const ManagementMenuSheet = ({
     <>
       <BottomSheet ariaLabel="이벤트 관리 메뉴" open={open} onClose={onClose}>
         <ManagementMenuList>
+          {shouldShowMatchingAction ? (
+            <ManagementMenuItem
+              disabled={isManagementMutating}
+              type="button"
+              onClick={handleMatchManagement}
+            >
+              <Icon
+                aria-hidden={true}
+                color="icon.secondary"
+                icon="match-lined"
+                size={20}
+              />
+              <Text color="text.primary" font="body-m-m">
+                매칭하기
+              </Text>
+            </ManagementMenuItem>
+          ) : null}
+          {shouldShowAttendanceAction ? (
+            <ManagementMenuItem
+              disabled={isManagementMutating}
+              type="button"
+              onClick={handleAttendanceManagement}
+            >
+              <Icon
+                aria-hidden={true}
+                color="icon.secondary"
+                icon="attendance-lined"
+                size={20}
+              />
+              <Text color="text.primary" font="body-m-m">
+                출석하기
+              </Text>
+            </ManagementMenuItem>
+          ) : null}
           {shouldShowCloseRecruitmentAction ? (
             <ManagementMenuItem
               disabled={isManagementMutating}
@@ -105,36 +195,40 @@ export const ManagementMenuSheet = ({
               </Text>
             </ManagementMenuItem>
           ) : null}
-          <ManagementMenuItem
-            disabled={isManagementMutating}
-            type="button"
-            onClick={handleEdit}
-          >
-            <Icon
-              aria-hidden={true}
-              color="icon.secondary"
-              icon="edit-lined"
-              size={20}
-            />
-            <Text color="text.primary" font="body-m-m">
-              모집 게시글 수정하기
-            </Text>
-          </ManagementMenuItem>
-          <ManagementMenuItem
-            disabled={isManagementMutating}
-            type="button"
-            onClick={handleDelete}
-          >
-            <Icon
-              aria-hidden={true}
-              color="icon.secondary"
-              icon="trash-lined"
-              size={20}
-            />
-            <Text color="text.primary" font="body-m-m">
-              모집 게시글 삭제하기
-            </Text>
-          </ManagementMenuItem>
+          {canManagePost ? (
+            <>
+              <ManagementMenuItem
+                disabled={isManagementMutating}
+                type="button"
+                onClick={handleEdit}
+              >
+                <Icon
+                  aria-hidden={true}
+                  color="icon.secondary"
+                  icon="edit-lined"
+                  size={20}
+                />
+                <Text color="text.primary" font="body-m-m">
+                  모집 게시글 수정하기
+                </Text>
+              </ManagementMenuItem>
+              <ManagementMenuItem
+                disabled={isManagementMutating}
+                type="button"
+                onClick={handleDelete}
+              >
+                <Icon
+                  aria-hidden={true}
+                  color="icon.secondary"
+                  icon="trash-lined"
+                  size={20}
+                />
+                <Text color="text.primary" font="body-m-m">
+                  모집 게시글 삭제하기
+                </Text>
+              </ManagementMenuItem>
+            </>
+          ) : null}
           {canExtractAttendanceList ? (
             <ManagementMenuItem
               disabled={isManagementMutating}

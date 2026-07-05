@@ -14,6 +14,11 @@ import { APP_PATH } from '@/router/path';
 import { useEventDetailRoute } from '../EventDetailRouteContext';
 import type { EventDetailTab } from '../types';
 import { copyTextToClipboard, isApprovedUser, isEventDetailTab } from '../utils';
+import {
+  canManageEventOperations,
+  canManageEventPost,
+  isEventOrganizer,
+} from '../utils/eventDetailPermissions';
 import { useKakaoShare } from './useKakaoShare';
 
 const EVENT_DETAIL_SECTION_TO_TAB: Record<string, EventDetailTab> = {
@@ -46,10 +51,16 @@ export const useEventDetailPage = () => {
   const isApprovalPending = user?.role === USER_ROLES.WAIT;
   const selectedTab = getEventDetailTabFromSection(searchParams.get('section'));
   const activeTab = canAccessProtectedTabs ? selectedTab : 'detail';
-  const canManageEvent =
-    user !== null &&
-    (event.viewer?.isOrganizer === true || user.role === USER_ROLES.ADMIN);
+  const isOrganizer = isEventOrganizer(event);
+  const canManageEventActions = canManageEventOperations({ event, user });
+  const canManagePost = canManageEventPost({ event, user });
   const canExtractAttendanceList = user?.role === USER_ROLES.ADMIN;
+  const canShowOperationActionsInMenu =
+    canManageEventActions &&
+    !isOrganizer &&
+    event.recruitStatus !== 'RECRUIT_UPCOMING';
+  const canOpenManagementSheet =
+    canManagePost || canExtractAttendanceList || canShowOperationActionsInMenu;
 
   const openRestrictedSheet = () => {
     setIsRestrictedSheetOpen(true);
@@ -124,7 +135,9 @@ export const useEventDetailPage = () => {
     activeTab,
     canAccessProtectedTabs,
     canExtractAttendanceList,
-    canManageEvent,
+    canManageEventActions,
+    canManagePost,
+    canOpenManagementSheet,
     closeManagementSheet,
     closeRestrictedSheet,
     event,
@@ -136,10 +149,12 @@ export const useEventDetailPage = () => {
     handleTabSelectionChange,
     isApprovalPending,
     isAuthenticated,
+    isOrganizer,
     isManagementSheetOpen,
     isRestrictedSheetOpen,
     isValidEventId,
     openManagementSheet,
     openRestrictedSheet,
+    shouldShowOperationActionsInMenu: canShowOperationActionsInMenu,
   };
 };

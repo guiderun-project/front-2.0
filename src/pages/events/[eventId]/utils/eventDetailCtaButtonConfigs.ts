@@ -26,7 +26,7 @@ export type EventDetailCtaConfig =
   | EventDetailCtaNoticeConfig;
 
 type EventDetailCtaParams = {
-  canManageEvent: boolean;
+  isEventOrganizer: boolean;
   isEventDateStarted: boolean;
   isApplied: boolean;
   recruitStatus: RecruitStatus;
@@ -61,12 +61,12 @@ const EVENT_DATE_STARTED_MANAGEMENT_BUTTONS = [
 ] satisfies EventDetailCtaButtonConfig[];
 
 export const getEventDetailCtaButtonConfigs = ({
-  canManageEvent,
+  isEventOrganizer,
   isEventDateStarted,
   isApplied,
   recruitStatus,
 }: EventDetailCtaParams): EventDetailCtaConfig[] => {
-  if (canManageEvent) {
+  if (isEventOrganizer) {
     return getManagementCtaButtonConfigs({
       isEventDateStarted,
       recruitStatus,
@@ -140,7 +140,7 @@ const getParticipantCtaButtonConfigs = ({
   recruitStatus,
 }: Omit<
   EventDetailCtaParams,
-  'canManageEvent' | 'isEventDateStarted'
+  'isEventOrganizer' | 'isEventDateStarted'
 >): EventDetailCtaConfig[] => {
   switch (recruitStatus) {
     case 'RECRUIT_OPEN':

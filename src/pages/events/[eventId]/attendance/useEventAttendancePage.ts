@@ -10,13 +10,13 @@ import { useNavigate } from 'react-router-dom';
 import type { AttendanceParticipant } from '@/api/types';
 import { api } from '@/api/services';
 import { useToast } from '@/components';
-import { USER_ROLES } from '@/constants/roles';
 import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
 
 import type { AttendancePageState } from './attendancePageState';
 import { attendanceQueryKeys } from './queryKeys';
 import { useEventDetailRoute } from '../EventDetailRouteContext';
+import { canManageEventOperations } from '../utils/eventDetailPermissions';
 
 type AttendanceMutationInput = {
   participantName: string;
@@ -50,9 +50,7 @@ export const useEventAttendancePermission = () => {
   const { event } = useEventDetailRoute();
 
   return {
-    canManageAttendance:
-      user !== null &&
-      (event.viewer?.isOrganizer === true || user.role === USER_ROLES.ADMIN),
+    canManageAttendance: canManageEventOperations({ event, user }),
   };
 };
 

@@ -4,7 +4,6 @@ import type {
   EventApplyPatchRequestBody,
   EventApplyPostRequestBody,
 } from '@/api/types/application';
-import { USER_ROLES } from '@/constants/roles';
 import {
   buildAdditionalAnswerDetails,
   buildApplicantForm,
@@ -30,8 +29,8 @@ const getApplicationEligibilityError = (
     return badRequest('Event application is not open.');
   }
 
-  if (event.organizerId === user.userId || user.role === USER_ROLES.ADMIN) {
-    return badRequest('Event managers cannot apply to this event.');
+  if (event.organizerId === user.userId) {
+    return badRequest('Event organizers cannot apply to this event.');
   }
 
   return null;

@@ -15,8 +15,8 @@ import {
 
 type UseEventDetailCtaParams = {
   canAccessProtectedTabs: boolean;
-  canManageEvent: boolean;
   event: EventDetailResponse;
+  isEventOrganizer: boolean;
   onRestrictedAccess: () => void;
 };
 
@@ -41,8 +41,8 @@ const isEventDetailCtaButtonConfig = (
 
 export const useEventDetailCta = ({
   canAccessProtectedTabs,
-  canManageEvent,
   event,
+  isEventOrganizer,
   onRestrictedAccess,
 }: UseEventDetailCtaParams): UseEventDetailCtaResult => {
   const eventId = event.eventId;
@@ -81,15 +81,15 @@ export const useEventDetailCta = ({
   const buttonConfigs = useMemo(
     () =>
       getEventDetailCtaButtonConfigs({
-        canManageEvent,
+        isEventOrganizer,
         isEventDateStarted,
         isApplied: event.viewer?.isApplied === true,
         recruitStatus: event.recruitStatus,
       }),
     [
-      canManageEvent,
       event.recruitStatus,
       event.viewer?.isApplied,
+      isEventOrganizer,
       isEventDateStarted,
     ],
   );

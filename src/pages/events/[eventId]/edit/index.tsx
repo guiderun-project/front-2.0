@@ -5,12 +5,12 @@ import { useForm, useFormState, useWatch } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { ConfirmPopup, CONFIRM_POPUP_VARIANT, PageLayout } from '@/components';
-import { USER_ROLES } from '@/constants/roles';
 import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
 
 import { PageState } from '../components/PanelState';
 import { useEventDetailRoute } from '../EventDetailRouteContext';
+import { canManageEventPost } from '../utils/eventDetailPermissions';
 import { EventForm } from '../../form/EventForm';
 import { EVENT_FORM_MODES } from '../../form/constants';
 import {
@@ -37,9 +37,7 @@ export const EventEditPage = (): ReactElement => {
   const initializedEventIdRef = useRef<number | null>(null);
   const previousDateRef = useRef<string | null>(null);
   const previousStartTimeRef = useRef<string | null>(null);
-  const canManageEvent =
-    user !== null &&
-    (event.viewer?.isOrganizer === true || user.role === USER_ROLES.ADMIN);
+  const canManageEvent = canManageEventPost({ event, user });
   const eventType = event.eventType;
   const formSchema = useMemo(
     () =>
