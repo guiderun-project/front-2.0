@@ -280,12 +280,17 @@ const MatchingCriteriaAccordion = ({
                   <CriteriaList aria-label={`${column.title} 매칭 기준`}>
                     {column.items.map((criterion) => (
                       <CriteriaItem key={criterion.group}>
-                        <CriteriaGroupLetter $group={criterion.group}>
-                          {criterion.group}
-                        </CriteriaGroupLetter>
-                        <CriteriaValue color="text.secondary" font="detail-m-r">
-                          {criterion.value}
-                        </CriteriaValue>
+                        <HiddenText>
+                          {`${criterion.group}팀 러닝기록 ${criterion.accessibilityValue}`}
+                        </HiddenText>
+                        <CriteriaItemVisual aria-hidden={true}>
+                          <CriteriaGroupLetter $group={criterion.group}>
+                            {criterion.group}
+                          </CriteriaGroupLetter>
+                          <CriteriaValue color="text.secondary" font="detail-m-r">
+                            {criterion.value}
+                          </CriteriaValue>
+                        </CriteriaItemVisual>
                       </CriteriaItem>
                     ))}
                   </CriteriaList>
@@ -310,20 +315,53 @@ type CriteriaGroup = Extract<RunningGroup, "A" | "B" | "C" | "D" | "E">;
 const MATCHING_CRITERIA: Array<{
   group: CriteriaGroup;
   guide: string;
+  guideAccessibilityValue: string;
   vi: string;
+  viAccessibilityValue: string;
 }> = [
-  { group: "A", vi: "~50분", guide: "~45분" },
-  { group: "B", vi: "51~56분", guide: "46~52분" },
-  { group: "C", vi: "57~65분", guide: "53~59분" },
-  { group: "D", vi: "66분~", guide: "60분~" },
-  { group: "E", vi: "기록 없음", guide: "기록 없음" },
+  {
+    group: "A",
+    vi: "~50분",
+    viAccessibilityValue: "50분 이하",
+    guide: "~45분",
+    guideAccessibilityValue: "45분 이하",
+  },
+  {
+    group: "B",
+    vi: "51~56분",
+    viAccessibilityValue: "51분 이상 56분 이하",
+    guide: "46~52분",
+    guideAccessibilityValue: "46분 이상 52분 이하",
+  },
+  {
+    group: "C",
+    vi: "57~65분",
+    viAccessibilityValue: "57분 이상 65분 이하",
+    guide: "53~59분",
+    guideAccessibilityValue: "53분 이상 59분 이하",
+  },
+  {
+    group: "D",
+    vi: "66분~",
+    viAccessibilityValue: "66분 이상",
+    guide: "60분~",
+    guideAccessibilityValue: "60분 이상",
+  },
+  {
+    group: "E",
+    vi: "기록 없음",
+    viAccessibilityValue: "기록 없음",
+    guide: "기록 없음",
+    guideAccessibilityValue: "기록 없음",
+  },
 ];
 
 const MATCHING_CRITERIA_COLUMNS = [
   {
     type: "vi",
     title: "시각장애러너",
-    items: MATCHING_CRITERIA.map(({ group, vi }) => ({
+    items: MATCHING_CRITERIA.map(({ group, vi, viAccessibilityValue }) => ({
+      accessibilityValue: viAccessibilityValue,
       group,
       value: vi,
     })),
@@ -331,7 +369,8 @@ const MATCHING_CRITERIA_COLUMNS = [
   {
     type: "guide",
     title: "가이드러너",
-    items: MATCHING_CRITERIA.map(({ group, guide }) => ({
+    items: MATCHING_CRITERIA.map(({ group, guide, guideAccessibilityValue }) => ({
+      accessibilityValue: guideAccessibilityValue,
       group,
       value: guide,
     })),
@@ -627,6 +666,13 @@ const CriteriaList = styled.ul(({ theme }) => ({
 
 const CriteriaItem = styled.li(({ theme }) => ({
   display: "flex",
+  alignItems: "flex-start",
+  gap: theme.spacing.md,
+  minWidth: 0,
+}));
+
+const CriteriaItemVisual = styled.span(({ theme }) => ({
+  display: "inline-flex",
   alignItems: "flex-start",
   gap: theme.spacing.md,
   minWidth: 0,
