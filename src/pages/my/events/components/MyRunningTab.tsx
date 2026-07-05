@@ -108,6 +108,7 @@ export const MyRunningTab = (): ReactElement => {
           <Filter
             ariaLabel="유형 필터"
             icon="chevron-down-lined"
+            neutralValue={EVENT_LIST_TYPE_FILTERS.TOTAL}
             options={TYPE_FILTER_OPTIONS}
             placeholder="유형"
             sheetTitle="유형 선택"
@@ -117,6 +118,7 @@ export const MyRunningTab = (): ReactElement => {
           <Filter
             ariaLabel="주최여부 필터"
             icon="chevron-down-lined"
+            neutralValue={MY_ACTIVITY_EVENT_RELATION_FILTERS.TOTAL}
             options={RELATION_FILTER_OPTIONS}
             placeholder="주최여부"
             sheetTitle="주최여부 선택"

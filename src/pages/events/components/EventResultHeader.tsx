@@ -49,6 +49,7 @@ export const EventResultHeader = ({
           <Filter
             ariaLabel="유형 필터"
             icon="chevron-down-lined"
+            neutralValue={EVENT_LIST_TYPE_FILTERS.TOTAL}
             options={TYPE_FILTER_OPTIONS}
             placeholder="유형"
             sheetTitle="유형 선택"
@@ -58,6 +59,7 @@ export const EventResultHeader = ({
           <Filter
             ariaLabel="모집구분 필터"
             icon="chevron-down-lined"
+            neutralValue={RECRUIT_STATUS_FILTERS.ALL}
             options={RECRUIT_FILTER_OPTIONS}
             placeholder="모집구분"
             sheetTitle="모집구분 선택"
