@@ -12,6 +12,7 @@ import {
   Select,
   Textarea,
   TimeInput,
+  useToast,
   type SelectOptions,
 } from '@/components';
 import { TRAINING_RECORD_LABELS, type RunnerRecordGroup } from '@/constants';
@@ -53,8 +54,10 @@ export const RunningEditView = (): ReactElement => {
 
 const MyRunningEditContent = (): ReactElement => {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [isExitConfirmOpen, setIsExitConfirmOpen] = useState(false);
   const exitResolverRef = useRef<((v: boolean) => void) | null>(null);
+  const hasSubmittedRef = useRef(false);
   const {
     values,
     userType,
@@ -67,14 +70,17 @@ const MyRunningEditContent = (): ReactElement => {
     submit,
   } = useRunningEdit();
 
-  const handleExitConfirm = useCallback(
-    () =>
-      new Promise<boolean>((resolve) => {
-        exitResolverRef.current = resolve;
-        setIsExitConfirmOpen(true);
-      }),
-    [],
-  );
+  const handleExitConfirm = useCallback(() => {
+    // 정보 수정 완료 후 이동하는 경우에는 확인 없이 바로 이동을 허용한다.
+    if (hasSubmittedRef.current) {
+      return Promise.resolve(true);
+    }
+
+    return new Promise<boolean>((resolve) => {
+      exitResolverRef.current = resolve;
+      setIsExitConfirmOpen(true);
+    });
+  }, []);
 
   useRouteBlockerConfirm({ enabled: isDirty, onConfirm: handleExitConfirm });
 
@@ -88,6 +94,12 @@ const MyRunningEditContent = (): ReactElement => {
     const isSucceeded = await submit();
 
     if (isSucceeded) {
+      hasSubmittedRef.current = true;
+      showToast({
+        type: 'success',
+        icon: 'check-lined',
+        content: '정보 수정을 완료했어요',
+      });
       navigate(APP_PATH.MY);
     }
   };
