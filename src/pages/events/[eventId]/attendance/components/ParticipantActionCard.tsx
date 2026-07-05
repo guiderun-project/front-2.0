@@ -10,14 +10,12 @@ import { ParticipantInfo } from './ParticipantInfo';
 type AttendanceActionStatus = 'waiting' | 'attended';
 
 type ParticipantActionCardProps = {
-  disabled: boolean;
   participant: AttendanceParticipant;
   status: AttendanceActionStatus;
   onAction: (participant: AttendanceParticipant) => void;
 };
 
 export const ParticipantActionCard = ({
-  disabled,
   participant,
   status,
   onAction,
@@ -30,7 +28,6 @@ export const ParticipantActionCard = ({
     <ParticipantCard>
       <ParticipantInfo participant={participant} />
       <Button
-        disabled={disabled}
         level={status === 'waiting' ? 'primary' : 'quaternary'}
         size="s"
         onClick={() => {

@@ -6,6 +6,7 @@ export type ShowToastOptions = {
   type: ToastType;
   icon: IconName;
   content: string;
+  announce?: boolean;
 };
 
 export type ToastPhase = 'visible' | 'closing';

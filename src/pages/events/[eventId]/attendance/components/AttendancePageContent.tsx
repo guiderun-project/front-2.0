@@ -20,7 +20,6 @@ type AttendanceMessageContentProps = {
 
 type AttendanceReadyContentProps = {
   pageState: AttendanceReadyState;
-  updatingParticipantIds: ReadonlySet<string>;
   onAttend: (participant: AttendanceParticipant) => void;
   onCancelAttendance: (participant: AttendanceParticipant) => void;
 };
@@ -66,7 +65,6 @@ export const AttendancePageContent = (
 
   const { attendance, canceledParticipants } = props.pageState;
   const {
-    updatingParticipantIds,
     onAttend,
     onCancelAttendance,
   } = props;
@@ -86,7 +84,6 @@ export const AttendancePageContent = (
             participants={waitingParticipants}
             renderParticipant={(participant) => (
               <ParticipantActionCard
-                disabled={updatingParticipantIds.has(participant.userId)}
                 participant={participant}
                 status="waiting"
                 onAction={onAttend}
@@ -105,7 +102,6 @@ export const AttendancePageContent = (
             participants={attendedParticipants}
             renderParticipant={(participant) => (
               <ParticipantActionCard
-                disabled={updatingParticipantIds.has(participant.userId)}
                 participant={participant}
                 status="attended"
                 onAction={onCancelAttendance}

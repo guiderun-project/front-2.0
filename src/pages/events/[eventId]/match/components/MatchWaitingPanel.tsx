@@ -16,7 +16,6 @@ import { MatchParticipantCard } from './MatchParticipantCard';
 import { AllMatchedState } from './MatchStates';
 
 type MatchWaitingPanelProps = {
-  disabledParticipantAction: boolean;
   eventGroupLabelContext: EventGroupLabelContext;
   selectedUserIds: ReadonlySet<string>;
   waiting: MatchingWaitingResponse;
@@ -24,7 +23,6 @@ type MatchWaitingPanelProps = {
 };
 
 export const MatchWaitingPanel = ({
-  disabledParticipantAction,
   eventGroupLabelContext,
   selectedUserIds,
   waiting,
@@ -61,7 +59,6 @@ export const MatchWaitingPanel = ({
                 <li key={participant.userId}>
                   <MatchParticipantCard
                     applicationGroup={group.runningGroup}
-                    disabled={disabledParticipantAction}
                     eventGroupLabelContext={eventGroupLabelContext}
                     isSelected={selectedUserIds.has(participant.userId)}
                     participant={participant}

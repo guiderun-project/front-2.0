@@ -19,7 +19,6 @@ export const AttendanceReadyPage = ({
     attendancePageState,
     attendParticipant,
     cancelAttendance,
-    updatingParticipantIds,
   } = useEventAttendancePage(eventId);
   const waitingCount = attendancePageState.attendance.summary.waitingCount;
 
@@ -32,7 +31,6 @@ export const AttendanceReadyPage = ({
       </HiddenText>
       <AttendancePageContent
         pageState={attendancePageState}
-        updatingParticipantIds={updatingParticipantIds}
         onAttend={attendParticipant}
         onCancelAttendance={cancelAttendance}
       />

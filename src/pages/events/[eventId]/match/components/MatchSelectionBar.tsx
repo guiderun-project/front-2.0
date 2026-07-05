@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react';
+import { useId, type ReactElement } from 'react';
 
 import { keyframes } from '@emotion/react';
 import styled from '@emotion/styled';
@@ -8,7 +8,6 @@ import { HiddenText, IconButton, Text } from '@/components';
 
 type MatchSelectionBarProps = {
   canCreateMatching: boolean;
-  isCreatingMatching: boolean;
   selectedGuides: MatchingWaitingParticipant[];
   selectedVi: MatchingWaitingParticipant | null;
   onClear: () => void;
@@ -17,12 +16,12 @@ type MatchSelectionBarProps = {
 
 export const MatchSelectionBar = ({
   canCreateMatching,
-  isCreatingMatching,
   selectedGuides,
   selectedVi,
   onClear,
   onCreateMatching,
 }: MatchSelectionBarProps): ReactElement | null => {
+  const selectionLabelId = useId();
   const hasSelection = selectedVi !== null || selectedGuides.length > 0;
 
   if (!hasSelection) {
@@ -30,10 +29,7 @@ export const MatchSelectionBar = ({
   }
 
   const actionText = canCreateMatching ? '이대로 매칭하기' : '파트너를 선택해주세요';
-  const actionDescription = canCreateMatching
-    ? '선택된 참가자로 매칭하기'
-    : '파트너를 선택해주세요';
-  const isActionDisabled = !canCreateMatching || isCreatingMatching;
+  const isActionDisabled = !canCreateMatching;
   const selectionDescription = getSelectionDescription(
     selectedVi,
     selectedGuides,
@@ -41,7 +37,8 @@ export const MatchSelectionBar = ({
 
   return (
     <FixedSelectionArea>
-      <SelectionPanel aria-label="선택된 매칭 참가자">
+      <SelectionPanel aria-labelledby={selectionLabelId} role="group">
+        <HiddenText id={selectionLabelId}>선택 현황</HiddenText>
         <SelectionContent>
           <HiddenText>{selectionDescription}</HiddenText>
           <SelectionItems aria-hidden={true}>
@@ -82,8 +79,7 @@ export const MatchSelectionBar = ({
           type="button"
           onClick={onCreateMatching}
         >
-          <HiddenText>{actionDescription}</HiddenText>
-          <span aria-hidden={true}>{actionText}</span>
+          {actionText}
         </SelectionActionButton>
       </SelectionPanel>
     </FixedSelectionArea>
@@ -149,7 +145,7 @@ const FixedSelectionArea = styled.div(({ theme }) => ({
   transform: 'translateX(-50%)',
 }));
 
-const SelectionPanel = styled.aside(({ theme }) => ({
+const SelectionPanel = styled.div(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   gap: theme.spacing.lg,
