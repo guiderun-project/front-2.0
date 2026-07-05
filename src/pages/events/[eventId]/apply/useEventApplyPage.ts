@@ -84,6 +84,7 @@ export const useEventApplyPage = () => {
 
   const form = useForm<EventApplyFormValues>({
     resolver: zodResolver(eventApplyFormSchema),
+    shouldFocusError: false,
     values: defaultValues,
   });
 

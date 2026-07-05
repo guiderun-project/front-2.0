@@ -29,6 +29,7 @@ type SelectBaseProps<TValue extends string> = {
   confirmText?: string;
   disabled?: boolean;
   placeholder?: string;
+  required?: boolean;
   isBackdropCloseDisabled?: boolean;
   isEscapeCloseDisabled?: boolean;
   maxHeight?: string;
