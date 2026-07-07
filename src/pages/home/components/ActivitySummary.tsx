@@ -1,13 +1,34 @@
-import type { ReactElement } from "react";
+import { Suspense, lazy, type ReactElement } from "react";
 
 import styled from "@emotion/styled";
 
-import { Graphic, HiddenText, Text } from "@/components";
+import mainDarkLottie from "@/assets/lotties/main_dark.json";
+import mainLightLottie from "@/assets/lotties/main_light.json";
+import { HiddenText, Text } from "@/components";
 import { useAuth } from "@/contexts";
 import { useHomeSummary } from "@/pages/home/hooks/useHomeSummary";
 import { getRunnerStageHeadline } from "@/pages/home/utils";
+import { useColorMode } from "@/styles/useColorMode";
 
 const formatNumber = (value: number) => value.toLocaleString("ko-KR");
+const Lottie = lazy(() => import("lottie-react"));
+
+const MainRunnerLottie = (): ReactElement => {
+  const { colorMode } = useColorMode();
+  const animationData = colorMode === "dark" ? mainDarkLottie : mainLightLottie;
+
+  return (
+    <Suspense fallback={null}>
+      <Lottie
+        key={colorMode}
+        animationData={animationData}
+        autoplay={true}
+        loop={true}
+        style={{ width: "100%", height: "100%" }}
+      />
+    </Suspense>
+  );
+};
 
 export const ActivitySummary = (): ReactElement => {
   const { user } = useAuth();
@@ -48,7 +69,7 @@ export const ActivitySummary = (): ReactElement => {
             </HeadlineBody>
           </Headline>
           <RunnerGraphicBox aria-hidden={true}>
-            <Graphic aria-hidden={true} color="icon.primary" graphic="main" />
+            <MainRunnerLottie />
           </RunnerGraphicBox>
         </HeadlineRow>
 
@@ -95,7 +116,7 @@ export const ActivitySummary = (): ReactElement => {
           </Text>
         </Headline>
         <RunnerGraphicBox aria-hidden={true}>
-          <Graphic aria-hidden={true} color="icon.primary" graphic="main" />
+          <MainRunnerLottie />
         </RunnerGraphicBox>
       </HeadlineRow>
 
