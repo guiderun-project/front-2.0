@@ -1,7 +1,6 @@
 import type { ComponentType, SVGProps } from 'react';
 
 import CongratsGraphic from '@/assets/graphics/congrats.svg?react';
-import MainGraphic from '@/assets/graphics/main.svg?react';
 import WelcomeGraphic from '@/assets/graphics/welcome.svg?react';
 
 type SvgGraphicComponent = ComponentType<SVGProps<SVGSVGElement>>;
@@ -19,12 +18,6 @@ export const graphicRegistry = {
     height: 120,
     label: '축하 그래픽',
     width: 120,
-  },
-  main: {
-    Component: MainGraphic,
-    height: 70,
-    label: '러너 그래픽',
-    width: 94,
   },
   welcome: {
     Component: WelcomeGraphic,
