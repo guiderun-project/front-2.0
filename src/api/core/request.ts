@@ -1,5 +1,4 @@
 import { normalizeApiError } from '@/api/core/apiError';
-import { captureApiError } from '@/api/core/errorLogging';
 
 export const handleApiRequest = async <T>(request: () => Promise<T>) => {
   try {
@@ -7,7 +6,6 @@ export const handleApiRequest = async <T>(request: () => Promise<T>) => {
   } catch (error) {
     const apiError = normalizeApiError(error);
 
-    captureApiError(apiError);
     throw apiError;
   }
 };

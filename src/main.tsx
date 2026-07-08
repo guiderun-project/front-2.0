@@ -2,10 +2,16 @@ import { StrictMode, type ReactNode } from 'react';
 
 import { Global, ThemeProvider } from '@emotion/react';
 import { PostHogProvider } from '@posthog/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+  MutationCache,
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 
+import { captureApiError } from '@/api/core';
 import { baseURL } from '@/api/core/client';
 import { BirthDateGate } from '@/components/BirthDateGate';
 import { LoaderScreen } from '@/components/Loader';
@@ -56,6 +62,16 @@ type BootstrapLoaderState = {
 };
 
 const queryClient = new QueryClient({
+  mutationCache: new MutationCache({
+    onError: (error) => {
+      captureApiError(error);
+    },
+  }),
+  queryCache: new QueryCache({
+    onError: (error) => {
+      captureApiError(error);
+    },
+  }),
   defaultOptions: {
     queries: {
       retry: 1,

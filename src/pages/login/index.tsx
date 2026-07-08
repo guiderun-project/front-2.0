@@ -4,15 +4,16 @@ import { useState } from 'react';
 import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
 
+import { getApiErrorMessage } from '@/api/core';
+import { api } from '@/api/services';
 import {
   FooterButton,
   FormPageLayout,
   Input,
   PageLayout,
 } from '@/components';
-import { api } from '@/api/services';
-import { useAuth } from '@/contexts';
 import { ACCOUNT_FIND_TYPE } from '@/constants';
+import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
 
 const LOGIN_FORM_ID = 'login-form';
@@ -43,8 +44,8 @@ export const LoginPage = (): ReactElement => {
       const { accessToken } = await api.auth.loginPost({ accountId, password });
       await startSession(accessToken);
       navigate(APP_PATH.HOME, { replace: true });
-    } catch {
-      setErrorText(LOGIN_ERROR_MESSAGE);
+    } catch (error) {
+      setErrorText(getApiErrorMessage(error, LOGIN_ERROR_MESSAGE));
     } finally {
       setIsSubmitting(false);
     }

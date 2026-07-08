@@ -3,6 +3,9 @@ import posthog from 'posthog-js';
 import type { ApiError } from '@/api/core/apiError';
 import { isApiError } from '@/api/core/apiError';
 
+const IDENTIFIER_SEGMENT_PATTERN =
+  /^(?:\d+|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|(?=.{8,}$)(?=.*\d)[A-Za-z0-9_-]+)$/i;
+
 const isPostHogEnabled = () => {
   return Boolean(import.meta.env.VITE_POSTHOG_PROJECT_TOKEN);
 };
@@ -26,8 +29,8 @@ export const captureApiError = (error: unknown) => {
     errorCode: error.errorCode,
     kind: error.kind,
     method: error.method,
-    url: error.url,
-    path: error.path,
+    url: sanitizePathLikeValue(error.url),
+    path: sanitizePathLikeValue(error.path),
   };
 
   if (['server', 'network', 'unknown'].includes(error.kind)) {
@@ -74,6 +77,33 @@ const matchesPath = (url: string | undefined, pattern: RegExp) => {
   }
 };
 
+const sanitizePathLikeValue = (value: string | undefined) => {
+  if (!value) {
+    return undefined;
+  }
+
+  const path = getPathname(value);
+
+  return path
+    .split('/')
+    .map((segment) => {
+      if (IDENTIFIER_SEGMENT_PATTERN.test(segment)) {
+        return ':id';
+      }
+
+      return segment;
+    })
+    .join('/');
+};
+
+const getPathname = (value: string) => {
+  try {
+    return new URL(value, 'http://localhost').pathname;
+  } catch {
+    return value.split(/[?#]/)[0] ?? value;
+  }
+};
+
 export const captureRenderError = (
   error: Error,
   info: { componentStack?: string },
@@ -83,7 +113,24 @@ export const captureRenderError = (
   }
 
   posthog.captureException(error, {
-    route: window.location.pathname,
+    routeTemplate: sanitizePathLikeValue(window.location.pathname),
     componentStack: info.componentStack,
   });
+};
+
+export const captureRouteError = (error: unknown) => {
+  if (!isPostHogEnabled() || isApiError(error)) {
+    return;
+  }
+
+  const properties = {
+    routeTemplate: sanitizePathLikeValue(window.location.pathname),
+  };
+
+  if (error instanceof Error) {
+    posthog.captureException(error, properties);
+    return;
+  }
+
+  posthog.capture('route_error', properties);
 };

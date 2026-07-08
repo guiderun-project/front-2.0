@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ReactElement } from 'react';
 
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
+import { getApiErrorMessage } from '@/api/core';
 import { api } from '@/api/services';
 import { PageLayout, Text } from '@/components';
 import { useAuth } from '@/contexts';
@@ -9,11 +10,14 @@ import { APP_PATH } from '@/router/path';
 
 type Status = 'processing' | 'error';
 
+const OAUTH_ERROR_MESSAGE = '로그인에 실패했어요. 다시 시도해 주세요.';
+
 export const KakaoOAuthPage = (): ReactElement => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { startSession } = useAuth();
   const [status, setStatus] = useState<Status>('processing');
+  const [errorMessage, setErrorMessage] = useState(OAUTH_ERROR_MESSAGE);
   const handledRef = useRef(false);
 
   useEffect(() => {
@@ -45,7 +49,8 @@ export const KakaoOAuthPage = (): ReactElement => {
 
         await startSession(result.accessToken);
         navigate(APP_PATH.HOME, { replace: true });
-      } catch {
+      } catch (error) {
+        setErrorMessage(getApiErrorMessage(error, OAUTH_ERROR_MESSAGE));
         setStatus('error');
       }
     };
@@ -58,7 +63,7 @@ export const KakaoOAuthPage = (): ReactElement => {
       <Text align="center" color="text.secondary" font="body-m-m">
         {status === 'processing'
           ? '카카오 로그인 처리 중이에요...'
-          : '로그인에 실패했어요. 다시 시도해 주세요.'}
+          : errorMessage}
       </Text>
     </PageLayout>
   );
