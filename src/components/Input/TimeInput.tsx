@@ -14,6 +14,9 @@ import type { TimeInputProps, TimeValue } from "./Input.types";
 
 const SEGMENT_PLACEHOLDER = "--";
 
+// 스크린리더에 시/분/초 입력 형식을 안내한다.
+const FORMAT_HINT = "시간 분 초 형식으로 입력해주세요";
+
 type SegmentKey = "hours" | "minutes" | "seconds";
 
 const EMPTY_TIME: TimeValue = { hours: "", minutes: "", seconds: "" };
@@ -44,6 +47,7 @@ export const TimeInput = ({
   const reactId = useId();
   const labelId = `${reactId}-label`;
   const messageId = `${reactId}-message`;
+  const formatHintId = `${reactId}-format`;
   const segmentRefs = useRef<Array<HTMLInputElement | null>>([]);
 
   const isControlled = value !== undefined;
@@ -118,17 +122,11 @@ export const TimeInput = ({
   const handleBoxPointerDown = (
     event: React.PointerEvent<HTMLDivElement>,
   ): void => {
-    if (event.target !== event.currentTarget) {
-      return;
-    }
-
+    // 러닝 그룹 동기화를 위해 기록은 반드시 시→분→초 순서로 채워야 한다.
+    // 분/초 칸을 직접 눌러 그쪽부터 입력되면 유효성 검사(6자리)에서 걸리므로,
+    // 어느 위치를 눌러도 항상 '시' 칸으로 포커스를 보낸다. (자동 이동은 그대로 동작)
     event.preventDefault();
-    const firstIncompleteIndex = SEGMENTS.findIndex(
-      (segment) => current[segment.key].length < MAX_SEGMENT_LENGTH,
-    );
-    const targetIndex =
-      firstIncompleteIndex === -1 ? SEGMENTS.length - 1 : firstIncompleteIndex;
-    segmentRefs.current[targetIndex]?.focus();
+    segmentRefs.current[0]?.focus();
   };
 
   return (
@@ -141,7 +139,9 @@ export const TimeInput = ({
           {label}
         </FloatingLabel>
         <SegmentRow
-          aria-describedby={hasMessage ? messageId : undefined}
+          aria-describedby={[formatHintId, hasMessage ? messageId : null]
+            .filter(Boolean)
+            .join(" ")}
           aria-labelledby={labelId}
           data-segments=""
           role="group"
@@ -176,6 +176,7 @@ export const TimeInput = ({
           {message}
         </Message>
       )}
+      <FormatHint id={formatHintId}>{FORMAT_HINT}</FormatHint>
     </Root>
   );
 };
@@ -318,3 +319,17 @@ const Message = styled.p<{ $error: boolean }>(({ theme, $error }) => ({
   color: $error ? theme.color.text.danger : theme.color.text.tertiary,
   ...typographyStyle(theme, INFO_TYPOGRAPHY),
 }));
+
+// 화면에는 보이지 않고 스크린리더에만 읽히는 형식 안내 텍스트.
+const FormatHint = styled.span({
+  position: "absolute",
+  width: "1px",
+  height: "1px",
+  margin: "-1px",
+  padding: 0,
+  border: 0,
+  overflow: "hidden",
+  clip: "rect(0 0 0 0)",
+  clipPath: "inset(50%)",
+  whiteSpace: "nowrap",
+});
