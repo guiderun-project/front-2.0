@@ -98,6 +98,9 @@ export const AdditionalSelectOptionFields = ({
                       }
                       aria-invalid={hasVisibleError || undefined}
                       aria-label={`선택지 ${optionIndex + 1}`}
+                      enterKeyHint={
+                        optionIndex < options.length - 1 ? 'next' : 'done'
+                      }
                       name={field.name}
                       placeholder="선택지를 입력하세요"
                       readOnly={readOnly}

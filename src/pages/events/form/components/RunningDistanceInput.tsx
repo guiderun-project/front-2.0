@@ -52,6 +52,7 @@ export const RunningDistanceInput = ({
   const reactId = useId();
   const controlId = `${reactId}-control`;
   const messageId = `${reactId}-message`;
+  const unitId = `${reactId}-unit`;
   const inputRef = useRef<HTMLInputElement>(null);
   const message = errorText ?? helperText;
   const hasError = Boolean(errorText);
@@ -61,7 +62,7 @@ export const RunningDistanceInput = ({
     1,
   );
   const describedBy =
-    [message ? messageId : null, describedById ?? null]
+    [message ? messageId : null, unitId, describedById ?? null]
       .filter(Boolean)
       .join(' ') || undefined;
 
@@ -96,7 +97,7 @@ export const RunningDistanceInput = ({
             value={value}
             onChange={handleChange}
           />
-          <UnitText aria-hidden="true">km</UnitText>
+          <UnitText id={unitId}>km</UnitText>
         </ContentRow>
       </FieldBox>
       {message ? (

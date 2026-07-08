@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react';
+import type { KeyboardEvent, ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 import { useFieldArray, useWatch, type UseFormReturn } from 'react-hook-form';
@@ -46,8 +46,20 @@ export const AdditionalQuestionEditor = ({
     append(createAdditionalQuestionDraft(type));
   };
 
+  const handleEditorKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (
+      event.key !== 'Enter' ||
+      event.nativeEvent.isComposing ||
+      !(event.target instanceof HTMLInputElement)
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+  };
+
   return (
-    <EditorRoot>
+    <EditorRoot onKeyDown={handleEditorKeyDown}>
       <EditorHeader>
         <Text as="p" color="text.secondary" font="body-m-m">
           {'확인하고 싶은 질문이나 설문을 추가해보세요.\n각 항목당 하나씩 추가할 수 있어요.'}

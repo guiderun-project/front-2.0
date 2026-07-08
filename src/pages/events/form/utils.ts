@@ -34,6 +34,10 @@ type EventRequestParams = {
   values: EventFormValues;
 };
 
+type CreateDefaultEventFormValuesOptions = {
+  eventDate?: string;
+};
+
 export const getTodayDateValue = (): string => {
   const today = new Date();
   const year = today.getFullYear();
@@ -168,14 +172,16 @@ export const getQueryValueFromEventType = (
 
 export const createDefaultEventFormValues = (
   eventType: EventType,
+  options: CreateDefaultEventFormValuesOptions = {},
 ): EventFormValues => {
   const today = getTodayDateValue();
+  const eventDate = options.eventDate ?? today;
 
   return {
     recruitStartDate: today,
     recruitEndDate: today,
     name: '',
-    date: today,
+    date: eventDate,
     startTime: DEFAULT_EVENT_START_TIME,
     endTime: DEFAULT_EVENT_END_TIME,
     operationType: eventType === 'TRAINING' ? 'GENERAL' : undefined,
