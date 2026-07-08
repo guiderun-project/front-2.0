@@ -2,7 +2,8 @@ import { useState, type FormEvent, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
-import { Button, Icon, IconButton, Text } from '@/components';
+import { getApiErrorMessage } from '@/api/core';
+import { Button, Icon, IconButton, Text, useToast } from '@/components';
 
 import { useEventComments } from '../hooks/useEventComments';
 import { formatRelativeTime } from '../utils';
@@ -13,6 +14,7 @@ export const CommentsSection = (): ReactElement => {
   const {
     comments,
     currentUserId,
+    error,
     handleCreateComment: createComment,
     handleDeleteComment: deleteComment,
     handleUpdateComment: updateComment,
@@ -20,6 +22,7 @@ export const CommentsSection = (): ReactElement => {
     isError,
     isPending,
   } = useEventComments();
+  const { showToast } = useToast();
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
   const [commentFormValue, setCommentFormValue] = useState('');
   const isEditing = editingCommentId !== null;
@@ -35,22 +38,43 @@ export const CommentsSection = (): ReactElement => {
       return;
     }
 
-    if (editingCommentId !== null) {
-      await updateComment(editingCommentId, trimmedContent);
-      setEditingCommentId(null);
-    } else {
-      await createComment(trimmedContent);
-    }
+    try {
+      if (editingCommentId !== null) {
+        await updateComment(editingCommentId, trimmedContent);
+        setEditingCommentId(null);
+      } else {
+        await createComment(trimmedContent);
+      }
 
-    setCommentFormValue('');
+      setCommentFormValue('');
+    } catch (submitError) {
+      showToast({
+        type: 'error',
+        icon: 'alert-circle-filled',
+        content: getApiErrorMessage(
+          submitError,
+          editingCommentId !== null
+            ? '댓글 수정에 실패했습니다.'
+            : '댓글 등록에 실패했습니다.',
+        ),
+      });
+    }
   };
 
   const handleDeleteComment = async (commentId: number) => {
-    await deleteComment(commentId);
+    try {
+      await deleteComment(commentId);
 
-    if (editingCommentId === commentId) {
-      setEditingCommentId(null);
-      setCommentFormValue('');
+      if (editingCommentId === commentId) {
+        setEditingCommentId(null);
+        setCommentFormValue('');
+      }
+    } catch (deleteError) {
+      showToast({
+        type: 'error',
+        icon: 'alert-circle-filled',
+        content: getApiErrorMessage(deleteError, '댓글 삭제에 실패했습니다.'),
+      });
     }
   };
 
@@ -82,7 +106,9 @@ export const CommentsSection = (): ReactElement => {
         {isPending ? (
           <PanelState>댓글을 불러오는 중입니다.</PanelState>
         ) : isError ? (
-          <PanelState>댓글을 불러오지 못했습니다.</PanelState>
+          <PanelState>
+            {getApiErrorMessage(error, '댓글을 불러오지 못했습니다.')}
+          </PanelState>
         ) : comments && comments.items.length > 0 ? (
           <CommentList>
             {comments.items.map((comment) => {

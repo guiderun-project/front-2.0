@@ -7,6 +7,7 @@ import {
 } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
+import { getApiErrorMessage } from '@/api/core';
 import type {
   MatchingCompletedRow,
   MatchingWaitingParticipant,
@@ -237,8 +238,8 @@ export const useEventMatchPage = (eventId: number) => {
       });
       await invalidateMatchingQueries();
     },
-    onError: () => {
-      announceAssertively('매칭에 실패했어요.');
+    onError: (error) => {
+      announceAssertively(getApiErrorMessage(error, '매칭에 실패했어요.'));
     },
     onSettled: () => {
       isCreatingMatchingGuardRef.current = false;
@@ -251,8 +252,10 @@ export const useEventMatchPage = (eventId: number) => {
     onMutate: ({ viId }) => {
       setCancelingViId(viId);
     },
-    onError: (_, matching) => {
-      announceAssertively(`${matching.viName}님의 매칭 취소에 실패했어요.`);
+    onError: (error, matching) => {
+      announceAssertively(
+        getApiErrorMessage(error, `${matching.viName}님의 매칭 취소에 실패했어요.`),
+      );
     },
     onSettled: () => {
       setCancelingViId(null);

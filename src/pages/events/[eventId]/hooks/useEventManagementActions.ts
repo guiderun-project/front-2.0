@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
+import { getApiErrorMessage } from '@/api/core';
 import { api } from '@/api/services';
 import { useToast } from '@/components';
 import { APP_PATH } from '@/router/path';
@@ -44,11 +45,11 @@ export const useEventManagementActions = ({
         queryKey: eventDetailQueryKeys.detailRoot(eventId),
       });
     },
-    onError: () => {
+    onError: (error) => {
       showToast({
         type: 'error',
         icon: 'alert-circle-filled',
-        content: '모집 마감에 실패했어요.',
+        content: getApiErrorMessage(error, '모집 마감에 실패했어요.'),
       });
     },
   });
@@ -60,8 +61,8 @@ export const useEventManagementActions = ({
       void queryClient.invalidateQueries({ queryKey: eventDetailQueryKeys.root });
       navigate(APP_PATH.EVENTS);
     },
-    onError: () => {
-      window.alert('모집 게시글 삭제에 실패했어요.');
+    onError: (error) => {
+      window.alert(getApiErrorMessage(error, '모집 게시글 삭제에 실패했어요.'));
     },
   });
   const downloadAttendanceCsvMutation = useMutation({
@@ -81,8 +82,10 @@ export const useEventManagementActions = ({
         window.alert('출석 인원 명단 추출에 실패했어요.');
       }
     },
-    onError: () => {
-      window.alert('출석 인원 명단 추출에 실패했어요.');
+    onError: (error) => {
+      window.alert(
+        getApiErrorMessage(error, '출석 인원 명단 추출에 실패했어요.'),
+      );
     },
   });
 

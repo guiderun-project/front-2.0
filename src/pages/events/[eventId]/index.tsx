@@ -129,6 +129,7 @@ export const EventDetailPage = (): ReactElement => {
           <Tabs.Panel id="applicants">
             <ApplicantsPanel
               data={applicantsQuery.data}
+              error={applicantsQuery.error}
               eventCategory={event.eventCategory}
               eventType={event.eventType}
               isError={applicantsQuery.isError}
@@ -141,6 +142,7 @@ export const EventDetailPage = (): ReactElement => {
           <Tabs.Panel id="matching">
             <MatchingPanel
               data={matchingStatus.data}
+              error={matchingStatus.error}
               eventCategory={event.eventCategory}
               eventType={event.eventType}
               isError={matchingStatus.isError}
@@ -178,6 +180,7 @@ export const EventDetailPage = (): ReactElement => {
       />
       <ApplicantFormSheet
         data={applicantFormQuery.data}
+        error={applicantFormQuery.error}
         eventCategory={event.eventCategory}
         eventType={event.eventType}
         isError={applicantFormQuery.isError}

@@ -3,6 +3,7 @@ import { Suspense, useMemo, type ReactElement } from 'react';
 import { QueryErrorResetBoundary, useSuspenseQuery } from '@tanstack/react-query';
 import { Outlet, useLocation, useParams } from 'react-router-dom';
 
+import { getApiErrorMessage } from '@/api/core';
 import { api } from '@/api/services';
 import type { EventDetailResponse } from '@/api/types';
 import { ErrorBoundary, LoaderScreen, PageTitle } from '@/components';
@@ -126,12 +127,15 @@ export const EventDetailRouteProvider = (): ReactElement => {
       {({ reset }) => (
         <ErrorBoundary
           key={eventId}
-          fallback={
+          fallback={({ error }) => (
             <EventDetailRouteState
-              title="이벤트 정보를 불러오지 못했어요"
+              title={getApiErrorMessage(
+                error,
+                '이벤트 정보를 불러오지 못했어요',
+              )}
               description="잠시 후 다시 시도해주세요."
             />
-          }
+          )}
           onReset={reset}
         >
           <Suspense fallback={<EventDetailRouteLoader />}>

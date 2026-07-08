@@ -7,6 +7,7 @@ import {
 } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
+import { getApiErrorMessage } from '@/api/core';
 import type { AttendanceParticipant } from '@/api/types';
 import { api } from '@/api/services';
 import { useToast } from '@/components';
@@ -122,8 +123,13 @@ export const useEventAttendancePage = (eventId: number) => {
       });
       await invalidateAttendanceStatus();
     },
-    onError: (_, participant) => {
-      announceAssertively(`${participant.participantName}님 출석 처리에 실패했어요.`);
+    onError: (error, participant) => {
+      announceAssertively(
+        getApiErrorMessage(
+          error,
+          `${participant.participantName}님 출석 처리에 실패했어요.`,
+        ),
+      );
     },
     onSettled: (_, __, participant) => {
       finishParticipantUpdate(participant.userId);
@@ -145,8 +151,13 @@ export const useEventAttendancePage = (eventId: number) => {
       });
       await invalidateAttendanceStatus();
     },
-    onError: (_, participant) => {
-      announceAssertively(`${participant.participantName}님 출석 취소에 실패했어요.`);
+    onError: (error, participant) => {
+      announceAssertively(
+        getApiErrorMessage(
+          error,
+          `${participant.participantName}님 출석 취소에 실패했어요.`,
+        ),
+      );
     },
     onSettled: (_, __, participant) => {
       finishParticipantUpdate(participant.userId);

@@ -79,6 +79,7 @@ export const useEventComments = () => {
 
   return {
     comments: commentsQuery.data,
+    error: commentsQuery.error,
     currentUserId,
     handleCreateComment,
     handleDeleteComment,

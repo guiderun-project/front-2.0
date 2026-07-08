@@ -3,6 +3,7 @@ import { Suspense, type ReactElement, type ReactNode } from "react";
 import styled from "@emotion/styled";
 import { QueryErrorResetBoundary } from "@tanstack/react-query";
 
+import { getApiErrorMessage } from "@/api/core";
 import { Button } from "@/components/Button";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
@@ -22,9 +23,9 @@ export const QueryBoundary = ({
       {({ reset }) => (
         <ErrorBoundary
           onReset={reset}
-          fallback={({ reset: retry }) => (
+          fallback={({ error, reset: retry }) => (
             <Message role="alert">
-              {errorMessage}
+              {getApiErrorMessage(error, errorMessage)}
               <Button level="secondary" size="s" type="button" onClick={retry}>
                 다시 시도
               </Button>

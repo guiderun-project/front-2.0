@@ -4,6 +4,7 @@ import { useState } from 'react';
 import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
 
+import { getApiErrorMessage } from '@/api/core';
 import { api } from '@/api/services';
 import {
   FooterButton,
@@ -79,8 +80,8 @@ export const FindId = (): ReactElement => {
         phoneNum,
       });
       sendCode(response);
-    } catch {
-      setPhoneError(SEND_CODE_ERROR_MESSAGE);
+    } catch (error) {
+      setPhoneError(getApiErrorMessage(error, SEND_CODE_ERROR_MESSAGE));
     } finally {
       setIsSubmitting(false);
     }
@@ -112,8 +113,8 @@ export const FindId = (): ReactElement => {
         // 인증은 성공했으나 일치하는 계정이 없는 경우다.
         setPhase(FIND_ID_PHASE.NOT_FOUND);
       }
-    } catch {
-      setCertError(CERT_CODE_ERROR_MESSAGE);
+    } catch (error) {
+      setCertError(getApiErrorMessage(error, CERT_CODE_ERROR_MESSAGE));
     } finally {
       setIsSubmitting(false);
     }
@@ -358,4 +359,3 @@ const NotFoundContainer = styled.div(({ theme }) => ({
   paddingBottom: '3.5rem',
   paddingInline: theme.spacing['2xl'],
 }));
-

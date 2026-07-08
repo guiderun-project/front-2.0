@@ -2,6 +2,7 @@ import { useId, useState, type ReactElement } from "react";
 
 import styled from "@emotion/styled";
 
+import { getApiErrorMessage } from "@/api/core";
 import type { MatchingUser, RunningGroup } from "@/api/types";
 import { Badge, HiddenText, Icon, Text } from "@/components";
 import { RUNNER_TYPE_LABELS } from "@/constants";
@@ -20,6 +21,7 @@ import { ProfileAvatar } from "./ProfileAvatar";
 
 type MatchingPanelProps = {
   data?: MatchingStatusViewModel;
+  error: unknown;
   eventCategory: EventGroupLabelContext["eventCategory"];
   eventType: EventGroupLabelContext["eventType"];
   isError: boolean;
@@ -29,6 +31,7 @@ type MatchingPanelProps = {
 
 export const MatchingPanel = ({
   data,
+  error,
   eventCategory,
   eventType,
   isError,
@@ -40,7 +43,11 @@ export const MatchingPanel = ({
   }
 
   if (isError || !data) {
-    return <PanelState>매칭 현황을 불러오지 못했습니다.</PanelState>;
+    return (
+      <PanelState>
+        {getApiErrorMessage(error, "매칭 현황을 불러오지 못했습니다.")}
+      </PanelState>
+    );
   }
 
   if (data.isEmpty) {

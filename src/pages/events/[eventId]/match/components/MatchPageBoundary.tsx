@@ -2,6 +2,7 @@ import { Suspense, type ReactElement, type ReactNode } from 'react';
 
 import { QueryErrorResetBoundary } from '@tanstack/react-query';
 
+import { getApiErrorMessage } from '@/api/core';
 import { ErrorBoundary } from '@/components';
 
 import type { MatchMessageState } from '../matchPageState';
@@ -22,7 +23,14 @@ export const MatchPageBoundary = ({
     <QueryErrorResetBoundary>
       {({ reset }) => (
         <ErrorBoundary
-          fallback={<MatchMessagePage pageState={errorState} />}
+          fallback={({ error }) => (
+            <MatchMessagePage
+              pageState={{
+                ...errorState,
+                message: getApiErrorMessage(error, errorState.message),
+              }}
+            />
+          )}
           onReset={reset}
         >
           <Suspense fallback={<MatchMessagePage pageState={loadingState} />}>

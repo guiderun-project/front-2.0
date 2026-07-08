@@ -2,10 +2,16 @@ import { StrictMode, type ReactNode } from 'react';
 
 import { Global, ThemeProvider } from '@emotion/react';
 import { PostHogProvider } from '@posthog/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+  MutationCache,
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 
+import { captureApiError } from '@/api/core';
 import { baseURL } from '@/api/core/client';
 import { BirthDateGate } from '@/components/BirthDateGate';
 import { LoaderScreen } from '@/components/Loader';
@@ -42,6 +48,11 @@ const postHogProjectToken = import.meta.env.VITE_POSTHOG_PROJECT_TOKEN;
 const postHogOptions = {
   api_host: import.meta.env.VITE_POSTHOG_HOST,
   defaults: '2026-05-30',
+  capture_exceptions: {
+    capture_unhandled_errors: true,
+    capture_unhandled_rejections: true,
+    capture_console_errors: false,
+  },
 } as const;
 
 type BootstrapLoaderState = {
@@ -51,6 +62,16 @@ type BootstrapLoaderState = {
 };
 
 const queryClient = new QueryClient({
+  mutationCache: new MutationCache({
+    onError: (error) => {
+      captureApiError(error);
+    },
+  }),
+  queryCache: new QueryCache({
+    onError: (error) => {
+      captureApiError(error);
+    },
+  }),
   defaultOptions: {
     queries: {
       retry: 1,

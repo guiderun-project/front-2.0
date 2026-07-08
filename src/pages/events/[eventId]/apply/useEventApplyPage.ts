@@ -2,10 +2,10 @@ import { useMemo, useRef, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
 import { useForm } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
 
+import { getApiErrorMessage, isNotFoundApiError } from '@/api/core';
 import { api } from '@/api/services';
 import type { MyEventApplyGetResponse } from '@/api/types';
 import { useToast } from '@/components';
@@ -33,7 +33,7 @@ import {
 } from './schema';
 
 const isNotFoundError = (error: unknown) => {
-  return isAxiosError(error) && error.response?.status === 404;
+  return isNotFoundApiError(error);
 };
 
 const getMyFormOrNull = async (
@@ -149,8 +149,8 @@ export const useEventApplyPage = () => {
       void invalidateEventQueries();
       setIsCompleted(true);
     },
-    onError: () => {
-      window.alert('참여 신청에 실패했어요.');
+    onError: (error) => {
+      window.alert(getApiErrorMessage(error, '참여 신청에 실패했어요.'));
     },
   });
 
@@ -182,8 +182,8 @@ export const useEventApplyPage = () => {
         });
       }, 0);
     },
-    onError: () => {
-      window.alert('신청서 수정에 실패했어요.');
+    onError: (error) => {
+      window.alert(getApiErrorMessage(error, '신청서 수정에 실패했어요.'));
     },
   });
 

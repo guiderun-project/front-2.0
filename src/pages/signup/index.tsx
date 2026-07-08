@@ -11,6 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
 
+import { getApiErrorMessage } from '@/api/core';
 import { api } from '@/api/services';
 import {
   ConfirmPopup,
@@ -165,8 +166,13 @@ export const SignupPage = (): ReactElement => {
       });
       setIssuedAccessToken(response.accessToken);
       goNext();
-    } catch {
-      window.alert('회원가입에 실패했어요. 잠시 후 다시 시도해주세요.');
+    } catch (error) {
+      window.alert(
+        getApiErrorMessage(
+          error,
+          '회원가입에 실패했어요. 잠시 후 다시 시도해주세요.',
+        ),
+      );
     } finally {
       setIsSubmitting(false);
     }

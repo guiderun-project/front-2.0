@@ -4,6 +4,7 @@ import { useState } from 'react';
 import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
 
+import { getApiErrorMessage } from '@/api/core';
 import { api } from '@/api/services';
 import {
   FooterButton,
@@ -102,8 +103,8 @@ export const FindPassword = (): ReactElement => {
         phoneNum,
       });
       sendCode(response);
-    } catch {
-      setVerifyError(VERIFY_ERROR_MESSAGE);
+    } catch (error) {
+      setVerifyError(getApiErrorMessage(error, VERIFY_ERROR_MESSAGE));
     } finally {
       setIsSubmitting(false);
     }
@@ -126,8 +127,8 @@ export const FindPassword = (): ReactElement => {
         });
       setToken(issuedToken);
       setPhase(FIND_PASSWORD_PHASE.RESET);
-    } catch {
-      setCertError(CERT_CODE_ERROR_MESSAGE);
+    } catch (error) {
+      setCertError(getApiErrorMessage(error, CERT_CODE_ERROR_MESSAGE));
     } finally {
       setIsSubmitting(false);
     }
@@ -145,8 +146,8 @@ export const FindPassword = (): ReactElement => {
     try {
       await api.auth.newPasswordPatch({ token, newPassword });
       setPhase(FIND_PASSWORD_PHASE.DONE);
-    } catch {
-      setResetError(RESET_ERROR_MESSAGE);
+    } catch (error) {
+      setResetError(getApiErrorMessage(error, RESET_ERROR_MESSAGE));
     } finally {
       setIsSubmitting(false);
     }

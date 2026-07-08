@@ -2,8 +2,8 @@ import type { ReactElement, ReactNode } from 'react';
 import { useCallback, useEffect, useMemo } from 'react';
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
 
+import { isUnauthorizedApiError } from '@/api/core';
 import { api } from '@/api/services';
 import type { UserInfoGetResponse } from '@/api/types';
 import {
@@ -23,7 +23,7 @@ type AuthProviderProps = {
 };
 
 const isUnauthorizedError = (error: unknown) => {
-  return isAxiosError(error) && error.response?.status === 401;
+  return isUnauthorizedApiError(error);
 };
 
 const shouldRetryAuthUserQuery = (failureCount: number, error: unknown) => {

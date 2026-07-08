@@ -3,6 +3,7 @@ import { useState, type ReactElement } from 'react';
 import styled from '@emotion/styled';
 import { useMutation } from '@tanstack/react-query';
 
+import { getApiErrorMessage } from '@/api/core';
 import { api } from '@/api/services';
 import { useAuth } from '@/contexts';
 import {
@@ -27,7 +28,7 @@ export const BirthDateSheet = ({
   const { refreshUser } = useAuth();
   const [birthDate, setBirthDate] = useState('');
 
-  const { isError, isPending, mutate, reset } = useMutation({
+  const { error, isError, isPending, mutate, reset } = useMutation({
     mutationFn: (isoDate: string) =>
       api.user.birthDatePatch({ birthDate: isoDate }),
     onSuccess: async () => {
@@ -39,7 +40,10 @@ export const BirthDateSheet = ({
   const hasFormatError =
     birthDate.length === BIRTH_DATE_MAX_LENGTH && isoDate === null;
   const errorText = isError
-    ? '생년월일을 등록하지 못했어요. 다시 시도해주세요.'
+    ? getApiErrorMessage(
+        error,
+        '생년월일을 등록하지 못했어요. 다시 시도해주세요.',
+      )
     : hasFormatError
       ? '올바른 생년월일을 입력해주세요.'
       : undefined;

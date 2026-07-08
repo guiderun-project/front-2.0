@@ -1,6 +1,9 @@
+import { useEffect } from 'react';
+
 import styled from '@emotion/styled';
 import { isRouteErrorResponse, Link, useRouteError } from 'react-router-dom';
 
+import { captureRouteError, getApiErrorMessage } from '@/api/core';
 import { PageTitle } from '@/components';
 
 const getMessage = (error: unknown) => {
@@ -9,7 +12,7 @@ const getMessage = (error: unknown) => {
   }
 
   if (error instanceof Error) {
-    return error.message;
+    return getApiErrorMessage(error, error.message);
   }
 
   return 'An unexpected routing error occurred.';
@@ -17,6 +20,10 @@ const getMessage = (error: unknown) => {
 
 export const RouteErrorPage = () => {
   const error = useRouteError();
+
+  useEffect(() => {
+    captureRouteError(error);
+  }, [error]);
 
   return (
     <>

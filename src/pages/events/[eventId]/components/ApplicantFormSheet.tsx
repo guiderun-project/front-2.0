@@ -2,6 +2,7 @@ import type { ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
+import { getApiErrorMessage } from '@/api/core';
 import type { EventApplicantFormResponse, RunningGroup } from '@/api/types';
 import { BottomSheet, ButtonGroup, Text, useToast } from '@/components';
 
@@ -17,6 +18,7 @@ const EMPTY_VALUE = '미입력';
 
 type ApplicantFormSheetProps = {
   data?: EventApplicantFormResponse;
+  error: unknown;
   eventCategory: EventGroupLabelContext['eventCategory'];
   eventType: EventGroupLabelContext['eventType'];
   isError: boolean;
@@ -33,6 +35,7 @@ type ApplicantFormRow = {
 
 export const ApplicantFormSheet = ({
   data,
+  error,
   eventCategory,
   eventType,
   isError,
@@ -87,7 +90,9 @@ export const ApplicantFormSheet = ({
         <PanelState>신청서를 불러오는 중입니다.</PanelState>
       ) : null}
       {isError ? (
-        <PanelState>신청서를 불러오지 못했습니다.</PanelState>
+        <PanelState>
+          {getApiErrorMessage(error, '신청서를 불러오지 못했습니다.')}
+        </PanelState>
       ) : null}
       {!isPending && !isError && !data ? (
         <PanelState>신청서 정보를 선택해주세요.</PanelState>

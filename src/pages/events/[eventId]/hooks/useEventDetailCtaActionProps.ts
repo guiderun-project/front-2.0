@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
+import { getApiErrorMessage } from '@/api/core';
 import { api } from '@/api/services';
 import { APP_PATH } from '@/router/path';
 
@@ -41,8 +42,8 @@ export const useEventDetailCtaActionProps = ({
         }),
       ]);
     },
-    onError: () => {
-      window.alert('신청 취소에 실패했어요.');
+    onError: (error) => {
+      window.alert(getApiErrorMessage(error, '신청 취소에 실패했어요.'));
     },
   });
 
