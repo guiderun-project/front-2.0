@@ -66,6 +66,7 @@ export const AdditionalQuestionCard = ({
                 }
                 aria-invalid={hasVisibleError || undefined}
                 aria-label={`${title} 내용`}
+                enterKeyHint={questionType === 'SELECT' ? 'next' : 'done'}
                 maxLength={ADDITIONAL_QUESTION_TITLE_MAX_LENGTH}
                 name={titleField.name}
                 placeholder="질문을 입력하세요"

@@ -23,6 +23,16 @@ type AttendanceMutationInput = {
   userId: string;
 };
 
+type LiveAnnouncement = {
+  message: string;
+  politeness: 'polite' | 'assertive';
+};
+
+const EMPTY_ANNOUNCEMENT: LiveAnnouncement = {
+  message: '',
+  politeness: 'polite',
+};
+
 export const useEventAttendanceRoute = () => {
   const navigate = useNavigate();
   const { eventId, isValidEventId } = useEventDetailRoute();
@@ -57,8 +67,13 @@ export const useEventAttendancePermission = () => {
 export const useEventAttendancePage = (eventId: number) => {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
-  const [announcement, setAnnouncement] = useState('');
+  const [announcement, setAnnouncement] =
+    useState<LiveAnnouncement>(EMPTY_ANNOUNCEMENT);
   const updatingParticipantIdsRef = useRef(new Set<string>());
+
+  const announceAssertively = (message: string) => {
+    setAnnouncement({ message, politeness: 'assertive' });
+  };
 
   const [attendanceQuery, canceledApplicantsQuery] = useSuspenseQueries({
     queries: [
@@ -98,7 +113,7 @@ export const useEventAttendancePage = (eventId: number) => {
     onSuccess: async (_, participant) => {
       const successMessage = `${participant.participantName}님 출석을 완료했어요`;
 
-      setAnnouncement(successMessage);
+      announceAssertively(successMessage);
       showToast({
         type: 'success',
         icon: 'check-thick-lined',
@@ -108,7 +123,7 @@ export const useEventAttendancePage = (eventId: number) => {
       await invalidateAttendanceStatus();
     },
     onError: (_, participant) => {
-      setAnnouncement(`${participant.participantName}님 출석 처리에 실패했어요.`);
+      announceAssertively(`${participant.participantName}님 출석 처리에 실패했어요.`);
     },
     onSettled: (_, __, participant) => {
       finishParticipantUpdate(participant.userId);
@@ -121,7 +136,7 @@ export const useEventAttendancePage = (eventId: number) => {
     onSuccess: async (_, participant) => {
       const successMessage = `${participant.participantName}님 출석을 취소했어요`;
 
-      setAnnouncement(successMessage);
+      announceAssertively(successMessage);
       showToast({
         type: 'error',
         icon: 'delete-lined',
@@ -131,7 +146,7 @@ export const useEventAttendancePage = (eventId: number) => {
       await invalidateAttendanceStatus();
     },
     onError: (_, participant) => {
-      setAnnouncement(`${participant.participantName}님 출석 취소에 실패했어요.`);
+      announceAssertively(`${participant.participantName}님 출석 취소에 실패했어요.`);
     },
     onSettled: (_, __, participant) => {
       finishParticipantUpdate(participant.userId);

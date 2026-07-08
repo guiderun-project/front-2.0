@@ -49,7 +49,9 @@ export const EventNewPage = (): ReactElement => {
   );
   const form = useForm<EventFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: createDefaultEventFormValues(fallbackEventType),
+    defaultValues: createDefaultEventFormValues(fallbackEventType, {
+      eventDate: '',
+    }),
     mode: 'onChange',
   });
   const date = useWatch({ control: form.control, name: 'date' });
@@ -60,7 +62,11 @@ export const EventNewPage = (): ReactElement => {
   const { createEvent, isCreatingEvent } = useEventCreateMutation({ eventType });
 
   useEffect(() => {
-    form.reset(createDefaultEventFormValues(fallbackEventType));
+    form.reset(
+      createDefaultEventFormValues(fallbackEventType, {
+        eventDate: '',
+      }),
+    );
   }, [fallbackEventType, form]);
 
   useEffect(() => {

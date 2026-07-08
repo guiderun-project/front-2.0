@@ -40,7 +40,16 @@ type CancelMatchingOptions = {
   onSuccess?: () => void;
 };
 
+type LiveAnnouncement = {
+  message: string;
+  politeness: 'polite' | 'assertive';
+};
+
 const MATCHING_COMPLETE_MESSAGE = '매칭을 완료했어요.';
+const EMPTY_ANNOUNCEMENT: LiveAnnouncement = {
+  message: '',
+  politeness: 'polite',
+};
 
 type SelectionAnnouncementInput = {
   participant: MatchingWaitingParticipant;
@@ -119,7 +128,8 @@ export const useEventMatchPage = (eventId: number) => {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState<MatchTabId>('waiting');
-  const [announcement, setAnnouncement] = useState('');
+  const [announcement, setAnnouncement] =
+    useState<LiveAnnouncement>(EMPTY_ANNOUNCEMENT);
   const [selectedViId, setSelectedViId] = useState<string | null>(null);
   const [selectedGuideIds, setSelectedGuideIds] = useState<string[]>([]);
   const [cancelingViId, setCancelingViId] = useState<string | null>(null);
@@ -184,10 +194,18 @@ export const useEventMatchPage = (eventId: number) => {
   const hasVisibleSelectionBar = activeTab === 'waiting' && hasSelection;
   const canCreateMatching = selectedVi !== null && selectedGuides.length > 0;
 
+  const announcePolitely = (message: string) => {
+    setAnnouncement({ message, politeness: 'polite' });
+  };
+
+  const announceAssertively = (message: string) => {
+    setAnnouncement({ message, politeness: 'assertive' });
+  };
+
   const clearSelection = () => {
     setSelectedViId(null);
     setSelectedGuideIds([]);
-    setAnnouncement('선택한 참가자를 모두 해제했습니다.');
+    announcePolitely('선택한 참가자를 모두 해제했습니다.');
   };
 
   const invalidateMatchingQueries = async () => {
@@ -210,7 +228,7 @@ export const useEventMatchPage = (eventId: number) => {
       }),
     onSuccess: async () => {
       clearSelection();
-      setAnnouncement(MATCHING_COMPLETE_MESSAGE);
+      announceAssertively(MATCHING_COMPLETE_MESSAGE);
       showToast({
         type: 'success',
         icon: 'check-thick-lined',
@@ -220,7 +238,7 @@ export const useEventMatchPage = (eventId: number) => {
       await invalidateMatchingQueries();
     },
     onError: () => {
-      setAnnouncement('매칭에 실패했어요.');
+      announceAssertively('매칭에 실패했어요.');
     },
     onSettled: () => {
       isCreatingMatchingGuardRef.current = false;
@@ -234,7 +252,7 @@ export const useEventMatchPage = (eventId: number) => {
       setCancelingViId(viId);
     },
     onError: (_, matching) => {
-      setAnnouncement(`${matching.viName}님의 매칭 취소에 실패했어요.`);
+      announceAssertively(`${matching.viName}님의 매칭 취소에 실패했어요.`);
     },
     onSettled: () => {
       setCancelingViId(null);
@@ -247,7 +265,7 @@ export const useEventMatchPage = (eventId: number) => {
         selectedViId === participant.userId ? null : participant.userId;
 
       setSelectedViId(nextSelectedViId);
-      setAnnouncement(
+      announcePolitely(
         getSelectionAnnouncement({
           participant,
           selectedGuideIds,
@@ -262,7 +280,7 @@ export const useEventMatchPage = (eventId: number) => {
       : [...selectedGuideIds, participant.userId];
 
     setSelectedGuideIds(nextSelectedGuideIds);
-    setAnnouncement(
+    announcePolitely(
       getSelectionAnnouncement({
         participant,
         selectedGuideIds: nextSelectedGuideIds,
@@ -298,7 +316,7 @@ export const useEventMatchPage = (eventId: number) => {
           const successMessage = `${matching.viName}님의 매칭을 취소했어요.`;
 
           options?.onSuccess?.();
-          setAnnouncement(successMessage);
+          announceAssertively(successMessage);
           showToast({
             type: 'error',
             icon: 'delete-lined',
