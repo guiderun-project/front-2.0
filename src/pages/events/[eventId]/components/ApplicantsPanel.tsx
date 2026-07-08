@@ -2,6 +2,7 @@ import type { ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
+import { getApiErrorMessage } from '@/api/core';
 import type { EventApplicant, EventApplicantListResponse } from '@/api/types';
 import { Badge, HiddenText, Icon, RunnerTypeAvatar, Text } from '@/components';
 import { RUNNER_TYPE_LABELS } from '@/constants';
@@ -12,6 +13,7 @@ import { ProfileAvatar } from './ProfileAvatar';
 
 type ApplicantsPanelProps = {
   data?: EventApplicantListResponse;
+  error: unknown;
   eventCategory: EventGroupLabelContext['eventCategory'];
   eventType: EventGroupLabelContext['eventType'];
   isError: boolean;
@@ -21,6 +23,7 @@ type ApplicantsPanelProps = {
 
 export const ApplicantsPanel = ({
   data,
+  error,
   eventCategory,
   eventType,
   isError,
@@ -32,7 +35,11 @@ export const ApplicantsPanel = ({
   }
 
   if (isError || !data) {
-    return <PanelState>신청자 명단을 불러오지 못했습니다.</PanelState>;
+    return (
+      <PanelState>
+        {getApiErrorMessage(error, '신청자 명단을 불러오지 못했습니다.')}
+      </PanelState>
+    );
   }
 
   const { groups, summary } = data;

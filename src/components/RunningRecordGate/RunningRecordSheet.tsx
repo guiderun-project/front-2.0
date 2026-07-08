@@ -2,6 +2,7 @@ import { useId, useState, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
+import { getApiErrorMessage } from '@/api/core';
 import { BottomSheet } from '../BottomSheet';
 import { Button, ButtonGroup } from '../Button';
 import { Input } from '../Input';
@@ -41,7 +42,8 @@ export const RunningRecordSheet = ({
   const [isInputStep, setIsInputStep] = useState(false);
   const [distance, setDistance] = useState('');
 
-  const { isError, isPending, mutate, reset } = useSaveRunningDistance(eventId);
+  const { error, isError, isPending, mutate, reset } =
+    useSaveRunningDistance(eventId);
   const { isPending: isSkipping, mutate: skip } = useSkipRunningDistance(eventId);
 
   const handleSkip = () => {
@@ -54,7 +56,10 @@ export const RunningRecordSheet = ({
 
   const parsedDistance = parseDistance(distance);
   const errorText = isError
-    ? '러닝 거리를 저장하지 못했어요. 다시 시도해주세요.'
+    ? getApiErrorMessage(
+        error,
+        '러닝 거리를 저장하지 못했어요. 다시 시도해주세요.',
+      )
     : undefined;
 
   const title = (

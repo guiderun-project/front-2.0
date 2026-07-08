@@ -125,6 +125,7 @@ export const captureRouteError = (error: unknown) => {
 
   const properties = {
     routeTemplate: sanitizePathLikeValue(window.location.pathname),
+    ...getRouteErrorProperties(error),
   };
 
   if (error instanceof Error) {
@@ -133,4 +134,28 @@ export const captureRouteError = (error: unknown) => {
   }
 
   posthog.capture('route_error', properties);
+};
+
+const getRouteErrorProperties = (error: unknown) => {
+  if (!isRouteErrorResponseLike(error)) {
+    return {};
+  }
+
+  return {
+    status: error.status,
+    statusText: error.statusText,
+  };
+};
+
+const isRouteErrorResponseLike = (
+  error: unknown,
+): error is { status: number; statusText: string } => {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'status' in error &&
+    typeof error.status === 'number' &&
+    'statusText' in error &&
+    typeof error.statusText === 'string'
+  );
 };
