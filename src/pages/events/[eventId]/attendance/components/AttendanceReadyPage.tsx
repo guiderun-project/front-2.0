@@ -21,14 +21,17 @@ export const AttendanceReadyPage = ({
     cancelAttendance,
   } = useEventAttendancePage(eventId);
   const waitingCount = attendancePageState.attendance.summary.waitingCount;
+  const politeAnnouncement =
+    announcement.politeness === 'polite' ? announcement.message : '';
+  const assertiveAnnouncement =
+    announcement.politeness === 'assertive' ? announcement.message : '';
 
   return (
     <AttendancePageShell
       description={<AttendanceLeadDescription waitingCount={waitingCount} />}
     >
-      <HiddenText role="status">
-        {announcement}
-      </HiddenText>
+      <HiddenText role="status">{politeAnnouncement}</HiddenText>
+      <HiddenText role="alert">{assertiveAnnouncement}</HiddenText>
       <AttendancePageContent
         pageState={attendancePageState}
         onAttend={attendParticipant}

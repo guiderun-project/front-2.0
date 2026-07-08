@@ -57,6 +57,10 @@ const MatchReadyPageContent = ({
     waitingCount > 0 ? (
       <MatchLeadDescription waitingCount={waitingCount} />
     ) : undefined;
+  const politeAnnouncement =
+    announcement.politeness === 'polite' ? announcement.message : '';
+  const assertiveAnnouncement =
+    announcement.politeness === 'assertive' ? announcement.message : '';
 
   const handleBack = () => {
     if (hasSelection) {
@@ -79,7 +83,8 @@ const MatchReadyPageContent = ({
       title={pageTitle}
       onBack={handleBack}
     >
-      <HiddenText role="status">{announcement}</HiddenText>
+      <HiddenText role="status">{politeAnnouncement}</HiddenText>
+      <HiddenText role="alert">{assertiveAnnouncement}</HiddenText>
       <MatchPageContent
         eventGroupLabelContext={eventGroupLabelContext}
         matchPage={matchPage}
