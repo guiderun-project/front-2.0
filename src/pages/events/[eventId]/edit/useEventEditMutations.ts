@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
+import { getApiErrorMessage } from '@/api/core';
 import { api } from '@/api/services';
 import type { EventDetailResponse } from '@/api/types';
 import { useToast } from '@/components';
@@ -49,8 +50,8 @@ export const useEventEditMutations = ({
         });
       }, 0);
     },
-    onError: () => {
-      window.alert('모임 수정에 실패했어요.');
+    onError: (error) => {
+      window.alert(getApiErrorMessage(error, '모임 수정에 실패했어요.'));
     },
   });
   const deleteMutation = useMutation({
@@ -61,8 +62,8 @@ export const useEventEditMutations = ({
       });
       navigate(APP_PATH.EVENTS);
     },
-    onError: () => {
-      window.alert('모집 게시글 삭제에 실패했어요.');
+    onError: (error) => {
+      window.alert(getApiErrorMessage(error, '모집 게시글 삭제에 실패했어요.'));
     },
   });
 

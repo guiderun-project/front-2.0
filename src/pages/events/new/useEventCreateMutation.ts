@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
+import { getApiErrorMessage } from '@/api/core';
 import { api } from '@/api/services';
 import type { EventType } from '@/api/types';
 import { APP_PATH } from '@/router/path';
@@ -35,8 +36,8 @@ export const useEventCreateMutation = ({
       });
       navigate(APP_PATH.EVENT_DETAIL(response.eventId), { replace: true });
     },
-    onError: () => {
-      window.alert('모임 만들기에 실패했어요.');
+    onError: (error) => {
+      window.alert(getApiErrorMessage(error, '모임 만들기에 실패했어요.'));
     },
   });
 
