@@ -172,7 +172,6 @@ export const TimeInput = ({
           $error={hasError}
           data-helper={!hasError || undefined}
           id={messageId}
-          role={hasError ? "alert" : undefined}
         >
           {message}
         </Message>

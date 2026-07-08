@@ -211,7 +211,6 @@ export const InputFieldShell = <
               $error={hasError}
               data-helper={!hasError || undefined}
               id={messageId}
-              role={hasError ? "alert" : undefined}
             >
               {message}
             </Message>

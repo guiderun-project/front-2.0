@@ -143,7 +143,7 @@ export const Select = <TValue extends string = string>({
           </SelectTrigger>
         )}
         {hasError ? (
-          <SelectErrorMessage id={errorId} role="alert">
+          <SelectErrorMessage id={errorId}>
             {errorText}
           </SelectErrorMessage>
         ) : null}
