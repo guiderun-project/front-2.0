@@ -98,6 +98,7 @@ const MyEditContent = (): ReactElement => {
           기본 정보
         </Text>
         <Input
+          clearable
           errorText={
             hasBirthDateError ? '올바른 생년월일을 입력해주세요.' : undefined
           }
@@ -108,6 +109,7 @@ const MyEditContent = (): ReactElement => {
           onChange={(event) => setBirthDate(event.target.value)}
         />
         <Input
+          clearable
           error={hasPhoneError}
           errorText={hasPhoneError ? '올바른 전화번호를 입력해주세요.' : undefined}
           inputMode="numeric"
@@ -117,12 +119,14 @@ const MyEditContent = (): ReactElement => {
           onChange={(event) => setPhoneNumber(event.target.value)}
         />
         <Input
+          clearable
           label="SNS 계정"
           value={values.snsId}
           onChange={(event) => setSnsId(event.target.value)}
         />
         {canEditId1365 ? (
           <Input
+            clearable
             label="1365 계정"
             value={values.id1365}
             onChange={(event) => setId1365(event.target.value)}
