@@ -42,6 +42,11 @@ const postHogProjectToken = import.meta.env.VITE_POSTHOG_PROJECT_TOKEN;
 const postHogOptions = {
   api_host: import.meta.env.VITE_POSTHOG_HOST,
   defaults: '2026-05-30',
+  capture_exceptions: {
+    capture_unhandled_errors: true,
+    capture_unhandled_rejections: true,
+    capture_console_errors: false,
+  },
 } as const;
 
 type BootstrapLoaderState = {
