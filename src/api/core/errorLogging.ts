@@ -1,5 +1,6 @@
 import posthog from 'posthog-js';
 
+import type { ApiError } from '@/api/core/apiError';
 import { isApiError } from '@/api/core/apiError';
 
 const isPostHogEnabled = () => {
@@ -13,6 +14,10 @@ export const captureApiError = (error: unknown) => {
 
   if (!isApiError(error)) {
     posthog.captureException(error);
+    return;
+  }
+
+  if (isExpectedControlFlowApiError(error)) {
     return;
   }
 
@@ -31,6 +36,42 @@ export const captureApiError = (error: unknown) => {
   }
 
   posthog.capture('api_error', properties);
+};
+
+const isExpectedControlFlowApiError = (error: ApiError) => {
+  if (isRefreshTokenReissueFailure(error)) {
+    return true;
+  }
+
+  return isMyApplicationFormNotFound(error);
+};
+
+const isRefreshTokenReissueFailure = (error: ApiError) => {
+  return (
+    error.status === 401 &&
+    error.method === 'POST' &&
+    matchesPath(error.url, /^\/(?:api\/)?oauth\/login\/reissue$/)
+  );
+};
+
+const isMyApplicationFormNotFound = (error: ApiError) => {
+  return (
+    error.status === 404 &&
+    error.method === 'GET' &&
+    matchesPath(error.url, /^\/(?:api\/)?event\/[^/]+\/form$/)
+  );
+};
+
+const matchesPath = (url: string | undefined, pattern: RegExp) => {
+  if (!url) {
+    return false;
+  }
+
+  try {
+    return pattern.test(new URL(url, 'http://localhost').pathname);
+  } catch {
+    return pattern.test(url);
+  }
 };
 
 export const captureRenderError = (
