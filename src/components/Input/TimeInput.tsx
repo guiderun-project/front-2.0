@@ -12,16 +12,18 @@ import {
 } from "./fieldStyles";
 import type { TimeInputProps, TimeValue } from "./Input.types";
 
-const SEGMENT_PLACEHOLDER = "--";
-
 type SegmentKey = "hours" | "minutes" | "seconds";
 
 const EMPTY_TIME: TimeValue = { hours: "", minutes: "", seconds: "" };
 
-const SEGMENTS: ReadonlyArray<{ key: SegmentKey; label: string }> = [
-  { key: "hours", label: "시" },
-  { key: "minutes", label: "분" },
-  { key: "seconds", label: "초" },
+const SEGMENTS: ReadonlyArray<{
+  key: SegmentKey;
+  label: string;
+  placeholder: string;
+}> = [
+  { key: "hours", label: "시", placeholder: "HH" },
+  { key: "minutes", label: "분", placeholder: "MM" },
+  { key: "seconds", label: "초", placeholder: "SS" },
 ];
 
 // 각 칸(시/분/초)은 자기 값(최대 2자리)을 앞에서부터 채운다. 한 칸이 다 차면
@@ -158,7 +160,7 @@ export const TimeInput = ({
                 onChange={handleSegmentChange(index, segment.key)}
                 onFocus={handleSegmentFocus}
                 onKeyDown={handleSegmentKeyDown(index, segment.key)}
-                placeholder={SEGMENT_PLACEHOLDER}
+                placeholder={segment.placeholder}
                 ref={(node) => {
                   segmentRefs.current[index] = node;
                 }}
