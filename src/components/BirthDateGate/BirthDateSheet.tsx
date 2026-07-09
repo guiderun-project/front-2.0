@@ -16,7 +16,7 @@ import { BottomSheet } from '../BottomSheet';
 import { Button } from '../Button';
 import { Input } from '../Input';
 
-const BIRTH_DATE_HELPER_TEXT = 'YYYY.MM.DD 형식으로 입력해주세요';
+const BIRTH_DATE_HELPER_TEXT = '올바른 생년월일을 입력해주세요';
 
 type BirthDateSheetProps = {
   userName: string;
