@@ -80,7 +80,10 @@ const MyEditContent = (): ReactElement => {
     [],
   );
 
-  useRouteBlockerConfirm({ enabled: isDirty, onConfirm: handleExitConfirm });
+  const { allowNavigation } = useRouteBlockerConfirm({
+    enabled: isDirty,
+    onConfirm: handleExitConfirm,
+  });
 
   // 이미 아이디가 있으면 로그인 정보 설정 섹션을 노출하지 않는다.
   const hasAccountId = Boolean(accountId);
@@ -89,6 +92,7 @@ const MyEditContent = (): ReactElement => {
     const isSucceeded = await submit();
 
     if (isSucceeded) {
+      allowNavigation();
       navigate(APP_PATH.MY);
       window.setTimeout(() => {
         showToast({

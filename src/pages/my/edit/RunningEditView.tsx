@@ -78,7 +78,10 @@ const MyRunningEditContent = (): ReactElement => {
     [],
   );
 
-  useRouteBlockerConfirm({ enabled: isDirty, onConfirm: handleExitConfirm });
+  const { allowNavigation } = useRouteBlockerConfirm({
+    enabled: isDirty,
+    onConfirm: handleExitConfirm,
+  });
 
   const recordGroupOptions: SelectOptions<RunnerRecordGroup> =
     RECORD_GROUPS.map((group) => ({
@@ -90,6 +93,7 @@ const MyRunningEditContent = (): ReactElement => {
     const isSucceeded = await submit();
 
     if (isSucceeded) {
+      allowNavigation();
       navigate(APP_PATH.MY);
       window.setTimeout(() => {
         showToast({
