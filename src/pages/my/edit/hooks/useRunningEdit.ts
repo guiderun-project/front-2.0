@@ -100,10 +100,13 @@ export const useRunningEdit = () => {
   });
 
   // 10KM 기록은 필수. 시·분·초 6자리를 모두 입력해야 한다(0 허용).
+  // 진입 시 기록이 비어 있어도(예: 가입 시 'E 기록없음' 선택) 에러로 보이지 않도록,
+  // 기록 필드가 초기값에서 바뀐 경우에만 에러를 노출한다.
   const isRecordComplete = isRunningRecordComplete(values.record);
-  const recordError = isRecordComplete
-    ? undefined
-    : '10KM 러닝기록을 입력해주세요.';
+  const recordError =
+    isRecordDirty && !isRecordComplete
+      ? '10KM 러닝기록을 입력해주세요.'
+      : undefined;
 
   const canSubmit = isDirty && isRecordComplete && !isPending;
 
