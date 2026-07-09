@@ -12,6 +12,7 @@ import {
   PageLayout,
   QueryBoundary,
   Text,
+  useToast,
 } from '@/components';
 import { useRouteBlockerConfirm } from '@/hooks/useRouteBlockerConfirm';
 import { APP_PATH } from '@/router/path';
@@ -51,6 +52,7 @@ export const ProfileEditView = (): ReactElement => {
 
 const MyEditContent = (): ReactElement => {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [isAccountSheetOpen, setIsAccountSheetOpen] = useState(false);
   const [isExitConfirmOpen, setIsExitConfirmOpen] = useState(false);
   const exitResolverRef = useRef<((v: boolean) => void) | null>(null);
@@ -78,7 +80,10 @@ const MyEditContent = (): ReactElement => {
     [],
   );
 
-  useRouteBlockerConfirm({ enabled: isDirty, onConfirm: handleExitConfirm });
+  const { allowNavigation } = useRouteBlockerConfirm({
+    enabled: isDirty,
+    onConfirm: handleExitConfirm,
+  });
 
   // 이미 아이디가 있으면 로그인 정보 설정 섹션을 노출하지 않는다.
   const hasAccountId = Boolean(accountId);
@@ -87,7 +92,15 @@ const MyEditContent = (): ReactElement => {
     const isSucceeded = await submit();
 
     if (isSucceeded) {
+      allowNavigation();
       navigate(APP_PATH.MY);
+      window.setTimeout(() => {
+        showToast({
+          type: 'success',
+          icon: 'check-lined',
+          content: '정보 수정이 완료되었어요',
+        });
+      }, 0);
     }
   };
 

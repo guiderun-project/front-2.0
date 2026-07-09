@@ -12,6 +12,7 @@ import {
   Select,
   Textarea,
   TimeInput,
+  useToast,
   type SelectOptions,
 } from '@/components';
 import { TRAINING_RECORD_LABELS, type RunnerRecordGroup } from '@/constants';
@@ -53,6 +54,7 @@ export const RunningEditView = (): ReactElement => {
 
 const MyRunningEditContent = (): ReactElement => {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [isExitConfirmOpen, setIsExitConfirmOpen] = useState(false);
   const exitResolverRef = useRef<((v: boolean) => void) | null>(null);
   const {
@@ -76,7 +78,10 @@ const MyRunningEditContent = (): ReactElement => {
     [],
   );
 
-  useRouteBlockerConfirm({ enabled: isDirty, onConfirm: handleExitConfirm });
+  const { allowNavigation } = useRouteBlockerConfirm({
+    enabled: isDirty,
+    onConfirm: handleExitConfirm,
+  });
 
   const recordGroupOptions: SelectOptions<RunnerRecordGroup> =
     RECORD_GROUPS.map((group) => ({
@@ -88,7 +93,15 @@ const MyRunningEditContent = (): ReactElement => {
     const isSucceeded = await submit();
 
     if (isSucceeded) {
+      allowNavigation();
       navigate(APP_PATH.MY);
+      window.setTimeout(() => {
+        showToast({
+          type: 'success',
+          icon: 'check-lined',
+          content: '정보 수정이 완료되었어요',
+        });
+      }, 0);
     }
   };
 
