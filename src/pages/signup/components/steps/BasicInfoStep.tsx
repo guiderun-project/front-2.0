@@ -4,11 +4,7 @@ import { Controller, useFormContext } from 'react-hook-form';
 
 import { Input } from '@/components';
 import { RUNNER_TYPE } from '@/constants';
-import {
-  BIRTH_DATE_MAX_LENGTH,
-  formatBirthDateInput,
-  PHONE_DIGIT_LENGTH,
-} from '@/utils';
+import { formatBirthDateInput, PHONE_DIGIT_LENGTH } from '@/utils';
 
 import {
   SIGNUP_FIELD,
@@ -47,7 +43,6 @@ export const BasicInfoStep = (): ReactElement => {
             errorText={fieldState.error?.message}
             inputMode="numeric"
             label="생년월일 8자리"
-            maxLength={BIRTH_DATE_MAX_LENGTH}
             value={field.value}
             onChange={(event) =>
               field.onChange(formatBirthDateInput(event.target.value))
@@ -64,7 +59,6 @@ export const BasicInfoStep = (): ReactElement => {
             errorText={fieldState.error?.message}
             inputMode="numeric"
             label="전화번호"
-            maxLength={PHONE_DIGIT_LENGTH}
             value={field.value}
             onChange={(event) =>
               field.onChange(
