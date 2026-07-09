@@ -115,20 +115,21 @@ export const TimeInput = ({
     input.setSelectionRange(end, end);
   };
 
+  // 세 칸을 하나의 인풋처럼 다룬다: 어디를 클릭하든(칸 내부 포함) 브라우저 기본
+  // 캐럿 배치를 막고, 미완성 칸의 끝(비어 있으면 맨 앞)으로 포커스를 고정한다.
   const handleBoxPointerDown = (
     event: React.PointerEvent<HTMLDivElement>,
   ): void => {
-    if (event.target !== event.currentTarget) {
-      return;
-    }
-
     event.preventDefault();
     const firstIncompleteIndex = SEGMENTS.findIndex(
       (segment) => current[segment.key].length < MAX_SEGMENT_LENGTH,
     );
     const targetIndex =
       firstIncompleteIndex === -1 ? SEGMENTS.length - 1 : firstIncompleteIndex;
-    segmentRefs.current[targetIndex]?.focus();
+    const target = segmentRefs.current[targetIndex];
+    target?.focus();
+    const end = target?.value.length ?? 0;
+    target?.setSelectionRange(end, end);
   };
 
   return (
