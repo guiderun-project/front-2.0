@@ -7,7 +7,7 @@ import type { UpdateRunningInfoRequest } from '@/api/types';
 import type { TimeValue } from '@/components';
 import { useAuth } from '@/contexts';
 import {
-  deriveRunningGroup,
+  deriveRunningGroupIfComplete,
   hasRunningRecord,
   isRunningRecordComplete,
   type RunnerRecordGroup,
@@ -139,9 +139,8 @@ export const useRunningEdit = () => {
       setValues((prev) => ({
         ...prev,
         record: value,
-        recordDegree: isRunningRecordComplete(value)
-          ? deriveRunningGroup(value, userType)
-          : prev.recordDegree,
+        recordDegree:
+          deriveRunningGroupIfComplete(value, userType) ?? prev.recordDegree,
       })),
     setHopePrefs: (value: string) => setField('hopePrefs', value),
     recordError,

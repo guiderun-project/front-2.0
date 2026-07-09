@@ -6,8 +6,7 @@ import { Input, Select, Textarea, TimeInput, type SelectOptions } from '@/compon
 import {
   RUNNER_TYPE,
   TRAINING_RECORD_LABELS,
-  deriveRunningGroup,
-  isRunningRecordComplete,
+  deriveRunningGroupIfComplete,
   type RunnerRecordGroup,
 } from '@/constants';
 
@@ -29,11 +28,13 @@ export const RecordStep = (): ReactElement => {
 
   // 6글자가 다 채워지면 러닝 그룹을 기록에 맞춰 동기화한다. (이후 수동 수정도 다음 기록 입력에 덮인다)
   useEffect(() => {
-    if (!isRunningRecordComplete(record)) {
+    const syncedGroup = deriveRunningGroupIfComplete(record, runnerType);
+
+    if (syncedGroup === null) {
       return;
     }
 
-    setValue(SIGNUP_FIELD.RECORD_DEGREE, deriveRunningGroup(record, runnerType), {
+    setValue(SIGNUP_FIELD.RECORD_DEGREE, syncedGroup, {
       shouldDirty: false,
     });
   }, [record, runnerType, setValue]);

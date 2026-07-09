@@ -62,7 +62,7 @@ const RUNNING_GROUP_MAX_MINUTES: Record<
 };
 
 // 10KM 러닝기록(시:분:초)을 러닝 그룹(A~E)으로 환산한다. 기록이 없거나 0이면 E(기록 없음).
-export const deriveRunningGroup = (
+const deriveRunningGroup = (
   record: TimeValue,
   type: UserType,
 ): RunnerRecordGroup => {
@@ -80,3 +80,11 @@ export const deriveRunningGroup = (
 
   return found?.group ?? 'D';
 };
+
+// 6자리(시·분·초)가 모두 채워진 기록만 그룹으로 환산한다.
+// 미완성이면 null을 반환해 호출부가 기존 그룹을 유지하게 한다.
+export const deriveRunningGroupIfComplete = (
+  record: TimeValue,
+  type: UserType,
+): RunnerRecordGroup | null =>
+  isRunningRecordComplete(record) ? deriveRunningGroup(record, type) : null;
