@@ -17,6 +17,8 @@ import { myQueryKeys } from '@/pages/my/queryKeys';
 
 export const HOPE_PREFS_MAX_LENGTH = 100;
 
+export const RECORD_ERROR_MESSAGE = 'HH:MM:SS 형식으로 입력해주세요';
+
 const EMPTY_RECORD: TimeValue = { hours: '', minutes: '', seconds: '' };
 
 /** 회원가입과 동일한 "HH:MM:SS" 10KM 기록 형식만 시:분:초로 역파싱한다. */
@@ -104,9 +106,7 @@ export const useRunningEdit = () => {
   // 기록 필드가 초기값에서 바뀐 경우에만 에러를 노출한다.
   const isRecordComplete = isRunningRecordComplete(values.record);
   const recordError =
-    isRecordDirty && !isRecordComplete
-      ? '10KM 러닝기록을 입력해주세요.'
-      : undefined;
+    isRecordDirty && !isRecordComplete ? RECORD_ERROR_MESSAGE : undefined;
 
   const canSubmit = isDirty && isRecordComplete && !isPending;
 
