@@ -28,9 +28,12 @@ export const BasicInfoStep = (): ReactElement => {
             error={Boolean(fieldState.error)}
             errorText={fieldState.error?.message}
             label="이름"
-            maxLength={SIGNUP_NAME_MAX_LENGTH}
             value={field.value}
-            onChange={field.onChange}
+            onChange={(event) =>
+              field.onChange(
+                event.target.value.slice(0, SIGNUP_NAME_MAX_LENGTH),
+              )
+            }
           />
         )}
       />
