@@ -16,7 +16,6 @@ import {
 } from '@/components';
 import { useRouteBlockerConfirm } from '@/hooks/useRouteBlockerConfirm';
 import { APP_PATH } from '@/router/path';
-import { BIRTH_DATE_MAX_LENGTH, PHONE_DIGIT_LENGTH } from '@/utils';
 
 import { AccountSetupSheet } from './components/AccountSetupSheet';
 import { useMyEdit } from './hooks/useMyEdit';
@@ -116,7 +115,6 @@ const MyEditContent = (): ReactElement => {
           }
           inputMode="numeric"
           label="생년월일 8자리"
-          maxLength={BIRTH_DATE_MAX_LENGTH}
           value={values.birthDate}
           onChange={(event) => setBirthDate(event.target.value)}
         />
@@ -125,7 +123,6 @@ const MyEditContent = (): ReactElement => {
           errorText={hasPhoneError ? '올바른 전화번호를 입력해주세요.' : undefined}
           inputMode="numeric"
           label="전화번호"
-          maxLength={PHONE_DIGIT_LENGTH}
           value={values.phoneNumber}
           onChange={(event) => setPhoneNumber(event.target.value)}
         />
