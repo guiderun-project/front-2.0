@@ -7,7 +7,7 @@ import type { UpdateRunningInfoRequest } from '@/api/types';
 import type { TimeValue } from '@/components';
 import { useAuth } from '@/contexts';
 import {
-  deriveRunningGroup,
+  deriveRunningGroupIfComplete,
   hasRunningRecord,
   isRunningRecordComplete,
   type RunnerRecordGroup,
@@ -16,6 +16,8 @@ import { useMyPage } from '@/pages/my/hooks/useMyPage';
 import { myQueryKeys } from '@/pages/my/queryKeys';
 
 export const HOPE_PREFS_MAX_LENGTH = 100;
+
+export const RECORD_ERROR_MESSAGE = 'HH:MM:SS 형식으로 입력해주세요';
 
 const EMPTY_RECORD: TimeValue = { hours: '', minutes: '', seconds: '' };
 
@@ -100,10 +102,11 @@ export const useRunningEdit = () => {
   });
 
   // 10KM 기록은 필수. 시·분·초 6자리를 모두 입력해야 한다(0 허용).
+  // 진입 시 기록이 비어 있어도(예: 가입 시 'E 기록없음' 선택) 에러로 보이지 않도록,
+  // 기록 필드가 초기값에서 바뀐 경우에만 에러를 노출한다.
   const isRecordComplete = isRunningRecordComplete(values.record);
-  const recordError = isRecordComplete
-    ? undefined
-    : '10KM 러닝기록을 입력해주세요.';
+  const recordError =
+    isRecordDirty && !isRecordComplete ? RECORD_ERROR_MESSAGE : undefined;
 
   const canSubmit = isDirty && isRecordComplete && !isPending;
 
@@ -136,9 +139,8 @@ export const useRunningEdit = () => {
       setValues((prev) => ({
         ...prev,
         record: value,
-        recordDegree: isRunningRecordComplete(value)
-          ? deriveRunningGroup(value, userType)
-          : prev.recordDegree,
+        recordDegree:
+          deriveRunningGroupIfComplete(value, userType) ?? prev.recordDegree,
       })),
     setHopePrefs: (value: string) => setField('hopePrefs', value),
     recordError,

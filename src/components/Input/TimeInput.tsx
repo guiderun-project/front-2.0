@@ -12,16 +12,18 @@ import {
 } from "./fieldStyles";
 import type { TimeInputProps, TimeValue } from "./Input.types";
 
-const SEGMENT_PLACEHOLDER = "--";
-
 type SegmentKey = "hours" | "minutes" | "seconds";
 
 const EMPTY_TIME: TimeValue = { hours: "", minutes: "", seconds: "" };
 
-const SEGMENTS: ReadonlyArray<{ key: SegmentKey; label: string }> = [
-  { key: "hours", label: "시" },
-  { key: "minutes", label: "분" },
-  { key: "seconds", label: "초" },
+const SEGMENTS: ReadonlyArray<{
+  key: SegmentKey;
+  label: string;
+  placeholder: string;
+}> = [
+  { key: "hours", label: "시", placeholder: "HH" },
+  { key: "minutes", label: "분", placeholder: "MM" },
+  { key: "seconds", label: "초", placeholder: "SS" },
 ];
 
 // 각 칸(시/분/초)은 자기 값(최대 2자리)을 앞에서부터 채운다. 한 칸이 다 차면
@@ -115,20 +117,21 @@ export const TimeInput = ({
     input.setSelectionRange(end, end);
   };
 
+  // 세 칸을 하나의 인풋처럼 다룬다: 어디를 클릭하든(칸 내부 포함) 브라우저 기본
+  // 캐럿 배치를 막고, 미완성 칸의 끝(비어 있으면 맨 앞)으로 포커스를 고정한다.
   const handleBoxPointerDown = (
     event: React.PointerEvent<HTMLDivElement>,
   ): void => {
-    if (event.target !== event.currentTarget) {
-      return;
-    }
-
     event.preventDefault();
     const firstIncompleteIndex = SEGMENTS.findIndex(
       (segment) => current[segment.key].length < MAX_SEGMENT_LENGTH,
     );
     const targetIndex =
       firstIncompleteIndex === -1 ? SEGMENTS.length - 1 : firstIncompleteIndex;
-    segmentRefs.current[targetIndex]?.focus();
+    const target = segmentRefs.current[targetIndex];
+    target?.focus();
+    const end = target?.value.length ?? 0;
+    target?.setSelectionRange(end, end);
   };
 
   return (
@@ -157,7 +160,7 @@ export const TimeInput = ({
                 onChange={handleSegmentChange(index, segment.key)}
                 onFocus={handleSegmentFocus}
                 onKeyDown={handleSegmentKeyDown(index, segment.key)}
-                placeholder={SEGMENT_PLACEHOLDER}
+                placeholder={segment.placeholder}
                 ref={(node) => {
                   segmentRefs.current[index] = node;
                 }}

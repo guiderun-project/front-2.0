@@ -16,7 +16,7 @@ import { BottomSheet } from '../BottomSheet';
 import { Button } from '../Button';
 import { Input } from '../Input';
 
-const BIRTH_DATE_HELPER_TEXT = 'YYYY.MM.DD 형식으로 입력해주세요';
+const BIRTH_DATE_ERROR_MESSAGE = '올바른 생년월일을 입력해주세요';
 
 type BirthDateSheetProps = {
   userName: string;
@@ -45,7 +45,7 @@ export const BirthDateSheet = ({
         '생년월일을 등록하지 못했어요. 다시 시도해주세요.',
       )
     : hasFormatError
-      ? '올바른 생년월일을 입력해주세요.'
+      ? BIRTH_DATE_ERROR_MESSAGE
       : undefined;
 
   const handleSubmit = () => {
@@ -81,7 +81,6 @@ export const BirthDateSheet = ({
       <Content>
         <Input
           errorText={errorText}
-          helperText={BIRTH_DATE_HELPER_TEXT}
           inputMode="numeric"
           label="생년월일 8자리"
           maxLength={BIRTH_DATE_MAX_LENGTH}
