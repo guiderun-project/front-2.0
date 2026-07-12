@@ -6,7 +6,6 @@ import { Link } from 'react-router-dom';
 import { Text } from '@/components';
 import { APP_PATH } from '@/router/path';
 
-import { formatActivityEventDate } from './formatActivityEventDate';
 import type { MyActivityPartnerEvent } from './types';
 
 type PartnerEventItemProps = {
@@ -16,19 +15,17 @@ type PartnerEventItemProps = {
 export const PartnerEventItem = ({
   event,
 }: PartnerEventItemProps): ReactElement => {
-  const eventDate = formatActivityEventDate(event.date);
-
   return (
     <EventListItem>
       <EventCard
-        aria-label={`${event.name}, ${eventDate}`}
+        aria-label={`${event.name}, ${event.dateText}`}
         to={APP_PATH.EVENT_DETAIL(event.id)}
       >
         <EventName color="text.primary" font="body-s-m">
           {event.name}
         </EventName>
         <EventDate color="text.secondary" font="body-s-r">
-          {eventDate}
+          {event.dateText}
         </EventDate>
       </EventCard>
     </EventListItem>
