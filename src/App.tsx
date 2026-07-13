@@ -55,23 +55,26 @@ const useFirstVisitIntroGate = (): boolean => {
   const { isAuthReady, user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const shouldRedirect =
-    isAuthReady &&
-    user === null &&
-    !isFirstVisitRedirectExcludedPath(location.pathname) &&
-    !hasSeenFirstVisit();
+  const isFirstVisitTarget = isAuthReady && user === null && !hasSeenFirstVisit();
+  const isRedirectExcluded = isFirstVisitRedirectExcludedPath(location.pathname);
+  const shouldRedirect = isFirstVisitTarget && !isRedirectExcluded;
 
   useEffect(() => {
-    if (!shouldRedirect) {
+    if (!isFirstVisitTarget) {
       return;
     }
 
     recordFirstVisitSeen();
+
+    if (!shouldRedirect) {
+      return;
+    }
+
     navigate(APP_PATH.INTRO, {
       replace: true,
       state: { from: location },
     });
-  }, [location, navigate, shouldRedirect]);
+  }, [isFirstVisitTarget, location, navigate, shouldRedirect]);
 
   return isAuthReady && !shouldRedirect;
 };
