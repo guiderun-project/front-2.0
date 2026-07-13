@@ -1,18 +1,18 @@
-import type { ReactElement } from 'react';
+import type { ReactElement } from "react";
 
-import styled from '@emotion/styled';
-import { useFormContext } from 'react-hook-form';
+import styled from "@emotion/styled";
+import { useFormContext } from "react-hook-form";
 
-import { CheckBox, Icon, Text } from '@/components';
+import { CheckBox, Icon, Text } from "@/components";
 
-import { APP_PATH } from '@/router/path';
+import { APP_PATH } from "@/router/path";
 
-import { TERMS_SECTIONS } from '@/pages/terms/constants';
+import { TERMS_SECTIONS } from "@/pages/terms/constants";
 
-import { SIGNUP_FIELD } from '@/pages/signup/constants';
-import { SIGNUP_COPY } from '@/pages/signup/copy';
-import type { SignupFormValues } from '@/pages/signup/types';
-import { StepLayout } from '@/pages/signup/components/StepLayout';
+import { SIGNUP_FIELD } from "@/pages/signup/constants";
+import { SIGNUP_COPY } from "@/pages/signup/copy";
+import type { SignupFormValues } from "@/pages/signup/types";
+import { StepLayout } from "@/pages/signup/components/StepLayout";
 
 const SECTION_CONFIG: Record<
   string,
@@ -21,15 +21,15 @@ const SECTION_CONFIG: Record<
       | typeof SIGNUP_FIELD.AGREEMENTS_PRIVACY
       | typeof SIGNUP_FIELD.AGREEMENTS_PORTRAIT_RIGHTS
       | typeof SIGNUP_FIELD.AGREEMENTS_SAFETY;
-    agreementKey: keyof SignupFormValues['agreements'];
+    agreementKey: keyof SignupFormValues["agreements"];
   }
 > = {
-  privacy: { field: SIGNUP_FIELD.AGREEMENTS_PRIVACY, agreementKey: 'privacy' },
+  privacy: { field: SIGNUP_FIELD.AGREEMENTS_PRIVACY, agreementKey: "privacy" },
   portrait: {
     field: SIGNUP_FIELD.AGREEMENTS_PORTRAIT_RIGHTS,
-    agreementKey: 'portraitRights',
+    agreementKey: "portraitRights",
   },
-  safety: { field: SIGNUP_FIELD.AGREEMENTS_SAFETY, agreementKey: 'safety' },
+  safety: { field: SIGNUP_FIELD.AGREEMENTS_SAFETY, agreementKey: "safety" },
 };
 
 export const TermsStep = (): ReactElement => {
@@ -83,7 +83,8 @@ export const TermsStep = (): ReactElement => {
                   }
                 />
                 <Text color="text.secondary" font="body-s-m">
-                  {section.title}{section.required && ' (필수)'}
+                  {section.title}
+                  {section.required && " (필수)"}
                 </Text>
               </ItemLabel>
               <DetailLink
@@ -104,10 +105,12 @@ export const TermsStep = (): ReactElement => {
       </ItemList>
 
       {errors.agreements?.privacy?.message ||
-      errors.agreements?.portraitRights?.message ? (
+      errors.agreements?.portraitRights?.message ||
+      errors.agreements?.safety?.message ? (
         <Text color="text.danger" font="detail-m-r" role="alert">
           {errors.agreements?.privacy?.message ??
-            errors.agreements?.portraitRights?.message}
+            errors.agreements?.portraitRights?.message ??
+            errors.agreements?.safety?.message}
         </Text>
       ) : null}
     </StepLayout>
@@ -115,39 +118,39 @@ export const TermsStep = (): ReactElement => {
 };
 
 const AllRow = styled.label(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
+  display: "flex",
+  alignItems: "center",
   gap: theme.spacing.lg,
   padding: theme.spacing.xl,
   borderRadius: theme.radius.md,
   backgroundColor: theme.color.bg.subtle,
-  cursor: 'pointer',
+  cursor: "pointer",
 }));
 
 const ItemList = styled.div(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
+  display: "flex",
+  flexDirection: "column",
   gap: theme.spacing.lg,
   padding: `${theme.spacing.none} ${theme.spacing.xl}`,
 }));
 
 const ItemRow = styled.div(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
+  display: "flex",
+  alignItems: "center",
   gap: theme.spacing.lg,
 }));
 
 const ItemLabel = styled.label(({ theme }) => ({
-  display: 'flex',
-  flex: '1 1 0',
+  display: "flex",
+  flex: "1 1 0",
   minWidth: 0,
-  alignItems: 'center',
+  alignItems: "center",
   gap: theme.spacing.lg,
-  cursor: 'pointer',
+  cursor: "pointer",
 }));
 
 const DetailLink = styled.a({
-  display: 'inline-flex',
+  display: "inline-flex",
   flexShrink: 0,
-  cursor: 'pointer',
+  cursor: "pointer",
 });

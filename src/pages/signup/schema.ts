@@ -128,6 +128,7 @@ export const signupSchema = z
       ctx.addIssue({
         code: "custom",
         message: "훈련 참여 및 안전 면책에 동의해주세요.",
+        path: ["agreements", "safety"],
       });
     }
   });
