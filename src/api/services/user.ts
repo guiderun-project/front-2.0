@@ -167,7 +167,9 @@ class UserApi {
    */
   withdrawalDelete = async (body: UserWithdrawalDeleteRequest) => {
     return handleApiRequest(async () => {
-      const response = await privateApi.delete<void>('/user', { data: body });
+      const response = await privateApi.delete<void>('/withdrawal', {
+        data: body,
+      });
 
       return response.data;
     });
