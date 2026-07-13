@@ -18,6 +18,7 @@ import type {
   UserBirthDatePatchRequest,
   UserBirthDatePatchResponse,
   UserInfoGetResponse,
+  UserPermissionGetResponse,
   UserWithdrawalDeleteRequest,
 } from '@/api/types/user';
 
@@ -126,6 +127,18 @@ class UserApi {
         '/user/account/duplicated',
         body,
       );
+
+      return response.data;
+    });
+  };
+
+  /**
+   * 로그인된 사용자의 권한 동의 상태를 조회한다.
+   */
+  permissionGet = async () => {
+    return handleApiRequest(async () => {
+      const response =
+        await privateApi.get<UserPermissionGetResponse>('/user/permission');
 
       return response.data;
     });

@@ -93,7 +93,7 @@ export const TermsStep = (): ReactElement => {
                 </Text>
               </ItemLabel>
               <DetailLink
-                aria-label={`${section.title} 약관 상세 보기 (새 탭)`}
+                aria-label={`${section.title} 약관 상세 보기 새창 열림`}
                 href={APP_PATH.TERMS}
                 rel="noopener noreferrer"
                 target="_blank"

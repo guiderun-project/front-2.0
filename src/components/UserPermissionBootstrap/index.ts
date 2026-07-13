@@ -1,0 +1,1 @@
+export { UserPermissionBootstrap } from './UserPermissionBootstrap';

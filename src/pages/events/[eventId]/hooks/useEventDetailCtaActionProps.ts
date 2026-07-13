@@ -11,6 +11,8 @@ import type { EventDetailCtaButtonConfig } from '../utils/eventDetailCtaButtonCo
 type UseEventDetailCtaActionPropsParams = {
   canAccessProtectedTabs: boolean;
   eventId: number;
+  isApplyPermissionChecking?: boolean;
+  onApply?: () => void;
   onRestrictedAccess: () => void;
 };
 
@@ -22,6 +24,8 @@ type EventDetailCtaActionProps = {
 export const useEventDetailCtaActionProps = ({
   canAccessProtectedTabs,
   eventId,
+  isApplyPermissionChecking = false,
+  onApply,
   onRestrictedAccess,
 }: UseEventDetailCtaActionPropsParams) => {
   const navigate = useNavigate();
@@ -53,9 +57,15 @@ export const useEventDetailCtaActionProps = ({
     switch (button.action) {
       case 'apply':
         return {
+          disabled: isApplyPermissionChecking,
           onClick: () => {
             if (!canAccessProtectedTabs) {
               onRestrictedAccess();
+              return;
+            }
+
+            if (onApply) {
+              onApply();
               return;
             }
 

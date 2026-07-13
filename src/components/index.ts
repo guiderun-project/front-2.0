@@ -26,3 +26,4 @@ export * from "./Tabs";
 export * from "./Text";
 export * from "./Toast";
 export * from "./TopNavigation";
+export * from "./UserPermissionBootstrap";

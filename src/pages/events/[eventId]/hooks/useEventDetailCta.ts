@@ -16,7 +16,9 @@ import {
 type UseEventDetailCtaParams = {
   canAccessProtectedTabs: boolean;
   event: EventDetailResponse;
+  isApplyPermissionChecking?: boolean;
   isEventOrganizer: boolean;
+  onApply?: () => void;
   onRestrictedAccess: () => void;
 };
 
@@ -42,7 +44,9 @@ const isEventDetailCtaButtonConfig = (
 export const useEventDetailCta = ({
   canAccessProtectedTabs,
   event,
+  isApplyPermissionChecking,
   isEventOrganizer,
+  onApply,
   onRestrictedAccess,
 }: UseEventDetailCtaParams): UseEventDetailCtaResult => {
   const eventId = event.eventId;
@@ -51,6 +55,8 @@ export const useEventDetailCta = ({
   const { getEventDetailCtaActionProps } = useEventDetailCtaActionProps({
     canAccessProtectedTabs,
     eventId,
+    isApplyPermissionChecking,
+    onApply,
     onRestrictedAccess,
   });
   const isEventDateStarted = hasEventDateStarted(eventDate, currentTime);

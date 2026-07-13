@@ -16,6 +16,7 @@ import { ManagementMenuSheet } from './components/ManagementMenuSheet';
 import { MatchingPanel } from './components/MatchingPanel';
 import { PageState } from './components/PanelState';
 import { RestrictedAccessSheet } from './components/RestrictedAccessSheet';
+import { TrainingSafetyPermissionSheet } from './components/TrainingSafetyPermissionSheet';
 import { EVENT_DETAIL_TABS } from './constants';
 import { useEventApplicants } from './hooks/useEventApplicants';
 import { useEventDetailPage } from './hooks/useEventDetailPage';
@@ -31,18 +32,24 @@ export const EventDetailPage = (): ReactElement => {
     canOpenManagementSheet,
     closeManagementSheet,
     closeRestrictedSheet,
+    closeTrainingSafetySheet,
     event,
     eventId,
+    handleApply,
     handleBack,
     handleCopyLink,
     handleKakaoShare,
     handleLogin,
     handleTabSelectionChange,
+    handleTrainingSafetyAgreement,
     isApprovalPending,
+    isApplyPermissionChecking,
     isAuthenticated,
     isOrganizer,
     isManagementSheetOpen,
     isRestrictedSheetOpen,
+    isTrainingSafetyAgreementPending,
+    isTrainingSafetySheetOpen,
     isValidEventId,
     openManagementSheet,
     openRestrictedSheet,
@@ -156,7 +163,9 @@ export const EventDetailPage = (): ReactElement => {
       <EventDetailCta
         canAccessProtectedTabs={canAccessProtectedTabs}
         event={event}
+        isApplyPermissionChecking={isApplyPermissionChecking}
         isEventOrganizer={isOrganizer}
+        onApply={handleApply}
         onRestrictedAccess={openRestrictedSheet}
       />
 
@@ -177,6 +186,12 @@ export const EventDetailPage = (): ReactElement => {
         recruitStatus={event.recruitStatus}
         showOperationActions={shouldShowOperationActionsInMenu}
         onClose={closeManagementSheet}
+      />
+      <TrainingSafetyPermissionSheet
+        isSubmitting={isTrainingSafetyAgreementPending}
+        open={isTrainingSafetySheetOpen}
+        onAgree={handleTrainingSafetyAgreement}
+        onClose={closeTrainingSafetySheet}
       />
       <ApplicantFormSheet
         data={applicantFormQuery.data}

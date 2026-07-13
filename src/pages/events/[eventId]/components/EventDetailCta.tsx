@@ -8,20 +8,26 @@ import { useEventDetailCta } from '../hooks/useEventDetailCta';
 type EventDetailCtaProps = {
   canAccessProtectedTabs: boolean;
   event: EventDetailResponse;
+  isApplyPermissionChecking?: boolean;
   isEventOrganizer: boolean;
+  onApply?: () => void;
   onRestrictedAccess: () => void;
 };
 
 export const EventDetailCta = ({
   canAccessProtectedTabs,
   event,
+  isApplyPermissionChecking,
   isEventOrganizer,
+  onApply,
   onRestrictedAccess,
 }: EventDetailCtaProps): ReactElement => {
   const { ctaItems, ratio } = useEventDetailCta({
     canAccessProtectedTabs,
     event,
+    isApplyPermissionChecking,
     isEventOrganizer,
+    onApply,
     onRestrictedAccess,
   });
 

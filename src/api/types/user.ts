@@ -104,6 +104,10 @@ export type CheckAccountDuplicatedResponse = {
   isUnique: boolean;
 };
 
+export type UserPermissionGetResponse = {
+  trainingSafety: boolean;
+};
+
 export type UpdateTrainingSafetyPermissionRequest = {
   trainingSafety: true;
 };

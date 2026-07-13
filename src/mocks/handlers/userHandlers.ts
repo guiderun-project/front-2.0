@@ -381,6 +381,20 @@ export const userHandlers: HttpHandler[] = [
     });
   }),
 
+  http.get(apiUrl('/user/permission'), ({ request }) => {
+    const authError = requireAuthorization(request);
+
+    if (authError) {
+      return authError;
+    }
+
+    const user = getCurrentUser();
+
+    return HttpResponse.json({
+      trainingSafety: user.trainingSafety ?? false,
+    });
+  }),
+
   http.patch(apiUrl('/user/permission/training-safety'), async ({ request }) => {
     const authError = requireAuthorization(request);
 
