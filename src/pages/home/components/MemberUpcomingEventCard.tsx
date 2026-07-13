@@ -87,9 +87,7 @@ export const MemberUpcomingEventCard = ({
         ) : (
           <MatchPendingNotice>
             <Text align="center" as="p" color="text.tertiary" font="detail-m-m">
-              아직 파트너 매칭 전이에요.
-              <br />
-              대략 러닝 2-3일 전에 매칭될 예정이에요.
+              아직 파트너 매칭 전이에요
             </Text>
           </MatchPendingNotice>
         )}
