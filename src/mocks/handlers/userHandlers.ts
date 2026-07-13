@@ -414,7 +414,7 @@ export const userHandlers: HttpHandler[] = [
     return noContent();
   }),
 
-  http.delete(apiUrl('/user'), async ({ request }) => {
+  http.delete(apiUrl('/withdrawal'), async ({ request }) => {
     const authError = requireAuthorization(request);
 
     if (authError) {
