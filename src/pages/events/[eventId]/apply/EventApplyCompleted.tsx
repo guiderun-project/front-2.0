@@ -1,8 +1,8 @@
-import { useEffect, useRef, type ReactElement } from 'react';
+import { useEffect, useRef, type ReactElement } from "react";
 
-import styled from '@emotion/styled';
+import styled from "@emotion/styled";
 
-import type { EventDetailResponse } from '@/api/types';
+import type { EventDetailResponse } from "@/api/types";
 import {
   FooterButton,
   Graphic,
@@ -10,10 +10,10 @@ import {
   PageLayout,
   Text,
   TopNavigation,
-} from '@/components';
+} from "@/components";
 
-import { focusFirstHeading } from './focusFirstHeading';
-import { createGoogleCalendarEventUrl } from './googleCalendar';
+import { focusFirstHeading } from "./focusFirstHeading";
+import { createGoogleCalendarEventUrl } from "./googleCalendar";
 
 type EventApplyCompletedProps = {
   event: EventDetailResponse;
@@ -34,7 +34,7 @@ export const EventApplyCompleted = ({
 
   const handleAddGoogleCalendar = () => {
     const calendarUrl = createGoogleCalendarEventUrl(event);
-    const calendarWindow = window.open('', '_blank');
+    const calendarWindow = window.open("", "_blank");
 
     if (calendarWindow) {
       calendarWindow.opener = null;
@@ -50,14 +50,14 @@ export const EventApplyCompleted = ({
       <CompletedPage>
         <TopNavigation
           left={{
-            ariaLabel: '이전 페이지로 이동',
-            icon: 'chevron-left-lined',
+            ariaLabel: "이전 페이지로 이동",
+            icon: "chevron-left-lined",
             onClick: onBack,
           }}
           right={[
             {
-              ariaLabel: '이벤트 상세로 이동',
-              icon: 'delete-lined',
+              ariaLabel: "이벤트 상세로 이동",
+              icon: "delete-lined",
               onClick: onViewEvent,
             },
           ]}
@@ -67,10 +67,10 @@ export const EventApplyCompleted = ({
           <Text as="h1" align="center" color="text.primary" font="heading-m-sb">
             참여 신청이 완료됐어요!
           </Text>
-          <Description color="text.secondary" font="body-m-m">
-            모임 전, 나의 파트너가 누구인지 확인해주세요.
-            {'\n'}
-            대략 모임 2-3일 전까지 매칭될 예정이에요.
+          <Description color="text.secondary" font="body-m-m" align="center">
+            모임에 참여하기 전,
+            {"\n"}
+            함께 달릴 파트너를 확인해주세요.
           </Description>
         </CompletedContent>
         <FooterButton ratio="100:100">
@@ -92,19 +92,19 @@ export const EventApplyCompleted = ({
 };
 
 const CompletedPage = styled.div({
-  position: 'relative',
-  minHeight: '100dvh',
-  overflow: 'hidden',
+  position: "relative",
+  minHeight: "100dvh",
+  overflow: "hidden",
 });
 
 const CompletedContent = styled.section(({ theme }) => ({
-  display: 'grid',
-  justifyItems: 'center',
+  display: "grid",
+  justifyItems: "center",
   gap: theme.spacing.lg,
-  padding: `${theme.spacing['2xl']} ${theme.spacing['2xl']} ${theme.spacing['6xl']}`,
-  textAlign: 'center',
+  padding: `${theme.spacing["2xl"]} ${theme.spacing["2xl"]} ${theme.spacing["6xl"]}`,
+  textAlign: "center",
 }));
 
 const Description = styled(Text)({
-  whiteSpace: 'pre-line',
+  whiteSpace: "pre-line",
 });

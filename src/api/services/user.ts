@@ -14,9 +14,11 @@ import type {
   UpdatePersonalInfoResponse,
   UpdateRunningInfoRequest,
   UpdateRunningInfoResponse,
+  UpdateTrainingSafetyPermissionRequest,
   UserBirthDatePatchRequest,
   UserBirthDatePatchResponse,
   UserInfoGetResponse,
+  UserPermissionGetResponse,
   UserWithdrawalDeleteRequest,
 } from '@/api/types/user';
 
@@ -123,6 +125,34 @@ class UserApi {
     return handleApiRequest(async () => {
       const response = await privateApi.post<CheckAccountDuplicatedResponse>(
         '/user/account/duplicated',
+        body,
+      );
+
+      return response.data;
+    });
+  };
+
+  /**
+   * 로그인된 사용자의 권한 동의 상태를 조회한다.
+   */
+  permissionGet = async () => {
+    return handleApiRequest(async () => {
+      const response =
+        await privateApi.get<UserPermissionGetResponse>('/user/permission');
+
+      return response.data;
+    });
+  };
+
+  /**
+   * 로그인된 사용자의 훈련 참여 및 안전 면책 동의 권한을 저장한다.
+   */
+  trainingSafetyPermissionPatch = async (
+    body: UpdateTrainingSafetyPermissionRequest,
+  ) => {
+    return handleApiRequest(async () => {
+      const response = await privateApi.patch<void>(
+        '/user/permission/training-safety',
         body,
       );
 

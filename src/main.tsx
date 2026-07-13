@@ -22,6 +22,7 @@ import {
 } from '@/components/PageLayout';
 import { RunningRecordGate } from '@/components/RunningRecordGate';
 import { ToastProvider } from '@/components/Toast';
+import { UserPermissionBootstrap } from '@/components/UserPermissionBootstrap';
 import { AuthProvider } from '@/contexts';
 import { APP_PATH } from '@/router/path';
 import { router } from '@/router/router';
@@ -179,6 +180,7 @@ const bootstrap = async () => {
               <ColorModeProvider>
                 <ToastProvider>
                   <RouterProvider router={router} />
+                  <UserPermissionBootstrap />
                   <BirthDateGate />
                   <RunningRecordGate />
                 </ToastProvider>

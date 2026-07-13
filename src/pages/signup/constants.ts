@@ -47,7 +47,7 @@ export const SIGNUP_FIELD = {
   AGREEMENTS: 'agreements',
   AGREEMENTS_PRIVACY: 'agreements.privacy',
   AGREEMENTS_PORTRAIT_RIGHTS: 'agreements.portraitRights',
-  AGREEMENTS_SAFETY: 'agreements.safety',
+  AGREEMENTS_TRAINING_SAFETY: 'agreements.trainingSafety',
 } as const satisfies Record<string, FieldPath<SignupFormValues>>;
 
 // 각 화면에서 "다음"으로 넘어가기 전에 검증할 필드. 선택 입력(snsId/id1365/partneredViName/record)은 제외한다.
@@ -64,7 +64,11 @@ export const SIGNUP_STEP_FIELDS: Record<
   ],
   experience: [SIGNUP_FIELD.HAS_EXPERIENCE],
   record: [SIGNUP_FIELD.RECORD],
-  terms: [SIGNUP_FIELD.AGREEMENTS_PRIVACY, SIGNUP_FIELD.AGREEMENTS_PORTRAIT_RIGHTS],
+  terms: [
+    SIGNUP_FIELD.AGREEMENTS_PRIVACY,
+    SIGNUP_FIELD.AGREEMENTS_PORTRAIT_RIGHTS,
+    SIGNUP_FIELD.AGREEMENTS_TRAINING_SAFETY,
+  ],
   complete: [],
 };
 
@@ -84,6 +88,6 @@ export const SIGNUP_FORM_DEFAULT_VALUES: SignupFormValues = {
   agreements: {
     privacy: false,
     portraitRights: false,
-    safety: false,
+    trainingSafety: false,
   },
 };

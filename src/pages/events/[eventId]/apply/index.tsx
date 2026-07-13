@@ -3,6 +3,7 @@ import type { ReactElement } from 'react';
 import { PageLayout } from '@/components/PageLayout';
 import { RoutePlaceholder } from '@/pages/_shared/RoutePlaceholder';
 
+import { TrainingSafetyPermissionSheet } from '../components/TrainingSafetyPermissionSheet';
 import { EventApplyCompleted } from './EventApplyCompleted';
 import { EventApplyForm } from './EventApplyForm';
 import { useEventApplyPage } from './useEventApplyPage';
@@ -12,6 +13,7 @@ export const EventApplyPage = (): ReactElement => {
     event,
     form,
     handleBack,
+    handleTrainingSafetyAgreement,
     handleViewEvent,
     handleSubmit,
     isAuthReady,
@@ -21,7 +23,11 @@ export const EventApplyPage = (): ReactElement => {
     isMyFormError,
     isMyFormReady,
     isSubmitting,
+    isTrainingSafetyAgreementPending,
+    isUserPermissionError,
+    isUserPermissionReady,
     isValidEventId,
+    needsTrainingSafetyAgreement,
     user,
   } = useEventApplyPage();
 
@@ -36,7 +42,7 @@ export const EventApplyPage = (): ReactElement => {
     );
   }
 
-  if (!isAuthReady || !isMyFormReady) {
+  if (!isAuthReady || !isMyFormReady || !isUserPermissionReady) {
     return (
       <PageLayout background="bg.subtle">
         <RoutePlaceholder
@@ -52,6 +58,17 @@ export const EventApplyPage = (): ReactElement => {
       <PageLayout background="bg.subtle">
         <RoutePlaceholder
           title="신청 정보를 불러오지 못했어요"
+          description="잠시 후 다시 시도해주세요."
+        />
+      </PageLayout>
+    );
+  }
+
+  if (isUserPermissionError) {
+    return (
+      <PageLayout background="bg.subtle">
+        <RoutePlaceholder
+          title="권한 정보를 불러오지 못했어요"
           description="잠시 후 다시 시도해주세요."
         />
       </PageLayout>
@@ -85,6 +102,19 @@ export const EventApplyPage = (): ReactElement => {
         <RoutePlaceholder
           title="참여 신청이 불가해요"
           description={ineligibleMessage}
+        />
+      </PageLayout>
+    );
+  }
+
+  if (needsTrainingSafetyAgreement) {
+    return (
+      <PageLayout background="bg.subtle">
+        <TrainingSafetyPermissionSheet
+          isSubmitting={isTrainingSafetyAgreementPending}
+          open
+          onAgree={handleTrainingSafetyAgreement}
+          onClose={handleBack}
         />
       </PageLayout>
     );

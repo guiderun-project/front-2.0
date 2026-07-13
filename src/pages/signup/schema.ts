@@ -1,6 +1,6 @@
-import { z } from 'zod';
+import { z } from "zod";
 
-import { RUNNER_TYPE, isRunningRecordComplete } from '@/constants';
+import { RUNNER_TYPE, isRunningRecordComplete } from "@/constants";
 
 // "YYYY.MM.DD" (formatBirthDateInput 출력 형식)
 const BIRTH_DATE_PATTERN = /^\d{4}\.\d{2}\.\d{2}$/;
@@ -12,7 +12,7 @@ const isValidBirthDate = (value: string): boolean => {
     return false;
   }
 
-  const [year, month, date] = value.split('.').map(Number);
+  const [year, month, date] = value.split(".").map(Number);
   const parsed = new Date(Date.UTC(year, month - 1, date));
 
   return (
@@ -33,7 +33,7 @@ const timeValueSchema = z.object({
 export const signupSchema = z
   .object({
     disabilityType: z.enum([RUNNER_TYPE.VI, RUNNER_TYPE.GUIDE]).nullable(),
-    gender: z.enum(['MALE', 'FEMALE']).nullable(),
+    gender: z.enum(["MALE", "FEMALE"]).nullable(),
     name: z.string(),
     birthDate: z.string(),
     phoneNumber: z.string(),
@@ -42,85 +42,93 @@ export const signupSchema = z
     hasExperience: z.boolean().nullable(),
     partneredViName: z.string(),
     record: timeValueSchema,
-    recordDegree: z.enum(['A', 'B', 'C', 'D', 'E']),
+    recordDegree: z.enum(["A", "B", "C", "D", "E"]),
     hopePrefs: z.string(),
     agreements: z.object({
       privacy: z.boolean(),
       portraitRights: z.boolean(),
-      safety: z.boolean(),
+      trainingSafety: z.boolean(),
     }),
   })
   .superRefine((values, ctx) => {
     if (!values.disabilityType) {
       ctx.addIssue({
-        code: 'custom',
-        message: '참여 유형을 선택해주세요.',
-        path: ['disabilityType'],
+        code: "custom",
+        message: "참여 유형을 선택해주세요.",
+        path: ["disabilityType"],
       });
     }
 
     if (!values.gender) {
       ctx.addIssue({
-        code: 'custom',
-        message: '성별을 선택해주세요.',
-        path: ['gender'],
+        code: "custom",
+        message: "성별을 선택해주세요.",
+        path: ["gender"],
       });
     }
 
     if (values.name.trim().length === 0) {
       ctx.addIssue({
-        code: 'custom',
-        message: '이름을 입력해주세요.',
-        path: ['name'],
+        code: "custom",
+        message: "이름을 입력해주세요.",
+        path: ["name"],
       });
     }
 
     if (!isValidBirthDate(values.birthDate)) {
       ctx.addIssue({
-        code: 'custom',
-        message: '올바른 생년월일을 입력해주세요.',
-        path: ['birthDate'],
+        code: "custom",
+        message: "올바른 생년월일을 입력해주세요.",
+        path: ["birthDate"],
       });
     }
 
     if (!PHONE_PATTERN.test(values.phoneNumber)) {
       ctx.addIssue({
-        code: 'custom',
-        message: '전화번호를 정확히 입력해주세요.',
-        path: ['phoneNumber'],
+        code: "custom",
+        message: "전화번호를 정확히 입력해주세요.",
+        path: ["phoneNumber"],
       });
     }
 
     if (values.hasExperience === null) {
       ctx.addIssue({
-        code: 'custom',
-        message: '러닝 경험 여부를 선택해주세요.',
-        path: ['hasExperience'],
+        code: "custom",
+        message: "러닝 경험 여부를 선택해주세요.",
+        path: ["hasExperience"],
       });
     }
 
     // 10KM 기록은 경험 유무와 무관하게 항상 필수. 시·분·초 6자리를 모두 입력해야 한다(0 허용).
     if (!isRunningRecordComplete(values.record)) {
       ctx.addIssue({
-        code: 'custom',
-        message: '10KM 러닝기록을 입력해주세요.',
-        path: ['record'],
+        code: "custom",
+        message: "10KM 러닝기록을 입력해주세요.",
+        path: ["record"],
       });
     }
 
     if (!values.agreements.privacy) {
       ctx.addIssue({
-        code: 'custom',
-        message: '개인정보 제공 및 활용에 동의해주세요.',
-        path: ['agreements', 'privacy'],
+        code: "custom",
+        message: "개인정보 제공 및 활용에 동의해주세요.",
+        path: ["agreements", "privacy"],
       });
     }
 
     if (!values.agreements.portraitRights) {
       ctx.addIssue({
-        code: 'custom',
-        message: '초상권 활용에 동의해주세요.',
-        path: ['agreements', 'portraitRights'],
+        code: "custom",
+        message: "초상권 활용에 동의해주세요.",
+        path: ["agreements", "portraitRights"],
+      });
+    }
+
+    if (!values.agreements.trainingSafety) {
+      ctx.addIssue({
+        code: "custom",
+        message: "훈련 참여 및 안전 면책에 동의해주세요.",
+        path: ["agreements", "trainingSafety"],
       });
     }
   });

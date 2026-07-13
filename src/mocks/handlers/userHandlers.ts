@@ -12,6 +12,7 @@ import type {
   SetAccountRequest,
   UpdatePersonalInfoRequest,
   UpdateRunningInfoRequest,
+  UpdateTrainingSafetyPermissionRequest,
   UserBirthDatePatchRequest,
   UserWithdrawalDeleteRequest,
 } from '@/api/types/user';
@@ -378,6 +379,39 @@ export const userHandlers: HttpHandler[] = [
     return HttpResponse.json({
       isUnique: !mockDb.users.some((user) => user.accountId === body.accountId),
     });
+  }),
+
+  http.get(apiUrl('/user/permission'), ({ request }) => {
+    const authError = requireAuthorization(request);
+
+    if (authError) {
+      return authError;
+    }
+
+    const user = getCurrentUser();
+
+    return HttpResponse.json({
+      trainingSafety: user.trainingSafety ?? false,
+    });
+  }),
+
+  http.patch(apiUrl('/user/permission/training-safety'), async ({ request }) => {
+    const authError = requireAuthorization(request);
+
+    if (authError) {
+      return authError;
+    }
+
+    const body = (await request.json()) as UpdateTrainingSafetyPermissionRequest;
+    const user = getCurrentUser();
+
+    if (body.trainingSafety !== true) {
+      return badRequest('trainingSafety must be true.');
+    }
+
+    user.trainingSafety = body.trainingSafety;
+
+    return noContent();
   }),
 
   http.delete(apiUrl('/user'), async ({ request }) => {

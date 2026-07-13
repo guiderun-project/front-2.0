@@ -6,8 +6,12 @@ import { useForm } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { getApiErrorMessage, isNotFoundApiError } from '@/api/core';
+import { userQueryKeys } from '@/api/queryKeys';
 import { api } from '@/api/services';
-import type { MyEventApplyGetResponse } from '@/api/types';
+import type {
+  MyEventApplyGetResponse,
+  UserPermissionGetResponse,
+} from '@/api/types';
 import { useToast } from '@/components';
 import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
@@ -68,6 +72,14 @@ export const useEventApplyPage = () => {
     queryFn: () => getMyFormOrNull(eventId),
     enabled: isValidEventId && isAuthReady && user !== null,
     retry: false,
+  });
+
+  const userPermissionQuery = useQuery({
+    queryKey: user ? userQueryKeys.permission(user.userId) : userQueryKeys.root,
+    queryFn: () => api.user.permissionGet(),
+    enabled: isValidEventId && isAuthReady && user !== null,
+    retry: false,
+    staleTime: Infinity,
   });
 
   const myForm = myFormQuery.data ?? null;
@@ -187,8 +199,39 @@ export const useEventApplyPage = () => {
     },
   });
 
+  const trainingSafetyPermissionMutation = useMutation({
+    mutationFn: () =>
+      api.user.trainingSafetyPermissionPatch({ trainingSafety: true }),
+    onSuccess: () => {
+      if (!user) {
+        return;
+      }
+
+      queryClient.setQueryData<UserPermissionGetResponse>(
+        userQueryKeys.permission(user.userId),
+        { trainingSafety: true },
+      );
+    },
+    onError: (error) => {
+      window.alert(
+        getApiErrorMessage(
+          error,
+          '훈련 참여 및 안전 면책 동의를 저장하지 못했어요.',
+        ),
+      );
+    },
+  });
+
   const handleBack = () => {
     navigateBackToDetail();
+  };
+
+  const handleTrainingSafetyAgreement = () => {
+    if (trainingSafetyPermissionMutation.isPending) {
+      return;
+    }
+
+    trainingSafetyPermissionMutation.mutate();
   };
 
   const handleSubmit = (values: EventApplyFormValues) => {
@@ -226,12 +269,17 @@ export const useEventApplyPage = () => {
 
   const isMyFormReady =
     myFormQuery.data !== undefined || myFormQuery.isError || !user;
+  const isUserPermissionReady =
+    userPermissionQuery.data !== undefined ||
+    userPermissionQuery.isError ||
+    !user;
 
   return {
     event,
     eventId,
     form,
     handleBack,
+    handleTrainingSafetyAgreement,
     handleViewEvent,
     handleSubmit,
     isAuthReady,
@@ -240,9 +288,15 @@ export const useEventApplyPage = () => {
     ineligibleMessage,
     isMyFormError: myFormQuery.isError,
     isMyFormReady,
+    isUserPermissionError: userPermissionQuery.isError,
+    isUserPermissionReady,
     isSubmitting:
       isSubmitLocked || createMutation.isPending || updateMutation.isPending,
+    isTrainingSafetyAgreementPending:
+      trainingSafetyPermissionMutation.isPending,
     isValidEventId,
+    needsTrainingSafetyAgreement:
+      user !== null && userPermissionQuery.data?.trainingSafety === false,
     user,
   };
 };

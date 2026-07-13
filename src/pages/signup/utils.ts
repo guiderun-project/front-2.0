@@ -34,6 +34,7 @@ export const toSignupRequest = (
     snsId: emptyToNull(values.snsId),
     privacy: true,
     portraitRights: true,
+    trainingSafety: true,
   };
 
   const hopePrefs = emptyToNull(values.hopePrefs);

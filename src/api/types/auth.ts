@@ -51,6 +51,7 @@ export type SignupCommonInfo = {
   snsId: string | null;
   privacy: true;
   portraitRights: true;
+  trainingSafety: true;
 };
 
 export type ViSignupInfo = {
