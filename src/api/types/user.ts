@@ -104,6 +104,10 @@ export type CheckAccountDuplicatedResponse = {
   isUnique: boolean;
 };
 
+export type UpdateTrainingSafetyPermissionRequest = {
+  trainingSafety: true;
+};
+
 export type UserWithdrawalDeleteRequest = {
   reasons: string[];
 };

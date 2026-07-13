@@ -40,6 +40,7 @@ export type MockUser = {
   detailRecord: string | null;
   hopePrefs: string | null;
   firstParticipation: boolean;
+  trainingSafety?: boolean;
 };
 
 export type MockEvent = {

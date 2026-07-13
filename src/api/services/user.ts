@@ -14,6 +14,7 @@ import type {
   UpdatePersonalInfoResponse,
   UpdateRunningInfoRequest,
   UpdateRunningInfoResponse,
+  UpdateTrainingSafetyPermissionRequest,
   UserBirthDatePatchRequest,
   UserBirthDatePatchResponse,
   UserInfoGetResponse,
@@ -123,6 +124,22 @@ class UserApi {
     return handleApiRequest(async () => {
       const response = await privateApi.post<CheckAccountDuplicatedResponse>(
         '/user/account/duplicated',
+        body,
+      );
+
+      return response.data;
+    });
+  };
+
+  /**
+   * 로그인된 사용자의 훈련 참여 및 안전 면책 동의 권한을 저장한다.
+   */
+  trainingSafetyPermissionPatch = async (
+    body: UpdateTrainingSafetyPermissionRequest,
+  ) => {
+    return handleApiRequest(async () => {
+      const response = await privateApi.patch<void>(
+        '/user/permission/training-safety',
         body,
       );
 

@@ -56,7 +56,7 @@ export const TERMS_SECTIONS: TermsSection[] = [
     ],
   },
   {
-    key: "safety",
+    key: "trainingSafety",
     title: "훈련 참여 및 안전 면책 동의서",
     required: true,
     body: [

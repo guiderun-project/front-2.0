@@ -143,8 +143,14 @@ export const authHandlers: HttpHandler[] = [
   http.post(apiUrl('/signup'), async ({ request }) => {
     const body = (await request.json()) as SignupPostRequest;
 
-    if (!body.common.privacy || !body.common.portraitRights) {
-      return badRequest('privacy and portraitRights must be true.');
+    if (
+      !body.common.privacy ||
+      !body.common.portraitRights ||
+      !body.common.trainingSafety
+    ) {
+      return badRequest(
+        'privacy, portraitRights and trainingSafety must be true.',
+      );
     }
 
     const nextUserId = `user-${body.disabilityType.toLowerCase()}-${mockDb.users.length + 1}`;
@@ -167,6 +173,7 @@ export const authHandlers: HttpHandler[] = [
       detailRecord: runningInfo.detailRecord,
       hopePrefs: runningInfo.hopePrefs,
       firstParticipation: true,
+      trainingSafety: body.common.trainingSafety,
     });
 
     activateMockRefreshSession();

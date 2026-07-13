@@ -209,7 +209,10 @@ export const SignupPage = (): ReactElement => {
     (step === 'runnerType' && selectedRunnerType === null) ||
     (step === 'gender' && selectedGender === null) ||
     (step === 'experience' && selectedHasExperience === null) ||
-    (isTermsStep && (!agreements.privacy || !agreements.portraitRights));
+    (isTermsStep &&
+      (!agreements.privacy ||
+        !agreements.portraitRights ||
+        !agreements.trainingSafety));
 
   return (
     <PageLayout background="bg.default">

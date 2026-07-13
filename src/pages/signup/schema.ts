@@ -47,7 +47,7 @@ export const signupSchema = z
     agreements: z.object({
       privacy: z.boolean(),
       portraitRights: z.boolean(),
-      safety: z.boolean(),
+      trainingSafety: z.boolean(),
     }),
   })
   .superRefine((values, ctx) => {
@@ -124,11 +124,11 @@ export const signupSchema = z
       });
     }
 
-    if (!values.agreements.safety) {
+    if (!values.agreements.trainingSafety) {
       ctx.addIssue({
         code: "custom",
         message: "훈련 참여 및 안전 면책에 동의해주세요.",
-        path: ["agreements", "safety"],
+        path: ["agreements", "trainingSafety"],
       });
     }
   });

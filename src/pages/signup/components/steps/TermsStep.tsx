@@ -20,7 +20,7 @@ const SECTION_CONFIG: Record<
     field:
       | typeof SIGNUP_FIELD.AGREEMENTS_PRIVACY
       | typeof SIGNUP_FIELD.AGREEMENTS_PORTRAIT_RIGHTS
-      | typeof SIGNUP_FIELD.AGREEMENTS_SAFETY;
+      | typeof SIGNUP_FIELD.AGREEMENTS_TRAINING_SAFETY;
     agreementKey: keyof SignupFormValues["agreements"];
   }
 > = {
@@ -29,7 +29,10 @@ const SECTION_CONFIG: Record<
     field: SIGNUP_FIELD.AGREEMENTS_PORTRAIT_RIGHTS,
     agreementKey: "portraitRights",
   },
-  safety: { field: SIGNUP_FIELD.AGREEMENTS_SAFETY, agreementKey: "safety" },
+  trainingSafety: {
+    field: SIGNUP_FIELD.AGREEMENTS_TRAINING_SAFETY,
+    agreementKey: "trainingSafety",
+  },
 };
 
 export const TermsStep = (): ReactElement => {
@@ -40,14 +43,16 @@ export const TermsStep = (): ReactElement => {
   } = useFormContext<SignupFormValues>();
   const agreements = watch(SIGNUP_FIELD.AGREEMENTS);
   const allChecked =
-    agreements.privacy && agreements.portraitRights && agreements.safety;
+    agreements.privacy &&
+    agreements.portraitRights &&
+    agreements.trainingSafety;
 
   // 체크 시 검증 에러를 즉시 해제하기 위해 shouldValidate 로 재검증한다.
   const setAgreement = (
     name:
       | typeof SIGNUP_FIELD.AGREEMENTS_PRIVACY
       | typeof SIGNUP_FIELD.AGREEMENTS_PORTRAIT_RIGHTS
-      | typeof SIGNUP_FIELD.AGREEMENTS_SAFETY,
+      | typeof SIGNUP_FIELD.AGREEMENTS_TRAINING_SAFETY,
     checked: boolean,
   ) => setValue(name, checked, { shouldValidate: true });
 
@@ -55,7 +60,7 @@ export const TermsStep = (): ReactElement => {
     const next = !allChecked;
     setValue(
       SIGNUP_FIELD.AGREEMENTS,
-      { privacy: next, portraitRights: next, safety: next },
+      { privacy: next, portraitRights: next, trainingSafety: next },
       { shouldValidate: true },
     );
   };
@@ -106,11 +111,11 @@ export const TermsStep = (): ReactElement => {
 
       {errors.agreements?.privacy?.message ||
       errors.agreements?.portraitRights?.message ||
-      errors.agreements?.safety?.message ? (
+      errors.agreements?.trainingSafety?.message ? (
         <Text color="text.danger" font="detail-m-r" role="alert">
           {errors.agreements?.privacy?.message ??
             errors.agreements?.portraitRights?.message ??
-            errors.agreements?.safety?.message}
+            errors.agreements?.trainingSafety?.message}
         </Text>
       ) : null}
     </StepLayout>
