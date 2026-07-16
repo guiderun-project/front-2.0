@@ -54,11 +54,7 @@ export const useEventDetailCtaActionProps = ({
       ]);
     },
     onError: (error) => {
-      showToast({
-        type: 'error',
-        icon: 'alert-circle-filled',
-        content: getApiErrorMessage(error, '신청 취소에 실패했어요.'),
-      });
+      window.alert(getApiErrorMessage(error, '신청 취소에 실패했어요.'));
     },
   });
 
