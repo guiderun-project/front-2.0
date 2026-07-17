@@ -953,6 +953,22 @@ const INPUT_CODE_EXAMPLES = [
 />`,
   },
   {
+    label: "Requirement",
+    code: `// requirement 를 주면 스크린리더가 라벨보다 '필수'/'선택'을 먼저 읽고,
+// required 일 때만 라벨 오른쪽에 빨간 점이 붙는다.
+<Input
+  label="필수 입력 항목"
+  placeholder="필수 항목이에요"
+  requirement="required"
+/>
+
+<Input
+  label="선택 입력 항목"
+  placeholder="선택 항목이에요"
+  requirement="optional"
+/>`,
+  },
+  {
     label: "Error prop",
     code: `<Input
   error
@@ -2131,6 +2147,16 @@ export const DesignPage = () => {
           </Text>
         </SectionTitle>
         <FieldList>
+          <Input
+            label="필수 입력 항목"
+            placeholder="필수 항목이에요"
+            requirement="required"
+          />
+          <Input
+            label="선택 입력 항목"
+            placeholder="선택 항목이에요"
+            requirement="optional"
+          />
           <Input
             clearable
             helperText="안내 메시지"

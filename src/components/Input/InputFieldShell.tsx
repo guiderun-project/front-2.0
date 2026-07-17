@@ -13,6 +13,8 @@ import styled from "@emotion/styled";
 import { HiddenText } from "@/components/HiddenText";
 import { IconButton } from "@/components/Icon";
 
+import { FieldLabelContent } from "./FieldLabelContent";
+
 import {
   CARET_BAR_HEIGHT,
   CARET_BAR_WIDTH,
@@ -99,6 +101,7 @@ export const InputFieldShell = <
   errorText,
   error = false,
   maxLength,
+  requirement,
   placeholder,
   value,
   defaultValue,
@@ -178,7 +181,9 @@ export const InputFieldShell = <
         data-multiline={multiline || undefined}
       >
         <Field>
-          <FloatingLabel htmlFor={controlId}>{label}</FloatingLabel>
+          <FloatingLabel htmlFor={controlId}>
+            <FieldLabelContent label={label} requirement={requirement} />
+          </FloatingLabel>
           <Caret aria-hidden="true" data-caret="" />
           {renderControl({
             id: controlId,

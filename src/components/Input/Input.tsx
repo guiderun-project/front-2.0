@@ -19,6 +19,7 @@ export const Input = ({
   className,
   describedById,
   controlRef,
+  requirement,
   placeholder,
   value,
   defaultValue,
@@ -41,6 +42,7 @@ export const Input = ({
       onChange={onChange}
       onClear={onClear}
       placeholder={placeholder}
+      requirement={requirement}
       trailing={trailing}
       value={value}
       renderControl={(control) => (
