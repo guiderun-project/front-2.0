@@ -12,7 +12,6 @@ const REQUIREMENT_TEXT: Record<InputRequirement, string> = {
 };
 
 const REQUIRED_DOT_SIZE = 3;
-const REQUIRED_DOT_GAP = 2;
 
 type FieldLabelContentProps = {
   label: string;
@@ -40,7 +39,7 @@ const RequiredDot = styled.span(({ theme }) => ({
   display: "inline-block",
   width: theme.pxToRem(REQUIRED_DOT_SIZE),
   height: theme.pxToRem(REQUIRED_DOT_SIZE),
-  marginLeft: theme.pxToRem(REQUIRED_DOT_GAP),
+  marginLeft: theme.spacing.xs,
   borderRadius: theme.radius.full,
   // 점 전용 bg 토큰이 없어 시맨틱 danger 색을 사용한다. (라이트/다크 모두 대응)
   backgroundColor: theme.color.text.danger,
