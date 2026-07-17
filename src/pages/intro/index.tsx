@@ -137,7 +137,7 @@ const GuideRunInfoButton = styled.button`
   border: ${({ theme }) => theme.pxToRem(1.4)} solid
     ${({ theme }) => theme.color.border.strong};
   border-radius: ${({ theme }) => theme.radius.full};
-  background-color: transparent;
+  background-color: ${({ theme }) => theme.color.bg.subtle};
   cursor: pointer;
   appearance: none;
 
