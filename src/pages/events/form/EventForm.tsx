@@ -16,7 +16,7 @@ import {
 } from "@/components";
 
 import { AdditionalQuestionEditor } from "./components/AdditionalQuestionEditor";
-import { MaskedDateInput } from "./components/MaskedDateInput";
+import { DateInput } from "./components/DateInput";
 import { MaskedTimeInput } from "./components/MaskedTimeInput";
 import { RunningDistanceInput } from "./components/RunningDistanceInput";
 import {
@@ -185,7 +185,7 @@ export const EventForm = ({
                 control={form.control}
                 name="date"
                 render={({ field, fieldState }) => (
-                  <MaskedDateInput
+                  <DateInput
                     controlRef={field.ref}
                     errorText={fieldState.error?.message}
                     label="모임 일시"
@@ -271,7 +271,7 @@ export const EventForm = ({
                 control={form.control}
                 name="recruitStartDate"
                 render={({ field, fieldState }) => (
-                  <MaskedDateInput
+                  <DateInput
                     controlRef={field.ref}
                     errorText={fieldState.error?.message}
                     label="모집 시작일"
@@ -285,7 +285,7 @@ export const EventForm = ({
                 control={form.control}
                 name="recruitEndDate"
                 render={({ field, fieldState }) => (
-                  <MaskedDateInput
+                  <DateInput
                     controlRef={field.ref}
                     errorText={fieldState.error?.message}
                     label="모집 마감일"
