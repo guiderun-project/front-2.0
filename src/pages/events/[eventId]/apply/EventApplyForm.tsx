@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react';
+import type { KeyboardEvent, ReactElement } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
 import styled from '@emotion/styled';
@@ -110,6 +110,20 @@ export const EventApplyForm = ({
     }));
   };
 
+  // 단일 라인 입력에서 Enter 로 폼이 암묵적으로 제출되는 것을 막는다.
+  // IME 조합 중에는 무시하고, textarea 줄바꿈과 버튼 동작은 그대로 둔다.
+  const handleFormKeyDown = (event: KeyboardEvent<HTMLFormElement>) => {
+    if (
+      event.key !== 'Enter' ||
+      event.nativeEvent.isComposing ||
+      !(event.target instanceof HTMLInputElement)
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+  };
+
   return (
     <PageLayout background="bg.subtle">
       <FormPageLayout
@@ -138,6 +152,7 @@ export const EventApplyForm = ({
       >
         <Form
           noValidate
+          onKeyDown={handleFormKeyDown}
           onSubmit={form.handleSubmit(onSubmit, handleInvalidSubmit)}
         >
           <FormSection>

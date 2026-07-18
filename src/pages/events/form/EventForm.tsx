@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import type { KeyboardEvent, ReactElement } from "react";
 
 import styled from "@emotion/styled";
 import { Controller, type UseFormReturn } from "react-hook-form";
@@ -68,6 +68,20 @@ export const EventForm = ({
       }
     : undefined;
 
+  // 단일 라인 입력에서 Enter 로 폼이 암묵적으로 제출되는 것을 막는다.
+  // IME 조합 중에는 무시하고, textarea 줄바꿈과 버튼 동작은 그대로 둔다.
+  const handleFormKeyDown = (event: KeyboardEvent<HTMLFormElement>) => {
+    if (
+      event.key !== "Enter" ||
+      event.nativeEvent.isComposing ||
+      !(event.target instanceof HTMLInputElement)
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+  };
+
   return (
     <>
       <FormPageLayout
@@ -80,7 +94,11 @@ export const EventForm = ({
           },
         }}
       >
-        <Form noValidate onSubmit={form.handleSubmit(onSubmit)}>
+        <Form
+          noValidate
+          onKeyDown={handleFormKeyDown}
+          onSubmit={form.handleSubmit(onSubmit)}
+        >
           <FormSection>
             <SectionHeader>
               <Text as="h2" color="text.secondary" font="body-m-sb">
