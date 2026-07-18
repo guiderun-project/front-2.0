@@ -7,6 +7,7 @@ import type { EventType } from "@/api/types";
 import {
   CheckBox,
   ConfirmPopup,
+  DateInput,
   FooterButton,
   FormPageLayout,
   Input,
@@ -16,7 +17,6 @@ import {
 } from "@/components";
 
 import { AdditionalQuestionEditor } from "./components/AdditionalQuestionEditor";
-import { DateInput } from "./components/DateInput";
 import { MaskedTimeInput } from "./components/MaskedTimeInput";
 import { RunningDistanceInput } from "./components/RunningDistanceInput";
 import {

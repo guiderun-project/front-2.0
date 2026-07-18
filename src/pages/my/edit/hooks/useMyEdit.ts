@@ -8,12 +8,9 @@ import { useAuth } from '@/contexts';
 import { useMyPage } from '@/pages/my/hooks/useMyPage';
 import { myQueryKeys } from '@/pages/my/queryKeys';
 import {
-  BIRTH_DATE_MAX_LENGTH,
-  formatBirthDateInput,
-  formatISODateToBirthDateInput,
+  isValidBirthDateISO,
   isValidKoreanPhone,
   normalizePhoneDigits,
-  toBirthDateISO,
 } from '@/utils';
 
 type MyEditFormValues = {
@@ -34,9 +31,7 @@ export const useMyEdit = () => {
 
   const initialValues = useMemo<MyEditFormValues>(
     () => ({
-      birthDate: personalInfo.birthDate
-        ? formatISODateToBirthDateInput(personalInfo.birthDate)
-        : '',
+      birthDate: personalInfo.birthDate ?? '',
       phoneNumber: normalizePhoneDigits(personalInfo.phoneNumber ?? ''),
       snsId: personalInfo.snsId ?? '',
       id1365: personalInfo.id1365 ?? '',
@@ -53,9 +48,10 @@ export const useMyEdit = () => {
     setValues((prev) => ({ ...prev, [key]: value }));
   };
 
-  const birthDateISO = toBirthDateISO(values.birthDate);
-  const hasBirthDateError =
-    values.birthDate.length === BIRTH_DATE_MAX_LENGTH && birthDateISO === null;
+  const birthDateISO = isValidBirthDateISO(values.birthDate)
+    ? values.birthDate
+    : null;
+  const hasBirthDateError = values.birthDate.length > 0 && birthDateISO === null;
   const hasPhoneError =
     values.phoneNumber.length > 0 && !isValidKoreanPhone(values.phoneNumber);
 
@@ -121,8 +117,7 @@ export const useMyEdit = () => {
   return {
     values,
     accountId: personalInfo.accountId,
-    setBirthDate: (value: string) =>
-      setField('birthDate', formatBirthDateInput(value)),
+    setBirthDate: (value: string) => setField('birthDate', value),
     setPhoneNumber: (value: string) =>
       setField('phoneNumber', normalizePhoneDigits(value)),
     setSnsId: (value: string) => setField('snsId', value),
