@@ -8,5 +8,5 @@ export const fontWeight = {
   medium: 500,
   semibold: 600,
   bold: 700,
-  promise: 400,
+  promise: 500,
 } as const;

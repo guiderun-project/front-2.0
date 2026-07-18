@@ -12,7 +12,7 @@ type ActionTone = 'teal' | 'cyan';
 export const HomeQuickActions = (): ReactElement => {
   return (
     <Section>
-      <ActionLink $tone="teal" to={APP_PATH.MY_EVENTS}>
+      <ActionLink $tone="cyan" to={APP_PATH.MY_EVENTS}>
         <ActionLabel>
           <Text color="text.primary" font="body-l-sb">
             나의 활동 보기
@@ -23,7 +23,7 @@ export const HomeQuickActions = (): ReactElement => {
         </ActionLabel>
       </ActionLink>
 
-      <ActionLink $tone="cyan" to={APP_PATH.EVENT_NEW}>
+      <ActionLink $tone="teal" to={APP_PATH.EVENT_NEW}>
         <ActionLabel>
           <Text color="text.primary" font="body-l-sb">
             모임 만들기
@@ -44,11 +44,8 @@ const Section = styled.section(({ theme }) => ({
   width: '100%',
 }));
 
-// soft 틴트 배경은 대응 시맨틱 토큰이 없어 프리미티브를 직접 사용한다.
 const toneBackground = (theme: Theme, tone: ActionTone) =>
-  tone === 'teal'
-    ? theme.colorPrimitive.accent.teal.a16
-    : theme.colorPrimitive.cyan['400-a12'];
+  tone === 'teal' ? theme.color.bg.accent1 : theme.color.bg.accent2;
 
 const ActionLink = styled(Link, {
   shouldForwardProp: (propName) => propName !== '$tone',

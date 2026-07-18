@@ -158,6 +158,13 @@ export const typography = {
     lineHeight: 1.32,
     letterSpacing: '-0.022em',
   },
+  'detail-s-m': {
+    fontFamily: fontFamily.base,
+    fontWeight: fontWeight.medium,
+    fontSize: '0.75rem',
+    lineHeight: 1.32,
+    letterSpacing: '-0.022em',
+  },
   'detail-s-r': {
     fontFamily: fontFamily.base,
     fontWeight: fontWeight.regular,
