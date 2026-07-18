@@ -10,6 +10,7 @@ import {
   LABEL_TYPOGRAPHY,
   typographyStyle,
 } from "./fieldStyles";
+import { FieldLabelContent } from "./FieldLabelContent";
 import type { TimeInputProps, TimeValue } from "./Input.types";
 
 type SegmentKey = "hours" | "minutes" | "seconds";
@@ -42,6 +43,7 @@ export const TimeInput = ({
   defaultValue,
   onChange,
   className,
+  requirement,
 }: TimeInputProps): ReactElement => {
   const reactId = useId();
   const labelId = `${reactId}-label`;
@@ -141,7 +143,7 @@ export const TimeInput = ({
         onPointerDown={handleBoxPointerDown}
       >
         <FloatingLabel data-floating-label="" id={labelId}>
-          {label}
+          <FieldLabelContent label={label} requirement={requirement} />
         </FloatingLabel>
         <SegmentRow
           aria-describedby={hasMessage ? messageId : undefined}

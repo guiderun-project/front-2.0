@@ -19,6 +19,7 @@ export const Textarea = ({
   maxLength,
   className,
   controlRef,
+  requirement,
   placeholder,
   value,
   defaultValue,
@@ -48,6 +49,7 @@ export const Textarea = ({
         onChange?.(event);
       }}
       placeholder={placeholder}
+      requirement={requirement}
       value={value}
       renderControl={({ ref, ...control }) => (
         <StyledTextarea

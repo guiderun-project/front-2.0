@@ -67,12 +67,12 @@ export const IntroPage = (): ReactElement => {
 
         <GuideRunInfoSection>
           <GuideRunInfoButton type="button" onClick={handleGuideRunInfoClick}>
-            <Text align="center" color="text.tertiary" font="body-s-sb">
+            <Text align="center" color="text.primary" font="body-s-sb">
               가이드런 알아보기
             </Text>
             <Icon
               aria-hidden={true}
-              color="text.tertiary"
+              color="text.primary"
               icon="external-link-lined"
               size={16}
             />
@@ -134,9 +134,10 @@ const GuideRunInfoButton = styled.button`
   justify-content: center;
   gap: ${({ theme }) => theme.spacing.md};
   padding: ${({ theme }) => `${theme.spacing.xl} ${theme.spacing['3xl']}`};
-  border: 1px solid ${({ theme }) => theme.color.border.default};
+  border: ${({ theme }) => theme.pxToRem(1.4)} solid
+    ${({ theme }) => theme.color.border.strong};
   border-radius: ${({ theme }) => theme.radius.full};
-  background-color: transparent;
+  background-color: ${({ theme }) => theme.color.bg.subtle};
   cursor: pointer;
   appearance: none;
 
