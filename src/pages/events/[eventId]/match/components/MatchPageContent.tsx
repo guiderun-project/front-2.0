@@ -1,18 +1,18 @@
-import type { ReactElement } from 'react';
+import type { ReactElement } from "react";
 
-import styled from '@emotion/styled';
+import styled from "@emotion/styled";
 
-import { Text } from '@/components';
+import { Text } from "@/components";
 
-import type { EventGroupLabelContext } from '../../utils';
-import type { MatchMessageState } from '../matchPageState';
-import type { EventMatchPageModel } from '../useEventMatchPage';
-import { useMatchScrollSpy } from '../useMatchScrollSpy';
-import { MatchCompletedPanel } from './MatchCompletedPanel';
-import { MatchSegmentNav } from './MatchSegmentNav';
-import { MatchSelectionBar } from './MatchSelectionBar';
-import { PanelState } from './MatchStates';
-import { MatchWaitingPanel } from './MatchWaitingPanel';
+import type { EventGroupLabelContext } from "../../utils";
+import type { MatchMessageState } from "../matchPageState";
+import type { EventMatchPageModel } from "../useEventMatchPage";
+import { useMatchScrollSpy } from "../useMatchScrollSpy";
+import { MatchCompletedPanel } from "./MatchCompletedPanel";
+import { MatchSegmentNav } from "./MatchSegmentNav";
+import { MatchSelectionBar } from "./MatchSelectionBar";
+import { PanelState } from "./MatchStates";
+import { MatchWaitingPanel } from "./MatchWaitingPanel";
 
 type MatchMessageContentProps = {
   pageState: MatchMessageState;
@@ -63,7 +63,7 @@ export const MatchPageContent = ({
 
       <Section ref={waitingRef}>
         <SectionHeader>
-          <Text as="h2" color="text.primary" font="body-l-sb">
+          <Text as="h2" color="text.tertiary" font="body-m-m">
             매칭대기
           </Text>
           <SectionCount color="text.tertiary" font="body-m-m">
@@ -82,7 +82,7 @@ export const MatchPageContent = ({
 
       <Section ref={completedRef}>
         <SectionHeader>
-          <Text as="h2" color="text.primary" font="body-l-sb">
+          <Text as="h2" color="text.tertiary" font="body-m-m">
             매칭완료
           </Text>
           <SectionCount color="text.tertiary" font="body-m-m">
@@ -111,49 +111,49 @@ export const MatchPageContent = ({
 };
 
 const Content = styled.div(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  minHeight: '100%',
-  padding: `${theme.spacing['2xl']} ${theme.spacing['2xl']} ${theme.spacing['4xl']}`,
-  boxSizing: 'border-box',
+  display: "flex",
+  flexDirection: "column",
+  minHeight: "100%",
+  padding: `${theme.spacing["2xl"]} ${theme.spacing["2xl"]} ${theme.spacing["4xl"]}`,
+  boxSizing: "border-box",
 }));
 
 const ReadyContent = styled.div<{ $hasSelectionBar: boolean }>(
   ({ $hasSelectionBar, theme }) => ({
-    display: 'flex',
-    flexDirection: 'column',
-    minHeight: '100%',
+    display: "flex",
+    flexDirection: "column",
+    minHeight: "100%",
     paddingBottom: $hasSelectionBar ? theme.pxToRem(176) : theme.spacing.none,
-    boxSizing: 'border-box',
-    transition: 'padding-bottom 180ms ease-out',
+    boxSizing: "border-box",
+    transition: "padding-bottom 180ms ease-out",
 
-    '@media (prefers-reduced-motion: reduce)': {
-      transition: 'none',
+    "@media (prefers-reduced-motion: reduce)": {
+      transition: "none",
     },
   }),
 );
 
 const Section = styled.section(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
+  display: "flex",
+  flexDirection: "column",
   gap: theme.spacing.lg,
-  padding: `${theme.spacing.lg} ${theme.spacing['2xl']} ${theme.spacing['4xl']}`,
-  boxSizing: 'border-box',
+  padding: `${theme.spacing.lg} ${theme.spacing["2xl"]} ${theme.spacing["4xl"]}`,
+  boxSizing: "border-box",
 }));
 
 const SectionHeader = styled.div(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
+  display: "flex",
+  alignItems: "center",
   gap: theme.spacing.md,
   minWidth: 0,
 }));
 
 const SectionCount = styled(Text)({
-  display: 'inline-block',
+  display: "inline-block",
 });
 
 const SectionDivider = styled.div(({ theme }) => ({
-  width: '100%',
+  width: "100%",
   height: theme.spacing.lg,
   backgroundColor: theme.color.border.subtle,
 }));
