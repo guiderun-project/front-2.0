@@ -16,6 +16,7 @@ import {
   getMatchingSummary,
   isMatched,
   mockDb,
+  toMatchingPartner,
   toMatchingUser,
   visibleRunningGroups,
 } from '@/mocks/fixtures';
@@ -39,6 +40,12 @@ const getMatchingUser = (eventId: number, userId: string) => {
   const form = findAppliedForm(eventId, userId);
 
   return form ? toMatchingUser(form) : null;
+};
+
+const getMatchingPartner = (eventId: number, userId: string) => {
+  const form = findAppliedForm(eventId, userId);
+
+  return form ? toMatchingPartner(form) : null;
 };
 
 const isMatchingUser = (user: MatchingUser | null): user is MatchingUser => {
@@ -177,7 +184,7 @@ export const matchingHandlers: HttpHandler[] = [
             ...currentMatching.guideIds,
           ]
             .filter((userId) => userId !== currentUser.userId)
-            .map((userId) => getMatchingUser(eventId, userId))
+            .map((userId) => getMatchingPartner(eventId, userId))
             .filter((user) => Boolean(user))
         : [];
 

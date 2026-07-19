@@ -16,7 +16,7 @@ export const UpcomingEventList = (): ReactElement => {
   return (
     <Section aria-labelledby={headingId}>
       <Text id={headingId} as="h2" color="text.primary" font="heading-s-sb">
-        다가오는 러닝 모임
+        {data.viewerType === "MEMBER" ? "다가오는 러닝 모임" : "나의 러닝 일정"}
       </Text>
 
       {data.viewerType === "MEMBER" ? (

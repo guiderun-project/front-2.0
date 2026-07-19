@@ -3,8 +3,8 @@ import { useId, useState, type ReactElement } from "react";
 import styled from "@emotion/styled";
 
 import { getApiErrorMessage } from "@/api/core";
-import type { MatchingUser, RunningGroup } from "@/api/types";
-import { Badge, HiddenText, Icon, Text } from "@/components";
+import type { MatchingPartner, MatchingUser, RunningGroup } from "@/api/types";
+import { HiddenText, Icon, Text } from "@/components";
 import { RUNNER_TYPE_LABELS } from "@/constants";
 import type { AppTheme } from "@/styles/theme";
 
@@ -62,12 +62,13 @@ export const MatchingPanel = ({
         ) : null}
 
         <GroupList>
-          {data.groups.map((group) => (
+          {data.groups.map((group, index) => (
             <MatchingGroupCard
               key={group.runningGroup}
               eventCategory={eventCategory}
               eventType={eventType}
               group={group}
+              hasDivider={index < data.groups.length - 1}
             />
           ))}
         </GroupList>
@@ -83,12 +84,14 @@ type MatchingGroupCardProps = {
   eventCategory: EventGroupLabelContext["eventCategory"];
   eventType: EventGroupLabelContext["eventType"];
   group: MatchingStatusViewModel["groups"][number];
+  hasDivider: boolean;
 };
 
 const MatchingGroupCard = ({
   eventCategory,
   eventType,
   group,
+  hasDivider,
 }: MatchingGroupCardProps): ReactElement => {
   const groupLabel = getEventGroupDisplayLabel(
     { eventCategory, eventType },
@@ -96,15 +99,15 @@ const MatchingGroupCard = ({
   );
 
   return (
-    <GroupCard>
+    <GroupCard $hasDivider={hasDivider}>
       <GroupHeading>
         <GroupHeadingText role="text">
-          <Text as="span" color="text.primary" font="heading-s-sb">
+          <Text as="span" color="text.primary" font="body-m-sb">
             {groupLabel}
-          </Text>{" "}
-          <GroupCountText color="text.tertiary" font="body-m-m">
+          </Text>
+          <Text as="span" color="text.tertiary" font="body-m-m">
             {group.totalCount}명
-          </GroupCountText>
+          </Text>
         </GroupHeadingText>
       </GroupHeading>
       <MatchingRows aria-label={`${groupLabel} 매칭 결과`} role="list">
@@ -117,7 +120,7 @@ const MatchingGroupCard = ({
 };
 
 type MyPartnerSummaryProps = {
-  partners: MatchingUser[];
+  partners: MatchingPartner[];
 };
 
 const MyPartnerSummary = ({
@@ -126,7 +129,7 @@ const MyPartnerSummary = ({
   return (
     <MyPartnerCard>
       <HiddenText>{getMyPartnerSummaryDescription(partners)}</HiddenText>
-      <Text aria-hidden={true} color="text.tertiary" font="body-m-m">
+      <Text aria-hidden={true} color="text.primary" font="body-m-sb">
         내 파트너
       </Text>
       {partners.length > 0 ? (
@@ -134,25 +137,31 @@ const MyPartnerSummary = ({
           {partners.map((partner) => (
             <PartnerItem key={partner.userId}>
               <ProfileAvatar name={partner.name} type={partner.type} />
+              <Text color="text.tertiary" font="detail-m-m">
+                기존 {partner.defaultGroup}그룹
+              </Text>
             </PartnerItem>
           ))}
         </PartnerList>
       ) : (
-        <Badge aria-hidden={true} size="s" tone="gray">
-          대기중
-        </Badge>
+        <Text aria-hidden={true} color="text.tertiary" font="detail-m-m">
+          아직 파트너 매칭 전이에요
+        </Text>
       )}
     </MyPartnerCard>
   );
 };
 
-const getMyPartnerSummaryDescription = (partners: MatchingUser[]) => {
+const getMyPartnerSummaryDescription = (partners: MatchingPartner[]) => {
   if (partners.length === 0) {
-    return "내 파트너 대기중";
+    return "내 파트너 아직 파트너 매칭 전이에요";
   }
 
   return `내 파트너 ${partners
-    .map((partner) => `${RUNNER_TYPE_LABELS[partner.type]} ${partner.name}`)
+    .map(
+      (partner) =>
+        `${RUNNER_TYPE_LABELS[partner.type]} ${partner.name} 기존 ${partner.defaultGroup}그룹`,
+    )
     .join(", ")}`;
 };
 
@@ -236,7 +245,6 @@ const UnmatchedSlot = (): ReactElement => {
   );
 };
 
-// 공용 Accordion 디자인이 확정되면 shared component로 전환할 수 있습니다.
 const MatchingCriteriaAccordion = ({
   defaultOpen = false,
 }: {
@@ -257,7 +265,7 @@ const MatchingCriteriaAccordion = ({
         type="button"
         onClick={handleToggle}
       >
-        <Text color="text.secondary" font="heading-s-sb">
+        <Text color="text.secondary" font="body-l-sb">
           매칭기준
         </Text>
         <ChevronIcon $isOpen={isOpen}>
@@ -294,7 +302,10 @@ const MatchingCriteriaAccordion = ({
                           <CriteriaGroupLetter $group={criterion.group}>
                             {criterion.group}
                           </CriteriaGroupLetter>
-                          <CriteriaValue color="text.secondary" font="detail-m-r">
+                          <CriteriaValue
+                            color="text.secondary"
+                            font="detail-m-r"
+                          >
                             {criterion.value}
                           </CriteriaValue>
                         </CriteriaItemVisual>
@@ -376,11 +387,13 @@ const MATCHING_CRITERIA_COLUMNS = [
   {
     type: "guide",
     title: "가이드러너",
-    items: MATCHING_CRITERIA.map(({ group, guide, guideAccessibilityValue }) => ({
-      accessibilityValue: guideAccessibilityValue,
-      group,
-      value: guide,
-    })),
+    items: MATCHING_CRITERIA.map(
+      ({ group, guide, guideAccessibilityValue }) => ({
+        accessibilityValue: guideAccessibilityValue,
+        group,
+        value: guide,
+      }),
+    ),
   },
 ] as const;
 
@@ -420,30 +433,28 @@ const ResultsSection = styled.div(({ theme }) => ({
 
 const MyPartnerCard = styled.article(({ theme }) => ({
   display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  gap: theme.spacing["3xl"],
+  flexDirection: "column",
+  alignItems: "flex-start",
+  gap: theme.spacing.lg,
   width: "100%",
   minWidth: 0,
-  padding: theme.spacing.xl,
+  padding: `${theme.spacing.xl} ${theme.spacing["2xl"]}`,
   borderRadius: theme.pxToRem(20),
-  backgroundColor: theme.color.bg.elevated,
+  backgroundColor: theme.color.bg.default,
   boxSizing: "border-box",
 }));
 
 const PartnerList = styled.div(({ theme }) => ({
   display: "flex",
-  flexWrap: "wrap",
-  alignItems: "flex-end",
+  flexDirection: "column",
+  alignItems: "flex-start",
   gap: theme.spacing.md,
-  justifyContent: "flex-end",
   minWidth: 0,
 }));
 
 const PartnerItem = styled.div(({ theme }) => ({
   display: "flex",
   alignItems: "center",
-  justifyContent: "flex-end",
   gap: theme.spacing.md,
   minWidth: 0,
 }));
@@ -451,28 +462,31 @@ const PartnerItem = styled.div(({ theme }) => ({
 const GroupList = styled.div(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
-  gap: theme.spacing.lg,
-}));
-
-const GroupCard = styled.article(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
-  gap: theme.spacing.lg,
-  padding: theme.spacing.xl,
+  padding: theme.spacing["2xl"],
+  gap: theme.spacing["3xl"],
   borderRadius: theme.radius.xl,
   backgroundColor: theme.color.bg.elevated,
 }));
 
+const GroupCard = styled.article<{ $hasDivider: boolean }>(
+  ({ $hasDivider, theme }) => ({
+    display: "flex",
+    flexDirection: "column",
+    gap: theme.spacing.lg,
+    paddingBottom: $hasDivider ? theme.spacing["3xl"] : 0,
+    borderBottom: $hasDivider ? `1px solid ${theme.color.border.subtle}` : 0,
+  }),
+);
+
 const GroupHeading = styled.h2({
+  display: "flex",
   margin: 0,
 });
 
-const GroupHeadingText = styled.span({
-  display: "inline",
-});
-
-const GroupCountText = styled(Text)(({ theme }) => ({
-  marginLeft: theme.spacing.md,
+const GroupHeadingText = styled.span(({ theme }) => ({
+  display: "inline-flex",
+  alignItems: "center",
+  gap: theme.spacing.md,
 }));
 
 const MatchingRows = styled.ul(({ theme }) => ({
