@@ -19,7 +19,6 @@ import {
 } from './constants';
 import type { EventFormValues } from './schema';
 
-const DATE_INPUT_MAX_LENGTH = 8;
 const DATE_VALUE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const TIME_INPUT_MAX_LENGTH = 4;
 const TIME_VALUE_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/;
@@ -53,19 +52,6 @@ export const getCurrentTimeValue = (): string => {
   const minutes = String(now.getMinutes()).padStart(2, '0');
 
   return `${hours}:${minutes}`;
-};
-
-export const formatDateInput = (value: string): string => {
-  const digits = value.replace(/\D/g, '').slice(0, DATE_INPUT_MAX_LENGTH);
-  const year = digits.slice(0, 4);
-  const month = digits.slice(4, 6);
-  const date = digits.slice(6, 8);
-
-  return [year, month, date].filter(Boolean).join('-');
-};
-
-export const formatDateDisplay = (value: string): string => {
-  return value.replaceAll('-', '.');
 };
 
 export const isValidDateValue = (value: string): boolean => {

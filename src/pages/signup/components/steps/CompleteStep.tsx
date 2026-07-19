@@ -16,8 +16,12 @@ export const CompleteStep = (): ReactElement => {
       <Body align="center" color="text.tertiary" font="body-m-m">
         {SIGNUP_COPY.complete.body}
       </Body>
-      <Text align="center" color="text.brand" font="body-m-sb">
-        {SIGNUP_COPY.complete.highlight}
+      <Text align="center" color="text.primary" font="body-m-sb">
+        {SIGNUP_COPY.complete.highlight.prefix}
+        <Text color="text.brand" font="body-m-sb">
+          {SIGNUP_COPY.complete.highlight.brand}
+        </Text>
+        {SIGNUP_COPY.complete.highlight.suffix}
       </Text>
     </Wrapper>
   );

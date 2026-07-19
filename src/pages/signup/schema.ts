@@ -1,26 +1,10 @@
 import { z } from "zod";
 
 import { RUNNER_TYPE, isRunningRecordComplete } from "@/constants";
+import { isValidBirthDateISO } from "@/utils";
 
-// "YYYY.MM.DD" (formatBirthDateInput 출력 형식)
-const BIRTH_DATE_PATTERN = /^\d{4}\.\d{2}\.\d{2}$/;
 // 숫자만 있는 휴대폰 번호 (01X + 7~8자리)
 const PHONE_PATTERN = /^01[0-9]\d{7,8}$/;
-
-const isValidBirthDate = (value: string): boolean => {
-  if (!BIRTH_DATE_PATTERN.test(value)) {
-    return false;
-  }
-
-  const [year, month, date] = value.split(".").map(Number);
-  const parsed = new Date(Date.UTC(year, month - 1, date));
-
-  return (
-    parsed.getUTCFullYear() === year &&
-    parsed.getUTCMonth() === month - 1 &&
-    parsed.getUTCDate() === date
-  );
-};
 
 const timeValueSchema = z.object({
   hours: z.string(),
@@ -75,7 +59,7 @@ export const signupSchema = z
       });
     }
 
-    if (!isValidBirthDate(values.birthDate)) {
+    if (!isValidBirthDateISO(values.birthDate)) {
       ctx.addIssue({
         code: "custom",
         message: "올바른 생년월일을 입력해주세요.",

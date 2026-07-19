@@ -13,6 +13,8 @@ import styled from "@emotion/styled";
 import { HiddenText } from "@/components/HiddenText";
 import { IconButton } from "@/components/Icon";
 
+import { FieldLabelContent } from "./FieldLabelContent";
+
 import {
   CARET_BAR_HEIGHT,
   CARET_BAR_WIDTH,
@@ -58,6 +60,12 @@ type InputFieldShellProps<E extends HTMLInputElement | HTMLTextAreaElement> =
     className?: string;
     describedById?: string;
     controlRef?: Ref<E>;
+    /**
+     * 값이 비어 있어도 라벨을 항상 위로 띄운다.
+     * input[type=date]처럼 브라우저가 자체 플레이스홀더(mm/dd/yyyy)를 항상 그리는
+     * 컨트롤에서 라벨과 겹치는 것을 막는 용도다.
+     */
+    alwaysFloatLabel?: boolean;
     renderControl: (control: InputControlRenderProps<E>) => ReactNode;
   };
 
@@ -99,6 +107,8 @@ export const InputFieldShell = <
   errorText,
   error = false,
   maxLength,
+  requirement,
+  alwaysFloatLabel = false,
   placeholder,
   value,
   defaultValue,
@@ -174,11 +184,13 @@ export const InputFieldShell = <
   return (
     <Root className={className} data-error={hasError || undefined}>
       <FieldBox
-        data-filled={hasValue || undefined}
+        data-filled={hasValue || alwaysFloatLabel || undefined}
         data-multiline={multiline || undefined}
       >
         <Field>
-          <FloatingLabel htmlFor={controlId}>{label}</FloatingLabel>
+          <FloatingLabel htmlFor={controlId}>
+            <FieldLabelContent label={label} requirement={requirement} />
+          </FloatingLabel>
           <Caret aria-hidden="true" data-caret="" />
           {renderControl({
             id: controlId,

@@ -7,16 +7,18 @@ type ButtonSizeStyle = {
   height: number;
   minWidth?: number;
   paddingX: 'md' | 'xl';
-  gap: 'sm';
+  gap: 's' | 'sm';
   radius: 'sm' | 'md';
-  typography: TypographyToken;
 };
+
+// 사이즈 무관 default 두께에, 사이즈별로 다른 값만 덮어쓴다
+type ButtonBorderWidth = { default: number } & Partial<Record<ButtonSize, number>>;
 
 type ButtonColorTokens = {
   background?: ColorToken;
   border?: {
     color: ColorToken;
-    width: number;
+    width: ButtonBorderWidth;
   };
   content: ColorToken;
 };
@@ -28,27 +30,34 @@ export const BUTTON_SIZE_STYLES = {
     paddingX: 'xl',
     gap: 'sm',
     radius: 'md',
-    typography: 'body-l-b',
   },
   m: {
     width: 84,
     height: 42,
     paddingX: 'xl',
-    gap: 'sm',
+    gap: 's',
     radius: 'md',
-    typography: 'body-m-sb',
   },
   s: {
     height: 32,
     minWidth: 56,
     paddingX: 'md',
-    gap: 'sm',
+    gap: 's',
     radius: 'sm',
-    typography: 'body-s-sb',
   },
 } as const satisfies Record<ButtonSize, ButtonSizeStyle>;
 
 export const BUTTON_ICON_SIZE = 14;
+
+// 사이즈 기준 기본 타이포. size=l 은 primary 만 Bold(body-l-b) 로 예외 처리
+export const BUTTON_TYPOGRAPHY: Record<ButtonSize, TypographyToken> = {
+  l: 'body-l-sb',
+  m: 'body-m-sb',
+  s: 'detail-m-sb',
+};
+
+export const resolveButtonBorderWidth = (width: ButtonBorderWidth, size: ButtonSize): number =>
+  width[size] ?? width.default;
 
 export const BUTTON_COLOR_TOKENS: Record<ButtonLevel, Record<ButtonStatus, ButtonColorTokens>> = {
   primary: {
@@ -78,7 +87,7 @@ export const BUTTON_COLOR_TOKENS: Record<ButtonLevel, Record<ButtonStatus, Butto
       background: 'bg.brand-soft2',
       border: {
         color: 'text.brand',
-        width: 2,
+        width: { default: 2 },
       },
       content: 'text.brand',
     },
@@ -95,14 +104,14 @@ export const BUTTON_COLOR_TOKENS: Record<ButtonLevel, Record<ButtonStatus, Butto
     default: {
       border: {
         color: 'border.default',
-        width: 1.8,
+        width: { default: 1.4, l: 1.8 },
       },
       content: 'text.secondary',
     },
     selected: {
       border: {
         color: 'text.brand',
-        width: 2,
+        width: { default: 2 },
       },
       content: 'text.brand',
     },
@@ -110,7 +119,7 @@ export const BUTTON_COLOR_TOKENS: Record<ButtonLevel, Record<ButtonStatus, Butto
       background: 'bg.surface',
       border: {
         color: 'border.subtle',
-        width: 2,
+        width: { default: 2 },
       },
       content: 'text.secondary',
     },
@@ -118,7 +127,7 @@ export const BUTTON_COLOR_TOKENS: Record<ButtonLevel, Record<ButtonStatus, Butto
       background: 'bg.subtle',
       border: {
         color: 'border.subtle',
-        width: 1.4,
+        width: { default: 1.4 },
       },
       content: 'text.quaternary',
     },
@@ -126,13 +135,17 @@ export const BUTTON_COLOR_TOKENS: Record<ButtonLevel, Record<ButtonStatus, Butto
   quaternary: {
     default: {
       background: 'bg.overlay',
+      border: {
+        color: 'border.subtle',
+        width: { default: 1.2 },
+      },
       content: 'text.secondary',
     },
     selected: {
       background: 'bg.overlay',
       border: {
         color: 'border.default',
-        width: 2,
+        width: { default: 2, s: 1.4 },
       },
       content: 'text.secondary',
     },
@@ -140,7 +153,7 @@ export const BUTTON_COLOR_TOKENS: Record<ButtonLevel, Record<ButtonStatus, Butto
       background: 'bg.overlay',
       border: {
         color: 'border.default',
-        width: 2,
+        width: { default: 2, s: 1.4 },
       },
       content: 'text.secondary',
     },
