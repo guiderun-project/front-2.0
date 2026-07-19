@@ -20,6 +20,10 @@ export const SIGNUP_COPY = {
   complete: {
     title: '가입을 완료했어요!',
     body: '서로 믿고 달릴 수 있는 환경을 위해\n가입 정보를 확인하고 있어요.',
-    highlight: '하루 이내에 카카오톡으로 안내드릴게요!',
+    highlight: {
+      prefix: '빠른 시일 내에 ',
+      brand: '카카오톡', // 이 부분만 text.brand 색상
+      suffix: '으로 안내드릴게요!',
+    },
   },
 } as const;
