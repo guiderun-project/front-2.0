@@ -3,13 +3,14 @@ import { useId, type ReactElement } from 'react';
 import { keyframes } from '@emotion/react';
 import styled from '@emotion/styled';
 
-import type { MatchingWaitingParticipant } from '@/api/types';
 import { HiddenText, IconButton, Text } from '@/components';
+
+import type { SelectablePerson } from '../useEventMatchPage';
 
 type MatchSelectionBarProps = {
   canCreateMatching: boolean;
-  selectedGuides: MatchingWaitingParticipant[];
-  selectedVi: MatchingWaitingParticipant | null;
+  selectedGuides: SelectablePerson[];
+  selectedVi: SelectablePerson | null;
   onClear: () => void;
   onCreateMatching: () => void;
 };
@@ -87,8 +88,8 @@ export const MatchSelectionBar = ({
 };
 
 const getSelectionDescription = (
-  selectedVi: MatchingWaitingParticipant | null,
-  selectedGuides: MatchingWaitingParticipant[],
+  selectedVi: SelectablePerson | null,
+  selectedGuides: SelectablePerson[],
 ) => {
   const viDescription = selectedVi
     ? `시각장애러너 ${selectedVi.name}`
