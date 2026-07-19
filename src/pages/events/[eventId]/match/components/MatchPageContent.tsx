@@ -50,8 +50,6 @@ export const MatchPageContent = ({
   } = matchPage;
   const { activeSection, completedRef, navRef, scrollToSection, waitingRef } =
     useMatchScrollSpy();
-  const waitingCount = pageState.waiting.summary.waitingCount;
-  const completedCount = pageState.completed.summary.completedViCount;
 
   return (
     <ReadyContent $hasSelectionBar={hasSelection}>
@@ -66,9 +64,6 @@ export const MatchPageContent = ({
           <Text as="h2" color="text.tertiary" font="body-m-m">
             매칭대기
           </Text>
-          <SectionCount color="text.tertiary" font="body-m-m">
-            {waitingCount}
-          </SectionCount>
         </SectionHeader>
         <MatchWaitingPanel
           eventGroupLabelContext={eventGroupLabelContext}
@@ -85,9 +80,6 @@ export const MatchPageContent = ({
           <Text as="h2" color="text.tertiary" font="body-m-m">
             매칭완료
           </Text>
-          <SectionCount color="text.tertiary" font="body-m-m">
-            {completedCount}
-          </SectionCount>
         </SectionHeader>
         <MatchCompletedPanel
           completed={pageState.completed}
@@ -147,10 +139,6 @@ const SectionHeader = styled.div(({ theme }) => ({
   gap: theme.spacing.md,
   minWidth: 0,
 }));
-
-const SectionCount = styled(Text)({
-  display: "inline-block",
-});
 
 const SectionDivider = styled.div(({ theme }) => ({
   width: "100%",
