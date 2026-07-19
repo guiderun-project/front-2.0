@@ -32,6 +32,9 @@ export const MatchPageShell = ({
             icon: 'chevron-left-lined',
             onClick: onBack ?? navigateBack,
           },
+          // TODO(추가 필요): TopNavigation 우측 '매칭이 처음인가요?' 툴팁 + '?' 도움말 아이콘 버튼.
+          // Figma 4234-66494 상단 우측 참고. 현재 TopNavigation.right 는 IconButton 배열만 지원하므로
+          // 툴팁 칩까지 붙이려면 컴포넌트 확장 또는 별도 오버레이가 필요. 이번 작업 범위에서 제외됨.
         }}
       >
         {children}

@@ -3,13 +3,14 @@ import { useId, type ReactElement } from 'react';
 import { keyframes } from '@emotion/react';
 import styled from '@emotion/styled';
 
-import type { MatchingWaitingParticipant } from '@/api/types';
 import { HiddenText, IconButton, Text } from '@/components';
+
+import type { SelectablePerson } from '../useEventMatchPage';
 
 type MatchSelectionBarProps = {
   canCreateMatching: boolean;
-  selectedGuides: MatchingWaitingParticipant[];
-  selectedVi: MatchingWaitingParticipant | null;
+  selectedGuides: SelectablePerson[];
+  selectedVi: SelectablePerson | null;
   onClear: () => void;
   onCreateMatching: () => void;
 };
@@ -65,9 +66,9 @@ export const MatchSelectionBar = ({
             )}
           </SelectionItems>
           <SelectionClearButton
-            aria-label="선택한 참가자 모두 해제"
+            aria-label="선택 취소"
             color="badge.text.primitive"
-            icon="delete-lined"
+            icon="close-lined"
             iconSize={19.2}
             shape="round"
             size={32}
@@ -87,8 +88,8 @@ export const MatchSelectionBar = ({
 };
 
 const getSelectionDescription = (
-  selectedVi: MatchingWaitingParticipant | null,
-  selectedGuides: MatchingWaitingParticipant[],
+  selectedVi: SelectablePerson | null,
+  selectedGuides: SelectablePerson[],
 ) => {
   const viDescription = selectedVi
     ? `시각장애러너 ${selectedVi.name}`

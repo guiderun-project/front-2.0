@@ -97,7 +97,7 @@ const GroupHeader = styled.div(({ theme }) => ({
   minWidth: 0,
 }));
 
-const GroupHeading = styled.h2({
+const GroupHeading = styled.h3({
   margin: 0,
 });
 
