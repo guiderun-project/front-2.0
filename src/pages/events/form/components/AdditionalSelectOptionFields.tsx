@@ -1,15 +1,15 @@
-import type { ChangeEvent, ReactElement } from 'react';
+import type { ChangeEvent, ReactElement } from "react";
 
-import styled from '@emotion/styled';
-import { Controller, useWatch, type UseFormReturn } from 'react-hook-form';
+import styled from "@emotion/styled";
+import { Controller, useWatch, type UseFormReturn } from "react-hook-form";
 
-import { Button, IconButton } from '@/components';
+import { Button, IconButton } from "@/components";
 
 import {
   ADDITIONAL_SELECT_OPTION_DELETABLE_START_INDEX,
   ADDITIONAL_SELECT_OPTION_MAX_COUNT,
-} from '../constants';
-import type { EventFormValues } from '../schema';
+} from "../constants";
+import type { EventFormValues } from "../schema";
 
 type AdditionalSelectOptionFieldsProps = {
   form: UseFormReturn<EventFormValues>;
@@ -42,7 +42,7 @@ export const AdditionalSelectOptionFields = ({
 
     form.setValue(
       `additionalQuestions.${questionIndex}.options`,
-      [...options, ''],
+      [...options, ""],
       { shouldDirty: true, shouldTouch: true, shouldValidate: false },
     );
   };
@@ -99,7 +99,7 @@ export const AdditionalSelectOptionFields = ({
                       aria-invalid={hasVisibleError || undefined}
                       aria-label={`선택지 ${optionIndex + 1}`}
                       enterKeyHint={
-                        optionIndex < options.length - 1 ? 'next' : 'done'
+                        optionIndex < options.length - 1 ? "next" : "done"
                       }
                       name={field.name}
                       placeholder="선택지를 입력하세요"
@@ -139,12 +139,12 @@ export const AdditionalSelectOptionFields = ({
           disabled={isAddOptionDisabled}
           fullWidth
           level="quaternary"
-          rightIcon={{ icon: 'plus-lined' }}
+          rightIcon={{ icon: "plus-lined" }}
           size="m"
           type="button"
           onClick={handleAddOption}
         >
-          항목 추가하기
+          선택지 추가
         </Button>
       )}
     </OptionGroup>
@@ -152,14 +152,14 @@ export const AdditionalSelectOptionFields = ({
 };
 
 const OptionGroup = styled.div(({ theme }) => ({
-  display: 'grid',
+  display: "grid",
   gap: theme.spacing.md,
 }));
 
 const OptionList = styled.div<{ $readOnly: boolean }>(
   ({ $readOnly, theme }) => ({
-    overflow: 'hidden',
-    width: '100%',
+    overflow: "hidden",
+    width: "100%",
     border: `${theme.pxToRem(1)} solid ${theme.color.border.default}`,
     borderRadius: theme.radius.md,
     backgroundColor: $readOnly
@@ -170,24 +170,24 @@ const OptionList = styled.div<{ $readOnly: boolean }>(
 
 const OptionField = styled.div<{ $readOnly: boolean }>(
   ({ $readOnly, theme }) => ({
-    display: 'grid',
+    display: "grid",
     gap: theme.spacing.s,
     minHeight: theme.pxToRem(51),
     padding: theme.spacing.xl,
-    boxSizing: 'border-box',
+    boxSizing: "border-box",
     backgroundColor: $readOnly
       ? theme.color.bg.surface
       : theme.color.bg.default,
 
-    '& + &': {
+    "& + &": {
       borderTop: `${theme.pxToRem(1)} solid ${theme.color.border.default}`,
     },
   }),
 );
 
 const OptionControlRow = styled.div(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
+  display: "flex",
+  alignItems: "center",
   gap: theme.spacing.md,
 }));
 
@@ -195,12 +195,12 @@ const OptionInput = styled.input<{
   $hasError: boolean;
   $readOnly: boolean;
 }>(({ $hasError, $readOnly, theme }) => ({
-  ...theme.typography['body-m-m'],
-  width: '100%',
+  ...theme.typography["body-m-m"],
+  width: "100%",
   minWidth: 0,
   padding: 0,
   border: 0,
-  backgroundColor: 'transparent',
+  backgroundColor: "transparent",
   color: $hasError
     ? theme.color.text.danger
     : $readOnly
@@ -208,18 +208,18 @@ const OptionInput = styled.input<{
       : theme.color.text.primary,
   outline: 0,
 
-  '&::placeholder': {
+  "&::placeholder": {
     color: theme.color.text.tertiary,
   },
 
-  '&:read-only': {
+  "&:read-only": {
     color: theme.color.text.tertiary,
-    cursor: 'default',
+    cursor: "default",
   },
 }));
 
 const FieldError = styled.p(({ theme }) => ({
-  ...theme.typography['body-s-m'],
+  ...theme.typography["body-s-m"],
   minWidth: 0,
   margin: 0,
   color: theme.color.text.danger,

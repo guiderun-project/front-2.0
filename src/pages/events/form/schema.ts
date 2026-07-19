@@ -82,7 +82,7 @@ const additionalQuestionSchema = z.discriminatedUnion('type', [
       .array(requiredTextSchema)
       .min(
         ADDITIONAL_SELECT_OPTION_MIN_COUNT,
-        '선택지는 최소 3개 이상 입력해주세요.',
+        `선택지는 최소 ${ADDITIONAL_SELECT_OPTION_MIN_COUNT}개 이상 입력해주세요.`,
       )
       .max(
         ADDITIONAL_SELECT_OPTION_MAX_COUNT,

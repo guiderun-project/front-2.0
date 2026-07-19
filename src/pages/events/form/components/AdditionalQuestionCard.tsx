@@ -1,19 +1,19 @@
-import type { ReactElement } from 'react';
+import type { ReactElement } from "react";
 
-import styled from '@emotion/styled';
-import { Controller, type UseFormReturn } from 'react-hook-form';
+import styled from "@emotion/styled";
+import { Controller, type UseFormReturn } from "react-hook-form";
 
-import { IconButton, Text } from '@/components';
+import { IconButton, Text } from "@/components";
 
-import { ADDITIONAL_QUESTION_TITLE_MAX_LENGTH } from '../constants';
-import type { EventFormValues } from '../schema';
-import { AdditionalSelectOptionFields } from './AdditionalSelectOptionFields';
+import { ADDITIONAL_QUESTION_TITLE_MAX_LENGTH } from "../constants";
+import type { EventFormValues } from "../schema";
+import { AdditionalSelectOptionFields } from "./AdditionalSelectOptionFields";
 
 type AdditionalQuestionCardProps = {
   fieldId: string;
   form: UseFormReturn<EventFormValues>;
   questionIndex: number;
-  questionType: EventFormValues['additionalQuestions'][number]['type'];
+  questionType: EventFormValues["additionalQuestions"][number]["type"];
   readOnly?: boolean;
   onRemove: () => void;
 };
@@ -26,13 +26,19 @@ export const AdditionalQuestionCard = ({
   readOnly = false,
   onRemove,
 }: AdditionalQuestionCardProps): ReactElement => {
-  const title = questionType === 'TEXT' ? '질문' : '설문';
+  const title = questionType === "TEXT" ? "질문" : "투표";
+  const titleInputId = `${fieldId}-question-title`;
   const titleErrorId = `${fieldId}-question-title-error`;
 
   return (
     <QuestionCard>
       <QuestionCardHeader>
-        <Text as="h3" color="text.primary" font="body-m-sb">
+        <Text
+          as="label"
+          color="text.primary"
+          font="body-m-sb"
+          htmlFor={titleInputId}
+        >
           {title}
         </Text>
         {readOnly ? null : (
@@ -65,11 +71,15 @@ export const AdditionalQuestionCard = ({
                   !readOnly && fieldState.error ? titleErrorId : undefined
                 }
                 aria-invalid={hasVisibleError || undefined}
-                aria-label={`${title} 내용`}
-                enterKeyHint={questionType === 'SELECT' ? 'next' : 'done'}
+                enterKeyHint={questionType === "SELECT" ? "next" : "done"}
+                id={titleInputId}
                 maxLength={ADDITIONAL_QUESTION_TITLE_MAX_LENGTH}
                 name={titleField.name}
-                placeholder="질문을 입력하세요"
+                placeholder={
+                  questionType === "TEXT"
+                    ? "질문을 입력하세요"
+                    : "투표 제목을 입력하세요"
+                }
                 readOnly={readOnly}
                 value={titleField.value}
                 onBlur={titleField.onBlur}
@@ -87,7 +97,7 @@ export const AdditionalQuestionCard = ({
                   <Counter aria-live="polite">
                     <Text
                       as="span"
-                      color={hasVisibleError ? 'text.danger' : 'text.brand'}
+                      color={hasVisibleError ? "text.danger" : "text.brand"}
                       font="body-s-m"
                     >
                       {titleField.value.length}
@@ -103,7 +113,7 @@ export const AdditionalQuestionCard = ({
         }}
       />
 
-      {questionType === 'SELECT' ? (
+      {questionType === "SELECT" ? (
         <AdditionalSelectOptionFields
           form={form}
           questionIndex={questionIndex}
@@ -115,7 +125,7 @@ export const AdditionalQuestionCard = ({
 };
 
 const QuestionCard = styled.div(({ theme }) => ({
-  display: 'grid',
+  display: "grid",
   gap: theme.spacing.md,
   padding: theme.spacing.xl,
   borderRadius: theme.pxToRem(20),
@@ -123,14 +133,14 @@ const QuestionCard = styled.div(({ theme }) => ({
 }));
 
 const QuestionCardHeader = styled.div(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
   gap: theme.spacing.md,
 }));
 
 const QuestionTitleField = styled.div(({ theme }) => ({
-  display: 'grid',
+  display: "grid",
   gap: theme.spacing.md,
 }));
 
@@ -138,8 +148,8 @@ const QuestionTitleInput = styled.input<{
   $hasError: boolean;
   $readOnly: boolean;
 }>(({ $hasError, $readOnly, theme }) => ({
-  ...theme.typography['body-m-m'],
-  width: '100%',
+  ...theme.typography["body-m-m"],
+  width: "100%",
   minWidth: 0,
   minHeight: theme.pxToRem(51),
   padding: theme.spacing.xl,
@@ -147,17 +157,17 @@ const QuestionTitleInput = styled.input<{
     $hasError ? theme.color.border.danger : theme.color.border.default
   }`,
   borderRadius: theme.radius.md,
-  boxSizing: 'border-box',
+  boxSizing: "border-box",
   backgroundColor: $readOnly ? theme.color.bg.surface : theme.color.bg.default,
   color: $readOnly ? theme.color.text.tertiary : theme.color.text.primary,
   outline: 0,
-  transition: 'border-color 140ms ease-out, border-width 140ms ease-out',
+  transition: "border-color 140ms ease-out, border-width 140ms ease-out",
 
-  '&::placeholder': {
+  "&::placeholder": {
     color: theme.color.text.tertiary,
   },
 
-  '&:focus': {
+  "&:focus": {
     borderWidth: $readOnly ? theme.pxToRem(1) : theme.pxToRem(2),
     borderColor: $readOnly
       ? theme.color.border.default
@@ -166,35 +176,35 @@ const QuestionTitleInput = styled.input<{
         : theme.color.border.brand,
   },
 
-  '&:read-only': {
+  "&:read-only": {
     backgroundColor: theme.color.bg.surface,
     color: theme.color.text.tertiary,
-    cursor: 'default',
+    cursor: "default",
   },
 
-  '@media (prefers-reduced-motion: reduce)': {
-    transition: 'none',
+  "@media (prefers-reduced-motion: reduce)": {
+    transition: "none",
   },
 }));
 
 const InformRow = styled.div(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'flex-start',
-  justifyContent: 'space-between',
+  display: "flex",
+  alignItems: "flex-start",
+  justifyContent: "space-between",
   minHeight: theme.pxToRem(21),
   gap: theme.spacing.md,
 }));
 
 const FieldError = styled.p(({ theme }) => ({
-  ...theme.typography['body-s-m'],
+  ...theme.typography["body-s-m"],
   minWidth: 0,
   margin: 0,
   color: theme.color.text.danger,
 }));
 
 const Counter = styled.span(({ theme }) => ({
-  display: 'inline-flex',
+  display: "inline-flex",
   flexShrink: 0,
-  alignItems: 'center',
+  alignItems: "center",
   gap: theme.spacing.xs,
 }));
