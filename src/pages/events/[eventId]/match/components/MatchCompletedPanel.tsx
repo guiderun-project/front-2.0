@@ -158,7 +158,7 @@ const PersonContent = ({
 
 const PersonBox = (props: PersonSelectProps): ReactElement => {
   return (
-    <PersonBoxRoot>
+    <PersonBoxRoot $selected={props.selected}>
       <PersonContent {...props} />
     </PersonBoxRoot>
   );
@@ -166,7 +166,7 @@ const PersonBox = (props: PersonSelectProps): ReactElement => {
 
 const PersonRow = (props: PersonSelectProps): ReactElement => {
   return (
-    <PersonRowRoot>
+    <PersonRowRoot $selected={props.selected}>
       <PersonContent {...props} />
     </PersonRowRoot>
   );
@@ -252,13 +252,22 @@ const personBoxBase = (theme: AppTheme) => ({
   WebkitTapHighlightColor: 'transparent',
 });
 
-const PersonBoxRoot = styled.label(({ theme }) => ({
-  ...personBoxBase(theme),
-  flex: '1 1 0',
-  justifyContent: 'center',
-  borderRadius: theme.radius.lg,
-  backgroundColor: theme.color.bg.subtle,
-}));
+const PersonBoxRoot = styled.label<{ $selected: boolean }>(
+  ({ $selected, theme }) => ({
+    ...personBoxBase(theme),
+    flex: '1 1 0',
+    justifyContent: 'center',
+    borderRadius: theme.radius.lg,
+    backgroundColor: $selected
+      ? theme.color.bg['brand-soft']
+      : theme.color.bg.subtle,
+    transition: 'background-color 160ms ease-out',
+
+    '@media (prefers-reduced-motion: reduce)': {
+      transition: 'none',
+    },
+  }),
+);
 
 const GuideBox = styled.div(({ theme }) => ({
   display: 'flex',
@@ -272,10 +281,18 @@ const GuideBox = styled.div(({ theme }) => ({
   boxSizing: 'border-box',
 }));
 
-const PersonRowRoot = styled.label(({ theme }) => ({
-  ...personBoxBase(theme),
-  width: '100%',
-}));
+const PersonRowRoot = styled.label<{ $selected: boolean }>(
+  ({ $selected, theme }) => ({
+    ...personBoxBase(theme),
+    width: '100%',
+    backgroundColor: $selected ? theme.color.bg['brand-soft'] : 'transparent',
+    transition: 'background-color 160ms ease-out',
+
+    '@media (prefers-reduced-motion: reduce)': {
+      transition: 'none',
+    },
+  }),
+);
 
 const PersonAvatarName = styled.div(({ theme }) => ({
   display: 'flex',

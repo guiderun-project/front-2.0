@@ -175,22 +175,6 @@ export const useEventMatchPage = (eventId: number) => {
     return map;
   }, [completedQuery.data, waitingQuery.data]);
 
-  // 매칭완료 VI를 다시 선택할 때 기존 가이드를 프리필하기 위한 맵.
-  const completedGuideIdsByVi = useMemo(() => {
-    const map = new Map<string, string[]>();
-
-    completedQuery.data.groups.forEach((group) => {
-      group.rows.forEach((row) => {
-        map.set(
-          row.vi.userId,
-          row.guides.map((guide) => guide.userId),
-        );
-      });
-    });
-
-    return map;
-  }, [completedQuery.data]);
-
   const selectedVi = useMemo(() => {
     if (!selectedViId) {
       return null;
@@ -272,33 +256,16 @@ export const useEventMatchPage = (eventId: number) => {
 
   const toggleParticipant = (person: SelectablePerson) => {
     if (person.type === 'VI') {
-      if (selectedViId === person.userId) {
-        setSelectedViId(null);
-        announcePolitely(
-          getSelectionAnnouncement({
-            person,
-            selectedGuideIds,
-            selectedViId: null,
-          }),
-        );
-        return;
-      }
+      // 체크박스는 각각 독립적으로 동작한다. VI 선택은 VI만 토글한다.
+      const nextSelectedViId =
+        selectedViId === person.userId ? null : person.userId;
 
-      setSelectedViId(person.userId);
-
-      // 매칭완료 VI를 선택하면 replace 편집을 위해 기존 가이드를 프리필한다.
-      const prefilledGuideIds = completedGuideIdsByVi.get(person.userId);
-      const nextSelectedGuideIds = prefilledGuideIds ?? selectedGuideIds;
-
-      if (prefilledGuideIds) {
-        setSelectedGuideIds(prefilledGuideIds);
-      }
-
+      setSelectedViId(nextSelectedViId);
       announcePolitely(
         getSelectionAnnouncement({
           person,
-          selectedGuideIds: nextSelectedGuideIds,
-          selectedViId: person.userId,
+          selectedGuideIds,
+          selectedViId: nextSelectedViId,
         }),
       );
       return;
