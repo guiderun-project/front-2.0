@@ -265,7 +265,7 @@ const MatchingCriteriaAccordion = ({
         type="button"
         onClick={handleToggle}
       >
-        <Text color="text.secondary" font="heading-s-sb">
+        <Text color="text.secondary" font="body-l-sb">
           매칭기준
         </Text>
         <ChevronIcon $isOpen={isOpen}>
@@ -479,6 +479,7 @@ const GroupCard = styled.article<{ $hasDivider: boolean }>(
 );
 
 const GroupHeading = styled.h2({
+  display: "flex",
   margin: 0,
 });
 
