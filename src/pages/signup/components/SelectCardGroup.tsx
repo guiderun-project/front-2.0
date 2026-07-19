@@ -44,7 +44,7 @@ export const SelectCardGroup = <T extends string | boolean>({
               key={String(option.value)}
               aria-checked={selected}
               fullWidth
-              leftIcon={selected ? { icon: 'check-lined' } : undefined}
+              leftIcon={selected ? { icon: 'check-thick-lined' } : undefined}
               level="line-type"
               role="radio"
               size="l"
