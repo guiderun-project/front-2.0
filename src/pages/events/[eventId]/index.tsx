@@ -1,28 +1,30 @@
-import type { ReactElement } from 'react';
+import type { ReactElement } from "react";
 
 import {
   PageLayout,
   Tabs,
   TopNavigation,
   type TopNavigationIconButtonProps,
-} from '@/components';
+} from "@/components";
 
-import { ApplicantFormSheet } from './components/ApplicantFormSheet';
-import { ApplicantsPanel } from './components/ApplicantsPanel';
-import { DetailPanel } from './components/DetailPanel';
-import { EventDetailCta } from './components/EventDetailCta';
-import { EventHero } from './components/EventHero';
-import { ManagementMenuSheet } from './components/ManagementMenuSheet';
-import { MatchingPanel } from './components/MatchingPanel';
-import { PageState } from './components/PanelState';
-import { RestrictedAccessSheet } from './components/RestrictedAccessSheet';
-import { TrainingSafetyPermissionSheet } from './components/TrainingSafetyPermissionSheet';
-import { EVENT_DETAIL_TABS } from './constants';
-import { useEventApplicants } from './hooks/useEventApplicants';
-import { useEventDetailPage } from './hooks/useEventDetailPage';
-import { useEventMatchingStatus } from './hooks/useEventMatchingStatus';
+import { ApplicantFormSheet } from "./components/ApplicantFormSheet";
+import { ApplicantsPanel } from "./components/ApplicantsPanel";
+import { DetailPanel } from "./components/DetailPanel";
+import { EventDetailCta } from "./components/EventDetailCta";
+import { EventHero } from "./components/EventHero";
+import { ManagementMenuSheet } from "./components/ManagementMenuSheet";
+import { MatchingPanel } from "./components/MatchingPanel";
+import { PageState } from "./components/PanelState";
+import { RestrictedAccessSheet } from "./components/RestrictedAccessSheet";
+import { TrainingSafetyPermissionSheet } from "./components/TrainingSafetyPermissionSheet";
+import { EVENT_DETAIL_TABS } from "./constants";
+import { useEventApplicants } from "./hooks/useEventApplicants";
+import { useEventDetailPage } from "./hooks/useEventDetailPage";
+import { useEventMatchingStatus } from "./hooks/useEventMatchingStatus";
+import { useNavigate } from "react-router-dom";
 
 export const EventDetailPage = (): ReactElement => {
+  const navigate = useNavigate();
   const {
     activeTab,
     canAccessProtectedTabs,
@@ -58,7 +60,7 @@ export const EventDetailPage = (): ReactElement => {
   const matchingStatus = useEventMatchingStatus({
     eventId,
     enabled:
-      isValidEventId && canAccessProtectedTabs && activeTab === 'matching',
+      isValidEventId && canAccessProtectedTabs && activeTab === "matching",
   });
   const {
     applicantFormQuery,
@@ -73,21 +75,26 @@ export const EventDetailPage = (): ReactElement => {
     eventId,
   });
   const navigationLeftAction: TopNavigationIconButtonProps = {
-    icon: 'chevron-left-lined',
-    ariaLabel: '뒤로가기',
+    icon: "chevron-left-lined",
+    ariaLabel: "뒤로가기",
     onClick: handleBack,
   };
   const navigationRightActions: TopNavigationIconButtonProps[] = [
     {
-      icon: 'share-lined',
-      ariaLabel: '카카오톡 공유하기 새창 열림',
+      icon: "home-lined",
+      ariaLabel: "홈으로 이동",
+      onClick: () => navigate("/"),
+    },
+    {
+      icon: "share-lined",
+      ariaLabel: "카카오톡 공유하기 새창 열림",
       onClick: handleKakaoShare,
     },
     ...(canOpenManagementSheet
       ? [
           {
-            icon: 'more-vertical-lined',
-            ariaLabel: '더보기',
+            icon: "more-vertical-lined",
+            ariaLabel: "더보기",
             onClick: openManagementSheet,
           } satisfies TopNavigationIconButtonProps,
         ]
@@ -96,7 +103,10 @@ export const EventDetailPage = (): ReactElement => {
 
   if (!isValidEventId) {
     return (
-      <PageLayout background="bg.brand-event" gradient="gradient.bg.brand-event">
+      <PageLayout
+        background="bg.brand-event"
+        gradient="gradient.bg.brand-event"
+      >
         <TopNavigation
           aria-label="이벤트 상세 상단 메뉴"
           left={navigationLeftAction}
@@ -116,7 +126,10 @@ export const EventDetailPage = (): ReactElement => {
       />
       <EventHero event={event} />
 
-      <Tabs selectedKey={activeTab} onSelectionChange={handleTabSelectionChange}>
+      <Tabs
+        selectedKey={activeTab}
+        onSelectionChange={handleTabSelectionChange}
+      >
         <Tabs.List>
           {EVENT_DETAIL_TABS.map((tab) => (
             <Tabs.Tab key={tab.id} id={tab.id}>
