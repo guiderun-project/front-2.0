@@ -203,9 +203,8 @@ const NameRow = styled.div(({ theme }) => ({
 const ParticipantName = styled(Text)({
   display: 'block',
   minWidth: 0,
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
+  wordBreak: 'keep-all',
+  overflowWrap: 'anywhere',
 });
 
 const ParticipantMeta = styled(Text)({

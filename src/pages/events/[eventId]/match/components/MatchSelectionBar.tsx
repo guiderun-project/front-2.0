@@ -66,9 +66,9 @@ export const MatchSelectionBar = ({
             )}
           </SelectionItems>
           <SelectionClearButton
-            aria-label="선택한 참가자 모두 해제"
+            aria-label="선택 취소"
             color="badge.text.primitive"
-            icon="delete-lined"
+            icon="close-lined"
             iconSize={19.2}
             shape="round"
             size={32}
