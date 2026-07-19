@@ -1,6 +1,7 @@
 import type {
   EventMatchingStatusResponse,
   MatchingGroup,
+  MatchingPartner,
   MatchingRow,
   MatchingUser,
 } from '@/api/types';
@@ -21,7 +22,7 @@ type MatchingStatusViewGroup = Omit<MatchingGroup, 'rows'> & {
 export type MatchingStatusViewModel = {
   groups: MatchingStatusViewGroup[];
   isEmpty: boolean;
-  myPartners: MatchingUser[];
+  myPartners: MatchingPartner[];
 };
 
 export const createMatchingStatusViewModel = (

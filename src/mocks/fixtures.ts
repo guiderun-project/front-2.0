@@ -21,7 +21,7 @@ import type {
   EventListGetResponse,
   EventUpdateRequest,
 } from '@/api/types/event';
-import type { MatchingUser } from '@/api/types/matching';
+import type { MatchingPartner, MatchingUser } from '@/api/types/matching';
 import type { RoleEnum } from '@/api/types/common';
 
 export type MockUser = {
@@ -1441,6 +1441,15 @@ export const toMatchingUser = (form: MockEventForm): MatchingUser => {
     name: user.name,
     type: user.type,
     applyGroup: form.group,
+  };
+};
+
+export const toMatchingPartner = (form: MockEventForm): MatchingPartner => {
+  const user = getFormUser(form);
+
+  return {
+    ...toMatchingUser(form),
+    defaultGroup: user.recordDegree,
   };
 };
 

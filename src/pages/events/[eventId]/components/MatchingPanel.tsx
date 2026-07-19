@@ -3,8 +3,8 @@ import { useId, useState, type ReactElement } from "react";
 import styled from "@emotion/styled";
 
 import { getApiErrorMessage } from "@/api/core";
-import type { MatchingUser, RunningGroup } from "@/api/types";
-import { Badge, HiddenText, Icon, Text } from "@/components";
+import type { MatchingPartner, MatchingUser, RunningGroup } from "@/api/types";
+import { HiddenText, Icon, Text } from "@/components";
 import { RUNNER_TYPE_LABELS } from "@/constants";
 import type { AppTheme } from "@/styles/theme";
 
@@ -117,7 +117,7 @@ const MatchingGroupCard = ({
 };
 
 type MyPartnerSummaryProps = {
-  partners: MatchingUser[];
+  partners: MatchingPartner[];
 };
 
 const MyPartnerSummary = ({
@@ -126,7 +126,7 @@ const MyPartnerSummary = ({
   return (
     <MyPartnerCard>
       <HiddenText>{getMyPartnerSummaryDescription(partners)}</HiddenText>
-      <Text aria-hidden={true} color="text.tertiary" font="body-m-m">
+      <Text aria-hidden={true} color="text.primary" font="body-m-sb">
         내 파트너
       </Text>
       {partners.length > 0 ? (
@@ -134,25 +134,31 @@ const MyPartnerSummary = ({
           {partners.map((partner) => (
             <PartnerItem key={partner.userId}>
               <ProfileAvatar name={partner.name} type={partner.type} />
+              <Text color="text.tertiary" font="detail-m-m">
+                기존 {partner.defaultGroup}그룹
+              </Text>
             </PartnerItem>
           ))}
         </PartnerList>
       ) : (
-        <Badge aria-hidden={true} size="s" tone="gray">
-          대기중
-        </Badge>
+        <Text aria-hidden={true} color="text.tertiary" font="detail-m-m">
+          아직 파트너 매칭 전이에요
+        </Text>
       )}
     </MyPartnerCard>
   );
 };
 
-const getMyPartnerSummaryDescription = (partners: MatchingUser[]) => {
+const getMyPartnerSummaryDescription = (partners: MatchingPartner[]) => {
   if (partners.length === 0) {
-    return "내 파트너 대기중";
+    return "내 파트너 아직 파트너 매칭 전이에요";
   }
 
   return `내 파트너 ${partners
-    .map((partner) => `${RUNNER_TYPE_LABELS[partner.type]} ${partner.name}`)
+    .map(
+      (partner) =>
+        `${RUNNER_TYPE_LABELS[partner.type]} ${partner.name} 기존 ${partner.defaultGroup}그룹`,
+    )
     .join(", ")}`;
 };
 
@@ -420,30 +426,28 @@ const ResultsSection = styled.div(({ theme }) => ({
 
 const MyPartnerCard = styled.article(({ theme }) => ({
   display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  gap: theme.spacing["3xl"],
+  flexDirection: "column",
+  alignItems: "flex-start",
+  gap: theme.spacing.lg,
   width: "100%",
   minWidth: 0,
-  padding: theme.spacing.xl,
+  padding: `${theme.spacing.xl} ${theme.spacing["2xl"]}`,
   borderRadius: theme.pxToRem(20),
-  backgroundColor: theme.color.bg.elevated,
+  backgroundColor: theme.color.bg.default,
   boxSizing: "border-box",
 }));
 
 const PartnerList = styled.div(({ theme }) => ({
   display: "flex",
-  flexWrap: "wrap",
-  alignItems: "flex-end",
+  flexDirection: "column",
+  alignItems: "flex-start",
   gap: theme.spacing.md,
-  justifyContent: "flex-end",
   minWidth: 0,
 }));
 
 const PartnerItem = styled.div(({ theme }) => ({
   display: "flex",
   alignItems: "center",
-  justifyContent: "flex-end",
   gap: theme.spacing.md,
   minWidth: 0,
 }));
