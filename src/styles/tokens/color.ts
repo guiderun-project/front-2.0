@@ -78,12 +78,13 @@ export const colorPrimitive = {
     blue: {
       base: "#3F6EBC",
       a14: "rgba(0, 109, 255, 0.14)",
-      strong: "#0054D6",
+      strong: "#0056CA",
+      strong2: "#113E7B",
       a22: "rgba(0, 109, 255, 0.22)",
       soft: "#8CC2FF",
     },
     rose: {
-      base: "#CB4670",
+      base: "#EC6363",
     },
     violet: {
       base: "#5A5CD1",
@@ -160,10 +161,11 @@ export const primitiveColorTokenMap = {
   "primitive.accent.teal.a22": "rgba(104, 209, 194, 0.22)",
   "primitive.accent.blue.base": "#3F6EBC",
   "primitive.accent.blue.a14": "rgba(0, 109, 255, 0.14)",
-  "primitive.accent.blue.strong": "#0054D6",
+  "primitive.accent.blue.strong": "#0056CA",
+  "primitive.accent.blue.strong2": "#113E7B",
   "primitive.accent.blue.a22": "rgba(0, 109, 255, 0.22)",
   "primitive.accent.blue.soft": "#8CC2FF",
-  "primitive.accent.rose.base": "#CB4670",
+  "primitive.accent.rose.base": "#EC6363",
   "primitive.accent.violet.base": "#5A5CD1",
   "primitive.accent.violet.a22": "rgba(124, 60, 255, 0.22)",
   "primitive.accent.violet.strong": "#7627F5",
@@ -230,7 +232,7 @@ export const semanticColorAliases = {
       "team-d": "primitive.accent.teal.base",
       "team-e": "primitive.accent.blue.base",
       vi: "primitive.accent.rose.base",
-      guide: "primitive.accent.violet.base",
+      guide: "primitive.accent.blue.strong2",
     },
     icon: {
       primary: "primitive.neutral.900",
@@ -323,7 +325,7 @@ export const semanticColorAliases = {
       "team-d": "primitive.accent.teal.base",
       "team-e": "primitive.accent.blue.base",
       vi: "primitive.accent.rose.base",
-      guide: "primitive.accent.violet.base",
+      guide: "primitive.accent.blue.strong",
     },
     icon: {
       primary: "primitive.neutral.100",
