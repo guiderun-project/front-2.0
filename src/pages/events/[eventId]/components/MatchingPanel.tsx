@@ -62,12 +62,13 @@ export const MatchingPanel = ({
         ) : null}
 
         <GroupList>
-          {data.groups.map((group) => (
+          {data.groups.map((group, index) => (
             <MatchingGroupCard
               key={group.runningGroup}
               eventCategory={eventCategory}
               eventType={eventType}
               group={group}
+              hasDivider={index < data.groups.length - 1}
             />
           ))}
         </GroupList>
@@ -83,12 +84,14 @@ type MatchingGroupCardProps = {
   eventCategory: EventGroupLabelContext["eventCategory"];
   eventType: EventGroupLabelContext["eventType"];
   group: MatchingStatusViewModel["groups"][number];
+  hasDivider: boolean;
 };
 
 const MatchingGroupCard = ({
   eventCategory,
   eventType,
   group,
+  hasDivider,
 }: MatchingGroupCardProps): ReactElement => {
   const groupLabel = getEventGroupDisplayLabel(
     { eventCategory, eventType },
@@ -96,15 +99,15 @@ const MatchingGroupCard = ({
   );
 
   return (
-    <GroupCard>
+    <GroupCard $hasDivider={hasDivider}>
       <GroupHeading>
         <GroupHeadingText role="text">
-          <Text as="span" color="text.primary" font="heading-s-sb">
+          <Text as="span" color="text.primary" font="body-m-sb">
             {groupLabel}
-          </Text>{" "}
-          <GroupCountText color="text.tertiary" font="body-m-m">
+          </Text>
+          <Text as="span" color="text.tertiary" font="body-m-m">
             {group.totalCount}명
-          </GroupCountText>
+          </Text>
         </GroupHeadingText>
       </GroupHeading>
       <MatchingRows aria-label={`${groupLabel} 매칭 결과`} role="list">
@@ -242,7 +245,6 @@ const UnmatchedSlot = (): ReactElement => {
   );
 };
 
-// 공용 Accordion 디자인이 확정되면 shared component로 전환할 수 있습니다.
 const MatchingCriteriaAccordion = ({
   defaultOpen = false,
 }: {
@@ -300,7 +302,10 @@ const MatchingCriteriaAccordion = ({
                           <CriteriaGroupLetter $group={criterion.group}>
                             {criterion.group}
                           </CriteriaGroupLetter>
-                          <CriteriaValue color="text.secondary" font="detail-m-r">
+                          <CriteriaValue
+                            color="text.secondary"
+                            font="detail-m-r"
+                          >
                             {criterion.value}
                           </CriteriaValue>
                         </CriteriaItemVisual>
@@ -382,11 +387,13 @@ const MATCHING_CRITERIA_COLUMNS = [
   {
     type: "guide",
     title: "가이드러너",
-    items: MATCHING_CRITERIA.map(({ group, guide, guideAccessibilityValue }) => ({
-      accessibilityValue: guideAccessibilityValue,
-      group,
-      value: guide,
-    })),
+    items: MATCHING_CRITERIA.map(
+      ({ group, guide, guideAccessibilityValue }) => ({
+        accessibilityValue: guideAccessibilityValue,
+        group,
+        value: guide,
+      }),
+    ),
   },
 ] as const;
 
@@ -455,28 +462,30 @@ const PartnerItem = styled.div(({ theme }) => ({
 const GroupList = styled.div(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
-  gap: theme.spacing.lg,
-}));
-
-const GroupCard = styled.article(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
-  gap: theme.spacing.lg,
-  padding: theme.spacing.xl,
+  padding: theme.spacing["2xl"],
+  gap: theme.spacing["3xl"],
   borderRadius: theme.radius.xl,
   backgroundColor: theme.color.bg.elevated,
 }));
+
+const GroupCard = styled.article<{ $hasDivider: boolean }>(
+  ({ $hasDivider, theme }) => ({
+    display: "flex",
+    flexDirection: "column",
+    gap: theme.spacing.lg,
+    paddingBottom: $hasDivider ? theme.spacing["3xl"] : 0,
+    borderBottom: $hasDivider ? `1px solid ${theme.color.border.subtle}` : 0,
+  }),
+);
 
 const GroupHeading = styled.h2({
   margin: 0,
 });
 
-const GroupHeadingText = styled.span({
-  display: "inline",
-});
-
-const GroupCountText = styled(Text)(({ theme }) => ({
-  marginLeft: theme.spacing.md,
+const GroupHeadingText = styled.span(({ theme }) => ({
+  display: "inline-flex",
+  alignItems: "center",
+  gap: theme.spacing.md,
 }));
 
 const MatchingRows = styled.ul(({ theme }) => ({
