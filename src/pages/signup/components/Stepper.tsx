@@ -22,18 +22,18 @@ export const Stepper = ({
   className,
 }: StepperProps): ReactElement => {
   const total = steps.length;
-  const safeCurrent = Math.min(Math.max(current, 1), total);
+  const currentStep = Math.min(Math.max(current, 1), total);
 
   return (
     <Nav aria-label="회원가입 단계" className={className}>
-      <HiddenText>{`총 ${total}단계 중 ${safeCurrent}단계 진행 중`}</HiddenText>
+      <HiddenText>{`총 ${total}단계 중 ${currentStep}단계 진행 중`}</HiddenText>
       <StepList>
         {steps.map((label, index) => {
           const stepNumber = index + 1;
           const status: StepStatus =
-            stepNumber < safeCurrent
+            stepNumber < currentStep
               ? 'complete'
-              : stepNumber === safeCurrent
+              : stepNumber === currentStep
                 ? 'current'
                 : 'upcoming';
 
