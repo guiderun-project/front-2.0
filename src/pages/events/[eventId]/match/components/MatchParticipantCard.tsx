@@ -1,4 +1,4 @@
-import { Fragment, type ReactElement } from 'react';
+import type { ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
@@ -15,11 +15,6 @@ type MatchParticipantCardProps = {
   isSelected: boolean;
   participant: MatchingWaitingParticipant;
   onToggle: (participant: MatchingWaitingParticipant) => void;
-};
-
-type AdditionalInfoItem = {
-  answer: string;
-  title: string;
 };
 
 const getParticipantMeta = (
@@ -57,22 +52,6 @@ const getOriginalRunningGroupText = (
     : null;
 };
 
-const getAdditionalInfoItems = (
-  participant: MatchingWaitingParticipant,
-): AdditionalInfoItem[] => {
-  const commentItems = participant.additionalComment
-    ? [{ answer: participant.additionalComment, title: '추가 코멘트' }]
-    : [];
-  const answerItems = participant.additionalAnswers
-    .filter((answer) => answer.answer)
-    .map((answer) => ({
-      answer: answer.answer ?? '',
-      title: answer.questionTitle,
-    }));
-
-  return [...commentItems, ...answerItems];
-};
-
 export const MatchParticipantCard = ({
   applicationGroup,
   eventGroupLabelContext,
@@ -85,71 +64,60 @@ export const MatchParticipantCard = ({
     eventGroupLabelContext,
     participant,
   );
-  const infoItems = getAdditionalInfoItems(participant);
   const selectLabel =
     `${RUNNER_TYPE_LABELS[participant.type]} ${participant.name} ${isSelected ? '선택 취소' : '선택'}`;
 
   return (
     <ParticipantCard $isSelected={isSelected}>
-      <CardHeaderLabel>
-        <CheckBox
-          aria-label={selectLabel}
-          checked={isSelected}
-          onChange={() => {
-            onToggle(participant);
-          }}
-        />
-        <ParticipantInfo>
-          <RunnerTypeAvatar size="m" type={participant.type} />
-          <InfoTextGroup>
-            <NameRow>
+      <CheckBox
+        aria-label={selectLabel}
+        checked={isSelected}
+        onChange={() => {
+          onToggle(participant);
+        }}
+      />
+      <InfoColumn>
+        <Profile>
+          <NameRow>
+            <AvatarNameGroup>
+              <RunnerTypeAvatar size="m" type={participant.type} />
               <ParticipantName color="text.primary" font="body-m-sb">
                 {participant.name}
               </ParticipantName>
-              {participant.isFirstParticipation ? (
-                <Badge size="s" tone="cyan">
-                  첫참여
-                </Badge>
-              ) : null}
-            </NameRow>
-            {participantMeta ? (
-              <ParticipantMeta color="text.tertiary" font="body-s-m">
-                {participantMeta}
-              </ParticipantMeta>
+            </AvatarNameGroup>
+            {participant.isFirstParticipation ? (
+              <Badge size="s" tone="cyan">
+                첫참여
+              </Badge>
             ) : null}
-          </InfoTextGroup>
-        </ParticipantInfo>
-      </CardHeaderLabel>
+          </NameRow>
+          {participantMeta ? (
+            <ParticipantMeta color="text.tertiary" font="body-s-m">
+              {participantMeta}
+            </ParticipantMeta>
+          ) : null}
+        </Profile>
 
-      {isSelected && infoItems.length > 0 ? (
-        <CommentSection>
-          {infoItems.map((item, index) => (
-            <Fragment key={`${item.title}-${index}`}>
-              {index > 0 ? <CommentDivider /> : null}
-              <CommentItem>
-                <Text color="text.quaternary" font="detail-s-sb">
-                  {item.title}
-                </Text>
-                <Text color="text.secondary" font="detail-m-m">
-                  {item.answer}
-                </Text>
-              </CommentItem>
-            </Fragment>
-          ))}
-        </CommentSection>
-      ) : null}
+        {participant.additionalComment ? (
+          <CommentBox>
+            <Text color="text.tertiary" font="body-s-m">
+              {participant.additionalComment}
+            </Text>
+          </CommentBox>
+        ) : null}
+      </InfoColumn>
     </ParticipantCard>
   );
 };
 
-const ParticipantCard = styled.article<{ $isSelected: boolean }>(
+const ParticipantCard = styled.label<{ $isSelected: boolean }>(
   ({ $isSelected, theme }) => ({
     display: 'flex',
-    flexDirection: 'column',
+    alignItems: 'center',
     gap: theme.spacing.lg,
     width: '100%',
     minWidth: 0,
-    padding: theme.spacing.lg,
+    padding: `${theme.spacing.lg} ${theme.spacing.lg} ${theme.spacing.lg} ${theme.spacing.xl}`,
     border: `${theme.pxToRem(2)} solid ${
       $isSelected ? theme.color.border.focused : 'transparent'
     }`,
@@ -158,6 +126,9 @@ const ParticipantCard = styled.article<{ $isSelected: boolean }>(
     backgroundColor: $isSelected
       ? theme.color.bg['brand-soft']
       : theme.color.bg.subtle,
+    cursor: 'pointer',
+    touchAction: 'manipulation',
+    WebkitTapHighlightColor: 'transparent',
     transition: 'background-color 160ms ease-out, border-color 160ms ease-out',
 
     '@media (prefers-reduced-motion: reduce)': {
@@ -166,30 +137,19 @@ const ParticipantCard = styled.article<{ $isSelected: boolean }>(
   }),
 );
 
-const CardHeaderLabel = styled.label(({ theme }) => ({
+const InfoColumn = styled.div(({ theme }) => ({
   display: 'flex',
-  alignItems: 'center',
-  gap: theme.spacing.lg,
-  width: '100%',
-  minWidth: 0,
-  cursor: 'pointer',
-  touchAction: 'manipulation',
-  WebkitTapHighlightColor: 'transparent',
-}));
-
-const ParticipantInfo = styled.div(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  flex: '1 1 auto',
-  gap: theme.spacing.s,
-  minWidth: 0,
-}));
-
-const InfoTextGroup = styled.div(({ theme }) => ({
-  display: 'flex',
+  flex: '1 1 0',
   flexDirection: 'column',
   justifyContent: 'center',
-  gap: theme.spacing.xs,
+  gap: theme.spacing.sm,
+  minWidth: 0,
+}));
+
+const Profile = styled.div(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing.s,
   minWidth: 0,
 }));
 
@@ -197,6 +157,13 @@ const NameRow = styled.div(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   gap: theme.spacing.md,
+  minWidth: 0,
+}));
+
+const AvatarNameGroup = styled.div(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  gap: theme.spacing.s,
   minWidth: 0,
 }));
 
@@ -210,31 +177,15 @@ const ParticipantName = styled(Text)({
 const ParticipantMeta = styled(Text)({
   display: 'block',
   minWidth: 0,
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
+  wordBreak: 'keep-all',
+  overflowWrap: 'anywhere',
 });
 
-const CommentSection = styled.div(({ theme }) => ({
+const CommentBox = styled.div(({ theme }) => ({
   display: 'flex',
-  flexDirection: 'column',
-  gap: theme.spacing.lg,
   width: '100%',
-  padding: `${theme.spacing.lg} ${theme.spacing.xl}`,
-  borderRadius: theme.radius.md,
-  backgroundColor: theme.color.bg.elevated,
+  padding: `${theme.spacing.md} ${theme.spacing.lg}`,
+  borderRadius: theme.radius.sm,
+  backgroundColor: theme.color.bg.surface,
   boxSizing: 'border-box',
-}));
-
-const CommentItem = styled.div(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: theme.spacing.s,
-  minWidth: 0,
-}));
-
-const CommentDivider = styled.div(({ theme }) => ({
-  width: '100%',
-  height: 0,
-  borderTop: `1px solid ${theme.color.border.subtle}`,
 }));
