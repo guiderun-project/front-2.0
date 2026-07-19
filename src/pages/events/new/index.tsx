@@ -192,6 +192,7 @@ export const EventNewPage = (): ReactElement => {
         eventType={eventType}
         form={form}
         isSubmitting={isCreatingEvent}
+        minEventDate={createdDate}
         mode={EVENT_FORM_MODES.CREATE}
         onBack={handleBack}
         onCancelBack={handleCancelBack}

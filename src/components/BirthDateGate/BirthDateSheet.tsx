@@ -6,15 +6,11 @@ import { useMutation } from '@tanstack/react-query';
 import { getApiErrorMessage } from '@/api/core';
 import { api } from '@/api/services';
 import { useAuth } from '@/contexts';
-import {
-  BIRTH_DATE_MAX_LENGTH,
-  formatBirthDateInput,
-  toBirthDateISO,
-} from '@/utils';
+import { getTodayISODate, isValidBirthDateISO } from '@/utils';
 
 import { BottomSheet } from '../BottomSheet';
 import { Button } from '../Button';
-import { Input } from '../Input';
+import { DateInput } from '../Input';
 
 const BIRTH_DATE_ERROR_MESSAGE = '올바른 생년월일을 입력해주세요';
 
@@ -36,9 +32,8 @@ export const BirthDateSheet = ({
     },
   });
 
-  const isoDate = toBirthDateISO(birthDate);
-  const hasFormatError =
-    birthDate.length === BIRTH_DATE_MAX_LENGTH && isoDate === null;
+  const isoDate = isValidBirthDateISO(birthDate) ? birthDate : null;
+  const hasFormatError = birthDate.length > 0 && isoDate === null;
   const errorText = isError
     ? getApiErrorMessage(
         error,
@@ -79,18 +74,17 @@ export const BirthDateSheet = ({
       }
     >
       <Content>
-        <Input
+        <DateInput
           errorText={errorText}
-          inputMode="numeric"
-          label="생년월일 8자리"
-          maxLength={BIRTH_DATE_MAX_LENGTH}
+          label="생년월일"
+          max={getTodayISODate()}
           value={birthDate}
-          onChange={(event) => {
+          onChange={(value) => {
             if (isError) {
               reset();
             }
 
-            setBirthDate(formatBirthDateInput(event.target.value));
+            setBirthDate(value);
           }}
         />
       </Content>

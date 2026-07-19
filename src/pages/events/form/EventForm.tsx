@@ -7,6 +7,7 @@ import type { EventType } from "@/api/types";
 import {
   CheckBox,
   ConfirmPopup,
+  DateInput,
   FooterButton,
   FormPageLayout,
   Input,
@@ -16,7 +17,6 @@ import {
 } from "@/components";
 
 import { AdditionalQuestionEditor } from "./components/AdditionalQuestionEditor";
-import { MaskedDateInput } from "./components/MaskedDateInput";
 import { MaskedTimeInput } from "./components/MaskedTimeInput";
 import { RunningDistanceInput } from "./components/RunningDistanceInput";
 import {
@@ -42,6 +42,11 @@ type EventFormProps = {
   onDelete?: () => void;
   isDeleting?: boolean;
   submitDisabled?: boolean;
+  /**
+   * 모임 일시로 고를 수 있는 가장 이른 날짜(YYYY-MM-DD).
+   * date picker 에서 이전 날짜를 아예 못 고르게 막는 용도로, 스키마 검증과 같은 값을 쓴다.
+   */
+  minEventDate?: string;
 };
 
 export const EventForm = ({
@@ -57,7 +62,9 @@ export const EventForm = ({
   onDelete,
   onSubmit,
   submitDisabled = false,
+  minEventDate,
 }: EventFormProps): ReactElement => {
+  const recruitStartDate = form.watch("recruitStartDate");
   const resolvedSubmitLabel =
     mode === EVENT_FORM_MODES.EDIT ? "수정완료" : "모임 만들기";
   const resolvedSecondaryAction = onDelete
@@ -203,10 +210,11 @@ export const EventForm = ({
                 control={form.control}
                 name="date"
                 render={({ field, fieldState }) => (
-                  <MaskedDateInput
+                  <DateInput
                     controlRef={field.ref}
                     errorText={fieldState.error?.message}
                     label="모임 일시"
+                    min={minEventDate}
                     value={field.value}
                     onBlur={field.onBlur}
                     onChange={field.onChange}
@@ -289,7 +297,7 @@ export const EventForm = ({
                 control={form.control}
                 name="recruitStartDate"
                 render={({ field, fieldState }) => (
-                  <MaskedDateInput
+                  <DateInput
                     controlRef={field.ref}
                     errorText={fieldState.error?.message}
                     label="모집 시작일"
@@ -303,10 +311,11 @@ export const EventForm = ({
                 control={form.control}
                 name="recruitEndDate"
                 render={({ field, fieldState }) => (
-                  <MaskedDateInput
+                  <DateInput
                     controlRef={field.ref}
                     errorText={fieldState.error?.message}
                     label="모집 마감일"
+                    min={recruitStartDate || undefined}
                     value={field.value}
                     onBlur={field.onBlur}
                     onChange={field.onChange}

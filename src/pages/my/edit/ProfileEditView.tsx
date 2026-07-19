@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Button,
   ConfirmPopup,
+  DateInput,
   FooterButton,
   FormPageLayout,
   Input,
@@ -16,6 +17,7 @@ import {
 } from '@/components';
 import { useRouteBlockerConfirm } from '@/hooks/useRouteBlockerConfirm';
 import { APP_PATH } from '@/router/path';
+import { getTodayISODate } from '@/utils';
 
 import { AccountSetupSheet } from './components/AccountSetupSheet';
 import { useMyEdit } from './hooks/useMyEdit';
@@ -109,15 +111,14 @@ const MyEditContent = (): ReactElement => {
         <Text color="text.secondary" font="body-m-sb">
           기본 정보
         </Text>
-        <Input
-          clearable
+        <DateInput
           errorText={
             hasBirthDateError ? '올바른 생년월일을 입력해주세요.' : undefined
           }
-          inputMode="numeric"
-          label="생년월일 8자리"
+          label="생년월일"
+          max={getTodayISODate()}
           value={values.birthDate}
-          onChange={(event) => setBirthDate(event.target.value)}
+          onChange={setBirthDate}
         />
         <Input
           clearable
