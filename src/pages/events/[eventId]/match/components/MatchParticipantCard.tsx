@@ -117,10 +117,7 @@ const ParticipantCard = styled.label<{ $isSelected: boolean }>(
     gap: theme.spacing.lg,
     width: '100%',
     minWidth: 0,
-    padding: `${theme.spacing.lg} ${theme.spacing.lg} ${theme.spacing.lg} ${theme.spacing.xl}`,
-    border: `${theme.pxToRem(2)} solid ${
-      $isSelected ? theme.color.border.focused : 'transparent'
-    }`,
+    padding: `${theme.spacing.lg} ${theme.spacing.xl}`,
     borderRadius: theme.radius.lg,
     boxSizing: 'border-box',
     backgroundColor: $isSelected
@@ -129,7 +126,7 @@ const ParticipantCard = styled.label<{ $isSelected: boolean }>(
     cursor: 'pointer',
     touchAction: 'manipulation',
     WebkitTapHighlightColor: 'transparent',
-    transition: 'background-color 160ms ease-out, border-color 160ms ease-out',
+    transition: 'background-color 160ms ease-out',
 
     '@media (prefers-reduced-motion: reduce)': {
       transition: 'none',
