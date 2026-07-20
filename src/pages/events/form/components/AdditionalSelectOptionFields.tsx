@@ -3,13 +3,22 @@ import type { ChangeEvent, ReactElement } from "react";
 import styled from "@emotion/styled";
 import { Controller, useWatch, type UseFormReturn } from "react-hook-form";
 
-import { Button, IconButton } from "@/components";
+import { Button, HiddenText, IconButton } from "@/components";
 
 import {
   ADDITIONAL_SELECT_OPTION_DELETABLE_START_INDEX,
   ADDITIONAL_SELECT_OPTION_MAX_COUNT,
 } from "../constants";
 import type { EventFormValues } from "../schema";
+import { useStatusAnnouncement } from "../useStatusAnnouncement";
+
+// react-hook-form 이 새 필드를 등록/정리한 리렌더 이후에 실행해야 하는 포커스
+// 이동을 두 프레임 지연시킨다. (rAF 1회는 커밋 전에 실행될 수 있다)
+const focusAfterRerender = (focus: () => void): void => {
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(focus);
+  });
+};
 
 type AdditionalSelectOptionFieldsProps = {
   form: UseFormReturn<EventFormValues>;
@@ -27,6 +36,7 @@ export const AdditionalSelectOptionFields = ({
       control: form.control,
       name: `additionalQuestions.${questionIndex}.options`,
     }) ?? [];
+  const { announce, announcedMessage } = useStatusAnnouncement();
 
   if (!Array.isArray(options)) {
     return null;
@@ -40,11 +50,20 @@ export const AdditionalSelectOptionFields = ({
       return;
     }
 
+    const nextIndex = options.length;
+
     form.setValue(
       `additionalQuestions.${questionIndex}.options`,
       [...options, ""],
       { shouldDirty: true, shouldTouch: true, shouldValidate: false },
     );
+    announce(`선택지를 추가했어요. 현재 ${nextIndex + 1}개예요.`);
+    // 새 선택지 입력으로 포커스를 옮겨 추가된 위치가 바로 낭독되게 한다.
+    focusAfterRerender(() => {
+      form.setFocus(
+        `additionalQuestions.${questionIndex}.options.${nextIndex}`,
+      );
+    });
   };
   const handleRemoveOption = (optionIndex: number) => {
     if (
@@ -54,11 +73,26 @@ export const AdditionalSelectOptionFields = ({
       return;
     }
 
+    const nextOptions = options.filter(
+      (_, currentIndex) => currentIndex !== optionIndex,
+    );
+
     form.setValue(
       `additionalQuestions.${questionIndex}.options`,
-      options.filter((_, currentIndex) => currentIndex !== optionIndex),
+      nextOptions,
       { shouldDirty: true, shouldTouch: true, shouldValidate: true },
     );
+    announce(`선택지를 삭제했어요. 현재 ${nextOptions.length}개예요.`);
+    // 포커스를 갖고 있던 삭제 버튼이 행과 함께 사라질 수 있으므로, 같은 위치
+    // (마지막 행이었다면 이전 행)의 선택지 입력으로 포커스를 복구한다.
+    focusAfterRerender(() => {
+      form.setFocus(
+        `additionalQuestions.${questionIndex}.options.${Math.min(
+          optionIndex,
+          nextOptions.length - 1,
+        )}`,
+      );
+    });
   };
 
   return (
@@ -147,6 +181,8 @@ export const AdditionalSelectOptionFields = ({
           선택지 추가
         </Button>
       )}
+      {/* 선택지 추가/삭제 안내용 상시 마운트 라이브 리전. */}
+      <HiddenText role="status">{announcedMessage}</HiddenText>
     </OptionGroup>
   );
 };

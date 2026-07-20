@@ -3,7 +3,7 @@ import type { ReactElement } from "react";
 import styled from "@emotion/styled";
 import { Controller, type UseFormReturn } from "react-hook-form";
 
-import { IconButton, Text } from "@/components";
+import { HiddenText, IconButton, Text } from "@/components";
 
 import { ADDITIONAL_QUESTION_TITLE_MAX_LENGTH } from "../constants";
 import type { EventFormValues } from "../schema";
@@ -29,6 +29,7 @@ export const AdditionalQuestionCard = ({
   const title = questionType === "TEXT" ? "질문" : "투표";
   const titleInputId = `${fieldId}-question-title`;
   const titleErrorId = `${fieldId}-question-title-error`;
+  const titleCounterId = `${fieldId}-question-title-counter`;
 
   return (
     <QuestionCard>
@@ -68,7 +69,12 @@ export const AdditionalQuestionCard = ({
                 $hasError={hasVisibleError}
                 $readOnly={readOnly}
                 aria-describedby={
-                  !readOnly && fieldState.error ? titleErrorId : undefined
+                  [
+                    !readOnly && fieldState.error ? titleErrorId : null,
+                    !readOnly ? titleCounterId : null,
+                  ]
+                    .filter(Boolean)
+                    .join(" ") || undefined
                 }
                 aria-invalid={hasVisibleError || undefined}
                 enterKeyHint={questionType === "SELECT" ? "next" : "done"}
@@ -94,16 +100,20 @@ export const AdditionalQuestionCard = ({
                   ) : (
                     <span />
                   )}
-                  <Counter aria-live="polite">
+                  {/* 타이핑마다 낭독되는 aria-live 대신 입력의 aria-describedby 로
+                      연결해 포커스 시에만 글자 수 제한이 안내되게 한다. */}
+                  <Counter id={titleCounterId} role="text">
                     <Text
                       as="span"
                       color={hasVisibleError ? "text.danger" : "text.brand"}
                       font="body-s-m"
                     >
+                      <HiddenText>현재</HiddenText>
                       {titleField.value.length}
                     </Text>
                     <Text as="span" color="text.tertiary" font="body-s-m">
-                      /{ADDITIONAL_QUESTION_TITLE_MAX_LENGTH}자
+                      /<HiddenText>최대 글자 수</HiddenText>
+                      {ADDITIONAL_QUESTION_TITLE_MAX_LENGTH}자
                     </Text>
                   </Counter>
                 </InformRow>

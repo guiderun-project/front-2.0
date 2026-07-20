@@ -1,4 +1,4 @@
-import type { KeyboardEvent, ReactElement } from "react";
+import { useId, type KeyboardEvent, type ReactElement } from "react";
 
 import styled from "@emotion/styled";
 import { Controller, type UseFormReturn } from "react-hook-form";
@@ -10,6 +10,7 @@ import {
   DateInput,
   FooterButton,
   FormPageLayout,
+  HiddenText,
   Input,
   Select,
   Text,
@@ -64,6 +65,8 @@ export const EventForm = ({
   submitDisabled = false,
   minEventDate,
 }: EventFormProps): ReactElement => {
+  const privateHelperId = useId();
+  const submitBlockedHintId = useId();
   const recruitStartDate = form.watch("recruitStartDate");
   const resolvedSubmitLabel =
     mode === EVENT_FORM_MODES.EDIT ? "수정완료" : "모임 만들기";
@@ -118,6 +121,7 @@ export const EventForm = ({
                 name="name"
                 render={({ field, fieldState }) => (
                   <Input
+                    aria-required={true}
                     controlRef={field.ref}
                     errorText={fieldState.error?.message}
                     label="모임 제목"
@@ -140,6 +144,7 @@ export const EventForm = ({
                       label="모임 운영방식"
                       options={TRAINING_OPERATION_OPTIONS}
                       placeholder="모임 운영방식"
+                      required
                       sheetTitle="모임 운영방식"
                       triggerRef={field.ref}
                       value={
@@ -177,6 +182,7 @@ export const EventForm = ({
                   <PrivateField>
                     <PrivateLabel>
                       <CheckBox
+                        aria-describedby={privateHelperId}
                         checked={field.value}
                         name={field.name}
                         onBlur={field.onBlur}
@@ -186,7 +192,11 @@ export const EventForm = ({
                         비공개 모임
                       </Text>
                     </PrivateLabel>
-                    <PrivateHelper color="text.tertiary" font="body-s-m">
+                    <PrivateHelper
+                      color="text.tertiary"
+                      font="body-s-m"
+                      id={privateHelperId}
+                    >
                       {
                         "비공개 모임는 전체 목록에서는 보이지 않고,\n특정 링크를 통해서만 접근할 수 있어요."
                       }
@@ -211,6 +221,7 @@ export const EventForm = ({
                 name="date"
                 render={({ field, fieldState }) => (
                   <DateInput
+                    aria-required={true}
                     controlRef={field.ref}
                     errorText={fieldState.error?.message}
                     label="모임 일시"
@@ -227,6 +238,7 @@ export const EventForm = ({
                   name="startTime"
                   render={({ field, fieldState }) => (
                     <MaskedTimeInput
+                      aria-required={true}
                       controlRef={field.ref}
                       errorText={fieldState.error?.message}
                       label="시작시간"
@@ -241,6 +253,7 @@ export const EventForm = ({
                   name="endTime"
                   render={({ field, fieldState }) => (
                     <MaskedTimeInput
+                      aria-required={true}
                       controlRef={field.ref}
                       errorText={fieldState.error?.message}
                       label="종료 시간"
@@ -256,6 +269,7 @@ export const EventForm = ({
                 name="place"
                 render={({ field, fieldState }) => (
                   <Input
+                    aria-required={true}
                     controlRef={field.ref}
                     errorText={fieldState.error?.message}
                     label="만나는 장소"
@@ -298,6 +312,7 @@ export const EventForm = ({
                 name="recruitStartDate"
                 render={({ field, fieldState }) => (
                   <DateInput
+                    aria-required={true}
                     controlRef={field.ref}
                     errorText={fieldState.error?.message}
                     label="모집 시작일"
@@ -312,6 +327,7 @@ export const EventForm = ({
                 name="recruitEndDate"
                 render={({ field, fieldState }) => (
                   <DateInput
+                    aria-required={true}
                     controlRef={field.ref}
                     errorText={fieldState.error?.message}
                     label="모집 마감일"
@@ -353,6 +369,9 @@ export const EventForm = ({
               </FooterButton.Button>
             ) : null}
             <FooterButton.Button
+              aria-describedby={
+                submitDisabled ? submitBlockedHintId : undefined
+              }
               disabled={submitDisabled || isSubmitting || isDeleting}
               fullWidth
               size="l"
@@ -361,6 +380,13 @@ export const EventForm = ({
               {resolvedSubmitLabel}
             </FooterButton.Button>
           </FooterButton>
+          {/* 비활성 사유를 disabled 버튼에서도 낭독되는 aria-describedby 로 전달한다. */}
+          {submitDisabled ? (
+            <HiddenText id={submitBlockedHintId}>
+              입력하지 않았거나 잘못 입력한 항목이 있어 완료할 수 없어요. 위쪽
+              입력 항목의 오류를 확인해주세요.
+            </HiddenText>
+          ) : null}
         </Form>
       </FormPageLayout>
 

@@ -81,6 +81,21 @@ export const isValidTimeValue = (value: string): boolean => {
   return TIME_VALUE_PATTERN.test(value);
 };
 
+/**
+ * 'HH:MM' 시간 값을 스크린리더 안내용 한국어 라벨로 바꾼다.
+ * 예: '09:30' → '9시 30분', '18:00' → '18시 정각'
+ * '정각'/'분' 모두 받침으로 끝나 뒤에 조사 '으로'를 그대로 붙일 수 있다.
+ */
+export const formatTimeValueSrLabel = (value: string): string => {
+  if (!isValidTimeValue(value)) {
+    return value;
+  }
+
+  const [hours, minutes] = value.split(':').map(Number);
+
+  return minutes === 0 ? `${hours}시 정각` : `${hours}시 ${minutes}분`;
+};
+
 export const isTimeAfter = (time: string, baseTime: string): boolean => {
   if (!isValidTimeValue(time) || !isValidTimeValue(baseTime)) {
     return false;
