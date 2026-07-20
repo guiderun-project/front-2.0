@@ -1,4 +1,10 @@
-import { useId, useState, type ReactElement } from 'react';
+import {
+  useEffect,
+  useId,
+  useState,
+  type ReactElement,
+  type ReactNode,
+} from 'react';
 
 import styled from '@emotion/styled';
 
@@ -56,8 +62,35 @@ export const Select = <TValue extends string = string>({
     ? `${triggerBaseAccessibleName} ${REQUIRED_LABEL_TEXT}`
     : triggerBaseAccessibleName;
   const triggerAccessibleName = selectedOption
-    ? `${triggerRequiredAccessibleName}, 현재 선택: ${selectedOption.label}`
+    ? `${triggerRequiredAccessibleName}, 현재 선택: ${selectedOption.srLabel ?? selectedOption.label}`
     : triggerRequiredAccessibleName;
+  // 오류 메시지는 조건부로 삽입되어 등장 시점이 낭독되지 않으므로, 상시
+  // 마운트된 라이브 리전 미러에 다음 프레임에 주입해 안내한다. iOS
+  // VoiceOver가 동일 문자열 재주입을 재낭독하지 않아 먼저 비운 뒤 채운다.
+  const [announcedError, setAnnouncedError] = useState<ReactNode>('');
+
+  useEffect(() => {
+    let injectFrameId: number | undefined;
+    const clearFrameId = window.requestAnimationFrame(() => {
+      setAnnouncedError('');
+
+      if (!errorText) {
+        return;
+      }
+
+      injectFrameId = window.requestAnimationFrame(() => {
+        setAnnouncedError(errorText);
+      });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(clearFrameId);
+
+      if (injectFrameId !== undefined) {
+        window.cancelAnimationFrame(injectFrameId);
+      }
+    };
+  }, [errorText]);
 
   const handleOpen = () => {
     if (disabled) {
@@ -108,6 +141,8 @@ export const Select = <TValue extends string = string>({
             selectedOption,
             value,
             disabled,
+            hasError,
+            errorId,
           })
         ) : (
           <SelectTrigger
@@ -147,6 +182,7 @@ export const Select = <TValue extends string = string>({
             {errorText}
           </SelectErrorMessage>
         ) : null}
+        <HiddenText role="alert">{announcedError}</HiddenText>
       </SelectRoot>
 
       <BottomSheet
@@ -181,8 +217,11 @@ const SelectCheckList = <TValue extends string>({
   options,
   value,
 }: SelectCheckListProps<TValue>): ReactElement => {
+  // 옵션 버튼이 각각 탭 정지인 구조에서는 listbox/option(단일 탭 정지 +
+  // 방향키 전제)이 실제 조작 모델과 어긋나므로, SelectCardGroup과 동일하게
+  // radiogroup/radio + aria-checked로 단일 선택 의미를 전달한다.
   return (
-    <SelectCheckListRoot aria-label={ariaLabel} role="listbox">
+    <SelectCheckListRoot aria-label={ariaLabel} role="radiogroup">
       {options.map((option) => {
         const isSelected = option.value === value;
 
@@ -190,10 +229,11 @@ const SelectCheckList = <TValue extends string>({
           <SelectOptionButton
             key={option.value}
             $selected={isSelected}
+            aria-checked={isSelected}
             aria-disabled={option.disabled || undefined}
-            aria-selected={isSelected}
+            aria-label={option.srLabel}
             disabled={option.disabled}
-            role="option"
+            role="radio"
             type="button"
             onClick={() => onChange(option.value)}
           >
