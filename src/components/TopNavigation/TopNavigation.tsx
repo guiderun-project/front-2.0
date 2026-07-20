@@ -24,8 +24,10 @@ export type TopNavigationProps = {
   'aria-label'?: string;
 };
 
+// nav 랜드마크는 스크린리더가 역할('탐색'/'내비게이션')을 덧붙여 낭독하므로
+// 라벨에 역할어를 넣지 않는다. 하단의 '하단 메뉴'와 명명을 맞춘다.
 export const TopNavigation = ({
-  'aria-label': ariaLabel = '상단 내비게이션',
+  'aria-label': ariaLabel = '상단 메뉴',
   className,
   left,
   right,

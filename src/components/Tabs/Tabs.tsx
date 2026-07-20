@@ -21,6 +21,7 @@ import type {
 
 type TabsContextValue = {
   layout: TabsLayout;
+  listLabel?: string;
 };
 
 type TabsComponent = ((props: TabsProps) => ReactElement) & {
@@ -41,12 +42,15 @@ const TabsStyleContext = createContext<TabsContextValue>({
 const useTabsStyle = () => useContext(TabsStyleContext);
 
 const TabsRoot = ({
+  // react-aria-components 는 Tabs 루트 div 에 aria-label 을 적용하지 않고
+  // 걸러내므로, 컨텍스트로 내려 tablist 의 접근 가능한 이름으로 사용한다.
+  'aria-label': ariaLabel,
   children,
   fullWidth = DEFAULT_FULL_WIDTH,
   layout = DEFAULT_LAYOUT,
   ...props
 }: TabsProps): ReactElement => {
-  const contextValue = useMemo(() => ({ layout }), [layout]);
+  const contextValue = useMemo(() => ({ layout, listLabel: ariaLabel }), [ariaLabel, layout]);
 
   return (
     <TabsStyleContext.Provider value={contextValue}>
@@ -57,11 +61,11 @@ const TabsRoot = ({
   );
 };
 
-const TabsList = ({ children, ...props }: TabsListProps): ReactElement => {
-  const { layout } = useTabsStyle();
+const TabsList = ({ 'aria-label': ariaLabel, children, ...props }: TabsListProps): ReactElement => {
+  const { layout, listLabel } = useTabsStyle();
 
   return (
-    <StyledTabList $layout={layout} {...props}>
+    <StyledTabList $layout={layout} aria-label={ariaLabel ?? listLabel} {...props}>
       {children}
     </StyledTabList>
   );

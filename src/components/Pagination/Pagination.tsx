@@ -2,6 +2,7 @@ import type { ComponentPropsWithoutRef, ReactElement } from "react";
 
 import styled from "@emotion/styled";
 
+import { HiddenText } from "@/components/HiddenText";
 import { IconButton } from "@/components/Icon";
 import { Text } from "@/components/Text";
 
@@ -56,10 +57,10 @@ export const Pagination = ({
     <Nav aria-label={ariaLabel} {...props}>
       <List>
         <li>
-          <IconButton
+          <PagerIconButton
+            aria-disabled={isFirstPage}
             aria-label="이전 페이지"
-            color="icon.secondary"
-            disabled={isFirstPage}
+            color={isFirstPage ? "icon.disabled" : "icon.secondary"}
             icon="chevron-left-lined"
             iconSize={CHEVRON_ICON_SIZE}
             onClick={() => goTo(currentPage - 1)}
@@ -90,10 +91,10 @@ export const Pagination = ({
         })}
 
         <li>
-          <IconButton
+          <PagerIconButton
+            aria-disabled={isLastPage}
             aria-label="다음 페이지"
-            color="icon.secondary"
-            disabled={isLastPage}
+            color={isLastPage ? "icon.disabled" : "icon.secondary"}
             icon="chevron-right-lined"
             iconSize={CHEVRON_ICON_SIZE}
             onClick={() => goTo(currentPage + 1)}
@@ -101,12 +102,44 @@ export const Pagination = ({
           />
         </li>
       </List>
+      {/* 페이지 이동 결과와 전체 페이지 맥락을 스크린리더에 안내한다.
+          블록 윈도잉 때문에 화면만으로는 전체 페이지 수를 알 수 없다. */}
+      <HiddenText role="status">
+        {`총 ${totalPages}페이지 중 ${currentPage}페이지`}
+      </HiddenText>
     </Nav>
   );
 };
 
 const Nav = styled.nav`
   display: inline-flex;
+`;
+
+/**
+ * 경계 페이지에서 native disabled 를 쓰면 브라우저가 포커스를 body 로
+ * 떨어뜨려 키보드/스크린리더 사용자가 위치를 잃는다. aria-disabled 로
+ * 포커스를 보존하되(경계 밖 클릭은 goTo 가드가 무시), IconButton 의
+ * :disabled 시각 상태를 aria-disabled 셀렉터로 동일하게 재현한다.
+ * IconButton 기본 스타일보다 늦게 삽입되지 않으므로 && 로 우선순위를 높인다.
+ */
+const PagerIconButton = styled(IconButton)`
+  &&[aria-disabled="true"] {
+    cursor: not-allowed;
+    opacity: 0.48;
+  }
+
+  @media (hover: hover) {
+    &&[aria-disabled="true"]:hover {
+      background-color: transparent;
+      opacity: 0.48;
+    }
+  }
+
+  &&[aria-disabled="true"]:active {
+    background-color: transparent;
+    opacity: 0.48;
+    transform: none;
+  }
 `;
 
 const List = styled.ul`
