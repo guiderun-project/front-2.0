@@ -13,11 +13,37 @@ export const ToastViewport = (): ReactElement | null => {
   const shouldReduceMotion = useReducedMotion();
 
   const shouldAnnounceToast = toast ? toast.announce !== false : false;
+  const announcedToast = toast && shouldAnnounceToast ? toast : null;
+  const politeToast = announcedToast?.type !== 'error' ? announcedToast : null;
+  const assertiveToast = announcedToast?.type === 'error' ? announcedToast : null;
 
   return (
     <>
-      <ToastAnnouncer aria-atomic="true" aria-live="polite" role="status">
-        {toast && shouldAnnounceToast ? <span key={toast.id}>{toast.content}</span> : null}
+      {/*
+        data-live-announcer: react-aria ModalOverlay(BottomSheet/Popup)가 열릴 때
+        ariaHideOutside가 모달 밖 요소를 aria-hidden/inert 처리하는데, 이 속성이 있는
+        요소만 숨김 대상에서 제외되어 모달이 열린 동안에도 토스트가 낭독된다.
+        react-aria 비공개 규약이므로 react-aria 업그레이드 시 회귀 확인이 필요하다.
+        오류 토스트는 진행 중인 낭독에 밀리지 않도록 별도 role="alert"(assertive)
+        리전에서 낭독한다. 두 리전 모두 상시 마운트를 유지해야 한다.
+      */}
+      <ToastAnnouncer
+        aria-atomic="true"
+        aria-live="polite"
+        data-live-announcer="true"
+        role="status"
+      >
+        {politeToast ? <span key={politeToast.id}>{politeToast.content}</span> : null}
+      </ToastAnnouncer>
+      <ToastAnnouncer
+        aria-atomic="true"
+        aria-live="assertive"
+        data-live-announcer="true"
+        role="alert"
+      >
+        {assertiveToast ? (
+          <span key={assertiveToast.id}>{assertiveToast.content}</span>
+        ) : null}
       </ToastAnnouncer>
       <ToastPositioner aria-hidden="true">
         {toast ? (
