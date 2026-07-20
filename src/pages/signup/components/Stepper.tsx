@@ -44,7 +44,15 @@ export const Stepper = ({
             >
               <StepCircle $status={status}>
                 {status === 'complete' ? (
-                  <Icon color="icon.brand" icon="check-thick-lined" size={16} />
+                  <>
+                    {/* 체크 아이콘은 장식이라 숨기고, 완료 상태·순번을 텍스트로 노출한다. */}
+                    <HiddenText>{`${stepNumber}단계 완료`}</HiddenText>
+                    <Icon
+                      color="icon.brand"
+                      icon="check-thick-lined"
+                      size={16}
+                    />
+                  </>
                 ) : (
                   <Text
                     font="body-s-sb"

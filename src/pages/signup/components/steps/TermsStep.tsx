@@ -74,7 +74,8 @@ export const TermsStep = (): ReactElement => {
         </Text>
       </AllRow>
 
-      <ItemList>
+      {/* list-style: none이면 iOS VoiceOver가 리스트 시맨틱을 제거하므로 role="list"를 명시한다. */}
+      <ItemList role="list">
         {TERMS_SECTIONS.map((section) => {
           const config = SECTION_CONFIG[section.key];
           if (!config) return null;
@@ -132,14 +133,18 @@ const AllRow = styled.label(({ theme }) => ({
   cursor: "pointer",
 }));
 
-const ItemList = styled.div(({ theme }) => ({
+// ul/li 시맨틱으로 항목 수를 스크린리더에 알린다. 기본 마진·리스트 마커를
+// 제거해 기존 div 나열과 시각적으로 동일하게 유지한다.
+const ItemList = styled.ul(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   gap: theme.spacing.lg,
+  margin: 0,
   padding: `${theme.spacing.none} ${theme.spacing.xl}`,
+  listStyle: "none",
 }));
 
-const ItemRow = styled.div(({ theme }) => ({
+const ItemRow = styled.li(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   gap: theme.spacing.lg,
