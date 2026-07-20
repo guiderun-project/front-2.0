@@ -23,15 +23,14 @@ export const MatchSegmentNav = ({
   onSelect,
 }: MatchSegmentNavProps): ReactElement => {
   return (
-    <SegmentBar ref={navRef} aria-label="매칭 섹션 이동" role="tablist">
+    <SegmentBar ref={navRef} as="nav" aria-label="매칭 섹션 이동">
       {SEGMENTS.map((segment) => {
         const isActive = activeSection === segment.id;
 
         return (
           <SegmentButton
             key={segment.id}
-            aria-selected={isActive}
-            role="tab"
+            aria-current={isActive ? 'true' : undefined}
             type="button"
             $isActive={isActive}
             onClick={() => {
