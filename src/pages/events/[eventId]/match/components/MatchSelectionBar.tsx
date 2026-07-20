@@ -9,6 +9,7 @@ import type { SelectablePerson } from '../useEventMatchPage';
 
 type MatchSelectionBarProps = {
   canCreateMatching: boolean;
+  isCreatingMatching: boolean;
   selectedGuides: SelectablePerson[];
   selectedVi: SelectablePerson | null;
   onClear: () => void;
@@ -17,6 +18,7 @@ type MatchSelectionBarProps = {
 
 export const MatchSelectionBar = ({
   canCreateMatching,
+  isCreatingMatching,
   selectedGuides,
   selectedVi,
   onClear,
@@ -66,7 +68,7 @@ export const MatchSelectionBar = ({
             )}
           </SelectionItems>
           <SelectionClearButton
-            aria-label="선택 취소"
+            aria-label="선택 모두 해제"
             color="badge.text.primitive"
             icon="close-lined"
             iconSize={19.2}
@@ -76,6 +78,7 @@ export const MatchSelectionBar = ({
           />
         </SelectionContent>
         <SelectionActionButton
+          aria-busy={isCreatingMatching || undefined}
           disabled={isActionDisabled}
           type="button"
           onClick={onCreateMatching}

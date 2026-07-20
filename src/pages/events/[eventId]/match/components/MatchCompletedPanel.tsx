@@ -61,7 +61,8 @@ export const MatchCompletedPanel = ({
                 </GroupCountText>
               </GroupHeadingText>
             </GroupHeading>
-            <PairList>
+            {/* WebKit은 list-style: none인 목록의 list 역할을 제거하므로 role을 명시한다. */}
+            <PairList role="list">
               {group.rows.map((row) => (
                 <li key={row.vi.userId}>
                   <CompletedPair
@@ -133,8 +134,9 @@ const PersonContent = ({
   selected,
   onToggle,
 }: PersonSelectProps): ReactElement => {
-  const selectLabel =
-    `${RUNNER_TYPE_LABELS[person.type]} ${person.name} ${selected ? '선택 취소' : '선택'}`;
+  // 접근 가능한 이름은 안정적으로 고정한다. 선택 여부는 체크박스 checked
+  // 상태와 폴라이트 라이브 리전 안내가 전달하므로 이름에 넣지 않는다.
+  const selectLabel = `${RUNNER_TYPE_LABELS[person.type]} ${person.name} 선택`;
 
   return (
     <>
@@ -145,8 +147,10 @@ const PersonContent = ({
           onToggle(toSelectablePerson(person));
         }}
       />
-      <PersonAvatarName>
-        <RunnerTypeAvatar size="m" type={person.type} />
+      {/* 쌍 그룹 라벨과 체크박스 aria-label이 유형+이름을 이미 전달하므로
+          시각 전용 아바타·이름 블록은 중복 낭독을 막기 위해 숨긴다. */}
+      <PersonAvatarName aria-hidden={true}>
+        <RunnerTypeAvatar aria-hidden={true} size="m" type={person.type} />
         <PersonName color="text.primary" font="body-m-sb">
           {person.name}
         </PersonName>

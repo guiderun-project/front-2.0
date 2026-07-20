@@ -64,8 +64,10 @@ export const MatchParticipantCard = ({
     eventGroupLabelContext,
     participant,
   );
+  // 접근 가능한 이름은 안정적으로 고정한다. 선택 여부는 체크박스 checked
+  // 상태와 폴라이트 라이브 리전 안내가 전달하므로 이름에 넣지 않는다.
   const selectLabel =
-    `${RUNNER_TYPE_LABELS[participant.type]} ${participant.name} ${isSelected ? '선택 취소' : '선택'}`;
+    `${RUNNER_TYPE_LABELS[participant.type]} ${participant.name} 선택`;
 
   return (
     <ParticipantCard $isSelected={isSelected}>
@@ -79,8 +81,10 @@ export const MatchParticipantCard = ({
       <InfoColumn>
         <Profile>
           <NameRow>
-            <AvatarNameGroup>
-              <RunnerTypeAvatar size="m" type={participant.type} />
+            {/* 체크박스 aria-label이 유형+이름을 이미 전달하므로 시각 전용
+                아바타·이름 블록은 스크린리더 중복 낭독을 막기 위해 숨긴다. */}
+            <AvatarNameGroup aria-hidden={true}>
+              <RunnerTypeAvatar aria-hidden={true} size="m" type={participant.type} />
               <ParticipantName color="text.primary" font="body-m-sb">
                 {participant.name}
               </ParticipantName>

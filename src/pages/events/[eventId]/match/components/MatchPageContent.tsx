@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactElement } from "react";
+import { useEffect, useRef, useState, type ReactElement } from "react";
 
 import styled from "@emotion/styled";
 
@@ -56,6 +56,7 @@ export const MatchPageContent = ({
     clearSelection,
     createMatching,
     hasSelection,
+    isCreatingMatching,
     pageState,
     selectedGuides,
     selectedUserIds,
@@ -64,6 +65,41 @@ export const MatchPageContent = ({
   } = matchPage;
   const { activeSection, completedRef, navRef, scrollToSection, waitingRef } =
     useMatchScrollSpy();
+  const wasCreatingMatchingRef = useRef(false);
+
+  // 선택 바의 '선택 모두 해제'를 누르면 바가 통째로 언마운트되어 스크린리더
+  // 포커스가 body로 떨어지므로, 다음 프레임에 매칭대기 섹션 제목으로 포커스를
+  // 옮겨 낭독 커서가 목록 근처에 유지되게 한다.
+  const handleClearSelection = () => {
+    clearSelection();
+    window.requestAnimationFrame(() => {
+      waitingRef.current
+        ?.querySelector<HTMLElement>("h2")
+        ?.focus({ preventScroll: true });
+    });
+  };
+
+  useEffect(() => {
+    const wasCreatingMatching = wasCreatingMatchingRef.current;
+    wasCreatingMatchingRef.current = isCreatingMatching;
+
+    // 매칭 요청이 성공했을 때만 선택이 비워진다(실패 시 선택 유지). 성공으로
+    // 선택 바가 언마운트되면 다음 매칭을 이어갈 매칭대기 섹션 제목으로
+    // 포커스를 복구한다. rAF 지연으로 완료 안내(assertive)와의 경합을 줄인다.
+    if (!wasCreatingMatching || isCreatingMatching || hasSelection) {
+      return;
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
+      waitingRef.current
+        ?.querySelector<HTMLElement>("h2")
+        ?.focus({ preventScroll: true });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+    };
+  }, [hasSelection, isCreatingMatching, waitingRef]);
 
   return (
     <ReadyContent $hasSelectionBar={hasSelection}>
@@ -75,7 +111,7 @@ export const MatchPageContent = ({
 
       <Section ref={waitingRef}>
         <SectionHeader>
-          <Text as="h2" color="text.tertiary" font="body-m-m">
+          <Text as="h2" color="text.tertiary" font="body-m-m" tabIndex={-1}>
             매칭대기
           </Text>
         </SectionHeader>
@@ -91,7 +127,7 @@ export const MatchPageContent = ({
 
       <Section ref={completedRef}>
         <SectionHeader>
-          <Text as="h2" color="text.tertiary" font="body-m-m">
+          <Text as="h2" color="text.tertiary" font="body-m-m" tabIndex={-1}>
             매칭완료
           </Text>
         </SectionHeader>
@@ -106,9 +142,10 @@ export const MatchPageContent = ({
       {hasSelection ? (
         <MatchSelectionBar
           canCreateMatching={canCreateMatching}
+          isCreatingMatching={isCreatingMatching}
           selectedGuides={selectedGuides}
           selectedVi={selectedVi}
-          onClear={clearSelection}
+          onClear={handleClearSelection}
           onCreateMatching={createMatching}
         />
       ) : null}

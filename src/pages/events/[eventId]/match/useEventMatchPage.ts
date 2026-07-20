@@ -53,6 +53,20 @@ type SelectionAnnouncementInput = {
   selectedViId: string | null;
 };
 
+const getMatchingCompleteAnnouncement = (
+  viName: string | undefined,
+  waitingCount: number,
+): string => {
+  const completeMessage = viName
+    ? `${viName}님과 가이드러너 매칭을 완료했어요.`
+    : MATCHING_COMPLETE_MESSAGE;
+
+  // 대기 인원이 0명이면 매칭대기 빈 상태 문구·페이지 제목 변경과 같은 결론을 안내한다.
+  return waitingCount === 0
+    ? `${completeMessage} 모든 참여자가 매칭되었어요.`
+    : `${completeMessage} 매칭 대기 ${waitingCount}명 남았어요.`;
+};
+
 const getSelectionAnnouncement = ({
   person,
   selectedGuideIds,
@@ -235,9 +249,18 @@ export const useEventMatchPage = (eventId: number) => {
         },
         eventId,
       }),
-    onSuccess: async () => {
+    // 요청 시마다 라이브 리전 텍스트를 교체해 진행 중임을 안내하고, 같은 오류
+    // 문구로 재실패해도 alert 노드가 매번 변경되어 다시 낭독되게 한다.
+    onMutate: () => {
+      announcePolitely('매칭하고 있어요.');
+    },
+    onSuccess: async (data, variables) => {
+      const viName = personMap.get(variables.viId)?.name;
+
       clearSelection();
-      announceAssertively(MATCHING_COMPLETE_MESSAGE);
+      announceAssertively(
+        getMatchingCompleteAnnouncement(viName, data.summary.waitingCount),
+      );
       showToast({
         type: 'success',
         icon: 'check-thick-lined',

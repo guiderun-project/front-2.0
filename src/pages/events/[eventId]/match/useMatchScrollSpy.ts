@@ -93,6 +93,12 @@ export const useMatchScrollSpy = () => {
       behavior: 'smooth',
       top: Math.max(nextTop, 0),
     });
+
+    // 시각적 스크롤만으로는 스크린리더 낭독 커서가 움직이지 않으므로, 대상
+    // 섹션 제목(h2, tabIndex=-1)으로 포커스를 옮겨 다음 스와이프가 해당
+    // 섹션부터 이어지게 한다. preventScroll로 위의 smooth 스크롤은 유지한다.
+    const heading = target.querySelector<HTMLElement>('h2');
+    heading?.focus({ preventScroll: true });
   };
 
   return {
