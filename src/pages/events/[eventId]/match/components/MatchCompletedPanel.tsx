@@ -91,7 +91,7 @@ const CompletedPair = ({
   onToggleParticipant,
 }: CompletedPairProps): ReactElement => {
   return (
-    <PairRoot>
+    <PairRoot aria-label={getCompletedPairDescription(row)} role="group">
       <PairBoxes>
         <ViSlot>
           <PersonBox
@@ -169,6 +169,16 @@ const PersonRow = (props: PersonSelectProps): ReactElement => {
       <PersonContent {...props} />
     </PersonRowRoot>
   );
+};
+
+const getCompletedPairDescription = (row: MatchingCompletedRow) => {
+  if (row.guides.length === 0) {
+    return `${row.vi.name}의 가이드러너 없음`;
+  }
+
+  return `${row.vi.name}의 가이드러너 ${row.guides
+    .map((guide) => guide.name)
+    .join(', ')}`;
 };
 
 const GroupStack = styled.div(({ theme }) => ({
