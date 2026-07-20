@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import { useEffect, useState, type ReactElement } from "react";
 
 import styled from "@emotion/styled";
 
@@ -26,9 +26,23 @@ type MatchPageContentProps = {
 export const MatchPageMessageContent = ({
   pageState,
 }: MatchMessageContentProps): ReactElement => {
+  // 라이브 리전은 비어 있는 상태로 먼저 마운트한 뒤 다음 프레임에 메시지를
+  // 채워야 status/alert 변경이 스크린리더에 안정적으로 안내된다.
+  const [announcedMessage, setAnnouncedMessage] = useState("");
+
+  useEffect(() => {
+    const frameId = window.requestAnimationFrame(() => {
+      setAnnouncedMessage(pageState.message);
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+    };
+  }, [pageState.message]);
+
   return (
     <Content>
-      <PanelState role={pageState.role}>{pageState.message}</PanelState>
+      <PanelState role={pageState.role}>{announcedMessage}</PanelState>
     </Content>
   );
 };

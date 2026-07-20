@@ -7,7 +7,7 @@ import type {
   MatchingCompletedRow,
   MatchingUser,
 } from '@/api/types';
-import { CheckBox, HiddenText, Icon, RunnerTypeAvatar, Text } from '@/components';
+import { CheckBox, Icon, RunnerTypeAvatar, Text } from '@/components';
 import { RUNNER_TYPE_LABELS } from '@/constants';
 import type { AppTheme } from '@/styles/theme';
 
@@ -91,9 +91,8 @@ const CompletedPair = ({
   onToggleParticipant,
 }: CompletedPairProps): ReactElement => {
   return (
-    <PairRoot>
-      <HiddenText>{getCompletedPairDescription(row)}</HiddenText>
-      <PairBoxes aria-hidden={true}>
+    <PairRoot aria-label={getCompletedPairDescription(row)} role="group">
+      <PairBoxes>
         <ViSlot>
           <PersonBox
             person={row.vi}
