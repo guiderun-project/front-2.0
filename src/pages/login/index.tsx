@@ -2,13 +2,14 @@ import type { FormEvent, ReactElement } from 'react';
 import { useState } from 'react';
 
 import styled from '@emotion/styled';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { getApiErrorMessage } from '@/api/core';
 import { api } from '@/api/services';
 import {
   FooterButton,
   FormPageLayout,
+  HiddenText,
   Input,
   PageLayout,
 } from '@/components';
@@ -49,14 +50,6 @@ export const LoginPage = (): ReactElement => {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleFindId = () => {
-    navigate(`${APP_PATH.ACCOUNT_FIND}?type=${ACCOUNT_FIND_TYPE.ID}`);
-  };
-
-  const handleFindPassword = () => {
-    navigate(`${APP_PATH.ACCOUNT_FIND}?type=${ACCOUNT_FIND_TYPE.PASSWORD}`);
   };
 
   return (
@@ -109,14 +102,23 @@ export const LoginPage = (): ReactElement => {
           />
 
           <FindAccountRow>
-            <FindAccountButton type="button" onClick={handleFindId}>
+            <FindAccountLink
+              to={`${APP_PATH.ACCOUNT_FIND}?type=${ACCOUNT_FIND_TYPE.ID}`}
+            >
               아이디 찾기
-            </FindAccountButton>
+            </FindAccountLink>
             <Divider aria-hidden={true} />
-            <FindAccountButton type="button" onClick={handleFindPassword}>
+            <FindAccountLink
+              to={`${APP_PATH.ACCOUNT_FIND}?type=${ACCOUNT_FIND_TYPE.PASSWORD}`}
+            >
               비밀번호 찾기
-            </FindAccountButton>
+            </FindAccountLink>
           </FindAccountRow>
+
+          {/* 제출 진행 상태 스크린리더 안내 — 상시 마운트 리전에 텍스트만 교체 */}
+          <HiddenText role="status">
+            {isSubmitting ? '로그인 중이에요' : ''}
+          </HiddenText>
         </Container>
 
         <FooterButton>
@@ -150,11 +152,14 @@ const FindAccountRow = styled.div(({ theme }) => ({
   gap: theme.spacing['2xl'],
 }));
 
-const FindAccountButton = styled.button(({ theme }) => ({
+// 페이지 이동 동작이라 button 대신 Link(앵커) 시맨틱 사용 — 스크린리더 '링크' 탐색에 노출
+const FindAccountLink = styled(Link)(({ theme }) => ({
+  // 기존 button 요소의 UA 기본 패딩(1px 6px)을 명시해 시각 변화 방지
+  padding: '1px 6px',
   border: 0,
   backgroundColor: 'transparent',
   cursor: 'pointer',
-  appearance: 'none',
+  textDecoration: 'none',
   // 디자인 전용 타이포 — 매칭되는 typography 토큰이 없어 raw 값 사용 (fontWeight만 토큰)
   color: theme.color.text.primary,
   textAlign: 'center',
