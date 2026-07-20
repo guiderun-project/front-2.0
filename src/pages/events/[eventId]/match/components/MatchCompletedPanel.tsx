@@ -7,7 +7,7 @@ import type {
   MatchingCompletedRow,
   MatchingUser,
 } from '@/api/types';
-import { CheckBox, HiddenText, Icon, RunnerTypeAvatar, Text } from '@/components';
+import { CheckBox, Icon, RunnerTypeAvatar, Text } from '@/components';
 import { RUNNER_TYPE_LABELS } from '@/constants';
 import type { AppTheme } from '@/styles/theme';
 
@@ -92,8 +92,7 @@ const CompletedPair = ({
 }: CompletedPairProps): ReactElement => {
   return (
     <PairRoot>
-      <HiddenText>{getCompletedPairDescription(row)}</HiddenText>
-      <PairBoxes aria-hidden={true}>
+      <PairBoxes>
         <ViSlot>
           <PersonBox
             person={row.vi}
@@ -170,16 +169,6 @@ const PersonRow = (props: PersonSelectProps): ReactElement => {
       <PersonContent {...props} />
     </PersonRowRoot>
   );
-};
-
-const getCompletedPairDescription = (row: MatchingCompletedRow) => {
-  if (row.guides.length === 0) {
-    return `${row.vi.name}의 가이드러너 없음`;
-  }
-
-  return `${row.vi.name}의 가이드러너 ${row.guides
-    .map((guide) => guide.name)
-    .join(', ')}`;
 };
 
 const GroupStack = styled.div(({ theme }) => ({
