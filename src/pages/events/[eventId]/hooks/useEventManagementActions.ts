@@ -59,7 +59,11 @@ export const useEventManagementActions = ({
       onDeleteSuccess();
       onClose();
       void queryClient.invalidateQueries({ queryKey: eventDetailQueryKeys.root });
-      navigate(APP_PATH.EVENTS);
+      // SPA 라우트 전환은 자동으로 낭독되지 않으므로 RouteAnnouncer 가
+      // 목록 페이지 제목 대신 삭제 성공 사유를 낭독하도록 state 로 전달한다.
+      navigate(APP_PATH.EVENTS, {
+        state: { srAnnouncement: '모집 게시글을 삭제했어요.' },
+      });
     },
     onError: (error) => {
       window.alert(getApiErrorMessage(error, '모집 게시글 삭제에 실패했어요.'));
@@ -78,6 +82,11 @@ export const useEventManagementActions = ({
 
         downloadCsvFile({ content, filename });
         onClose();
+        showToast({
+          type: 'success',
+          icon: 'check-lined',
+          content: '출석 인원 명단을 내려받았어요.',
+        });
       } catch {
         window.alert('출석 인원 명단 추출에 실패했어요.');
       }

@@ -109,5 +109,8 @@ export const useEventDetailCtaActionProps = ({
     }
   };
 
-  return { getEventDetailCtaActionProps };
+  return {
+    getEventDetailCtaActionProps,
+    isCancelApplicationPending: cancelApplicationMutation.isPending,
+  };
 };

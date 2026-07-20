@@ -32,6 +32,7 @@ type EventDetailCtaItem = EventDetailCtaButton | EventDetailCtaNotice;
 
 type UseEventDetailCtaResult = {
   ctaItems: EventDetailCtaItem[];
+  isCancelApplicationPending: boolean;
   ratio?: ButtonGroupRatio;
 };
 
@@ -52,13 +53,14 @@ export const useEventDetailCta = ({
   const eventId = event.eventId;
   const eventDate = event.schedule.date;
   const [currentTime, setCurrentTime] = useState(() => Date.now());
-  const { getEventDetailCtaActionProps } = useEventDetailCtaActionProps({
-    canAccessProtectedTabs,
-    eventId,
-    isApplyPermissionChecking,
-    onApply,
-    onRestrictedAccess,
-  });
+  const { getEventDetailCtaActionProps, isCancelApplicationPending } =
+    useEventDetailCtaActionProps({
+      canAccessProtectedTabs,
+      eventId,
+      isApplyPermissionChecking,
+      onApply,
+      onRestrictedAccess,
+    });
   const isEventDateStarted = hasEventDateStarted(eventDate, currentTime);
 
   useEffect(() => {
@@ -115,6 +117,7 @@ export const useEventDetailCta = ({
 
   return {
     ctaItems,
+    isCancelApplicationPending,
     ratio: buttonCount === 2 ? '35:65' : undefined,
   };
 };

@@ -16,7 +16,7 @@ import {
   getEventGroupDisplayLabel,
   type EventGroupLabelContext,
 } from "../utils";
-import { PanelState } from "./PanelState";
+import { AnnouncedPanelState } from "./PanelState";
 import { ProfileAvatar } from "./ProfileAvatar";
 
 type MatchingPanelProps = {
@@ -39,19 +39,27 @@ export const MatchingPanel = ({
   showMyPartnerSummary,
 }: MatchingPanelProps): ReactElement => {
   if (isPending) {
-    return <PanelState>매칭 현황을 불러오는 중입니다.</PanelState>;
+    return (
+      <AnnouncedPanelState role="status">
+        매칭 현황을 불러오는 중입니다.
+      </AnnouncedPanelState>
+    );
   }
 
   if (isError || !data) {
     return (
-      <PanelState>
+      <AnnouncedPanelState role="alert">
         {getApiErrorMessage(error, "매칭 현황을 불러오지 못했습니다.")}
-      </PanelState>
+      </AnnouncedPanelState>
     );
   }
 
   if (data.isEmpty) {
-    return <PanelState>아직 매칭 현황이 없습니다.</PanelState>;
+    return (
+      <AnnouncedPanelState role="status">
+        아직 매칭 현황이 없습니다.
+      </AnnouncedPanelState>
+    );
   }
 
   return (
@@ -259,24 +267,27 @@ const MatchingCriteriaAccordion = ({
 
   return (
     <CriteriaSection>
-      <CriteriaHeaderButton
-        aria-controls={contentId}
-        aria-expanded={isOpen}
-        type="button"
-        onClick={handleToggle}
-      >
-        <Text color="text.secondary" font="body-l-sb">
-          매칭기준
-        </Text>
-        <ChevronIcon $isOpen={isOpen}>
-          <Icon
-            aria-hidden={true}
-            color="icon.primary"
-            icon="chevron-down-lined"
-            size={20}
-          />
-        </ChevronIcon>
-      </CriteriaHeaderButton>
+      {/* APG 아코디언 패턴: 제목을 헤딩 탐색(로터)에 노출하기 위해 버튼을 h2 로 감싼다. */}
+      <CriteriaHeading>
+        <CriteriaHeaderButton
+          aria-controls={contentId}
+          aria-expanded={isOpen}
+          type="button"
+          onClick={handleToggle}
+        >
+          <Text color="text.secondary" font="body-l-sb">
+            매칭기준
+          </Text>
+          <ChevronIcon $isOpen={isOpen}>
+            <Icon
+              aria-hidden={true}
+              color="icon.primary"
+              icon="chevron-down-lined"
+              size={20}
+            />
+          </ChevronIcon>
+        </CriteriaHeaderButton>
+      </CriteriaHeading>
 
       <CriteriaPanel
         aria-hidden={!isOpen}
@@ -582,6 +593,11 @@ const CriteriaSection = styled.section(({ theme }) => ({
   padding: `${theme.spacing.none} ${theme.spacing.none} ${theme.spacing["4xl"]}`,
   boxSizing: "border-box",
 }));
+
+const CriteriaHeading = styled.h2({
+  display: "flex",
+  margin: 0,
+});
 
 const CriteriaHeaderButton = styled.button(({ theme }) => ({
   display: "flex",

@@ -61,7 +61,7 @@ const EventDetailRouteState = ({
   return (
     <PageLayout background="bg.subtle">
       <PageTitle title={EVENT_DETAIL_DEFAULT_PAGE_TITLE} />
-      <RoutePlaceholder title={title} description={description} />
+      <RoutePlaceholder status title={title} description={description} />
     </PageLayout>
   );
 };
