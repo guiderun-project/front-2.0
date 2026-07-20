@@ -77,7 +77,11 @@ export const EventsPage = (): ReactElement => {
         <SearchEntry to={APP_PATH.EVENT_SEARCH} />
       </Header>
 
-      <Tabs selectedKey={tab} onSelectionChange={handleTabChange}>
+      <Tabs
+        aria-label="모임 목록 구분"
+        selectedKey={tab}
+        onSelectionChange={handleTabChange}
+      >
         <Tabs.List>
           <Tabs.Tab id={EVENT_LIST_TABS.UPCOMING}>예정 이벤트</Tabs.Tab>
           <Tabs.Tab id={EVENT_LIST_TABS.PAST}>지난 이벤트</Tabs.Tab>

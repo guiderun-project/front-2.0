@@ -41,19 +41,23 @@ export const EventSearchResult = ({
 
   const { items } = data;
   const { totalCount, totalPages } = data.pagination;
+  const isEmpty = items.length === 0;
 
   return (
     <>
       <EventResultHeader
         recruitFilter={recruitFilter}
         showFilters={true}
+        srStatusMessage={isEmpty ? "검색 결과가 없어요" : `총 ${totalCount}건`}
         totalCount={totalCount}
         typeFilter={typeFilter}
         onRecruitChange={onRecruitChange}
         onTypeChange={onTypeChange}
       />
-      {items.length === 0 ? (
-        <SearchEmpty role="status">
+      {isEmpty ? (
+        // 빈 상태 안내는 EventResultHeader 의 상시 마운트 status 리전이 담당한다.
+        // 콘텐츠와 함께 새로 마운트되는 라이브 리전은 낭독이 보장되지 않는다.
+        <SearchEmpty>
           <Icon
             aria-hidden={true}
             color="icon.tertiary"

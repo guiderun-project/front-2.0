@@ -51,25 +51,28 @@ export const EventBrowseResult = ({
 
   const { items } = data;
   const { totalCount, totalPages } = data.pagination;
+  const isEmpty = items.length === 0;
 
   return (
     <>
       <EventResultHeader
         recruitFilter={recruitFilter}
         showFilters={isUpcoming}
+        srStatusMessage={isEmpty ? "표시할 모임이 없어요." : `총 ${totalCount}건`}
         totalCount={totalCount}
         typeFilter={typeFilter}
         onRecruitChange={onRecruitChange}
         onTypeChange={onTypeChange}
       />
 
-      {items.length === 0 ? (
+      {isEmpty ? (
+        // 빈 상태 안내는 EventResultHeader 의 상시 마운트 status 리전이 담당한다.
+        // 콘텐츠와 함께 새로 마운트되는 라이브 리전은 낭독이 보장되지 않는다.
         <EmptyMessage
           align="center"
           as="p"
           color="text.tertiary"
           font="body-m-m"
-          role="status"
         >
           표시할 모임이 없어요.
         </EmptyMessage>

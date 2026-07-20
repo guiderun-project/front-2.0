@@ -12,7 +12,13 @@ import styled from "@emotion/styled";
 import { useNavigate } from "react-router-dom";
 
 import type { EventListTypeFilter, RecruitStatusFilter } from "@/api/types";
-import { Icon, IconButton, PageLayout, QueryBoundary } from "@/components";
+import {
+  HiddenText,
+  Icon,
+  IconButton,
+  PageLayout,
+  QueryBoundary,
+} from "@/components";
 
 import { EventSearchResult } from "../components/EventSearchResult";
 
@@ -63,6 +69,10 @@ export const EventSearchPage = (): ReactElement => {
 
   return (
     <PageLayout background="bg.default">
+      {/* 페이지에 보이는 헤딩이 없어 스크린리더 헤딩 탐색 기준점을 SR 전용으로 제공한다. */}
+      <HiddenText aria-level={1} role="heading">
+        모임 검색
+      </HiddenText>
       <SearchHeader
         role="search"
         onSubmit={(event: FormEvent) => event.preventDefault()}
@@ -77,7 +87,7 @@ export const EventSearchPage = (): ReactElement => {
           <SearchInput
             ref={inputRef}
             autoFocus
-            aria-label="이벤트 검색"
+            aria-label="모임 검색"
             enterKeyHint="search"
             placeholder={SEARCH_PLACEHOLDER}
             type="text"
