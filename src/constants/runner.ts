@@ -34,6 +34,35 @@ export const TRAINING_RECORD_LABELS: Record<
   },
 };
 
+/**
+ * 러닝 그룹 구간의 스크린리더 전용 라벨.
+ * 시각 라벨(TRAINING_RECORD_LABELS)의 물결표(~)는 VoiceOver/TalkBack 기본
+ * 구두점 설정에서 생략되어 "~50분"이 "50분"처럼 들리고 이하/이상 의미가
+ * 사라지므로, aria-label/HiddenText 용으로 범위를 풀어 쓴 라벨을 병행 제공한다.
+ *
+ * @example
+ * `${group} ${TRAINING_RECORD_SR_LABELS.VI[group]}` // 'A 50분 이하'
+ */
+export const TRAINING_RECORD_SR_LABELS: Record<
+  UserType,
+  Record<RunnerRecordGroup, string>
+> = {
+  VI: {
+    A: '50분 이하',
+    B: '51분에서 56분',
+    C: '57분에서 65분',
+    D: '66분 이상',
+    E: '기록 없음',
+  },
+  GUIDE: {
+    A: '45분 이하',
+    B: '46분에서 52분',
+    C: '53분에서 59분',
+    D: '60분 이상',
+    E: '기록 없음',
+  },
+};
+
 // 시/분/초 중 하나라도 입력되어 있으면 10KM 기록이 있다고 본다.
 export const hasRunningRecord = (record: TimeValue): boolean =>
   record.hours !== '' || record.minutes !== '' || record.seconds !== '';
