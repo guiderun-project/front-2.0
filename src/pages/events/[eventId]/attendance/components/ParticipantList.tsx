@@ -20,7 +20,8 @@ export const ParticipantList = <TParticipant extends { userId: string }>({
   }
 
   return (
-    <List>
+    // list-style 제거로 사라지는 WebKit(iOS VoiceOver)의 목록 시맨틱을 복원한다.
+    <List role="list">
       {participants.map((participant) => (
         <li key={participant.userId}>{renderParticipant(participant)}</li>
       ))}

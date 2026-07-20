@@ -14,6 +14,11 @@ import { useToast } from '@/components';
 import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
 
+import {
+  captureNextActionFocusTarget,
+  focusAttendanceTarget,
+  type AttendanceFocusTarget,
+} from './attendanceActionFocus';
 import type { AttendancePageState } from './attendancePageState';
 import { attendanceQueryKeys } from './queryKeys';
 import { useEventDetailRoute } from '../EventDetailRouteContext';
@@ -25,14 +30,18 @@ type AttendanceMutationInput = {
 };
 
 type LiveAnnouncement = {
+  id: number;
   message: string;
   politeness: 'polite' | 'assertive';
 };
 
 const EMPTY_ANNOUNCEMENT: LiveAnnouncement = {
+  id: 0,
   message: '',
   politeness: 'polite',
 };
+
+const UPDATING_ANNOUNCEMENT_MESSAGE = '처리 중이에요';
 
 export const useEventAttendanceRoute = () => {
   const navigate = useNavigate();
@@ -70,10 +79,30 @@ export const useEventAttendancePage = (eventId: number) => {
   const { showToast } = useToast();
   const [announcement, setAnnouncement] =
     useState<LiveAnnouncement>(EMPTY_ANNOUNCEMENT);
+  const [updatingParticipantIds, setUpdatingParticipantIds] = useState<
+    ReadonlySet<string>
+  >(new Set<string>());
   const updatingParticipantIdsRef = useRef(new Set<string>());
+  const pendingFocusTargetRef = useRef<AttendanceFocusTarget | null>(null);
+
+  const announce = (
+    message: string,
+    politeness: LiveAnnouncement['politeness'],
+  ) => {
+    // 같은 메시지가 연속 발생해도 재낭독되도록 id를 함께 증가시킨다.
+    setAnnouncement((previous) => ({
+      id: previous.id + 1,
+      message,
+      politeness,
+    }));
+  };
 
   const announceAssertively = (message: string) => {
-    setAnnouncement({ message, politeness: 'assertive' });
+    announce(message, 'assertive');
+  };
+
+  const announcePolitely = (message: string) => {
+    announce(message, 'polite');
   };
 
   const [attendanceQuery, canceledApplicantsQuery] = useSuspenseQueries({
@@ -101,11 +130,28 @@ export const useEventAttendancePage = (eventId: number) => {
     }
 
     updatingParticipantIdsRef.current.add(userId);
+    setUpdatingParticipantIds(new Set(updatingParticipantIdsRef.current));
     return true;
   };
 
   const finishParticipantUpdate = (userId: string) => {
     updatingParticipantIdsRef.current.delete(userId);
+    setUpdatingParticipantIds(new Set(updatingParticipantIdsRef.current));
+  };
+
+  const restoreFocusAfterUpdate = () => {
+    const focusTarget = pendingFocusTargetRef.current;
+    pendingFocusTargetRef.current = null;
+
+    if (focusTarget === null) {
+      return;
+    }
+
+    // 재조회로 카드가 다른 섹션으로 옮겨진 다음 프레임에 포커스를 되돌려
+    // 스크린리더 커서가 페이지 처음으로 리셋되지 않게 한다.
+    window.requestAnimationFrame(() => {
+      focusAttendanceTarget(focusTarget);
+    });
   };
 
   const attendMutation = useMutation({
@@ -122,6 +168,7 @@ export const useEventAttendancePage = (eventId: number) => {
         announce: false,
       });
       await invalidateAttendanceStatus();
+      restoreFocusAfterUpdate();
     },
     onError: (error, participant) => {
       announceAssertively(
@@ -150,6 +197,7 @@ export const useEventAttendancePage = (eventId: number) => {
         announce: false,
       });
       await invalidateAttendanceStatus();
+      restoreFocusAfterUpdate();
     },
     onError: (error, participant) => {
       announceAssertively(
@@ -166,9 +214,14 @@ export const useEventAttendancePage = (eventId: number) => {
 
   const attendParticipant = (participant: AttendanceParticipant) => {
     if (!startParticipantUpdate(participant.userId)) {
+      announcePolitely(UPDATING_ANNOUNCEMENT_MESSAGE);
       return;
     }
 
+    pendingFocusTargetRef.current = captureNextActionFocusTarget(
+      'waiting',
+      participant.userId,
+    );
     attendMutation.mutate({
       participantName: participant.name,
       userId: participant.userId,
@@ -177,9 +230,14 @@ export const useEventAttendancePage = (eventId: number) => {
 
   const cancelAttendance = (participant: AttendanceParticipant) => {
     if (!startParticipantUpdate(participant.userId)) {
+      announcePolitely(UPDATING_ANNOUNCEMENT_MESSAGE);
       return;
     }
 
+    pendingFocusTargetRef.current = captureNextActionFocusTarget(
+      'attended',
+      participant.userId,
+    );
     cancelAttendanceMutation.mutate({
       participantName: participant.name,
       userId: participant.userId,
@@ -197,5 +255,6 @@ export const useEventAttendancePage = (eventId: number) => {
     attendancePageState,
     attendParticipant,
     cancelAttendance,
+    updatingParticipantIds,
   };
 };

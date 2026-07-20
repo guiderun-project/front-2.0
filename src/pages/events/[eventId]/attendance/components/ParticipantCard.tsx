@@ -12,7 +12,7 @@ export const ParticipantCard = ({
   return <ParticipantCardRoot>{children}</ParticipantCardRoot>;
 };
 
-const ParticipantCardRoot = styled.article(({ theme }) => ({
+const ParticipantCardRoot = styled.div(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
