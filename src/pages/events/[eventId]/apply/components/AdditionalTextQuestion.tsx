@@ -4,7 +4,7 @@ import styled from '@emotion/styled';
 import { Controller, type Control } from 'react-hook-form';
 
 import type { AdditionalQuestionDetail } from '@/api/types';
-import { Text } from '@/components';
+import { HiddenText, Text } from '@/components';
 
 import type { EventApplyFormValues } from '../schema';
 
@@ -63,19 +63,27 @@ export const AdditionalTextQuestion = ({
               </QuestionBody>
             </QuestionCard>
             <InformRow>
-              <Counter
-                aria-label={`${value.length}/${ADDITIONAL_TEXT_ANSWER_MAX_LENGTH}자 입력`}
-                aria-live="polite"
-                id={`${inputId}-counter`}
-              >
+              {/* 카운터는 aria-describedby 로만 노출한다. aria-live 를 걸면 매
+                  타이핑마다 낭독되어 문자 에코를 방해한다(공용 InputFieldShell
+                  카운터와 동일한 정책). */}
+              <Counter id={`${inputId}-counter`} role="text">
                 <Text as="span" color="text.brand" font="body-s-m">
+                  <HiddenText>현재</HiddenText>
                   {value.length}
                 </Text>
                 <Text as="span" color="text.tertiary" font="body-s-r">
-                  /{ADDITIONAL_TEXT_ANSWER_MAX_LENGTH}자
+                  /<HiddenText>최대 글자 수</HiddenText>
+                  {ADDITIONAL_TEXT_ANSWER_MAX_LENGTH}자
                 </Text>
               </Counter>
             </InformRow>
+            {/* 최대 글자 수에 도달해 이후 입력이 무시되기 시작하는 시점을 알린다.
+                도달/해제 시에만 내용이 바뀌므로 타이핑마다 반복 낭독되지 않는다. */}
+            <HiddenText role="status">
+              {value.length === ADDITIONAL_TEXT_ANSWER_MAX_LENGTH
+                ? `최대 ${ADDITIONAL_TEXT_ANSWER_MAX_LENGTH}자에 도달했어요`
+                : ''}
+            </HiddenText>
           </QuestionField>
         );
       }}

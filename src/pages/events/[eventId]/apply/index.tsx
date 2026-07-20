@@ -16,6 +16,7 @@ export const EventApplyPage = (): ReactElement => {
     handleTrainingSafetyAgreement,
     handleViewEvent,
     handleSubmit,
+    hasJustAgreedTrainingSafety,
     isAuthReady,
     isCompleted,
     isEditMode,
@@ -28,6 +29,7 @@ export const EventApplyPage = (): ReactElement => {
     isUserPermissionReady,
     isValidEventId,
     needsTrainingSafetyAgreement,
+    submitErrorCount,
     user,
   } = useEventApplyPage();
 
@@ -35,6 +37,7 @@ export const EventApplyPage = (): ReactElement => {
     return (
       <PageLayout background="bg.subtle">
         <RoutePlaceholder
+          status
           title="잘못된 이벤트 주소예요"
           description="이벤트 주소를 다시 확인해주세요."
         />
@@ -46,6 +49,7 @@ export const EventApplyPage = (): ReactElement => {
     return (
       <PageLayout background="bg.subtle">
         <RoutePlaceholder
+          status
           title="신청 정보를 불러오고 있어요"
           description="잠시만 기다려주세요."
         />
@@ -57,6 +61,7 @@ export const EventApplyPage = (): ReactElement => {
     return (
       <PageLayout background="bg.subtle">
         <RoutePlaceholder
+          status
           title="신청 정보를 불러오지 못했어요"
           description="잠시 후 다시 시도해주세요."
         />
@@ -68,6 +73,7 @@ export const EventApplyPage = (): ReactElement => {
     return (
       <PageLayout background="bg.subtle">
         <RoutePlaceholder
+          status
           title="권한 정보를 불러오지 못했어요"
           description="잠시 후 다시 시도해주세요."
         />
@@ -79,6 +85,7 @@ export const EventApplyPage = (): ReactElement => {
     return (
       <PageLayout background="bg.subtle">
         <RoutePlaceholder
+          status
           title="로그인이 필요해요"
           description="로그인 후 이벤트 신청을 진행해주세요."
         />
@@ -100,6 +107,7 @@ export const EventApplyPage = (): ReactElement => {
     return (
       <PageLayout background="bg.subtle">
         <RoutePlaceholder
+          status
           title="참여 신청이 불가해요"
           description={ineligibleMessage}
         />
@@ -124,8 +132,10 @@ export const EventApplyPage = (): ReactElement => {
     <EventApplyForm
       event={event}
       form={form}
+      hasJustAgreedTrainingSafety={hasJustAgreedTrainingSafety}
       isEditMode={isEditMode}
       isSubmitting={isSubmitting}
+      submitErrorCount={submitErrorCount}
       user={user}
       onBack={handleBack}
       onSubmit={handleSubmit}

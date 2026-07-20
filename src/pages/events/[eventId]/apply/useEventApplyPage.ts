@@ -64,6 +64,9 @@ export const useEventApplyPage = () => {
   const { event, eventId, isValidEventId } = useEventDetailRoute();
   const [isCompleted, setIsCompleted] = useState(false);
   const [isSubmitLocked, setIsSubmitLocked] = useState(false);
+  // 제출 실패 횟수. 실패할 때마다 증가시켜 폼이 제출 버튼으로 포커스를
+  // 복귀시키는 트리거로 쓴다(버튼 disabled 해제 후 rAF 시점에 수행).
+  const [submitErrorCount, setSubmitErrorCount] = useState(0);
   const submitLockRef = useRef(false);
   const viewerKey = getEventDetailViewerKey(user?.userId);
 
@@ -259,12 +262,22 @@ export const useEventApplyPage = () => {
 
     lockSubmit();
 
+    // 실패 카운트 증가는 unlockSubmit 과 같은 렌더에 묶어, 폼의 포커스 복귀
+    // effect 가 버튼이 disabled 에서 풀린 뒤에 실행되도록 보장한다.
+    const handleSubmitSettled = (_data: unknown, error: unknown) => {
+      unlockSubmit();
+
+      if (error) {
+        setSubmitErrorCount((previous) => previous + 1);
+      }
+    };
+
     if (isEditMode) {
-      updateMutation.mutate(values, { onSettled: unlockSubmit });
+      updateMutation.mutate(values, { onSettled: handleSubmitSettled });
       return;
     }
 
-    createMutation.mutate(values, { onSettled: unlockSubmit });
+    createMutation.mutate(values, { onSettled: handleSubmitSettled });
   };
 
   const isMyFormReady =
@@ -282,6 +295,9 @@ export const useEventApplyPage = () => {
     handleTrainingSafetyAgreement,
     handleViewEvent,
     handleSubmit,
+    // 이번 방문에서 방금 면책 동의를 마치고 폼으로 전환됐는지.
+    // 폼이 동의 저장 완료를 스크린리더에 안내하는 데 쓴다.
+    hasJustAgreedTrainingSafety: trainingSafetyPermissionMutation.isSuccess,
     isAuthReady,
     isCompleted,
     isEditMode,
@@ -297,6 +313,7 @@ export const useEventApplyPage = () => {
     isValidEventId,
     needsTrainingSafetyAgreement:
       user !== null && userPermissionQuery.data?.trainingSafety === false,
+    submitErrorCount,
     user,
   };
 };
