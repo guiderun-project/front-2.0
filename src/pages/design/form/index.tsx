@@ -1,6 +1,7 @@
 import type { FormEvent, ReactElement } from 'react';
 
 import styled from '@emotion/styled';
+import { useNavigate } from 'react-router-dom';
 
 import {
   FooterButton,
@@ -12,6 +13,8 @@ import {
 } from '@/components';
 
 export const FormDesignPage = (): ReactElement => {
+  const navigate = useNavigate();
+
   return (
     <PageLayout background="bg.subtle">
       <FormPageLayout
@@ -19,6 +22,7 @@ export const FormDesignPage = (): ReactElement => {
           left: {
             icon: 'chevron-left-lined',
             ariaLabel: '이전 페이지로 이동',
+            onClick: () => navigate(-1),
           },
         }}
         title={'훈련 모임 정보를\n작성해주세요'}
