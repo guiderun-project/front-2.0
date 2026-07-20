@@ -20,6 +20,8 @@ type UsePhoneCertificationReturn = {
   isExpired: boolean;
   canExtend: boolean;
   timerText: string;
+  /** 만료 시 스크린리더 라이브 리전에 넣을 안내 문구. 만료 전에는 빈 문자열이다. */
+  expiredAnnouncement: string;
   certInputRef: RefObject<HTMLInputElement | null>;
   handlePhoneChange: (event: ChangeEvent<HTMLInputElement>) => void;
   handleCertCodeChange: (event: ChangeEvent<HTMLInputElement>) => void;
@@ -96,15 +98,25 @@ export const usePhoneCertification = (): UsePhoneCertificationReturn => {
     startTimer(response?.expiresInSeconds ?? DEFAULT_TIMER_SECONDS);
   };
 
+  const isExpired = isCodeSent && remainingSeconds <= 0;
+  // 타이머 텍스트는 aria-describedby라 포커스 시에만 읽히므로, 만료 순간을
+  // 라이브 리전으로 알릴 안내 문구를 함께 내려준다. 연장 가능 여부로 행동 안내를 분기한다.
+  const expiredAnnouncement = isExpired
+    ? canExtend
+      ? '인증 시간이 만료됐어요. 시간연장 버튼을 눌러주세요.'
+      : '인증 시간이 만료됐어요. 인증번호를 다시 요청해주세요.'
+    : '';
+
   return {
     phoneNum,
     certCode,
     isCodeSent,
     verificationId,
     remainingSeconds,
-    isExpired: isCodeSent && remainingSeconds <= 0,
+    isExpired,
     canExtend,
     timerText: formatRemainingTime(remainingSeconds),
+    expiredAnnouncement,
     certInputRef,
     handlePhoneChange,
     handleCertCodeChange,

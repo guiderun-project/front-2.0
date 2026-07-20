@@ -1,5 +1,5 @@
 import type { ReactElement, ReactNode } from 'react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
@@ -9,6 +9,7 @@ import { api } from '@/api/services';
 import {
   FooterButton,
   FormPageLayout,
+  HiddenText,
   Icon,
   Input,
   PageLayout,
@@ -54,6 +55,9 @@ export const FindPassword = (): ReactElement => {
   const [verifyError, setVerifyError] = useState('');
   const [certError, setCertError] = useState('');
   const [resetError, setResetError] = useState('');
+  // 단계 전환 결과를 스크린리더에 알리는 안내 문구. 상시 마운트된 라이브 리전에 주입한다.
+  const [phaseAnnouncement, setPhaseAnnouncement] = useState('');
+  const titleRef = useRef<HTMLSpanElement>(null);
   const {
     phoneNum,
     certCode,
@@ -62,12 +66,22 @@ export const FindPassword = (): ReactElement => {
     isExpired,
     canExtend,
     timerText,
+    expiredAnnouncement,
     certInputRef,
     handlePhoneChange,
     handleCertCodeChange,
     sendCode,
     extendTime,
   } = usePhoneCertification();
+
+  // 단계 전환 시 새 화면의 제목(h1)으로 포커스를 옮겨, 언마운트된 버튼에서 유실된
+  // 포커스를 복구하고 스크린리더가 새 단계 제목을 낭독하게 한다. (signup 단계 전환 패턴)
+  useEffect(() => {
+    const heading = titleRef.current?.closest<HTMLElement>('h1');
+    if (!heading) return;
+    heading.setAttribute('tabindex', '-1');
+    heading.focus();
+  }, [phase]);
 
   const passwordMismatch =
     confirmPassword.length > 0 && newPassword !== confirmPassword;
@@ -78,6 +92,8 @@ export const FindPassword = (): ReactElement => {
 
   const handleBack = () => {
     if (phase !== FIND_PASSWORD_PHASE.VERIFY) {
+      // 같은 안내를 다시 만나도 재낭독되도록 인증 단계로 돌아갈 때 안내를 비운다.
+      setPhaseAnnouncement('');
       setPhase(FIND_PASSWORD_PHASE.VERIFY);
       return;
     }
@@ -126,6 +142,7 @@ export const FindPassword = (): ReactElement => {
           number: certCode,
         });
       setToken(issuedToken);
+      setPhaseAnnouncement('본인 인증이 완료됐어요. 새 비밀번호를 입력해주세요.');
       setPhase(FIND_PASSWORD_PHASE.RESET);
     } catch (error) {
       setCertError(getApiErrorMessage(error, CERT_CODE_ERROR_MESSAGE));
@@ -145,6 +162,9 @@ export const FindPassword = (): ReactElement => {
 
     try {
       await api.auth.newPasswordPatch({ token, newPassword });
+      setPhaseAnnouncement(
+        '비밀번호 변경이 완료됐어요. 변경된 비밀번호로 로그인해주세요.',
+      );
       setPhase(FIND_PASSWORD_PHASE.DONE);
     } catch (error) {
       setResetError(getApiErrorMessage(error, RESET_ERROR_MESSAGE));
@@ -169,13 +189,14 @@ export const FindPassword = (): ReactElement => {
     }
   };
 
+  // 제목 내용을 ref 스팬으로 감싸 단계 전환 시 closest('h1')로 포커스 대상 제목을 찾는다.
   const resolveTitle = (): ReactNode => {
     if (phase === FIND_PASSWORD_PHASE.RESET) {
-      return TITLE_RESET;
+      return <span ref={titleRef}>{TITLE_RESET}</span>;
     }
     if (phase === FIND_PASSWORD_PHASE.DONE) {
       return (
-        <DoneTitleBox>
+        <DoneTitleBox ref={titleRef}>
           <Text as="span" color="text.secondary" font="body-m-m">
             비밀번호 변경 완료
           </Text>
@@ -185,7 +206,7 @@ export const FindPassword = (): ReactElement => {
         </DoneTitleBox>
       );
     }
-    return TITLE_VERIFY;
+    return <span ref={titleRef}>{TITLE_VERIFY}</span>;
   };
 
   return (
@@ -207,6 +228,11 @@ export const FindPassword = (): ReactElement => {
         }}
         title={resolveTitle()}
       >
+        {/* SR 전용 라이브 리전. 빈 상태로 상시 마운트해 두고 텍스트만 바꿔야
+            iOS VoiceOver/Android TalkBack이 변경을 안정적으로 낭독한다. */}
+        <HiddenText role="status">{phaseAnnouncement}</HiddenText>
+        <HiddenText role="status">{expiredAnnouncement}</HiddenText>
+
         {phase === FIND_PASSWORD_PHASE.VERIFY && (
           <Container>
             <Input
