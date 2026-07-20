@@ -30,6 +30,7 @@ import {
   typographyStyle,
 } from "./fieldStyles";
 import type { InputFieldOwnProps } from "./Input.types";
+import { useFieldErrorAnnouncement } from "./useFieldErrorAnnouncement";
 
 type FieldValue = string | number | readonly string[];
 
@@ -152,6 +153,12 @@ export const InputFieldShell = <
   const message = hasError ? errorText : helperText;
   const hasMessage = Boolean(message);
   const showCounter = maxLength != null;
+  // 오류는 aria-describedby 외에 상시 마운트된 라이브 리전으로도 미러링해야
+  // 포커스가 다른 곳에 있을 때 나타나는 오류를 스크린리더가 놓치지 않는다.
+  const errorAnnouncement = useFieldErrorAnnouncement(
+    hasError ? errorText : null,
+  );
+  const isAtMaxLength = maxLength != null && length >= maxLength;
 
   const describedBy =
     [
@@ -240,6 +247,14 @@ export const InputFieldShell = <
             </Counter>
           )}
         </InfoRow>
+      )}
+      <HiddenText role="status">{errorAnnouncement}</HiddenText>
+      {showCounter && (
+        // 최대 글자 수에 도달해 이후 입력이 무시되기 시작하는 시점을 알린다.
+        // 도달/해제 시에만 내용이 바뀌므로 타이핑마다 반복 낭독되지 않는다.
+        <HiddenText role="status">
+          {isAtMaxLength ? `최대 ${maxLength}자에 도달했어요` : ""}
+        </HiddenText>
       )}
     </Root>
   );

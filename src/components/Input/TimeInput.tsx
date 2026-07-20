@@ -3,6 +3,8 @@ import { Fragment, useId, useRef, useState } from "react";
 
 import styled from "@emotion/styled";
 
+import { HiddenText } from "@/components/HiddenText";
+
 import {
   CONTROL_TOP_SPACE,
   FIELD_MIN_HEIGHT,
@@ -12,6 +14,7 @@ import {
 } from "./fieldStyles";
 import { FieldLabelContent } from "./FieldLabelContent";
 import type { TimeInputProps, TimeValue } from "./Input.types";
+import { useFieldErrorAnnouncement } from "./useFieldErrorAnnouncement";
 
 type SegmentKey = "hours" | "minutes" | "seconds";
 
@@ -60,6 +63,11 @@ export const TimeInput = ({
   const message = hasError ? errorText : helperText;
   const hasMessage = Boolean(message);
   const hasValue = Boolean(current.hours || current.minutes || current.seconds);
+  // 오류는 aria-describedby 외에 상시 마운트된 라이브 리전으로도 미러링해야
+  // 포커스가 다른 곳에 있을 때 나타나는 오류를 스크린리더가 놓치지 않는다.
+  const errorAnnouncement = useFieldErrorAnnouncement(
+    hasError ? errorText : null,
+  );
 
   const commit = (next: TimeValue): void => {
     if (!isControlled) {
@@ -119,11 +127,19 @@ export const TimeInput = ({
     input.setSelectionRange(end, end);
   };
 
-  // 세 칸을 하나의 인풋처럼 다룬다: 어디를 클릭하든(칸 내부 포함) 브라우저 기본
-  // 캐럿 배치를 막고, 미완성 칸의 끝(비어 있으면 맨 앞)으로 포커스를 고정한다.
+  // 박스 여백/구분자/라벨을 클릭하면 미완성 칸의 끝(비어 있으면 맨 앞)으로
+  // 포커스를 고정해 세 칸을 하나의 인풋처럼 다룬다. 단, 세그먼트 input을 직접
+  // 탭한 경우에는 브라우저 기본 포커스를 존중한다 — 스크린리더 더블탭은
+  // 접근성 포커스된 칸의 중앙에 합성 탭을 보내므로, 여기서 preventDefault 후
+  // 다른 칸으로 리다이렉트하면 VoiceOver/TalkBack 사용자가 선택한 칸이 아닌
+  // 칸으로 포커스가 튕긴다.
   const handleBoxPointerDown = (
     event: React.PointerEvent<HTMLDivElement>,
   ): void => {
+    if (event.target instanceof HTMLInputElement) {
+      return;
+    }
+
     event.preventDefault();
     const firstIncompleteIndex = SEGMENTS.findIndex(
       (segment) => current[segment.key].length < MAX_SEGMENT_LENGTH,
@@ -155,8 +171,11 @@ export const TimeInput = ({
             <Fragment key={segment.key}>
               {index > 0 && <Separator aria-hidden="true">:</Separator>}
               <Segment
+                // 그룹의 aria-describedby/labelledby는 모바일 스크린리더가
+                // 내부 input 포커스 시 낭독하지 않으므로 각 칸에도 연결한다.
+                aria-describedby={hasMessage ? messageId : undefined}
                 aria-invalid={hasError || undefined}
-                aria-label={segment.label}
+                aria-label={`${label} ${segment.label}`}
                 inputMode="numeric"
                 maxLength={MAX_SEGMENT_LENGTH}
                 onChange={handleSegmentChange(index, segment.key)}
@@ -181,6 +200,7 @@ export const TimeInput = ({
           {message}
         </Message>
       )}
+      <HiddenText role="status">{errorAnnouncement}</HiddenText>
     </Root>
   );
 };
