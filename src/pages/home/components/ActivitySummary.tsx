@@ -45,7 +45,7 @@ export const ActivitySummary = (): ReactElement => {
     const metricsLabel = `지금까지 함께한 모임 총 ${participationCount}회, 누적 ${runningDistanceKm}킬로미터`;
 
     return (
-      <Section>
+      <Section aria-label="활동 요약">
         <HeadlineRow>
           <Headline>
             <HiddenText>
@@ -94,7 +94,7 @@ export const ActivitySummary = (): ReactElement => {
   const metricsLabel = `올해 러너들이 함께한 모임 총 ${eventCount}회, 누적 ${runningDistanceKm}킬로미터`;
 
   return (
-    <Section>
+    <Section aria-label="활동 요약">
       <HeadlineRow>
         <Headline>
           <HiddenText>올해도 러너들은 열심히 달리고 있어요</HiddenText>

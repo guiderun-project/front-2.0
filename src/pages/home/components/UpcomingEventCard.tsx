@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 
 import { Badge, Icon, Text } from "@/components";
 import { APP_PATH } from "@/router/path";
+import { formatDateSrLabel } from "@/utils";
 
 import {
   formatDday,
@@ -22,7 +23,10 @@ export const UpcomingEventCard = ({
   event,
 }: UpcomingEventCardProps): ReactElement => {
   const dateText = formatGuestEventDate(event.date);
-  const ariaLabel = `${event.name}, ${formatDdayLabel(event.dDay)}, ${dateText}`;
+  // 시각 표기('2026. 07. 21 화')는 스크린리더가 숫자·요일을 끊어 읽어
+  // 낭독 라벨만 '2026년 7월 21일 화요일' 형식으로 병기한다.
+  const dateSrLabel = formatDateSrLabel(event.date, { withWeekday: true });
+  const ariaLabel = `${event.name}, ${formatDdayLabel(event.dDay)}, ${dateSrLabel}`;
 
   return (
     <RowItem>
