@@ -194,7 +194,7 @@ export const router = createBrowserRouter([
               EventsPage,
               'public',
               createRouteFallback('bg.default'),
-              '전체 모임',
+              ROUTE_PAGE_TITLES.EVENTS,
             ),
           },
           {
@@ -203,7 +203,7 @@ export const router = createBrowserRouter([
               DesignPage,
               'public',
               createRouteFallback('bg.subtle'),
-              '디자인 시스템',
+              ROUTE_PAGE_TITLES.DESIGN,
             ),
           },
           {
@@ -212,7 +212,7 @@ export const router = createBrowserRouter([
               MyPage,
               'authenticated',
               createRouteFallback('bg.subtle'),
-              '마이페이지',
+              ROUTE_PAGE_TITLES.MY,
             ),
           },
         ],
@@ -223,7 +223,7 @@ export const router = createBrowserRouter([
           EventSearchPage,
           'public',
           createRouteFallback('bg.default'),
-          '모임 검색',
+          ROUTE_PAGE_TITLES.EVENT_SEARCH,
         ),
       },
       {
@@ -232,7 +232,7 @@ export const router = createBrowserRouter([
           FormDesignPage,
           'public',
           createRouteFallback('bg.subtle'),
-          '폼 디자인',
+          ROUTE_PAGE_TITLES.DESIGN_FORM,
         ),
       },
       {
@@ -241,7 +241,7 @@ export const router = createBrowserRouter([
           IntroPage,
           'public',
           createRouteFallback('bg.subtle', 'gradient.bg.brand-main'),
-          '시작하기',
+          ROUTE_PAGE_TITLES.INTRO,
         ),
       },
       {
@@ -250,7 +250,7 @@ export const router = createBrowserRouter([
           KakaoOAuthPage,
           'public',
           createRouteFallback('bg.subtle'),
-          '로그인 처리',
+          ROUTE_PAGE_TITLES.OAUTH,
         ),
       },
       {
@@ -259,7 +259,7 @@ export const router = createBrowserRouter([
           LoginPage,
           'guest-only',
           createRouteFallback('bg.default'),
-          '로그인',
+          ROUTE_PAGE_TITLES.LOGIN,
         ),
       },
       {
@@ -268,7 +268,7 @@ export const router = createBrowserRouter([
           SignupPage,
           'guest-only',
           createRouteFallback('bg.subtle'),
-          '회원가입',
+          ROUTE_PAGE_TITLES.SIGNUP,
         ),
       },
       {
@@ -285,7 +285,7 @@ export const router = createBrowserRouter([
           TermsPage,
           'public',
           createRouteFallback('bg.subtle'),
-          '약관',
+          ROUTE_PAGE_TITLES.TERMS,
         ),
       },
       {
@@ -294,7 +294,7 @@ export const router = createBrowserRouter([
           EventNewPage,
           'approved',
           createRouteFallback('bg.subtle'),
-          '모임 만들기',
+          ROUTE_PAGE_TITLES.EVENT_NEW,
         ),
       },
       {
@@ -353,7 +353,7 @@ export const router = createBrowserRouter([
           EventSupportPage,
           'public',
           createRouteFallback('bg.subtle'),
-          '이동지원 연락처',
+          ROUTE_PAGE_TITLES.EVENT_SUPPORT,
         ),
       },
       {
@@ -362,7 +362,7 @@ export const router = createBrowserRouter([
           MyEventsPage,
           'authenticated',
           createRouteFallback('bg.subtle'),
-          '나의 활동',
+          ROUTE_PAGE_TITLES.MY_EVENTS,
         ),
       },
       {
@@ -379,7 +379,7 @@ export const router = createBrowserRouter([
           AccountDeletePage,
           'authenticated',
           createRouteFallback('bg.subtle'),
-          '회원 탈퇴',
+          ROUTE_PAGE_TITLES.ACCOUNT_DELETE,
         ),
       },
       {

@@ -22,7 +22,18 @@ export const GuestOnlyRoute = ({
   }
 
   if (user) {
-    return <Navigate replace state={{ from: location }} to={APP_PATH.HOME} />;
+    // 앱 셸의 라우트 어나운서(App.tsx RouteAnnouncer)가 srAnnouncement를
+    // 라이브 리전으로 낭독해 무음 리다이렉트를 막는다.
+    return (
+      <Navigate
+        replace
+        state={{
+          from: location,
+          srAnnouncement: '이미 로그인되어 있어 홈화면으로 이동했어요.',
+        }}
+        to={APP_PATH.HOME}
+      />
+    );
   }
 
   return <>{children}</>;

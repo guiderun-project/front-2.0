@@ -46,5 +46,17 @@ export const ProtectedRoute = ({
     return <>{children}</>;
   }
 
-  return <Navigate replace state={{ from: location }} to={APP_PATH.INTRO} />;
+  // 무음 리다이렉트를 막기 위해 사유를 담아 보내면, 앱 셸의 라우트 어나운서
+  // (App.tsx RouteAnnouncer)가 srAnnouncement를 라이브 리전으로 낭독한다.
+  const srAnnouncement = user
+    ? '아직 이용 승인이 완료되지 않아 시작하기 페이지로 이동했어요.'
+    : '로그인이 필요해 시작하기 페이지로 이동했어요.';
+
+  return (
+    <Navigate
+      replace
+      state={{ from: location, srAnnouncement }}
+      to={APP_PATH.INTRO}
+    />
+  );
 };
