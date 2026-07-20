@@ -1,12 +1,14 @@
-import { useId, useState, type ReactElement } from 'react';
+import { useId, useRef, useState, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
 import { getApiErrorMessage } from '@/api/core';
 import { BottomSheet } from '../BottomSheet';
 import { Button, ButtonGroup } from '../Button';
+import { HiddenText } from '../HiddenText';
 import { Input } from '../Input';
 import { Text } from '../Text';
+import { useAnnouncedMessage } from './hooks/useAnnouncedMessage';
 import { useSaveRunningDistance } from './hooks/useSaveRunningDistance';
 import { useSkipRunningDistance } from './hooks/useSkipRunningDistance';
 
@@ -32,19 +34,27 @@ const parseDistance = (value: string): number | null => {
 type RunningRecordSheetProps = {
   eventId: number;
   eventName: string;
+  onSaved: () => void;
 };
 
 export const RunningRecordSheet = ({
   eventId,
   eventName,
+  onSaved,
 }: RunningRecordSheetProps): ReactElement => {
   const unitId = useId();
   const [isInputStep, setIsInputStep] = useState(false);
   const [distance, setDistance] = useState('');
+  const distanceInputRef = useRef<HTMLInputElement>(null);
 
   const { error, isError, isPending, mutate, reset } =
     useSaveRunningDistance(eventId);
-  const { isPending: isSkipping, mutate: skip } = useSkipRunningDistance(eventId);
+  const {
+    error: skipError,
+    isError: isSkipError,
+    isPending: isSkipping,
+    mutate: skip,
+  } = useSkipRunningDistance(eventId);
 
   const handleSkip = () => {
     if (isSkipping) {
@@ -61,6 +71,18 @@ export const RunningRecordSheet = ({
         '러닝 거리를 저장하지 못했어요. 다시 시도해주세요.',
       )
     : undefined;
+  // '괜찮아요'(건너뛰기) 실패는 화면에 별도 표시가 없어 라이브 리전으로만 안내한다.
+  const skipErrorText = isSkipError
+    ? getApiErrorMessage(skipError, '요청에 실패했어요. 다시 시도해주세요.')
+    : undefined;
+
+  // 제출 중에는 버튼이 disabled 되며 포커스가 사라지므로, 진행/실패 상태를
+  // 다이얼로그 내부의 상시 마운트 라이브 리전으로 안내한다.
+  // (저장 실패 오류는 Input 내부의 오류 미러링 리전이 낭독한다.)
+  const announcedPendingMessage = useAnnouncedMessage(
+    isPending ? '저장 중이에요' : isSkipping ? '건너뛰는 중이에요' : '',
+  );
+  const announcedSkipErrorMessage = useAnnouncedMessage(skipErrorText ?? '');
 
   const title = (
     <>
@@ -89,7 +111,18 @@ export const RunningRecordSheet = ({
       return;
     }
 
-    mutate(parsedDistance);
+    mutate(parsedDistance, {
+      onSuccess: () => {
+        onSaved();
+      },
+      onError: () => {
+        // 오류 텍스트가 렌더된 다음 프레임에 입력으로 포커스를 옮겨
+        // 라벨과 aria-describedby 오류가 함께 낭독되게 한다.
+        window.requestAnimationFrame(() => {
+          distanceInputRef.current?.focus();
+        });
+      },
+    });
   };
 
   const footer = isInputStep ? (
@@ -128,12 +161,15 @@ export const RunningRecordSheet = ({
       footer={footer}
       onClose={handleSkip}
     >
+      <HiddenText role="status">{announcedPendingMessage}</HiddenText>
+      <HiddenText role="alert">{announcedSkipErrorMessage}</HiddenText>
       {isInputStep ? (
         <Content>
           <Input
             autoFocus
             clearLabel="러닝 거리 지우기"
             clearable
+            controlRef={distanceInputRef}
             describedById={unitId}
             errorText={errorText}
             inputMode="decimal"
