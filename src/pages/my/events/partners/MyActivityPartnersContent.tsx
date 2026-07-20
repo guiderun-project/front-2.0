@@ -15,11 +15,13 @@ import { MyActivityPartnersResult } from './MyActivityPartnersResult';
 type MyActivityPartnersContentProps = {
   page: number;
   sort: MyActivityPartnerSort;
+  onLoaded?: (totalCount: number) => void;
   onPageChange: (page: number) => void;
   onSortChange: (sort: MyActivityPartnerSort) => void;
 };
 
 export const MyActivityPartnersContent = ({
+  onLoaded,
   onPageChange,
   onSortChange,
   page,
@@ -32,6 +34,7 @@ export const MyActivityPartnersContent = ({
           함께 달린 파트너
         </Text>
         <Filter
+          ariaLabel="정렬 기준"
           icon="sort-lined"
           mode="cycle"
           options={PARTNER_SORT_OPTIONS}
@@ -44,6 +47,7 @@ export const MyActivityPartnersContent = ({
         <MyActivityPartnersResult
           page={page}
           sort={sort}
+          onLoaded={onLoaded}
           onPageChange={onPageChange}
         />
       </QueryBoundary>

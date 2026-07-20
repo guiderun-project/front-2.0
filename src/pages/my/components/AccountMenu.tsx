@@ -4,6 +4,8 @@ import styled from '@emotion/styled';
 
 import { Icon, Text } from '@/components';
 
+import { HiddenHeading } from './HiddenHeading';
+
 type AccountMenuItem = {
   key: string;
   label: string;
@@ -38,6 +40,7 @@ export const AccountMenu = ({
 
   return (
     <Card aria-label="계정 설정">
+      <HiddenHeading>계정 설정</HiddenHeading>
       {items.map((item, index) => (
         <Fragment key={item.key}>
           {index > 0 ? <Divider aria-hidden={true} /> : null}

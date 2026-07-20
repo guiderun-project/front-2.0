@@ -7,6 +7,7 @@ import {
   ConfirmPopup,
   FooterButton,
   FormPageLayout,
+  HiddenText,
   PageLayout,
   QueryBoundary,
   Select,
@@ -14,15 +15,23 @@ import {
   TimeInput,
   useToast,
   type SelectOptions,
+  type TimeValue,
 } from '@/components';
-import { TRAINING_RECORD_LABELS, type RunnerRecordGroup } from '@/constants';
+import {
+  deriveRunningGroupIfComplete,
+  TRAINING_RECORD_LABELS,
+  TRAINING_RECORD_SR_LABELS,
+  type RunnerRecordGroup,
+} from '@/constants';
 import { useRouteBlockerConfirm } from '@/hooks/useRouteBlockerConfirm';
+import { useAnnouncedMessage } from '@/pages/my/hooks/useAnnouncedMessage';
 import { APP_PATH } from '@/router/path';
 
 import { HOPE_PREFS_MAX_LENGTH, useRunningEdit } from './hooks/useRunningEdit';
 
 const LOADING_MESSAGE = '러닝 정보를 불러오는 중이에요.';
 const ERROR_MESSAGE = '러닝 정보를 불러오지 못했어요.';
+const SUBMIT_FAILURE_MESSAGE = '정보 수정에 실패했어요. 다시 시도해주세요.';
 
 const RECORD_GROUPS: readonly RunnerRecordGroup[] = ['A', 'B', 'C', 'D', 'E'];
 
@@ -83,11 +92,42 @@ const MyRunningEditContent = (): ReactElement => {
     onConfirm: handleExitConfirm,
   });
 
+  const [submitFailure, setSubmitFailure] = useState({ message: '', revision: 0 });
+  const announcedSubmitFailure = useAnnouncedMessage(
+    submitFailure.message,
+    submitFailure.revision,
+  );
+  const [groupChangeNotice, setGroupChangeNotice] = useState({
+    message: '',
+    revision: 0,
+  });
+  const announcedGroupChangeNotice = useAnnouncedMessage(
+    groupChangeNotice.message,
+    groupChangeNotice.revision,
+  );
+
   const recordGroupOptions: SelectOptions<RunnerRecordGroup> =
     RECORD_GROUPS.map((group) => ({
       value: group,
       label: `${group} ${TRAINING_RECORD_LABELS[userType][group]}`,
+      // "A ~50분"의 물결표는 낭독에서 생략되므로 "A 50분 이하"로 풀어 읽는다.
+      srLabel: `${group} ${TRAINING_RECORD_SR_LABELS[userType][group]}`,
     }));
+
+  // 기록 6자리 완성 시 러닝 그룹이 조용히 자동 변경되므로(setRecord),
+  // 기록 입력 필드에 포커스 중인 스크린리더 사용자에게 변경을 안내한다.
+  const handleRecordChange = (value: TimeValue) => {
+    const nextGroup = deriveRunningGroupIfComplete(value, userType);
+
+    if (nextGroup !== null && nextGroup !== values.recordDegree) {
+      setGroupChangeNotice((previous) => ({
+        message: `러닝 그룹이 ${nextGroup} ${TRAINING_RECORD_SR_LABELS[userType][nextGroup]} 그룹으로 변경되었어요`,
+        revision: previous.revision + 1,
+      }));
+    }
+
+    setRecord(value);
+  };
 
   const handleSubmit = async () => {
     const isSucceeded = await submit();
@@ -102,16 +142,25 @@ const MyRunningEditContent = (): ReactElement => {
           content: '정보 수정이 완료되었어요',
         });
       }, 0);
+      return;
     }
+
+    // 실패 시 시각 오류 UI 추가는 기획 협의가 필요해 SR 전용 리전으로만 안내한다.
+    setSubmitFailure((previous) => ({
+      message: SUBMIT_FAILURE_MESSAGE,
+      revision: previous.revision + 1,
+    }));
   };
 
   return (
     <Fields>
+      <HiddenText role="status">{announcedGroupChangeNotice}</HiddenText>
+      <HiddenText role="alert">{announcedSubmitFailure}</HiddenText>
       <TimeInput
         errorText={recordError}
         label="10KM 러닝기록"
         value={values.record}
-        onChange={setRecord}
+        onChange={handleRecordChange}
       />
       <Select
         label="러닝 그룹"

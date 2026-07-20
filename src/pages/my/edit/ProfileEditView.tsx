@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, type ReactElement } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
@@ -9,6 +9,7 @@ import {
   DateInput,
   FooterButton,
   FormPageLayout,
+  HiddenText,
   Input,
   PageLayout,
   QueryBoundary,
@@ -16,6 +17,7 @@ import {
   useToast,
 } from '@/components';
 import { useRouteBlockerConfirm } from '@/hooks/useRouteBlockerConfirm';
+import { useAnnouncedMessage } from '@/pages/my/hooks/useAnnouncedMessage';
 import { APP_PATH } from '@/router/path';
 import { getTodayISODate } from '@/utils';
 
@@ -24,6 +26,11 @@ import { useMyEdit } from './hooks/useMyEdit';
 
 const LOADING_MESSAGE = '내 정보를 불러오는 중이에요.';
 const ERROR_MESSAGE = '내 정보를 불러오지 못했어요.';
+const SUBMIT_FAILURE_MESSAGE = '정보 수정에 실패했어요. 다시 시도해주세요.';
+const ACCOUNT_SETUP_SUCCESS_MESSAGE = '아이디를 설정했어요.';
+// 시트 exit 애니메이션(180ms)과 react-aria FocusScope 포커스 복원 시도가
+// 끝난 뒤에 포커스를 옮기기 위한 지연.
+const ACCOUNT_SHEET_EXIT_DELAY_MS = 300;
 
 export const ProfileEditView = (): ReactElement => {
   const navigate = useNavigate();
@@ -57,6 +64,21 @@ const MyEditContent = (): ReactElement => {
   const [isAccountSheetOpen, setIsAccountSheetOpen] = useState(false);
   const [isExitConfirmOpen, setIsExitConfirmOpen] = useState(false);
   const exitResolverRef = useRef<((v: boolean) => void) | null>(null);
+  const [submitFailure, setSubmitFailure] = useState({ message: '', revision: 0 });
+  const announcedSubmitFailure = useAnnouncedMessage(
+    submitFailure.message,
+    submitFailure.revision,
+  );
+  const [accountSetupSuccess, setAccountSetupSuccess] = useState({
+    message: '',
+    revision: 0,
+  });
+  const announcedAccountSetupSuccess = useAnnouncedMessage(
+    accountSetupSuccess.message,
+    accountSetupSuccess.revision,
+  );
+  const hasPendingAccountSetupSuccessRef = useRef(false);
+  const basicInfoSectionRef = useRef<HTMLElement>(null);
   const {
     values,
     accountId,
@@ -89,6 +111,35 @@ const MyEditContent = (): ReactElement => {
   // 이미 아이디가 있으면 로그인 정보 설정 섹션을 노출하지 않는다.
   const hasAccountId = Boolean(accountId);
 
+  // 아이디 설정 성공 시 myPage 재조회로 '아이디 설정하기' 트리거 섹션이
+  // 언마운트되어 시트가 닫힌 뒤 포커스가 body로 유실된다. 시트가 완전히
+  // 닫힌 뒤 '기본 정보' 제목으로 포커스를 옮기고, 바깥 aria-hidden이 풀린
+  // 상태에서 성공을 안내한다.
+  useEffect(() => {
+    if (isAccountSheetOpen || !hasPendingAccountSetupSuccessRef.current) {
+      return;
+    }
+
+    hasPendingAccountSetupSuccessRef.current = false;
+
+    const timeoutId = window.setTimeout(() => {
+      if (document.activeElement === document.body) {
+        basicInfoSectionRef.current
+          ?.querySelector<HTMLElement>('h2')
+          ?.focus({ preventScroll: true });
+      }
+
+      setAccountSetupSuccess((previous) => ({
+        message: ACCOUNT_SETUP_SUCCESS_MESSAGE,
+        revision: previous.revision + 1,
+      }));
+    }, ACCOUNT_SHEET_EXIT_DELAY_MS);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [isAccountSheetOpen]);
+
   const handleSubmit = async () => {
     const isSucceeded = await submit();
 
@@ -102,16 +153,27 @@ const MyEditContent = (): ReactElement => {
           content: '정보 수정이 완료되었어요',
         });
       }, 0);
+      return;
     }
+
+    // 실패 시 시각 오류 UI 추가는 기획 협의가 필요해 SR 전용 리전으로만 안내한다.
+    setSubmitFailure((previous) => ({
+      message: SUBMIT_FAILURE_MESSAGE,
+      revision: previous.revision + 1,
+    }));
   };
 
   return (
     <>
-      <Section aria-label="기본 정보">
-        <Text color="text.secondary" font="body-m-sb">
+      <HiddenText role="status">{announcedAccountSetupSuccess}</HiddenText>
+      <HiddenText role="alert">{announcedSubmitFailure}</HiddenText>
+
+      <Section aria-label="기본 정보" ref={basicInfoSectionRef}>
+        <Text as="h2" color="text.secondary" font="body-m-sb" tabIndex={-1}>
           기본 정보
         </Text>
         <DateInput
+          aria-required={true}
           errorText={
             hasBirthDateError ? '올바른 생년월일을 입력해주세요.' : undefined
           }
@@ -121,11 +183,14 @@ const MyEditContent = (): ReactElement => {
           onChange={setBirthDate}
         />
         <Input
+          aria-required={true}
+          autoComplete="tel-national"
           clearable
           error={hasPhoneError}
           errorText={hasPhoneError ? '올바른 전화번호를 입력해주세요.' : undefined}
           inputMode="numeric"
           label="전화번호"
+          type="tel"
           value={values.phoneNumber}
           onChange={(event) => setPhoneNumber(event.target.value)}
         />
@@ -186,6 +251,9 @@ const MyEditContent = (): ReactElement => {
         accountId={accountId}
         open={isAccountSheetOpen}
         onClose={() => setIsAccountSheetOpen(false)}
+        onSetupSuccess={() => {
+          hasPendingAccountSetupSuccessRef.current = true;
+        }}
       />
 
       <ConfirmPopup

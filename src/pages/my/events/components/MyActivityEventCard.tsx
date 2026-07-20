@@ -7,6 +7,8 @@ import type { MyActivityEventsResponse } from '@/api/types';
 import { Icon, Text } from '@/components';
 import { APP_PATH } from '@/router/path';
 
+import { formatEventDateTimeSrLabel } from '../utils';
+
 type MyActivityEvent = MyActivityEventsResponse['items'][number];
 
 const EVENT_TYPE_LABEL: Record<MyActivityEvent['type'], string> = {
@@ -23,7 +25,11 @@ export const MyActivityEventCard = ({
 }: MyActivityEventCardProps): ReactElement => {
   return (
     <CardItem>
-      <CardLink to={APP_PATH.EVENT_DETAIL(event.id)}>
+      {/* 영문 요일·하이픈 시간 구간이 어색하게 낭독되어 한국어 라벨로 대체한다. */}
+      <CardLink
+        aria-label={`${event.name}, ${EVENT_TYPE_LABEL[event.type]}, ${formatEventDateTimeSrLabel(event.date, event.dateText)}`}
+        to={APP_PATH.EVENT_DETAIL(event.id)}
+      >
         <CardBody>
           <CardName color="text.primary" font="body-l-sb">
             {event.name}

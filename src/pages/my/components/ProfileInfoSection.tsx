@@ -3,9 +3,11 @@ import type { ReactElement } from 'react';
 import styled from '@emotion/styled';
 
 import type { MyPageResponse } from '@/api/types';
-import { Button, Text } from '@/components';
+import { Button, HiddenText, Text } from '@/components';
+import { formatDateSrLabel, formatPhoneSrLabel } from '@/utils';
 
 import { EMPTY_INFO_TEXT } from '../constants';
+import { HiddenHeading } from './HiddenHeading';
 
 type ProfileInfoSectionProps = {
   personalInfo: MyPageResponse['personalInfo'];
@@ -22,20 +24,28 @@ export const ProfileInfoSection = ({
 
   return (
     <Card aria-label="내 정보">
+      <HiddenHeading>내 정보</HiddenHeading>
       <Row>
         <RowLabel color="text.secondary" font="body-m-sb">
           생년월일
         </RowLabel>
         {birthDate ? (
           <Text color="text.primary" font="body-m-m">
-            {birthDate.replace(/-/g, '.')}
+            {/* "1990.01.15" 점 표기는 날짜로 낭독되지 않아 한국어 라벨로 대체한다. */}
+            <HiddenText>{formatDateSrLabel(birthDate)}</HiddenText>
+            <span aria-hidden={true}>{birthDate.replace(/-/g, '.')}</span>
           </Text>
         ) : (
           <BirthDateValue>
             <EmptyValue color="text.quaternary" font="body-m-m">
               정보가 필요해요
             </EmptyValue>
-            <Button level="secondary" size="s" onClick={onInputBirthDate}>
+            <Button
+              aria-label="생년월일 입력하기"
+              level="secondary"
+              size="s"
+              onClick={onInputBirthDate}
+            >
               입력하기
             </Button>
           </BirthDateValue>
@@ -46,7 +56,15 @@ export const ProfileInfoSection = ({
           전화번호
         </RowLabel>
         <Text color="text.primary" font="body-m-m">
-          {phoneNumber ?? EMPTY_INFO_TEXT}
+          {phoneNumber ? (
+            <>
+              {/* 11자리 연속 낭독 대신 010 / 1234 / 5678 그룹으로 끊어 읽는다. */}
+              <HiddenText>{formatPhoneSrLabel(phoneNumber)}</HiddenText>
+              <span aria-hidden={true}>{phoneNumber}</span>
+            </>
+          ) : (
+            EMPTY_INFO_TEXT
+          )}
         </Text>
       </Row>
       <Row>
