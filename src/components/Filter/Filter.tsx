@@ -2,6 +2,7 @@ import type { ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
+import { HiddenText } from '@/components/HiddenText';
 import { Icon } from '@/components/Icon';
 import { Select, type SelectOption } from '@/components/Select';
 import { Text } from '@/components/Text';
@@ -10,6 +11,7 @@ import type { FilterProps, FilterVariant } from './Filter.types';
 
 const FILTER_ICON_SIZE = 16;
 const DEFAULT_PLACEHOLDER = '선택';
+const CYCLE_BEHAVIOR_HINT = '누르면 다음 옵션으로 바뀌어요';
 
 type FilterTriggerButtonProps = {
   ariaLabel?: string;
@@ -119,24 +121,37 @@ const FilterTriggerButton = ({
   onClick,
   variant,
 }: FilterTriggerButtonProps): ReactElement => {
+  const isCycle = mode === 'cycle';
+  // Compose the visible label into the accessible name so screen reader users
+  // hear both the filter category and the currently applied value, and the
+  // visible label stays part of the name (label in name).
+  const composedName = ariaLabel ? `${ariaLabel}, ${label}` : undefined;
+  const accessibleName =
+    composedName && isCycle ? `${composedName}, ${CYCLE_BEHAVIOR_HINT}` : composedName;
+
   return (
     <FilterTrigger
       $variant={variant}
       aria-expanded={mode === 'sheet' ? isOpen : undefined}
       aria-haspopup={mode === 'sheet' ? 'dialog' : undefined}
-      aria-label={ariaLabel}
+      aria-label={accessibleName}
       className={className}
       disabled={disabled}
       type="button"
       onClick={onClick}
     >
       <FilterLabel
+        aria-atomic={isCycle ? true : undefined}
+        // Cycle triggers keep focus on the button while only the label text
+        // changes, so announce the new value via a polite live region.
+        aria-live={isCycle ? 'polite' : undefined}
         as="span"
         color={disabled ? 'text.disabled' : 'text.secondary'}
         font="body-s-m"
       >
         {label}
       </FilterLabel>
+      {isCycle && !ariaLabel ? <HiddenText>{CYCLE_BEHAVIOR_HINT}</HiddenText> : null}
       <Icon
         aria-hidden={true}
         color={disabled ? 'icon.disabled' : 'icon.secondary'}
