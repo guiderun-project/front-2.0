@@ -7,7 +7,7 @@ import type {
   MatchingCompletedRow,
   MatchingUser,
 } from '@/api/types';
-import { CheckBox, Icon, RunnerTypeAvatar, Text } from '@/components';
+import { CheckBox, HiddenText, Icon, RunnerTypeAvatar, Text } from '@/components';
 import { RUNNER_TYPE_LABELS } from '@/constants';
 import type { AppTheme } from '@/styles/theme';
 
@@ -145,12 +145,11 @@ const PersonContent = ({
   selected,
   onToggle,
 }: PersonSelectProps): ReactElement => {
-  // 접근 가능한 이름에 매칭 상대(partnerText)를 함께 실어, 그룹 라벨을
-  // 건너뛰는 iOS VoiceOver에서도 페어 관계를 전달한다. 선택 여부는 체크박스
-  // checked 상태와 폴라이트 라이브 리전 안내가 전달하므로 이름에 넣지 않는다.
-  const selectLabel = partnerText
-    ? `${RUNNER_TYPE_LABELS[person.type]} ${person.name}, ${partnerText}, 선택`
-    : `${RUNNER_TYPE_LABELS[person.type]} ${person.name} 선택`;
+  // 체크박스 이름은 짧게 유지해 역할을 즉시 인지하게 하고, 매칭 상대는 별도
+  // 숨김 문장으로 전달한다. 그룹 라벨을 건너뛰는 iOS VoiceOver에서도 페어 관계가
+  // 전달된다. 선택 여부는 체크박스 checked 상태와 폴라이트 라이브 리전 안내가
+  // 전달하므로 이름에 넣지 않는다.
+  const selectLabel = `${RUNNER_TYPE_LABELS[person.type]} ${person.name} 선택`;
 
   return (
     <>
@@ -161,8 +160,8 @@ const PersonContent = ({
           onToggle(toSelectablePerson(person));
         }}
       />
-      {/* 쌍 그룹 라벨과 체크박스 aria-label이 유형+이름을 이미 전달하므로
-          시각 전용 아바타·이름 블록은 중복 낭독을 막기 위해 숨긴다. */}
+      {partnerText ? <HiddenText>{partnerText}</HiddenText> : null}
+      {/* 시각 전용 아바타·이름 블록은 체크박스·숨김 문장과 중복되므로 숨긴다. */}
       <PersonAvatarName aria-hidden={true}>
         <RunnerTypeAvatar aria-hidden={true} size="m" type={person.type} />
         <PersonName color="text.primary" font="body-m-sb">
