@@ -52,6 +52,7 @@ export const TimeInput = ({
   const labelId = `${reactId}-label`;
   const messageId = `${reactId}-message`;
   const segmentRefs = useRef<Array<HTMLInputElement | null>>([]);
+  const segmentRowRef = useRef<HTMLDivElement>(null);
 
   const isControlled = value !== undefined;
   const [internalValue, setInternalValue] = useState<TimeValue>(
@@ -65,8 +66,11 @@ export const TimeInput = ({
   const hasValue = Boolean(current.hours || current.minutes || current.seconds);
   // 오류는 aria-describedby 외에 상시 마운트된 라이브 리전으로도 미러링해야
   // 포커스가 다른 곳에 있을 때 나타나는 오류를 스크린리더가 놓치지 않는다.
+  // 단, 오류 등장 직후 세그먼트로 포커스가 옮겨온 검증-포커스 흐름에서는
+  // describedby가 낭독을 담당하므로 미러를 생략한다(중복 낭독 방지).
   const errorAnnouncement = useFieldErrorAnnouncement(
     hasError ? errorText : null,
+    segmentRowRef,
   );
 
   const commit = (next: TimeValue): void => {
@@ -133,6 +137,12 @@ export const TimeInput = ({
   // 접근성 포커스된 칸의 중앙에 합성 탭을 보내므로, 여기서 preventDefault 후
   // 다른 칸으로 리다이렉트하면 VoiceOver/TalkBack 사용자가 선택한 칸이 아닌
   // 칸으로 포커스가 튕긴다.
+  //
+  // 세그먼트가 보이지 않는 상태(비어 있고 포커스도 없어 opacity:0)에서는
+  // FieldBox 스타일이 [data-segments]의 pointer-events를 꺼서 탭이 이 핸들러로
+  // 떨어지게 한다. 덕분에 "빈 필드" 탭은 위치와 무관하게 첫 미완성 칸(시)으로
+  // 리다이렉트되고, 편집 중이거나 값이 있어 세그먼트가 보일 때만 직접 탭이
+  // 기본 포커스를 따른다.
   const handleBoxPointerDown = (
     event: React.PointerEvent<HTMLDivElement>,
   ): void => {
@@ -162,17 +172,20 @@ export const TimeInput = ({
           <FieldLabelContent label={label} requirement={requirement} />
         </FloatingLabel>
         <SegmentRow
-          aria-describedby={hasMessage ? messageId : undefined}
           aria-labelledby={labelId}
           data-segments=""
+          ref={segmentRowRef}
           role="group"
         >
           {SEGMENTS.map((segment, index) => (
             <Fragment key={segment.key}>
               {index > 0 && <Separator aria-hidden="true">:</Separator>}
               <Segment
-                // 그룹의 aria-describedby/labelledby는 모바일 스크린리더가
-                // 내부 input 포커스 시 낭독하지 않으므로 각 칸에도 연결한다.
+                // 메시지는 각 칸의 aria-describedby로만 연결한다. 그룹에도 함께
+                // 걸면 데스크톱 스크린리더가 그룹 진입 시와 칸 포커스 시 같은
+                // 메시지를 연속 두 번 낭독한다. 그룹의 aria-labelledby는 그룹
+                // 진입 시 라벨 컨텍스트 제공용으로만 남긴다(모바일 스크린리더는
+                // 그룹 속성을 input 포커스 시 낭독하지 않아 칸에 직접 연결).
                 aria-describedby={hasMessage ? messageId : undefined}
                 aria-invalid={hasError || undefined}
                 aria-label={`${label} ${segment.label}`}
@@ -244,13 +257,18 @@ const FieldBox = styled.div(({ theme }) => ({
     color: theme.color.text.brand,
   },
 
+  // 세그먼트가 숨겨진 동안(pointerEvents: none)에는 탭이 FieldBox로 떨어져
+  // 첫 미완성 칸 리다이렉트(handleBoxPointerDown)가 동작하고, 보이는 동안에만
+  // 세그먼트 직접 탭이 브라우저 기본 포커스를 따른다.
   "& [data-segments]": {
     opacity: 0,
+    pointerEvents: "none",
     transition: "opacity 120ms ease",
   },
 
   '&:focus-within [data-segments], &[data-filled="true"] [data-segments]': {
     opacity: 1,
+    pointerEvents: "auto",
   },
 
   "[data-error='true'] &": {

@@ -155,8 +155,11 @@ export const InputFieldShell = <
   const showCounter = maxLength != null;
   // 오류는 aria-describedby 외에 상시 마운트된 라이브 리전으로도 미러링해야
   // 포커스가 다른 곳에 있을 때 나타나는 오류를 스크린리더가 놓치지 않는다.
+  // 단, 오류 등장 직후 이 컨트롤로 포커스가 옮겨온 검증-포커스 흐름에서는
+  // describedby가 낭독을 담당하므로 미러를 생략한다(중복 낭독 방지).
   const errorAnnouncement = useFieldErrorAnnouncement(
     hasError ? errorText : null,
+    controlRef,
   );
   const isAtMaxLength = maxLength != null && length >= maxLength;
 
