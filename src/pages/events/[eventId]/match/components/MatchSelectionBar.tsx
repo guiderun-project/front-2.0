@@ -41,9 +41,11 @@ export const MatchSelectionBar = ({
   return (
     <FixedSelectionArea>
       <SelectionPanel aria-labelledby={selectionLabelId} role="group">
+        {/* 그룹 라벨(aria-labelledby)은 iOS VoiceOver가 낭독하지 않으므로,
+            '선택 현황' 맥락을 아래 낭독용 문장 앞에 직접 포함해 확실히 전달한다. */}
         <HiddenText id={selectionLabelId}>선택 현황</HiddenText>
         <SelectionContent>
-          <HiddenText>{selectionDescription}</HiddenText>
+          <HiddenText>{`선택 현황, ${selectionDescription}`}</HiddenText>
           <SelectionItems aria-hidden={true}>
             <SelectionItem
               isPlaceholder={selectedVi === null}
