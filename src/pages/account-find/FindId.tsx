@@ -16,6 +16,7 @@ import {
   TimerInput,
 } from '@/components';
 import { ACCOUNT_FIND_TYPE } from '@/constants';
+import { useAnnouncedMessage } from '@/pages/account-find/useAnnouncedMessage';
 import { usePhoneCertification } from '@/pages/account-find/usePhoneCertification';
 import { formatJoinDate } from '@/pages/account-find/utils';
 import { APP_PATH } from '@/router/path';
@@ -50,6 +51,8 @@ export const FindId = (): ReactElement => {
   const [certError, setCertError] = useState('');
   // 단계 전환 결과를 스크린리더에 알리는 안내 문구. 상시 마운트된 라이브 리전에 주입한다.
   const [phaseAnnouncement, setPhaseAnnouncement] = useState('');
+  // 단계 전환 시 h1 포커스 낭독이 먼저 시작된 뒤 안내가 이어지도록 리전 주입을 지연한다.
+  const announcedPhaseMessage = useAnnouncedMessage(phaseAnnouncement);
   const titleRef = useRef<HTMLSpanElement>(null);
   const {
     phoneNum,
@@ -136,9 +139,7 @@ export const FindId = (): ReactElement => {
         setPhase(FIND_ID_PHASE.FOUND);
       } catch {
         // 인증은 성공했으나 일치하는 계정이 없는 경우다.
-        setPhaseAnnouncement(
-          '등록된 아이디가 없어요. 서비스 이용을 위해 카카오톡 회원가입이 필요해요.',
-        );
+        // 제목(h1) 포커스 낭독이 같은 내용을 전부 전달하므로 별도 리전 안내는 넣지 않는다.
         setPhase(FIND_ID_PHASE.NOT_FOUND);
       }
     } catch (error) {
@@ -204,9 +205,12 @@ export const FindId = (): ReactElement => {
         title={resolveTitle()}
       >
         {/* SR 전용 라이브 리전. 빈 상태로 상시 마운트해 두고 텍스트만 바꿔야
-            iOS VoiceOver/Android TalkBack이 변경을 안정적으로 낭독한다. */}
-        <HiddenText role="status">{phaseAnnouncement}</HiddenText>
-        <HiddenText role="status">{expiredAnnouncement}</HiddenText>
+            iOS VoiceOver/Android TalkBack이 변경을 안정적으로 낭독한다.
+            만료 안내는 인증 단계에서만 유효하므로 다른 단계에서는 주입하지 않는다. */}
+        <HiddenText role="status">{announcedPhaseMessage}</HiddenText>
+        <HiddenText role="status">
+          {phase === FIND_ID_PHASE.VERIFY ? expiredAnnouncement : ''}
+        </HiddenText>
 
         {phase === FIND_ID_PHASE.VERIFY && (
           <Container>

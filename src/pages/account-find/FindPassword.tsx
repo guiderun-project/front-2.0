@@ -16,6 +16,7 @@ import {
   Text,
   TimerInput,
 } from '@/components';
+import { useAnnouncedMessage } from '@/pages/account-find/useAnnouncedMessage';
 import { usePhoneCertification } from '@/pages/account-find/usePhoneCertification';
 import {
   isValidNewPassword,
@@ -57,6 +58,8 @@ export const FindPassword = (): ReactElement => {
   const [resetError, setResetError] = useState('');
   // 단계 전환 결과를 스크린리더에 알리는 안내 문구. 상시 마운트된 라이브 리전에 주입한다.
   const [phaseAnnouncement, setPhaseAnnouncement] = useState('');
+  // 단계 전환 시 h1 포커스 낭독이 먼저 시작된 뒤 안내가 이어지도록 리전 주입을 지연한다.
+  const announcedPhaseMessage = useAnnouncedMessage(phaseAnnouncement);
   const titleRef = useRef<HTMLSpanElement>(null);
   const {
     phoneNum,
@@ -162,9 +165,8 @@ export const FindPassword = (): ReactElement => {
 
     try {
       await api.auth.newPasswordPatch({ token, newPassword });
-      setPhaseAnnouncement(
-        '비밀번호 변경이 완료됐어요. 변경된 비밀번호로 로그인해주세요.',
-      );
+      // 완료 제목(h1) 포커스 낭독이 같은 내용을 전부 전달하므로 별도 리전 안내는 넣지 않는다.
+      setPhaseAnnouncement('');
       setPhase(FIND_PASSWORD_PHASE.DONE);
     } catch (error) {
       setResetError(getApiErrorMessage(error, RESET_ERROR_MESSAGE));
@@ -229,9 +231,12 @@ export const FindPassword = (): ReactElement => {
         title={resolveTitle()}
       >
         {/* SR 전용 라이브 리전. 빈 상태로 상시 마운트해 두고 텍스트만 바꿔야
-            iOS VoiceOver/Android TalkBack이 변경을 안정적으로 낭독한다. */}
-        <HiddenText role="status">{phaseAnnouncement}</HiddenText>
-        <HiddenText role="status">{expiredAnnouncement}</HiddenText>
+            iOS VoiceOver/Android TalkBack이 변경을 안정적으로 낭독한다.
+            만료 안내는 인증 단계에서만 유효하므로 다른 단계에서는 주입하지 않는다. */}
+        <HiddenText role="status">{announcedPhaseMessage}</HiddenText>
+        <HiddenText role="status">
+          {phase === FIND_PASSWORD_PHASE.VERIFY ? expiredAnnouncement : ''}
+        </HiddenText>
 
         {phase === FIND_PASSWORD_PHASE.VERIFY && (
           <Container>
