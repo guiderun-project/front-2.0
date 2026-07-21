@@ -281,11 +281,6 @@ export const useEventMatchPage = (eventId: number) => {
         },
         eventId,
       }),
-    // 요청 시마다 라이브 리전 텍스트를 교체해 진행 중임을 안내하고, 같은 오류
-    // 문구로 재실패해도 alert 노드가 매번 변경되어 다시 낭독되게 한다.
-    onMutate: () => {
-      announcePolitely('매칭하고 있어요.');
-    },
     onSuccess: async (data, variables) => {
       const viName = personMap.get(variables.viId)?.name;
 
@@ -317,7 +312,6 @@ export const useEventMatchPage = (eventId: number) => {
 
   const toggleParticipant = (person: SelectablePerson) => {
     if (person.type === 'VI') {
-      // 체크박스는 각각 독립적으로 동작한다. VI 선택은 VI만 토글한다.
       const isDeselect = selectedViId === person.userId;
       const nextSelectedViId = isDeselect ? null : person.userId;
       // 다른 시각장애러너가 이미 선택돼 있었다면 이번 선택은 교체이므로,

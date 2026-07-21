@@ -91,10 +91,8 @@ const CompletedPair = ({
   selectedUserIds,
   onToggleParticipant,
 }: CompletedPairProps): ReactElement => {
-  // iOS VoiceOver는 role="group"의 aria-label을 낭독하지 않고 내부 체크박스로
-  // 바로 이동해, 그룹 라벨로만 전달하던 페어 관계가 유실됐다. 매칭 상대를 각
-  // 체크박스의 접근 가능한 이름에 직접 실어 어느 체크박스에서든 관계를 알 수
-  // 있게 한다.
+  // iOS VoiceOver는 role=group의 aria-label을 낭독하지 않으므로, 페어 관계를
+  // 각 체크박스 옆 숨김 문장(partnerText)으로 전달한다.
   const viPartnerText = getGuidesPartnerLabel(row.guides);
   const guidePartnerText = getViPartnerLabel(row.vi);
 
@@ -145,10 +143,7 @@ const PersonContent = ({
   selected,
   onToggle,
 }: PersonSelectProps): ReactElement => {
-  // 체크박스 이름은 짧게 유지해 역할을 즉시 인지하게 하고, 매칭 상대는 별도
-  // 숨김 문장으로 전달한다. 그룹 라벨을 건너뛰는 iOS VoiceOver에서도 페어 관계가
-  // 전달된다. 선택 여부는 체크박스 checked 상태와 폴라이트 라이브 리전 안내가
-  // 전달하므로 이름에 넣지 않는다.
+  // 체크박스 이름은 짧게 유지하고 매칭 상대는 아래 숨김 문장으로 전달한다.
   const selectLabel = `${RUNNER_TYPE_LABELS[person.type]} ${person.name} 선택`;
 
   return (

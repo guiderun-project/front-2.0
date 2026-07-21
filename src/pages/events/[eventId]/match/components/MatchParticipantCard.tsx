@@ -52,14 +52,10 @@ export const MatchParticipantCard = ({
     : null;
   const participantMeta = [groupText, partnerText].filter(Boolean).join(' ・');
 
-  // 체크박스 접근 가능한 이름은 짧게 유지해, 부가 정보를 다 듣기 전에 넘어가는
-  // 일 없이 스크린리더 사용자가 역할(체크박스)을 즉시 인지하게 한다. 선택 여부는
-  // 체크박스 checked 상태와 폴라이트 라이브 리전 안내가 전달하므로 넣지 않는다.
+  // 체크박스 이름은 짧게 유지해 역할(체크박스)을 빠르게 인지하게 한다.
   const selectLabel = `${RUNNER_TYPE_LABELS[participant.type]} ${participant.name} 선택`;
 
-  // 카드의 부가 정보(첫참여·기존그룹·희망파트너·추가코멘트)는 여러 요소로 흩어져
-  // 낭독되지 않도록 하나의 스크린리더 전용 문장으로 묶는다. 이름은 체크박스가
-  // 이미 전달하므로 제외한다.
+  // 부가 정보는 흩어져 낭독되지 않도록 한 문장으로 묶는다(이름은 체크박스가 전달).
   const detailLabel = [
     participant.isFirstParticipation ? '첫참여' : null,
     groupText,
@@ -80,8 +76,7 @@ export const MatchParticipantCard = ({
           onToggle(participant);
         }}
       />
-      {/* 부가 정보는 하나의 숨김 문장으로 묶어 낭독하고, 이를 시각적으로 보여주는
-          아래 영역은 중복 낭독을 막기 위해 통째로 숨긴다. */}
+      {/* 부가 정보는 위 숨김 문장으로 낭독하므로 시각 영역은 통째로 숨긴다. */}
       {detailLabel ? <HiddenText>{detailLabel}</HiddenText> : null}
       <InfoColumn aria-hidden={true}>
         <Profile>
