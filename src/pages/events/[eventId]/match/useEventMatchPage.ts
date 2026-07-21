@@ -89,7 +89,7 @@ const getSelectionAnnouncement = ({
     return `${person.name}님을 선택했습니다. 가이드러너 파트너를 선택해주세요.`;
   }
 
-  return `${person.name}님을 선택했습니다. 이대로 매칭하기를 눌러주세요.`;
+  return `${person.name}님을 선택했습니다. 화면 최하단에 이대로 매칭하기를 눌러주세요.`;
 };
 
 export const useEventMatchRoute = () => {
