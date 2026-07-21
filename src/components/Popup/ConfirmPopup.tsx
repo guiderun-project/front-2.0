@@ -86,6 +86,36 @@ export const ConfirmPopup = ({
     };
   }, [initialFocus, open]);
 
+  // 확인 버튼은 로딩 중 native disabled가 되어, 확인 버튼에 있던 포커스를
+  // 브라우저가 body로 떨어뜨린다. FocusScope의 contain 복구도 disabled 대상
+  // 에는 동작하지 않으므로, 포커스가 실제로 팝업 밖으로 유실된 경우에만 취소
+  // 버튼(비활성이면 패널)으로 회복한다. 유실되지 않았으면 이동하지 않으므로
+  // 로딩 때마다 포커스가 취소 버튼으로 강제 이동하는 문제는 재발하지 않는다.
+  useEffect(() => {
+    if (!open || !confirmLoading) {
+      return;
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
+      const panel = panelRef.current;
+      const activeElement = document.activeElement;
+
+      if (!panel || (activeElement && panel.contains(activeElement))) {
+        return;
+      }
+
+      const cancelButton = cancelButtonRef.current;
+      const fallbackTarget =
+        cancelButton && !cancelButton.disabled ? cancelButton : panel;
+
+      fallbackTarget.focus();
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+    };
+  }, [confirmLoading, open]);
+
   // aria-busy 변경은 스크린리더가 낭독하지 않으므로 처리 중 상태를 라이브
   // 리전으로 안내한다. 리전을 비운 뒤 다음 프레임에 텍스트를 주입해야
   // iOS VoiceOver/TalkBack에서 안정적으로 낭독되고, 로딩이 끝날 때도 rAF로

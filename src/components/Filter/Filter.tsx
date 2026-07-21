@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react';
+import { useId, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
@@ -121,44 +121,70 @@ const FilterTriggerButton = ({
   onClick,
   variant,
 }: FilterTriggerButtonProps): ReactElement => {
+  const hintId = useId();
+  const labelId = useId();
   const isCycle = mode === 'cycle';
-  // Compose the visible label into the accessible name so screen reader users
-  // hear both the filter category and the currently applied value, and the
-  // visible label stays part of the name (label in name).
-  const composedName = ariaLabel ? `${ariaLabel}, ${label}` : undefined;
-  const accessibleName =
-    composedName && isCycle ? `${composedName}, ${CYCLE_BEHAVIOR_HINT}` : composedName;
+  // Disabled triggers cannot cycle, so skip the behavior hint to avoid
+  // announcing an interaction that does nothing.
+  const hasCycleHint = isCycle && !disabled;
+  // Cycle triggers keep focus on the button while the value changes, so if
+  // the value were composed into the accessible name, screen readers that
+  // auto-announce name changes of the focused control (NVDA/JAWS) would read
+  // the new value twice together with the live region. Enabled cycle triggers
+  // therefore keep a fixed category name and announce value changes through
+  // the FilterLabel live region as the single channel. The current value and
+  // the behavior hint are exposed via aria-describedby instead: descriptions
+  // are read once on focus and their changes are not auto-announced.
+  const hasLiveCycleValue = hasCycleHint && Boolean(ariaLabel);
+  // Without ariaLabel the value is the content-based name itself, so the
+  // name-change announcement is the single channel and the live region stays
+  // off. Pass ariaLabel to cycle triggers for reliable announcements across
+  // screen readers (VoiceOver may not announce name changes).
+  const accessibleName = ariaLabel
+    ? hasLiveCycleValue
+      ? ariaLabel
+      : `${ariaLabel}, ${label}`
+    : undefined;
+  const describedBy = hasCycleHint
+    ? hasLiveCycleValue
+      ? `${labelId} ${hintId}`
+      : hintId
+    : undefined;
 
   return (
-    <FilterTrigger
-      $variant={variant}
-      aria-expanded={mode === 'sheet' ? isOpen : undefined}
-      aria-haspopup={mode === 'sheet' ? 'dialog' : undefined}
-      aria-label={accessibleName}
-      className={className}
-      disabled={disabled}
-      type="button"
-      onClick={onClick}
-    >
-      <FilterLabel
-        aria-atomic={isCycle ? true : undefined}
-        // Cycle triggers keep focus on the button while only the label text
-        // changes, so announce the new value via a polite live region.
-        aria-live={isCycle ? 'polite' : undefined}
-        as="span"
-        color={disabled ? 'text.disabled' : 'text.secondary'}
-        font="body-s-m"
+    <>
+      <FilterTrigger
+        $variant={variant}
+        aria-describedby={describedBy}
+        aria-expanded={mode === 'sheet' ? isOpen : undefined}
+        aria-haspopup={mode === 'sheet' ? 'dialog' : undefined}
+        aria-label={accessibleName}
+        className={className}
+        disabled={disabled}
+        type="button"
+        onClick={onClick}
       >
-        {label}
-      </FilterLabel>
-      {isCycle && !ariaLabel ? <HiddenText>{CYCLE_BEHAVIOR_HINT}</HiddenText> : null}
-      <Icon
-        aria-hidden={true}
-        color={disabled ? 'icon.disabled' : 'icon.secondary'}
-        icon={icon}
-        size={FILTER_ICON_SIZE}
-      />
-    </FilterTrigger>
+        <FilterLabel
+          aria-atomic={hasLiveCycleValue ? true : undefined}
+          aria-live={hasLiveCycleValue ? 'polite' : undefined}
+          as="span"
+          color={disabled ? 'text.disabled' : 'text.secondary'}
+          font="body-s-m"
+          id={labelId}
+        >
+          {label}
+        </FilterLabel>
+        <Icon
+          aria-hidden={true}
+          color={disabled ? 'icon.disabled' : 'icon.secondary'}
+          icon={icon}
+          size={FILTER_ICON_SIZE}
+        />
+      </FilterTrigger>
+      {/* The hint lives outside the button so it never joins the content-based
+          accessible name and is only exposed as an aria-describedby description. */}
+      {hasCycleHint ? <HiddenText id={hintId}>{CYCLE_BEHAVIOR_HINT}</HiddenText> : null}
+    </>
   );
 };
 

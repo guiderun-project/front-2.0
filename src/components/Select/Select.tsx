@@ -1,9 +1,9 @@
 import {
-  useEffect,
   useId,
+  useRef,
   useState,
+  type KeyboardEvent,
   type ReactElement,
-  type ReactNode,
 } from 'react';
 
 import styled from '@emotion/styled';
@@ -11,6 +11,7 @@ import styled from '@emotion/styled';
 import { BottomSheet } from '@/components/BottomSheet';
 import { HiddenText } from '@/components/HiddenText';
 import { Icon } from '@/components/Icon';
+import { useFieldErrorAnnouncement } from '@/components/Input/useFieldErrorAnnouncement';
 import { Text } from '@/components/Text';
 
 import type { SelectOption, SelectOptions, SelectProps } from './Select.types';
@@ -50,6 +51,7 @@ export const Select = <TValue extends string = string>({
   value,
 }: SelectProps<TValue>): ReactElement => {
   const reactId = useId();
+  const rootRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [pendingValue, setPendingValue] = useState<TValue | undefined>(value);
   const selectedOption = findSelectedOption(options, value);
@@ -65,32 +67,12 @@ export const Select = <TValue extends string = string>({
     ? `${triggerRequiredAccessibleName}, 현재 선택: ${selectedOption.srLabel ?? selectedOption.label}`
     : triggerRequiredAccessibleName;
   // 오류 메시지는 조건부로 삽입되어 등장 시점이 낭독되지 않으므로, 상시
-  // 마운트된 라이브 리전 미러에 다음 프레임에 주입해 안내한다. iOS
-  // VoiceOver가 동일 문자열 재주입을 재낭독하지 않아 먼저 비운 뒤 채운다.
-  const [announcedError, setAnnouncedError] = useState<ReactNode>('');
-
-  useEffect(() => {
-    let injectFrameId: number | undefined;
-    const clearFrameId = window.requestAnimationFrame(() => {
-      setAnnouncedError('');
-
-      if (!errorText) {
-        return;
-      }
-
-      injectFrameId = window.requestAnimationFrame(() => {
-        setAnnouncedError(errorText);
-      });
-    });
-
-    return () => {
-      window.cancelAnimationFrame(clearFrameId);
-
-      if (injectFrameId !== undefined) {
-        window.cancelAnimationFrame(injectFrameId);
-      }
-    };
-  }, [errorText]);
+  // 마운트된 라이브 리전 미러로 안내한다. JSX 오류 메시지는 렌더마다 참조가
+  // 바뀌어 반복 낭독을 유발할 수 있으므로 문자열/숫자만 안내하는 가드,
+  // rAF 기반 재낭독 보장, 검증-포커스 흐름(트리거로 포커스가 이동해 와
+  // describedby가 낭독하는 경우)의 미러 생략은 Input과 공용인
+  // useFieldErrorAnnouncement가 맡는다.
+  const announcedError = useFieldErrorAnnouncement(errorText, rootRef);
 
   const handleOpen = () => {
     if (disabled) {
@@ -133,7 +115,7 @@ export const Select = <TValue extends string = string>({
 
   return (
     <>
-      <SelectRoot data-error={hasError || undefined}>
+      <SelectRoot ref={rootRef} data-error={hasError || undefined}>
         {renderTrigger ? (
           renderTrigger({
             open: handleOpen,
@@ -217,12 +199,60 @@ const SelectCheckList = <TValue extends string>({
   options,
   value,
 }: SelectCheckListProps<TValue>): ReactElement => {
-  // 옵션 버튼이 각각 탭 정지인 구조에서는 listbox/option(단일 탭 정지 +
-  // 방향키 전제)이 실제 조작 모델과 어긋나므로, SelectCardGroup과 동일하게
-  // radiogroup/radio + aria-checked로 단일 선택 의미를 전달한다.
+  const listRef = useRef<HTMLDivElement>(null);
+  // 단일 선택 의미는 radiogroup/radio + aria-checked로 전달하고, APG 라디오
+  // 그룹 패턴의 키보드 계약(roving tabindex + 방향키 포커스 이동)을 함께
+  // 제공한다. 선택된 옵션(없거나 비활성이면 첫 활성 옵션)만 탭 정지점이 된다.
+  const selectedIndex = options.findIndex(
+    (option) => option.value === value && !option.disabled,
+  );
+  const tabbableIndex =
+    selectedIndex !== -1
+      ? selectedIndex
+      : options.findIndex((option) => !option.disabled);
+
+  // SelectCardGroup과 달리 방향키에서 onChange를 호출하지 않는다(선택이
+  // 포커스를 따라가지 않음). 비확인형 모드에서는 onChange가 시트를 닫으므로
+  // 첫 방향키 입력에 시트가 닫혀 버리기 때문이다. 방향키는 포커스만 옮기고
+  // 선택은 Enter/Space(버튼 클릭)로 확정한다.
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    const delta =
+      event.key === 'ArrowDown' || event.key === 'ArrowRight'
+        ? 1
+        : event.key === 'ArrowUp' || event.key === 'ArrowLeft'
+          ? -1
+          : 0;
+
+    if (delta === 0) {
+      return;
+    }
+
+    const radios = listRef.current?.querySelectorAll<HTMLButtonElement>(
+      '[role="radio"]:not(:disabled)',
+    );
+
+    if (!radios || radios.length === 0) {
+      return;
+    }
+
+    const currentIndex = Array.prototype.indexOf.call(radios, event.target);
+
+    if (currentIndex === -1) {
+      return;
+    }
+
+    event.preventDefault();
+    radios[(currentIndex + delta + radios.length) % radios.length].focus();
+  };
+
   return (
-    <SelectCheckListRoot aria-label={ariaLabel} role="radiogroup">
-      {options.map((option) => {
+    <SelectCheckListRoot
+      ref={listRef}
+      aria-label={ariaLabel}
+      role="radiogroup"
+      onKeyDown={handleKeyDown}
+    >
+      {options.map((option, index) => {
         const isSelected = option.value === value;
 
         return (
@@ -234,6 +264,7 @@ const SelectCheckList = <TValue extends string>({
             aria-label={option.srLabel}
             disabled={option.disabled}
             role="radio"
+            tabIndex={index === tabbableIndex ? 0 : -1}
             type="button"
             onClick={() => onChange(option.value)}
           >
