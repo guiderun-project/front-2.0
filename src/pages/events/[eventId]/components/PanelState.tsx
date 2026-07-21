@@ -2,6 +2,8 @@ import { useEffect, useState, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
+import { HiddenText } from '@/components';
+
 export const PanelState = styled.div(({ theme }) => ({
   display: 'grid',
   placeItems: 'center',
@@ -28,8 +30,9 @@ type AnnouncedPanelStateProps = {
 
 // 로딩/오류/빈 상태 문구를 라이브 리전으로 낭독시키는 PanelState 래퍼.
 // 콘텐츠를 담은 채 삽입된 리전은 iOS VoiceOver 가 낭독하지 않을 수 있어,
-// 빈 상태로 먼저 마운트한 뒤 다음 프레임에 메시지를 채운다
-// (MatchPageContent 의 MatchPageMessageContent 와 동일한 패턴).
+// 가시 텍스트는 즉시 렌더하고(첫 프레임 빈 화면 방지), 낭독용 텍스트만
+// 별도의 숨김 리전에 다음 프레임에 채운다. 가시 텍스트는 숨김 리전과의
+// 중복 낭독을 막기 위해 aria-hidden 처리한다.
 export const AnnouncedPanelState = ({
   children,
   role,
@@ -46,5 +49,10 @@ export const AnnouncedPanelState = ({
     };
   }, [children]);
 
-  return <PanelState role={role}>{announcedMessage}</PanelState>;
+  return (
+    <PanelState>
+      <span aria-hidden={true}>{children}</span>
+      <HiddenText role={role}>{announcedMessage}</HiddenText>
+    </PanelState>
+  );
 };

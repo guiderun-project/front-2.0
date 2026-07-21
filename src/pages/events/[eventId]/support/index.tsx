@@ -24,21 +24,19 @@ export const EventSupportPage = (): ReactElement => {
   const [selectedRegion, setSelectedRegion] = useState<TransportSupportRegion | null>(null);
 
   // 라우트 진입 시 페이지 제목(h1)으로 포커스를 옮겨 스크린리더가 제목부터 낭독하도록 한다.
-  // 렌더 직후 동기 focus는 iOS VoiceOver가 놓칠 수 있어 다음 프레임에 실행한다.
+  // RouteFocusManager 의 rAF 보다 먼저 activeElement 를 채워야 매니저의 body 가드가
+  // 작동해 main→h1 이중 포커스가 생기지 않으므로, NotFoundPage·signup 단계 전환과
+  // 동일하게 effect 안에서 동기적으로 focus 한다.
   // (문서 title 갱신·낭독은 라우터의 PageTitle/RouteAnnouncer가 담당)
   useEffect(() => {
-    const frameId = window.requestAnimationFrame(() => {
-      const heading = heroSectionRef.current?.querySelector<HTMLElement>('h1');
+    const heading = heroSectionRef.current?.querySelector<HTMLElement>('h1');
 
-      if (!heading) {
-        return;
-      }
+    if (!heading) {
+      return;
+    }
 
-      heading.setAttribute('tabindex', '-1');
-      heading.focus();
-    });
-
-    return () => window.cancelAnimationFrame(frameId);
+    heading.setAttribute('tabindex', '-1');
+    heading.focus();
   }, []);
 
   const handleBack = () => {

@@ -18,12 +18,12 @@ import {
   useToast,
 } from '@/components';
 
+import { useAnnouncedMessage } from '../hooks/useAnnouncedMessage';
 import { useEventComments } from '../hooks/useEventComments';
 import { formatRelativeTime } from '../utils';
 import { AnnouncedPanelState } from './PanelState';
 import { ProfileAvatar } from './ProfileAvatar';
 
-const ANNOUNCE_DELAY_MS = 150;
 const COMMENT_LABEL_PREVIEW_LENGTH = 20;
 
 type CommentFocusTarget = 'heading' | 'textarea';
@@ -133,13 +133,16 @@ export const CommentsSection = (): ReactElement => {
       }
 
       announce('댓글을 삭제했어요.');
-      setPendingFocusTarget('heading');
     } catch (deleteError) {
       showToast({
         type: 'error',
         icon: 'alert-circle-filled',
         content: getApiErrorMessage(deleteError, '댓글 삭제에 실패했습니다.'),
       });
+    } finally {
+      // 삭제 중 disabled 처리로 포커스가 body 로 떨어진 상태가 실패 시에도 남으므로,
+      // 등록/수정과 동일하게 성공/실패 모두 포커스 복귀를 예약한다.
+      setPendingFocusTarget('heading');
     }
   };
 
@@ -268,30 +271,6 @@ export const CommentsSection = (): ReactElement => {
 // 로터/스와이프로 버튼만 탐색해도 대상 댓글을 구분할 수 있게 내용 앞부분을 라벨에 포함한다.
 const getCommentPreview = (content: string) => {
   return content.slice(0, COMMENT_LABEL_PREVIEW_LENGTH);
-};
-
-// 상시 마운트된 라이브 리전에 넣을 메시지를 지연 주입한다.
-// 리전을 빈 상태로 먼저 렌더한 뒤 잠시 후 텍스트를 채워야 iOS VoiceOver 와
-// Android TalkBack 이 변경을 안정적으로 낭독하고, 같은 문자열 반복 안내는
-// revision 증가로 재주입을 트리거한다 (BirthDateGate 의 useAnnouncedMessage 와 동일 패턴).
-const useAnnouncedMessage = (message: string, revision: number): string => {
-  const [announcedMessage, setAnnouncedMessage] = useState('');
-
-  useEffect(() => {
-    const frameId = window.requestAnimationFrame(() => {
-      setAnnouncedMessage('');
-    });
-    const timeoutId = window.setTimeout(() => {
-      setAnnouncedMessage(message);
-    }, ANNOUNCE_DELAY_MS);
-
-    return () => {
-      window.cancelAnimationFrame(frameId);
-      window.clearTimeout(timeoutId);
-    };
-  }, [message, revision]);
-
-  return announcedMessage;
 };
 
 const CommentSectionRoot = styled.section(({ theme }) => ({
