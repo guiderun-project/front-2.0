@@ -112,8 +112,11 @@ export const MyRunningTab = (): ReactElement => {
     });
   };
 
+  // 동일 값을 1페이지에서 재선택하면 쿼리 키가 그대로라 onLoaded가 실행되지
+  // 않아 플래그가 남고, 이후 페이지 이동에서 허위 '필터 적용' 안내가 나간다.
+  // 목록이 실제로 갱신될 때(값 변경 또는 페이지 리셋)만 플래그를 세운다.
   const handleTypeChange = (value: EventListTypeFilter) => {
-    pendingFilterAnnouncementRef.current = true;
+    pendingFilterAnnouncementRef.current = value !== typeFilter || page !== 1;
     updateSearchParams((params) => {
       params.set('type', value);
       params.delete('page');
@@ -121,7 +124,8 @@ export const MyRunningTab = (): ReactElement => {
   };
 
   const handleRelationChange = (value: MyActivityEventRelationFilter) => {
-    pendingFilterAnnouncementRef.current = true;
+    pendingFilterAnnouncementRef.current =
+      value !== relationFilter || page !== 1;
     updateSearchParams((params) => {
       params.set('relation', value);
       params.delete('page');

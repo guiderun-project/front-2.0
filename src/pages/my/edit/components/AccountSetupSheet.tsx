@@ -10,13 +10,11 @@ import { useAccountSetup } from '../hooks/useAccountSetup';
 const PASSWORD_HELPER_TEXT =
   '영문, 특수문자를 포함해 8자 이상 32자 미만 입력해주세요';
 
-// 중복확인 결과는 helperText/errorText(aria-describedby)로만 렌더되어
-// 포커스가 버튼에 있는 스크린리더 사용자에게 낭독되지 않으므로,
-// 시트 내부 상시 마운트 라이브 리전으로 같은 문구를 안내한다.
-const CHECK_RESULT_MESSAGES = {
-  available: '사용 가능한 아이디예요',
-  taken: '이미 사용 중인 아이디예요',
-} as const;
+// helperText는 셸이 라이브 리전으로 미러링하지 않아 포커스가 버튼에 있는
+// 스크린리더 사용자에게 낭독되지 않으므로, 'available' 결과만 시트 내부
+// 상시 마운트 리전으로 안내한다. errorText('taken')는 InputFieldShell의
+// 오류 미러 리전이 자동 낭독하므로 여기서 재안내하면 이중 낭독이 된다.
+const CHECK_AVAILABLE_MESSAGE = '사용 가능한 아이디예요';
 const CHECK_FAILURE_MESSAGE = '중복 확인에 실패했어요. 다시 시도해주세요.';
 const SUBMIT_FAILURE_MESSAGE = '아이디 설정에 실패했어요. 다시 시도해주세요.';
 
@@ -90,8 +88,18 @@ export const AccountSetupSheet = ({
       return;
     }
 
+    if (result === 'taken') {
+      // 낭독은 Input errorText의 자동 미러에 맡기고, 이전 'available' 안내가
+      // 리전에 남지 않도록 비우기만 한다. (빈 문자열 주입은 낭독되지 않음)
+      setCheckNotice((previous) => ({
+        message: '',
+        revision: previous.revision + 1,
+      }));
+      return;
+    }
+
     setCheckNotice((previous) => ({
-      message: CHECK_RESULT_MESSAGES[result],
+      message: CHECK_AVAILABLE_MESSAGE,
       revision: previous.revision + 1,
     }));
   };
