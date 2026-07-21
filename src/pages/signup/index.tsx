@@ -39,7 +39,6 @@ import {
   SIGNUP_STEP_FIELDS,
   SIGNUP_STEP_STAGE,
 } from '@/pages/signup/constants';
-import { useAnnouncedMessage } from '@/pages/signup/hooks/useAnnouncedMessage';
 import { useSignupFunnel } from '@/pages/signup/hooks/useSignupFunnel';
 import { signupSchema } from '@/pages/signup/schema';
 import type { SignupFormValues, SignupStepId } from '@/pages/signup/types';
@@ -141,25 +140,6 @@ export const SignupPage = (): ReactElement => {
     heading.focus();
   }, [step]);
 
-  // '다음' 검증 실패를 알리는 폼 수준 안내. 포커스가 이동한 필드의 오류는
-  // aria-describedby로 함께 낭독되므로 문구는 간결하게 유지한다.
-  // 같은 단계에서 반복 실패해도 재낭독되도록 revision을 함께 올린다.
-  const [validationNotice, setValidationNotice] = useState({
-    message: '',
-    revision: 0,
-  });
-  const announcedValidationNotice = useAnnouncedMessage(
-    validationNotice.message,
-    validationNotice.revision,
-  );
-
-  // 단계 이동 시 이전 단계의 검증 실패 안내가 리전에 남지 않도록 비운다.
-  const clearValidationNotice = () => {
-    setValidationNotice((previous) =>
-      previous.message === '' ? previous : { ...previous, message: '' },
-    );
-  };
-
   const handleClose = () =>
     navigate(isCompleteStep ? APP_PATH.HOME : APP_PATH.INTRO);
 
@@ -168,7 +148,6 @@ export const SignupPage = (): ReactElement => {
       navigate(-1);
       return;
     }
-    clearValidationNotice();
     goPrev();
   };
 
@@ -217,17 +196,13 @@ export const SignupPage = (): ReactElement => {
     // 현재 단계의 필드만 검증하고, 통과해야 다음 단계로 이동한다.
     const isStepValid = await methods.trigger(SIGNUP_STEP_FIELDS[step]);
     if (isStepValid) {
-      clearValidationNotice();
       goNext();
       return;
     }
 
-    // 검증 실패: 스크린리더에 간결한 폼 수준 안내를 낭독시키고,
-    // 첫 오류 필드로 포커스를 옮겨 해당 필드의 오류가 describedby로 이어 낭독되게 한다.
-    setValidationNotice((previous) => ({
-      message: '입력 내용을 확인해주세요.',
-      revision: previous.revision + 1,
-    }));
+    // 검증 실패: 첫 오류 필드로 포커스를 옮겨 해당 필드의 오류가 describedby로
+    // 낭독되게 한다. 이 포커스 낭독이 단일 채널이므로 별도의 폼 수준 안내는 두지
+    // 않는다. (Input 오류 미러도 포커스가 막 도착한 오류의 주입을 생략한다.)
     // 오류 상태가 DOM에 반영된 다음 프레임에 포커스를 옮긴다.
     window.requestAnimationFrame(() => {
       const firstInvalidField = SIGNUP_STEP_FIELDS[step].find(
@@ -319,8 +294,7 @@ export const SignupPage = (): ReactElement => {
           </FooterButton.Button>
         </FooterButton>
 
-        {/* 검증 실패·제출 진행 안내용 SR 전용 라이브 리전. 상시 마운트해 두고 내용만 바꾼다. */}
-        <HiddenText role="status">{announcedValidationNotice}</HiddenText>
+        {/* 제출 진행 안내용 SR 전용 라이브 리전. 상시 마운트해 두고 내용만 바꾼다. */}
         <HiddenText role="status">
           {isSubmitting ? '가입 신청 중이에요' : ''}
         </HiddenText>

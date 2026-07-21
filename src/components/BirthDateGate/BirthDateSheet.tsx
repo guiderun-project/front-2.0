@@ -6,13 +6,13 @@ import { useMutation } from '@tanstack/react-query';
 import { getApiErrorMessage } from '@/api/core';
 import { api } from '@/api/services';
 import { useAuth } from '@/contexts';
+import { useAnnouncedMessage } from '@/hooks/useAnnouncedMessage';
 import { getTodayISODate, isValidBirthDateISO } from '@/utils';
 
 import { BottomSheet } from '../BottomSheet';
 import { Button } from '../Button';
 import { HiddenText } from '../HiddenText';
 import { DateInput } from '../Input';
-import { useAnnouncedMessage } from './useAnnouncedMessage';
 
 const BIRTH_DATE_ERROR_MESSAGE = '올바른 생년월일을 입력해주세요';
 
@@ -51,7 +51,9 @@ export const BirthDateSheet = ({
 
   // 제출 중에는 버튼이 disabled 되며 포커스가 사라지므로, 진행 상태를
   // 다이얼로그 내부의 상시 마운트 라이브 리전으로 안내한다.
-  // (등록 실패 오류는 Input 내부의 오류 미러링 리전이 낭독한다.)
+  // (등록 실패 오류는 onError의 포커스 이동으로 aria-describedby가 낭독하는
+  //  단일 채널이다. Input 오류 미러는 포커스가 막 도착한 오류의 주입을 생략하고,
+  //  타이핑 중 형식 오류만 미러가 낭독한다.)
   const announcedPendingMessage = useAnnouncedMessage(
     isPending ? '등록 중이에요' : '',
   );
@@ -65,6 +67,7 @@ export const BirthDateSheet = ({
       onError: () => {
         // 오류 텍스트가 렌더된 다음 프레임에 입력으로 포커스를 옮겨
         // 라벨과 aria-describedby 오류가 함께 낭독되게 한다.
+        // (검증-포커스 흐름에서는 Input 오류 미러가 주입을 생략해 중복 낭독이 없다.)
         window.requestAnimationFrame(() => {
           birthDateInputRef.current?.focus();
         });

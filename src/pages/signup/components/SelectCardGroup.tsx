@@ -35,6 +35,11 @@ export const SelectCardGroup = <T extends string | boolean>({
   const tabbableIndex = selectedIndex === -1 ? 0 : selectedIndex;
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    // 보조키 조합(Cmd+← 뒤로 가기 등)은 가로채지 않고 브라우저 기본 동작으로 통과시킨다.
+    if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) {
+      return;
+    }
+
     const delta =
       event.key === 'ArrowDown' || event.key === 'ArrowRight'
         ? 1
