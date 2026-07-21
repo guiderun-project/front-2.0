@@ -91,11 +91,19 @@ const CompletedPair = ({
   selectedUserIds,
   onToggleParticipant,
 }: CompletedPairProps): ReactElement => {
+  // iOS VoiceOver는 role="group"의 aria-label을 낭독하지 않고 내부 체크박스로
+  // 바로 이동해, 그룹 라벨로만 전달하던 페어 관계가 유실됐다. 매칭 상대를 각
+  // 체크박스의 접근 가능한 이름에 직접 실어 어느 체크박스에서든 관계를 알 수
+  // 있게 한다.
+  const viPartnerText = getGuidesPartnerLabel(row.guides);
+  const guidePartnerText = getViPartnerLabel(row.vi);
+
   return (
-    <PairRoot aria-label={getCompletedPairDescription(row)} role="group">
+    <PairRoot>
       <PairBoxes>
         <ViSlot>
           <PersonBox
+            partnerText={viPartnerText}
             person={row.vi}
             selected={selectedUserIds.has(row.vi.userId)}
             onToggle={onToggleParticipant}
@@ -111,6 +119,7 @@ const CompletedPair = ({
             <Fragment key={guide.userId}>
               {index > 0 ? <GuideDivider /> : null}
               <PersonRow
+                partnerText={guidePartnerText}
                 person={guide}
                 selected={selectedUserIds.has(guide.userId)}
                 onToggle={onToggleParticipant}
@@ -126,17 +135,22 @@ const CompletedPair = ({
 type PersonSelectProps = {
   person: MatchingUser;
   selected: boolean;
+  partnerText?: string;
   onToggle: (person: SelectablePerson) => void;
 };
 
 const PersonContent = ({
+  partnerText,
   person,
   selected,
   onToggle,
 }: PersonSelectProps): ReactElement => {
-  // 접근 가능한 이름은 안정적으로 고정한다. 선택 여부는 체크박스 checked
-  // 상태와 폴라이트 라이브 리전 안내가 전달하므로 이름에 넣지 않는다.
-  const selectLabel = `${RUNNER_TYPE_LABELS[person.type]} ${person.name} 선택`;
+  // 접근 가능한 이름에 매칭 상대(partnerText)를 함께 실어, 그룹 라벨을
+  // 건너뛰는 iOS VoiceOver에서도 페어 관계를 전달한다. 선택 여부는 체크박스
+  // checked 상태와 폴라이트 라이브 리전 안내가 전달하므로 이름에 넣지 않는다.
+  const selectLabel = partnerText
+    ? `${RUNNER_TYPE_LABELS[person.type]} ${person.name}, ${partnerText}, 선택`
+    : `${RUNNER_TYPE_LABELS[person.type]} ${person.name} 선택`;
 
   return (
     <>
@@ -175,15 +189,29 @@ const PersonRow = (props: PersonSelectProps): ReactElement => {
   );
 };
 
-const getCompletedPairDescription = (row: MatchingCompletedRow) => {
-  if (row.guides.length === 0) {
-    return `${row.vi.name}의 가이드러너 없음`;
+// 뒤에 '와/과'를 이름 받침에 맞춰 붙인다.
+const withWaGwa = (word: string): string => {
+  const lastCode = word.charCodeAt(word.length - 1);
+  const hasFinalConsonant =
+    lastCode >= 0xac00 && lastCode <= 0xd7a3 && (lastCode - 0xac00) % 28 !== 0;
+
+  return `${word}${hasFinalConsonant ? '과' : '와'}`;
+};
+
+// 시각장애러너 체크박스에서 낭독할 가이드러너 매칭 정보.
+const getGuidesPartnerLabel = (guides: MatchingUser[]): string => {
+  if (guides.length === 0) {
+    return '가이드러너 매칭 없음';
   }
 
-  return `${row.vi.name}의 가이드러너 ${row.guides
-    .map((guide) => guide.name)
-    .join(', ')}`;
+  const names = guides.map((guide) => guide.name).join(', ');
+
+  return `${withWaGwa(`가이드러너 ${names}`)} 매칭`;
 };
+
+// 가이드러너 체크박스에서 낭독할 시각장애러너 매칭 정보.
+const getViPartnerLabel = (vi: MatchingUser): string =>
+  `${withWaGwa(`시각장애러너 ${vi.name}`)} 매칭`;
 
 const GroupStack = styled.div(({ theme }) => ({
   display: 'flex',
