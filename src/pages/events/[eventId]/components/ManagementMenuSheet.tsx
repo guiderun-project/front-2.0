@@ -14,7 +14,7 @@ import {
 } from '@/components';
 import { APP_PATH } from '@/router/path';
 
-import { useAnnouncedMessage } from '../hooks/useAnnouncedMessage';
+import { useAnnouncedMessage } from '@/hooks/useAnnouncedMessage';
 import { useEventManagementActions } from '../hooks/useEventManagementActions';
 import {
   getEventDateStartTimestamp,

@@ -16,7 +16,7 @@ import {
   TimerInput,
 } from '@/components';
 import { ACCOUNT_FIND_TYPE } from '@/constants';
-import { useAnnouncedMessage } from '@/pages/account-find/useAnnouncedMessage';
+import { useAnnouncedMessage } from '@/hooks/useAnnouncedMessage';
 import { usePhoneCertification } from '@/pages/account-find/usePhoneCertification';
 import { formatJoinDate } from '@/pages/account-find/utils';
 import { APP_PATH } from '@/router/path';

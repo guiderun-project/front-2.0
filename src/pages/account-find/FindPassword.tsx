@@ -16,7 +16,7 @@ import {
   Text,
   TimerInput,
 } from '@/components';
-import { useAnnouncedMessage } from '@/pages/account-find/useAnnouncedMessage';
+import { useAnnouncedMessage } from '@/hooks/useAnnouncedMessage';
 import { usePhoneCertification } from '@/pages/account-find/usePhoneCertification';
 import {
   isValidNewPassword,

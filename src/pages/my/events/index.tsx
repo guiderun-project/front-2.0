@@ -18,7 +18,7 @@ import {
 import { MY_ACTIVITY_PARTNER_SORTS } from "@/api/constants/user";
 import type { MyActivityPartnerSort } from "@/api/types";
 import { HiddenText, PageLayout, TopNavigation } from "@/components";
-import { useAnnouncedMessage } from "@/pages/my/hooks/useAnnouncedMessage";
+import { useAnnouncedMessage } from "@/hooks/useAnnouncedMessage";
 
 import { MyRunningTab } from "./components/MyRunningTab";
 

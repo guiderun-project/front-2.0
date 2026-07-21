@@ -18,7 +18,7 @@ import {
   useToast,
 } from '@/components';
 
-import { useAnnouncedMessage } from '../hooks/useAnnouncedMessage';
+import { useAnnouncedMessage } from '@/hooks/useAnnouncedMessage';
 import { useEventComments } from '../hooks/useEventComments';
 import { formatRelativeTime } from '../utils';
 import { AnnouncedPanelState } from './PanelState';

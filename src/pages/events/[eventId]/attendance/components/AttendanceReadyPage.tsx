@@ -3,7 +3,7 @@ import { useEffect, type ReactElement } from 'react';
 import { HiddenText } from '@/components';
 
 import { focusFirstHeading } from '../focusFirstHeading';
-import { useAnnouncedMessage } from '../useAnnouncedMessage';
+import { useAnnouncedMessage } from '@/hooks/useAnnouncedMessage';
 import { useEventAttendancePage } from '../useEventAttendancePage';
 import { AttendanceLeadDescription } from './AttendanceLeadDescription';
 import { AttendancePageContent } from './AttendancePageContent';

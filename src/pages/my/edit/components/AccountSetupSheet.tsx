@@ -3,7 +3,7 @@ import { useState, type ReactElement } from 'react';
 import styled from '@emotion/styled';
 
 import { BottomSheet, Button, HiddenText, Input } from '@/components';
-import { useAnnouncedMessage } from '@/pages/my/hooks/useAnnouncedMessage';
+import { useAnnouncedMessage } from '@/hooks/useAnnouncedMessage';
 
 import { useAccountSetup } from '../hooks/useAccountSetup';
 

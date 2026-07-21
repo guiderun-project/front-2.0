@@ -22,7 +22,7 @@ import {
   Text,
   type SelectOptions,
 } from '@/components';
-import { useAnnouncedMessage } from '@/pages/my/hooks/useAnnouncedMessage';
+import { useAnnouncedMessage } from '@/hooks/useAnnouncedMessage';
 
 import { MyActivityEventList } from './MyActivityEventList';
 

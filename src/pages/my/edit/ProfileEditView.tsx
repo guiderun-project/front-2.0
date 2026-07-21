@@ -17,7 +17,7 @@ import {
   useToast,
 } from '@/components';
 import { useRouteBlockerConfirm } from '@/hooks/useRouteBlockerConfirm';
-import { useAnnouncedMessage } from '@/pages/my/hooks/useAnnouncedMessage';
+import { useAnnouncedMessage } from '@/hooks/useAnnouncedMessage';
 import { APP_PATH } from '@/router/path';
 import { getTodayISODate } from '@/utils';
 

@@ -24,7 +24,7 @@ import {
   type RunnerRecordGroup,
 } from '@/constants';
 import { useRouteBlockerConfirm } from '@/hooks/useRouteBlockerConfirm';
-import { useAnnouncedMessage } from '@/pages/my/hooks/useAnnouncedMessage';
+import { useAnnouncedMessage } from '@/hooks/useAnnouncedMessage';
 import { APP_PATH } from '@/router/path';
 
 import { HOPE_PREFS_MAX_LENGTH, useRunningEdit } from './hooks/useRunningEdit';
