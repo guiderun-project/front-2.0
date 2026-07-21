@@ -154,8 +154,10 @@ const FindAccountRow = styled.div(({ theme }) => ({
 
 // 페이지 이동 동작이라 button 대신 Link(앵커) 시맨틱 사용 — 스크린리더 '링크' 탐색에 노출
 const FindAccountLink = styled(Link)(({ theme }) => ({
-  // 기존 button 요소의 UA 기본 패딩(1px 6px)을 명시해 시각 변화 방지
-  padding: '1px 6px',
+  // 전환 전 button UA 기본 패딩은 엔진별로 달랐음(Blink 1px/6px, WebKit iOS 0/6px,
+  // WebKit macOS 2px 3px/6px, Gecko 1px/4px). 주 타겟인 iOS Safari 값 기준
+  // 0 / 6px(spacing.sm)로 전 브라우저 통일 — 기존 렌더 대비 차이는 엔진별 1~2px 이내
+  padding: `0 ${theme.spacing.sm}`,
   border: 0,
   backgroundColor: 'transparent',
   cursor: 'pointer',
