@@ -17,23 +17,6 @@ type MatchParticipantCardProps = {
   onToggle: (participant: MatchingWaitingParticipant) => void;
 };
 
-const getParticipantMeta = (
-  applicationGroup: RunningGroup,
-  eventGroupLabelContext: EventGroupLabelContext,
-  participant: MatchingWaitingParticipant,
-): string => {
-  const groupText = getOriginalRunningGroupText(
-    applicationGroup,
-    eventGroupLabelContext,
-    participant.originalRunningGroup,
-  );
-  const partnerText = participant.hopePartner
-    ? `희망파트너 ${participant.hopePartner}`
-    : null;
-
-  return [groupText, partnerText].filter(Boolean).join(' ・');
-};
-
 const getOriginalRunningGroupText = (
   applicationGroup: RunningGroup,
   { eventCategory, eventType }: EventGroupLabelContext,
@@ -59,15 +42,30 @@ export const MatchParticipantCard = ({
   participant,
   onToggle,
 }: MatchParticipantCardProps): ReactElement => {
-  const participantMeta = getParticipantMeta(
+  const groupText = getOriginalRunningGroupText(
     applicationGroup,
     eventGroupLabelContext,
-    participant,
+    participant.originalRunningGroup,
   );
-  // 접근 가능한 이름은 안정적으로 고정한다. 선택 여부는 체크박스 checked
+  const partnerText = participant.hopePartner
+    ? `희망파트너 ${participant.hopePartner}`
+    : null;
+  const participantMeta = [groupText, partnerText].filter(Boolean).join(' ・');
+
+  // 카드에 표시된 정보(이름·첫참여·기존그룹·희망파트너·추가코멘트)를 모두
+  // 체크박스 접근 가능한 이름으로 묶어, 그룹 라벨을 건너뛰는 iOS VoiceOver에서도
+  // 참가자 정보를 한 번에 파악할 수 있게 한다. 선택 여부는 체크박스 checked
   // 상태와 폴라이트 라이브 리전 안내가 전달하므로 이름에 넣지 않는다.
-  const selectLabel =
-    `${RUNNER_TYPE_LABELS[participant.type]} ${participant.name} 선택`;
+  const selectLabelParts = [
+    `${RUNNER_TYPE_LABELS[participant.type]} ${participant.name}`,
+    participant.isFirstParticipation ? '첫참여' : null,
+    groupText,
+    partnerText,
+    participant.additionalComment
+      ? `추가 코멘트 ${participant.additionalComment}`
+      : null,
+  ].filter(Boolean);
+  const selectLabel = `${selectLabelParts.join(', ')}, 선택`;
 
   return (
     <ParticipantCard $isSelected={isSelected}>
@@ -78,13 +76,13 @@ export const MatchParticipantCard = ({
           onToggle(participant);
         }}
       />
-      <InfoColumn>
+      {/* 위 체크박스 aria-label이 카드의 모든 정보를 묶어 낭독하므로, 시각 전용
+          정보 영역은 스크린리더 중복 낭독을 막기 위해 통째로 숨긴다. */}
+      <InfoColumn aria-hidden={true}>
         <Profile>
           <NameRow>
-            {/* 체크박스 aria-label이 유형+이름을 이미 전달하므로 시각 전용
-                아바타·이름 블록은 스크린리더 중복 낭독을 막기 위해 숨긴다. */}
-            <AvatarNameGroup aria-hidden={true}>
-              <RunnerTypeAvatar aria-hidden={true} size="m" type={participant.type} />
+            <AvatarNameGroup>
+              <RunnerTypeAvatar size="m" type={participant.type} />
               <ParticipantName color="text.primary" font="body-m-sb">
                 {participant.name}
               </ParticipantName>
