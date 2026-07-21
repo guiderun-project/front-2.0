@@ -31,7 +31,11 @@ export const MemberUpcomingEventCard = ({
   return (
     <CardItem>
       <CardLink aria-label={ariaLabel} to={APP_PATH.EVENT_DETAIL(event.id)}>
-        <TitleRow>
+        {/* 링크 접근 가능한 이름은 aria-label 로만 제공하고 내부 시각 콘텐츠는
+            전부 aria-hidden 처리한다. iOS VoiceOver 는 aria-label 이 있어도
+            링크 안 텍스트 블록이 여러 개면 개별 항목으로 쪼개 읽으므로,
+            자식을 숨겨 매칭 유무와 무관하게 카드가 한 덩어리로 낭독되게 한다. */}
+        <TitleRow aria-hidden={true}>
           <Badge size="s" tone="cyan" variant={getDdayBadgeVariant(event.dDay)}>
             {formatDday(event.dDay)}
           </Badge>
@@ -46,14 +50,14 @@ export const MemberUpcomingEventCard = ({
           />
         </TitleRow>
 
-        <InfoRow>
+        <InfoRow aria-hidden={true}>
           <Icon aria-hidden={true} color="icon.secondary" icon="map-lined" size={16} />
           <Text color="text.secondary" font="detail-m-r">
             {event.place}
           </Text>
         </InfoRow>
 
-        <InfoRow>
+        <InfoRow aria-hidden={true}>
           <Icon
             aria-hidden={true}
             color="icon.secondary"
@@ -66,18 +70,14 @@ export const MemberUpcomingEventCard = ({
         </InfoRow>
 
         {isMatched ? (
-          <MatchedPartnerBox>
+          <MatchedPartnerBox aria-hidden={true}>
             <PartnerLabel color="text.secondary" font="detail-m-m">
               내 파트너
             </PartnerLabel>
             <PartnerChips>
               {partners.map((partner, index) => (
                 <PartnerChip key={`${partner.type}-${partner.name}-${index}`}>
-                  <RunnerTypeAvatar
-                    aria-hidden
-                    size="s"
-                    type={partner.type}
-                  />
+                  <RunnerTypeAvatar size="s" type={partner.type} />
                   <Text color="text.primary" font="detail-m-sb">
                     {partner.name}
                   </Text>
@@ -86,7 +86,7 @@ export const MemberUpcomingEventCard = ({
             </PartnerChips>
           </MatchedPartnerBox>
         ) : (
-          <MatchPendingNotice>
+          <MatchPendingNotice aria-hidden={true}>
             <Text align="center" as="p" color="text.tertiary" font="detail-m-m">
               아직 파트너 매칭 전이에요
             </Text>

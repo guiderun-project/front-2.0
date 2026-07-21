@@ -31,7 +31,10 @@ export const UpcomingEventCard = ({
   return (
     <RowItem>
       <RowLink aria-label={ariaLabel} to={APP_PATH.EVENT_DETAIL(event.id)}>
-        <RowMain>
+        {/* 링크 이름은 aria-label 로만 제공하고 시각 콘텐츠는 aria-hidden 처리한다.
+            iOS VoiceOver 가 링크 안 텍스트 블록을 개별 항목으로 쪼개 읽는 것을 막아
+            카드가 한 덩어리로 낭독되게 한다. */}
+        <RowMain aria-hidden={true}>
           <TitleLine>
             <Badge size="s" tone="cyan" variant={getDdayBadgeVariant(event.dDay)}>
               {formatDday(event.dDay)}
