@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
 import {
   useMutation,
@@ -135,6 +135,12 @@ export const useEventMatchPage = (eventId: number) => {
     useState<LiveAnnouncement>(EMPTY_ANNOUNCEMENT);
   const [selectedViId, setSelectedViId] = useState<string | null>(null);
   const [selectedGuideIds, setSelectedGuideIds] = useState<string[]>([]);
+  // 매칭 요청이 실제로 성공했을 때만 증가하는 카운터. 화면은 이 값으로 성공을
+  // 감지해 포커스를 복구한다(선택 해제·실패 등 다른 전이와 구분하기 위함).
+  const [matchingSuccessCount, setMatchingSuccessCount] = useState(0);
+  // 매칭 완료 안내 문구는 즉시 낭독하지 않고 보관해 두었다가, 화면이 포커스
+  // 복구를 마친 뒤 announceMatchingCompletion 으로 소비한다.
+  const pendingCompletionAnnouncementRef = useRef<string | null>(null);
   const isCreatingMatchingGuardRef = useRef(false);
 
   const [waitingQuery, completedQuery] = useSuspenseQueries({
@@ -225,11 +231,28 @@ export const useEventMatchPage = (eventId: number) => {
     setAnnouncement({ message, politeness: 'assertive' });
   };
 
+  // 선택 해제 확인 문구는 여기서 바로 주입하지 않는다. 해제 시 선택 바
+  // 언마운트로 포커스 이동이 뒤따르는데, 즉시 주입하면 포커스 낭독에 잘리기
+  // 때문에 호출부가 포커스 복구 후 announceSelectionCleared 로 지연 안내한다.
   const clearSelection = () => {
     setSelectedViId(null);
     setSelectedGuideIds([]);
+  };
+
+  const announceSelectionCleared = () => {
     announcePolitely('선택한 참가자를 모두 해제했습니다.');
   };
+
+  // 보관해 둔 매칭 완료 안내를 소비한다. 포커스 복구(매칭대기 제목 낭독)가
+  // 끝난 뒤 호출되므로 polite 리전으로도 완료 문장 전체가 끊기지 않는다.
+  const announceMatchingCompletion = useCallback(() => {
+    const message = pendingCompletionAnnouncementRef.current;
+    pendingCompletionAnnouncementRef.current = null;
+
+    if (message !== null) {
+      setAnnouncement({ message, politeness: 'polite' });
+    }
+  }, []);
 
   const invalidateMatchingQueries = async () => {
     await Promise.all([
@@ -258,9 +281,15 @@ export const useEventMatchPage = (eventId: number) => {
       const viName = personMap.get(variables.viId)?.name;
 
       clearSelection();
-      announceAssertively(
-        getMatchingCompleteAnnouncement(viName, data.summary.waitingCount),
+      // 완료 안내를 즉시 assertive 로 주입하면 곧 이어지는 매칭대기 제목
+      // 포커스 이동이 낭독을 중간에 끊는다. 문구를 보관해 두고 성공 카운터만
+      // 올리면, 화면이 포커스를 먼저 복구한 뒤 안내를 지연 주입한다
+      // (한 이벤트 = 한 낭독 채널).
+      pendingCompletionAnnouncementRef.current = getMatchingCompleteAnnouncement(
+        viName,
+        data.summary.waitingCount,
       );
+      setMatchingSuccessCount((count) => count + 1);
       showToast({
         type: 'success',
         icon: 'check-thick-lined',
@@ -321,12 +350,15 @@ export const useEventMatchPage = (eventId: number) => {
   };
 
   return {
+    announceMatchingCompletion,
+    announceSelectionCleared,
     announcement,
     canCreateMatching,
     clearSelection,
     createMatching,
     hasSelection,
     isCreatingMatching: createMutation.isPending,
+    matchingSuccessCount,
     pageState,
     selectedGuides,
     selectedUserIds,

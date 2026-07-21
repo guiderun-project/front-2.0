@@ -23,6 +23,10 @@ type MatchPageContentProps = {
   matchPage: EventMatchPageModel;
 };
 
+// 포커스 복구(섹션 제목 낭독)가 끝난 뒤 라이브 리전 안내를 주입하기 위한
+// 지연. 포커스 이동과 동시에 주입하면 스크린리더가 안내를 중간에 끊는다.
+const FOCUS_ANNOUNCEMENT_DELAY_MS = 700;
+
 export const MatchPageMessageContent = ({
   pageState,
 }: MatchMessageContentProps): ReactElement => {
@@ -52,11 +56,14 @@ export const MatchPageContent = ({
   matchPage,
 }: MatchPageContentProps): ReactElement => {
   const {
+    announceMatchingCompletion,
+    announceSelectionCleared,
     canCreateMatching,
     clearSelection,
     createMatching,
     hasSelection,
     isCreatingMatching,
+    matchingSuccessCount,
     pageState,
     selectedGuides,
     selectedUserIds,
@@ -65,41 +72,60 @@ export const MatchPageContent = ({
   } = matchPage;
   const { activeSection, completedRef, navRef, scrollToSection, waitingRef } =
     useMatchScrollSpy();
-  const wasCreatingMatchingRef = useRef(false);
+  const lastHandledSuccessCountRef = useRef(matchingSuccessCount);
+  const clearAnnounceTimeoutRef = useRef<number | undefined>(undefined);
 
   // 선택 바의 '선택 모두 해제'를 누르면 바가 통째로 언마운트되어 스크린리더
   // 포커스가 body로 떨어지므로, 다음 프레임에 매칭대기 섹션 제목으로 포커스를
-  // 옮겨 낭독 커서가 목록 근처에 유지되게 한다.
+  // 옮겨 낭독 커서가 목록 근처에 유지되게 한다. 해제 확인 문구는 제목 낭독이
+  // 끝난 뒤 주입해 포커스 낭독에 잘리지 않게 한다(한 이벤트 = 한 낭독 채널).
   const handleClearSelection = () => {
     clearSelection();
     window.requestAnimationFrame(() => {
       waitingRef.current
         ?.querySelector<HTMLElement>("h2")
         ?.focus({ preventScroll: true });
+      window.clearTimeout(clearAnnounceTimeoutRef.current);
+      clearAnnounceTimeoutRef.current = window.setTimeout(() => {
+        announceSelectionCleared();
+      }, FOCUS_ANNOUNCEMENT_DELAY_MS);
     });
   };
 
   useEffect(() => {
-    const wasCreatingMatching = wasCreatingMatchingRef.current;
-    wasCreatingMatchingRef.current = isCreatingMatching;
+    return () => {
+      window.clearTimeout(clearAnnounceTimeoutRef.current);
+    };
+  }, []);
 
-    // 매칭 요청이 성공했을 때만 선택이 비워진다(실패 시 선택 유지). 성공으로
-    // 선택 바가 언마운트되면 다음 매칭을 이어갈 매칭대기 섹션 제목으로
-    // 포커스를 복구한다. rAF 지연으로 완료 안내(assertive)와의 경합을 줄인다.
-    if (!wasCreatingMatching || isCreatingMatching || hasSelection) {
+  useEffect(() => {
+    // 성공 카운터가 실제로 증가했을 때만 실행한다. 요청 진행 중 사용자가
+    // 선택을 직접 해제한 뒤 요청이 실패하는 경우처럼, 성공이 아닌 전이에서는
+    // 포커스를 옮기지 않는다(초기 마운트는 ref 초기값 비교로 건너뜀).
+    if (matchingSuccessCount === lastHandledSuccessCountRef.current) {
       return;
     }
 
+    lastHandledSuccessCountRef.current = matchingSuccessCount;
+
+    // 매칭 성공으로 선택 바가 언마운트되면 다음 매칭을 이어갈 매칭대기 섹션
+    // 제목으로 포커스를 먼저 복구하고, 완료 안내(이름·남은 인원)는 제목
+    // 낭독이 끝난 뒤 polite 리전에 지연 주입해 포커스 이동에 잘리지 않게 한다.
+    let announceTimeoutId: number | undefined;
     const frameId = window.requestAnimationFrame(() => {
       waitingRef.current
         ?.querySelector<HTMLElement>("h2")
         ?.focus({ preventScroll: true });
+      announceTimeoutId = window.setTimeout(() => {
+        announceMatchingCompletion();
+      }, FOCUS_ANNOUNCEMENT_DELAY_MS);
     });
 
     return () => {
       window.cancelAnimationFrame(frameId);
+      window.clearTimeout(announceTimeoutId);
     };
-  }, [hasSelection, isCreatingMatching, waitingRef]);
+  }, [announceMatchingCompletion, matchingSuccessCount, waitingRef]);
 
   return (
     <ReadyContent $hasSelectionBar={hasSelection}>

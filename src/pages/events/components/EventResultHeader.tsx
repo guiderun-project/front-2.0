@@ -22,6 +22,10 @@ const RECRUIT_FILTER_OPTIONS: SelectOptions<RecruitStatusFilter> = [
   { label: "모집마감", value: RECRUIT_STATUS_FILTERS.CLOSE },
 ];
 
+// 결과 갱신 안내 낭독이 끝난 뒤 리전을 비우기까지의 지연. 리전 텍스트가 계속
+// 남아 있으면 인접한 가시 문구('총 N건' 등)와 함께 탐색 시 두 번 낭독된다.
+const STATUS_CLEAR_DELAY_MS = 3000;
+
 type EventResultHeaderProps = {
   totalCount: number;
   showFilters: boolean;
@@ -51,12 +55,23 @@ export const EventResultHeader = ({
   const [announcedStatus, setAnnouncedStatus] = useState("");
 
   useEffect(() => {
+    let clearTimerId: number | undefined;
     const frameId = window.requestAnimationFrame(() => {
       setAnnouncedStatus(srStatusMessage);
+      // 낭독이 끝날 만큼 기다린 뒤 리전을 비워 가시 텍스트와의 중복 탐색
+      // 낭독을 막는다. status 리전의 기본 aria-relevant("additions text")에서
+      // 텍스트 제거는 낭독되지 않으므로 비우기는 조용히 처리된다.
+      clearTimerId = window.setTimeout(() => {
+        setAnnouncedStatus("");
+      }, STATUS_CLEAR_DELAY_MS);
     });
 
     return () => {
       window.cancelAnimationFrame(frameId);
+
+      if (clearTimerId !== undefined) {
+        window.clearTimeout(clearTimerId);
+      }
     };
   }, [srStatusMessage]);
 

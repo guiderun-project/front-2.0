@@ -118,6 +118,17 @@ export const AdditionalQuestionCard = ({
                   </Counter>
                 </InformRow>
               )}
+              {readOnly ? null : (
+                // 최대 글자 수에 도달해 이후 입력이 무시되기 시작하는 시점을
+                // 알린다(InputFieldShell 패리티). 도달/해제 시에만 내용이
+                // 바뀌므로 타이핑마다 반복 낭독되지 않는다.
+                <HiddenText role="status">
+                  {titleField.value.length >=
+                  ADDITIONAL_QUESTION_TITLE_MAX_LENGTH
+                    ? `최대 ${ADDITIONAL_QUESTION_TITLE_MAX_LENGTH}자에 도달했어요`
+                    : ""}
+                </HiddenText>
+              )}
             </QuestionTitleField>
           );
         }}
