@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react';
+import { useEffect, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
@@ -9,10 +9,12 @@ import type { MyActivityEventsParams } from '../queryKeys';
 import { MyActivityEventCard } from './MyActivityEventCard';
 
 type MyActivityEventListProps = MyActivityEventsParams & {
+  onLoaded?: (totalCount: number) => void;
   onPageChange: (page: number) => void;
 };
 
 export const MyActivityEventList = ({
+  onLoaded,
   onPageChange,
   page,
   relation,
@@ -21,6 +23,11 @@ export const MyActivityEventList = ({
   const { data } = useMyActivityEvents({ page, relation, type });
   const { items } = data;
   const { totalPages } = data.pagination;
+
+  // 필터 변경 등으로 새 데이터가 로드되면 상위의 SR 안내 리전에 알린다.
+  useEffect(() => {
+    onLoaded?.(data.pagination.totalCount);
+  }, [data, onLoaded]);
 
   if (items.length === 0) {
     return (

@@ -12,7 +12,7 @@ import {
   getEventPrimaryGroupLabel,
   type EventGroupLabelContext,
 } from '../utils';
-import { PanelState } from './PanelState';
+import { AnnouncedPanelState, PanelState } from './PanelState';
 
 const EMPTY_VALUE = '미입력';
 
@@ -87,12 +87,14 @@ export const ApplicantFormSheet = ({
     >
       {/* TODO: 디자인 확정 시 신청서 로딩/에러/빈 상태 UI로 교체 */}
       {isPending ? (
-        <PanelState>신청서를 불러오는 중입니다.</PanelState>
+        <AnnouncedPanelState role="status">
+          신청서를 불러오는 중입니다.
+        </AnnouncedPanelState>
       ) : null}
       {isError ? (
-        <PanelState>
+        <AnnouncedPanelState role="alert">
           {getApiErrorMessage(error, '신청서를 불러오지 못했습니다.')}
-        </PanelState>
+        </AnnouncedPanelState>
       ) : null}
       {!isPending && !isError && !data ? (
         <PanelState>신청서 정보를 선택해주세요.</PanelState>

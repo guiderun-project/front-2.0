@@ -16,6 +16,7 @@ import { api } from '@/api/services';
 import {
   ConfirmPopup,
   FooterButton,
+  HiddenText,
   PageLayout,
   TopNavigation,
 } from '@/components';
@@ -196,7 +197,27 @@ export const SignupPage = (): ReactElement => {
     const isStepValid = await methods.trigger(SIGNUP_STEP_FIELDS[step]);
     if (isStepValid) {
       goNext();
+      return;
     }
+
+    // 검증 실패: 첫 오류 필드로 포커스를 옮겨 해당 필드의 오류가 describedby로
+    // 낭독되게 한다. 이 포커스 낭독이 단일 채널이므로 별도의 폼 수준 안내는 두지
+    // 않는다. (Input 오류 미러도 포커스가 막 도착한 오류의 주입을 생략한다.)
+    // 오류 상태가 DOM에 반영된 다음 프레임에 포커스를 옮긴다.
+    window.requestAnimationFrame(() => {
+      const firstInvalidField = SIGNUP_STEP_FIELDS[step].find(
+        (name) => methods.getFieldState(name).invalid,
+      );
+      if (!firstInvalidField) return;
+      methods.setFocus(firstInvalidField);
+      // TimeInput(10KM 러닝기록)처럼 RHF ref가 연결되지 않는 필드는 setFocus가
+      // 무시되므로, 오류 표시된 첫 input으로 보조 포커스를 옮긴다.
+      if (!stepAreaRef.current?.contains(document.activeElement)) {
+        stepAreaRef.current
+          ?.querySelector<HTMLElement>('input[aria-invalid="true"]')
+          ?.focus();
+      }
+    });
   };
 
   const primaryLabel = isCompleteStep
@@ -262,6 +283,7 @@ export const SignupPage = (): ReactElement => {
 
         <FooterButton>
           <FooterButton.Button
+            aria-busy={isSubmitting}
             disabled={isFooterButtonDisabled}
             fullWidth
             size="l"
@@ -271,6 +293,11 @@ export const SignupPage = (): ReactElement => {
             {primaryLabel}
           </FooterButton.Button>
         </FooterButton>
+
+        {/* 제출 진행 안내용 SR 전용 라이브 리전. 상시 마운트해 두고 내용만 바꾼다. */}
+        <HiddenText role="status">
+          {isSubmitting ? '가입 신청 중이에요' : ''}
+        </HiddenText>
       </FormProvider>
     </PageLayout>
   );

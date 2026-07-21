@@ -3,9 +3,15 @@ import type { ReactElement } from 'react';
 import styled from '@emotion/styled';
 
 import type { MyPageResponse } from '@/api/types';
-import { Button, Text } from '@/components';
+import { Button, HiddenText, Text } from '@/components';
+import { formatTimeRecordSrLabel } from '@/utils';
 
-import { EMPTY_INFO_TEXT, getRunningGroupLabel } from '../constants';
+import {
+  EMPTY_INFO_TEXT,
+  getRunningGroupLabel,
+  getRunningGroupSrLabel,
+} from '../constants';
+import { HiddenHeading } from './HiddenHeading';
 
 type RunningInfoSectionProps = {
   runningInfo: MyPageResponse['runningInfo'];
@@ -17,15 +23,22 @@ export const RunningInfoSection = ({
   onEdit,
 }: RunningInfoSectionProps): ReactElement => {
   const { type, recordDegree, detailRecord, hopePrefs } = runningInfo;
+  // "00:52:30" 형식이 아니면(자유 형식 기록) 시각 텍스트를 그대로 읽는다.
+  const detailRecordSrLabel = detailRecord
+    ? formatTimeRecordSrLabel(detailRecord)
+    : null;
 
   return (
     <Card aria-label="러닝 정보">
+      <HiddenHeading>러닝 정보</HiddenHeading>
       <Row>
         <RowLabel color="text.secondary" font="body-m-sb">
           러닝 그룹
         </RowLabel>
         <Text color="text.primary" font="body-m-m">
-          {getRunningGroupLabel(recordDegree, type)}
+          {/* "A ~50분"의 물결표는 낭독에서 생략되므로 "A 50분 이하"로 풀어 읽는다. */}
+          <HiddenText>{getRunningGroupSrLabel(recordDegree, type)}</HiddenText>
+          <span aria-hidden={true}>{getRunningGroupLabel(recordDegree, type)}</span>
         </Text>
       </Row>
       <Row $align="flex-start">
@@ -33,7 +46,15 @@ export const RunningInfoSection = ({
           개인 기록
         </RowLabel>
         <Text color="text.primary" font="body-m-m">
-          {detailRecord ?? EMPTY_INFO_TEXT}
+          {detailRecord && detailRecordSrLabel !== detailRecord ? (
+            <>
+              {/* "00:52:30"은 시/분/초 구분 없이 낭독되므로 "52분 30초"로 읽는다. */}
+              <HiddenText>{detailRecordSrLabel}</HiddenText>
+              <span aria-hidden={true}>{detailRecord}</span>
+            </>
+          ) : (
+            (detailRecord ?? EMPTY_INFO_TEXT)
+          )}
         </Text>
       </Row>
       <Row $align="flex-start">

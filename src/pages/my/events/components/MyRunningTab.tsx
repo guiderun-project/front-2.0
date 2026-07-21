@@ -1,4 +1,10 @@
-import { useTransition, type ReactElement } from 'react';
+import {
+  useCallback,
+  useRef,
+  useState,
+  useTransition,
+  type ReactElement,
+} from 'react';
 
 import styled from '@emotion/styled';
 import { useSearchParams } from 'react-router-dom';
@@ -9,7 +15,14 @@ import type {
   EventListTypeFilter,
   MyActivityEventRelationFilter,
 } from '@/api/types';
-import { Filter, QueryBoundary, Text, type SelectOptions } from '@/components';
+import {
+  Filter,
+  HiddenText,
+  QueryBoundary,
+  Text,
+  type SelectOptions,
+} from '@/components';
+import { useAnnouncedMessage } from '@/hooks/useAnnouncedMessage';
 
 import { MyActivityEventList } from './MyActivityEventList';
 
@@ -50,6 +63,31 @@ export const MyRunningTab = (): ReactElement => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [, startTransition] = useTransition();
 
+  // 필터 변경은 트랜지션으로 기존 트리가 유지되어 로딩 안내가 나가지 않으므로,
+  // 데이터 로드 완료 후 SR 전용 리전으로 목록 갱신을 안내한다.
+  // (페이지 이동은 Pagination이 자동 안내하므로 제외)
+  const pendingFilterAnnouncementRef = useRef(false);
+  const [listNotice, setListNotice] = useState({ message: '', revision: 0 });
+  const announcedListNotice = useAnnouncedMessage(
+    listNotice.message,
+    listNotice.revision,
+  );
+
+  const handleListLoaded = useCallback((totalCount: number) => {
+    if (!pendingFilterAnnouncementRef.current) {
+      return;
+    }
+
+    pendingFilterAnnouncementRef.current = false;
+    setListNotice((previous) => ({
+      message:
+        totalCount > 0
+          ? `필터를 적용해 총 ${totalCount}개의 러닝 기록을 불러왔어요.`
+          : '필터를 적용했어요. 아직 러닝 기록이 없어요.',
+      revision: previous.revision + 1,
+    }));
+  }, []);
+
   const typeParam = searchParams.get('type');
   const relationParam = searchParams.get('relation');
   const typeValue = typeParam === null ? undefined : resolveType(typeParam);
@@ -74,7 +112,11 @@ export const MyRunningTab = (): ReactElement => {
     });
   };
 
+  // 동일 값을 1페이지에서 재선택하면 쿼리 키가 그대로라 onLoaded가 실행되지
+  // 않아 플래그가 남고, 이후 페이지 이동에서 허위 '필터 적용' 안내가 나간다.
+  // 목록이 실제로 갱신될 때(값 변경 또는 페이지 리셋)만 플래그를 세운다.
   const handleTypeChange = (value: EventListTypeFilter) => {
+    pendingFilterAnnouncementRef.current = value !== typeFilter || page !== 1;
     updateSearchParams((params) => {
       params.set('type', value);
       params.delete('page');
@@ -82,6 +124,8 @@ export const MyRunningTab = (): ReactElement => {
   };
 
   const handleRelationChange = (value: MyActivityEventRelationFilter) => {
+    pendingFilterAnnouncementRef.current =
+      value !== relationFilter || page !== 1;
     updateSearchParams((params) => {
       params.set('relation', value);
       params.delete('page');
@@ -134,10 +178,13 @@ export const MyRunningTab = (): ReactElement => {
             page={page}
             relation={relationFilter}
             type={typeFilter}
+            onLoaded={handleListLoaded}
             onPageChange={handlePageChange}
           />
         </QueryBoundary>
       </ListSection>
+
+      <HiddenText role="status">{announcedListNotice}</HiddenText>
     </>
   );
 };

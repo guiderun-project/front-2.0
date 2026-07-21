@@ -1,5 +1,5 @@
 import type { ReactElement, ReactNode } from 'react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import styled from '@emotion/styled';
 import { useNavigate } from 'react-router-dom';
@@ -9,16 +9,22 @@ import { api } from '@/api/services';
 import {
   FooterButton,
   FormPageLayout,
+  HiddenText,
   Icon,
   PageLayout,
   Text,
   TimerInput,
 } from '@/components';
 import { ACCOUNT_FIND_TYPE } from '@/constants';
+import { useAnnouncedMessage } from '@/hooks/useAnnouncedMessage';
 import { usePhoneCertification } from '@/pages/account-find/usePhoneCertification';
 import { formatJoinDate } from '@/pages/account-find/utils';
 import { APP_PATH } from '@/router/path';
-import { isValidKoreanPhone, PHONE_DIGIT_LENGTH } from '@/utils';
+import {
+  formatDateSrLabel,
+  isValidKoreanPhone,
+  PHONE_DIGIT_LENGTH,
+} from '@/utils';
 
 const FIND_ID_PHASE = {
   VERIFY: 'verify',
@@ -43,6 +49,11 @@ export const FindId = (): ReactElement => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [phoneError, setPhoneError] = useState('');
   const [certError, setCertError] = useState('');
+  // 단계 전환 결과를 스크린리더에 알리는 안내 문구. 상시 마운트된 라이브 리전에 주입한다.
+  const [phaseAnnouncement, setPhaseAnnouncement] = useState('');
+  // 단계 전환 시 h1 포커스 낭독이 먼저 시작된 뒤 안내가 이어지도록 리전 주입을 지연한다.
+  const announcedPhaseMessage = useAnnouncedMessage(phaseAnnouncement);
+  const titleRef = useRef<HTMLSpanElement>(null);
   const {
     phoneNum,
     certCode,
@@ -51,6 +62,7 @@ export const FindId = (): ReactElement => {
     isExpired,
     canExtend,
     timerText,
+    expiredAnnouncement,
     certInputRef,
     handlePhoneChange,
     handleCertCodeChange,
@@ -58,8 +70,19 @@ export const FindId = (): ReactElement => {
     extendTime,
   } = usePhoneCertification();
 
+  // 단계 전환 시 새 화면의 제목(h1)으로 포커스를 옮겨, 언마운트된 버튼에서 유실된
+  // 포커스를 복구하고 스크린리더가 새 단계 제목을 낭독하게 한다. (signup 단계 전환 패턴)
+  useEffect(() => {
+    const heading = titleRef.current?.closest<HTMLElement>('h1');
+    if (!heading) return;
+    heading.setAttribute('tabindex', '-1');
+    heading.focus();
+  }, [phase]);
+
   const handleBack = () => {
     if (phase !== FIND_ID_PHASE.VERIFY) {
+      // 같은 결과를 다시 만나도 재낭독되도록 인증 단계로 돌아갈 때 안내를 비운다.
+      setPhaseAnnouncement('');
       setPhase(FIND_ID_PHASE.VERIFY);
       return;
     }
@@ -106,11 +129,17 @@ export const FindId = (): ReactElement => {
         const { accountId: foundId, createdAt } = await api.auth.accountIdPost({
           token,
         });
+        const formattedJoinDate = formatJoinDate(createdAt);
+
         setAccountId(foundId);
-        setJoinDate(formatJoinDate(createdAt));
+        setJoinDate(formattedJoinDate);
+        setPhaseAnnouncement(
+          `아이디를 찾았어요. 아이디 ${foundId}, 가입일 ${formatDateSrLabel(formattedJoinDate)}.`,
+        );
         setPhase(FIND_ID_PHASE.FOUND);
       } catch {
         // 인증은 성공했으나 일치하는 계정이 없는 경우다.
+        // 제목(h1) 포커스 낭독이 같은 내용을 전부 전달하므로 별도 리전 안내는 넣지 않는다.
         setPhase(FIND_ID_PHASE.NOT_FOUND);
       }
     } catch (error) {
@@ -136,13 +165,14 @@ export const FindId = (): ReactElement => {
     }
   };
 
+  // 제목 내용을 ref 스팬으로 감싸 단계 전환 시 closest('h1')로 포커스 대상 제목을 찾는다.
   const resolveTitle = (): ReactNode => {
     if (phase === FIND_ID_PHASE.FOUND) {
-      return TITLE_FOUND;
+      return <span ref={titleRef}>{TITLE_FOUND}</span>;
     }
     if (phase === FIND_ID_PHASE.NOT_FOUND) {
       return (
-        <NotFoundTitleBox>
+        <NotFoundTitleBox ref={titleRef}>
           <Text as="span" color="text.secondary" font="body-m-m">
             등록된 아이디가 없어요
           </Text>
@@ -152,7 +182,7 @@ export const FindId = (): ReactElement => {
         </NotFoundTitleBox>
       );
     }
-    return TITLE_VERIFY;
+    return <span ref={titleRef}>{TITLE_VERIFY}</span>;
   };
 
   return (
@@ -174,6 +204,14 @@ export const FindId = (): ReactElement => {
         }}
         title={resolveTitle()}
       >
+        {/* SR 전용 라이브 리전. 빈 상태로 상시 마운트해 두고 텍스트만 바꿔야
+            iOS VoiceOver/Android TalkBack이 변경을 안정적으로 낭독한다.
+            만료 안내는 인증 단계에서만 유효하므로 다른 단계에서는 주입하지 않는다. */}
+        <HiddenText role="status">{announcedPhaseMessage}</HiddenText>
+        <HiddenText role="status">
+          {phase === FIND_ID_PHASE.VERIFY ? expiredAnnouncement : ''}
+        </HiddenText>
+
         {phase === FIND_ID_PHASE.VERIFY && (
           <Container>
             <TimerInput
@@ -232,9 +270,16 @@ export const FindId = (): ReactElement => {
                 <InfoLabel as="span" color="text.tertiary" font="body-m-sb">
                   가입일
                 </InfoLabel>
-                <Text as="span" color="text.primary" font="body-m-m">
+                {/* "YYYY.MM.DD"는 소수점 섞인 숫자처럼 낭독되므로 SR 전용 날짜 라벨을 병기한다. */}
+                <Text
+                  aria-hidden={true}
+                  as="span"
+                  color="text.primary"
+                  font="body-m-m"
+                >
                   {joinDate}
                 </Text>
+                <HiddenText>{formatDateSrLabel(joinDate)}</HiddenText>
               </InfoRow>
             </InfoCard>
             <ForgotPasswordButton

@@ -4,7 +4,7 @@ import styled from '@emotion/styled';
 
 import { EVENT_CATEGORIES, EVENT_TYPES } from '@/api/constants';
 import type { MatchingWaitingParticipant, RunningGroup } from '@/api/types';
-import { Badge, CheckBox, RunnerTypeAvatar, Text } from '@/components';
+import { Badge, CheckBox, HiddenText, RunnerTypeAvatar, Text } from '@/components';
 import { RUNNER_TYPE_LABELS } from '@/constants';
 
 import type { EventGroupLabelContext } from '../../utils';
@@ -15,23 +15,6 @@ type MatchParticipantCardProps = {
   isSelected: boolean;
   participant: MatchingWaitingParticipant;
   onToggle: (participant: MatchingWaitingParticipant) => void;
-};
-
-const getParticipantMeta = (
-  applicationGroup: RunningGroup,
-  eventGroupLabelContext: EventGroupLabelContext,
-  participant: MatchingWaitingParticipant,
-): string => {
-  const groupText = getOriginalRunningGroupText(
-    applicationGroup,
-    eventGroupLabelContext,
-    participant.originalRunningGroup,
-  );
-  const partnerText = participant.hopePartner
-    ? `희망파트너 ${participant.hopePartner}`
-    : null;
-
-  return [groupText, partnerText].filter(Boolean).join(' ・');
 };
 
 const getOriginalRunningGroupText = (
@@ -59,13 +42,30 @@ export const MatchParticipantCard = ({
   participant,
   onToggle,
 }: MatchParticipantCardProps): ReactElement => {
-  const participantMeta = getParticipantMeta(
+  const groupText = getOriginalRunningGroupText(
     applicationGroup,
     eventGroupLabelContext,
-    participant,
+    participant.originalRunningGroup,
   );
-  const selectLabel =
-    `${RUNNER_TYPE_LABELS[participant.type]} ${participant.name} ${isSelected ? '선택 취소' : '선택'}`;
+  const partnerText = participant.hopePartner
+    ? `희망파트너 ${participant.hopePartner}`
+    : null;
+  const participantMeta = [groupText, partnerText].filter(Boolean).join(' ・');
+
+  // 체크박스 이름은 짧게 유지해 역할(체크박스)을 빠르게 인지하게 한다.
+  const selectLabel = `${RUNNER_TYPE_LABELS[participant.type]} ${participant.name} 선택`;
+
+  // 부가 정보는 흩어져 낭독되지 않도록 한 문장으로 묶는다(이름은 체크박스가 전달).
+  const detailLabel = [
+    participant.isFirstParticipation ? '첫참여' : null,
+    groupText,
+    partnerText,
+    participant.additionalComment
+      ? `추가 코멘트 ${participant.additionalComment}`
+      : null,
+  ]
+    .filter(Boolean)
+    .join(', ');
 
   return (
     <ParticipantCard $isSelected={isSelected}>
@@ -76,7 +76,9 @@ export const MatchParticipantCard = ({
           onToggle(participant);
         }}
       />
-      <InfoColumn>
+      {/* 부가 정보는 위 숨김 문장으로 낭독하므로 시각 영역은 통째로 숨긴다. */}
+      {detailLabel ? <HiddenText>{detailLabel}</HiddenText> : null}
+      <InfoColumn aria-hidden={true}>
         <Profile>
           <NameRow>
             <AvatarNameGroup>

@@ -1,14 +1,15 @@
-import type { ReactElement } from 'react';
+import { useId, type ReactElement } from 'react';
 
 import { Controller, useFormContext } from 'react-hook-form';
 
-import { DateInput, Input } from '@/components';
+import { DateInput, HiddenText, Input } from '@/components';
 import { RUNNER_TYPE } from '@/constants';
 import { getTodayISODate, PHONE_DIGIT_LENGTH } from '@/utils';
 
 import {
   SIGNUP_FIELD,
   SIGNUP_NAME_MAX_LENGTH,
+  SIGNUP_STEP_STAGE,
 } from '@/pages/signup/constants';
 import { SIGNUP_COPY } from '@/pages/signup/copy';
 import type { SignupFormValues } from '@/pages/signup/types';
@@ -17,14 +18,20 @@ import { StepLayout } from '@/pages/signup/components/StepLayout';
 export const BasicInfoStep = (): ReactElement => {
   const { control, watch } = useFormContext<SignupFormValues>();
   const isGuide = watch(SIGNUP_FIELD.DISABILITY_TYPE) === RUNNER_TYPE.GUIDE;
+  // 이름 최대 글자수 안내(스크린리더 전용)를 aria-describedby로 연결하기 위한 id
+  const nameHintId = useId();
 
   return (
-    <StepLayout title={SIGNUP_COPY.basicInfo.title}>
+    <StepLayout stage={SIGNUP_STEP_STAGE.basicInfo} title={SIGNUP_COPY.basicInfo.title}>
       <Controller
         control={control}
         name={SIGNUP_FIELD.NAME}
         render={({ field, fieldState }) => (
           <Input
+            aria-required={true}
+            autoComplete="name"
+            controlRef={field.ref}
+            describedById={nameHintId}
             error={Boolean(fieldState.error)}
             errorText={fieldState.error?.message}
             label="이름"
@@ -37,11 +44,16 @@ export const BasicInfoStep = (): ReactElement => {
           />
         )}
       />
+      <HiddenText id={nameHintId}>
+        {`이름은 최대 ${SIGNUP_NAME_MAX_LENGTH}자까지 입력할 수 있어요`}
+      </HiddenText>
       <Controller
         control={control}
         name={SIGNUP_FIELD.BIRTH_DATE}
         render={({ field, fieldState }) => (
           <DateInput
+            aria-required={true}
+            controlRef={field.ref}
             error={Boolean(fieldState.error)}
             errorText={fieldState.error?.message}
             label="생년월일"
@@ -56,10 +68,15 @@ export const BasicInfoStep = (): ReactElement => {
         name={SIGNUP_FIELD.PHONE_NUMBER}
         render={({ field, fieldState }) => (
           <Input
+            aria-required={true}
+            autoComplete="tel"
+            controlRef={field.ref}
             error={Boolean(fieldState.error)}
             errorText={fieldState.error?.message}
             inputMode="numeric"
             label="전화번호"
+            name="phone"
+            type="tel"
             value={field.value}
             onChange={(event) =>
               field.onChange(

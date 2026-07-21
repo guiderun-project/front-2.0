@@ -1,4 +1,5 @@
-import type { ReactElement } from "react";
+import type { KeyboardEvent, ReactElement } from "react";
+import { useId, useRef, useState } from "react";
 
 import styled from "@emotion/styled";
 import { useNavigate } from "react-router-dom";
@@ -6,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import {
   FooterButton,
   FormPageLayout,
+  HiddenText,
   Icon,
   PageLayout,
   Text,
@@ -21,6 +23,11 @@ import { useAccountDelete } from "./hooks/useAccountDelete";
 
 export const AccountDeletePage = (): ReactElement => {
   const navigate = useNavigate();
+  const noticeTitleId = useId();
+  const noticeBodyId = useId();
+  const reasonRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  // 탈퇴 실패 안내 문구. 상시 마운트된 alert 라이브 리전에 주입한다.
+  const [submitError, setSubmitError] = useState("");
   const {
     selectedReason,
     selectReason,
@@ -33,11 +40,45 @@ export const AccountDeletePage = (): ReactElement => {
   } = useAccountDelete();
 
   const handleSubmit = async () => {
+    // 재시도 실패 시 같은 문구도 다시 낭독되도록 제출 시작 시점에 비운다.
+    setSubmitError("");
+
     const isSucceeded = await submit();
 
     if (isSucceeded) {
-      navigate(APP_PATH.INTRO, { replace: true });
+      // 라우트 어나운서(App.tsx)가 srAnnouncement를 이동 후 낭독한다.
+      navigate(APP_PATH.INTRO, {
+        replace: true,
+        state: { srAnnouncement: "회원 탈퇴가 완료됐어요." },
+      });
+      return;
     }
+
+    setSubmitError("탈퇴 처리에 실패했어요. 다시 시도해주세요.");
+  };
+
+  // APG 라디오 그룹 패턴: 방향키로 이전/다음 사유로 포커스를 옮기면서 그 사유를 선택한다.
+  const handleReasonKeyDown = (
+    event: KeyboardEvent<HTMLButtonElement>,
+    index: number,
+  ) => {
+    const lastIndex = WITHDRAWAL_REASON_OPTIONS.length - 1;
+    let nextIndex: number | null = null;
+
+    if (event.key === "ArrowDown" || event.key === "ArrowRight") {
+      nextIndex = index === lastIndex ? 0 : index + 1;
+    }
+    if (event.key === "ArrowUp" || event.key === "ArrowLeft") {
+      nextIndex = index === 0 ? lastIndex : index - 1;
+    }
+
+    if (nextIndex === null) {
+      return;
+    }
+
+    event.preventDefault();
+    selectReason(WITHDRAWAL_REASON_OPTIONS[nextIndex]);
+    reasonRefs.current[nextIndex]?.focus();
   };
 
   return (
@@ -59,18 +100,39 @@ export const AccountDeletePage = (): ReactElement => {
           ],
         }}
       >
+        {/* SR 전용 라이브 리전. 빈 상태로 상시 마운트해 두고 텍스트만 바꿔야
+            iOS VoiceOver/Android TalkBack이 변경을 안정적으로 낭독한다. */}
+        <HiddenText role="status">
+          {isCustomSelected
+            ? "기타 사유 입력란이 표시됐어요. 사유 입력 후 탈퇴하기 버튼을 누를 수 있어요."
+            : ""}
+        </HiddenText>
+        <HiddenText role="status">
+          {isSubmitting ? "탈퇴 처리 중이에요." : ""}
+        </HiddenText>
+        <HiddenText role="alert">{submitError}</HiddenText>
+
         <Content>
-          <ReasonList aria-label="탈퇴 사유" role="group">
-            {WITHDRAWAL_REASON_OPTIONS.map((reason) => {
+          <ReasonList aria-label="탈퇴 사유" role="radiogroup">
+            {WITHDRAWAL_REASON_OPTIONS.map((reason, index) => {
               const isSelected = selectedReason === reason;
+              // roving tabindex: 선택된 사유(없으면 첫 사유)만 탭 순서에 노출한다.
+              const isTabStop =
+                selectedReason === null ? index === 0 : isSelected;
 
               return (
                 <ReasonOption
                   key={reason}
+                  ref={(element) => {
+                    reasonRefs.current[index] = element;
+                  }}
                   $selected={isSelected}
-                  aria-pressed={isSelected}
+                  aria-checked={isSelected}
+                  role="radio"
+                  tabIndex={isTabStop ? 0 : -1}
                   type="button"
                   onClick={() => selectReason(reason)}
+                  onKeyDown={(event) => handleReasonKeyDown(event, index)}
                 >
                   {isSelected ? (
                     <Icon
@@ -101,10 +163,20 @@ export const AccountDeletePage = (): ReactElement => {
           ) : null}
 
           <NoticeBox>
-            <Text as="p" color="text.secondary" font="body-s-sb">
+            <Text
+              as="p"
+              color="text.secondary"
+              font="body-s-sb"
+              id={noticeTitleId}
+            >
               탈퇴 전, 꼭 확인해주세요
             </Text>
-            <Text as="p" color="text.tertiary" font="body-s-m">
+            <Text
+              as="p"
+              color="text.tertiary"
+              font="body-s-m"
+              id={noticeBodyId}
+            >
               가이드런 프로젝트를 탈퇴 할 경우, 가이드런과 함께 쌓아온 기록들이
               모두 사라집니다.
             </Text>
@@ -112,8 +184,10 @@ export const AccountDeletePage = (): ReactElement => {
         </Content>
 
         <FooterButton>
+          {/* 화면 탐색으로 버튼에 바로 도달해도 경고문이 함께 낭독되도록 연결한다. */}
           <FooterButton.Button
             aria-busy={isSubmitting}
+            aria-describedby={`${noticeTitleId} ${noticeBodyId}`}
             disabled={!canSubmit}
             fullWidth
             size="l"

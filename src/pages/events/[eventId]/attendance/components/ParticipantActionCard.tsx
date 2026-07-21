@@ -10,12 +10,14 @@ import { ParticipantInfo } from './ParticipantInfo';
 type AttendanceActionStatus = 'waiting' | 'attended';
 
 type ParticipantActionCardProps = {
+  isUpdating?: boolean;
   participant: AttendanceParticipant;
   status: AttendanceActionStatus;
   onAction: (participant: AttendanceParticipant) => void;
 };
 
 export const ParticipantActionCard = ({
+  isUpdating = false,
   participant,
   status,
   onAction,
@@ -27,7 +29,12 @@ export const ParticipantActionCard = ({
   return (
     <ParticipantCard>
       <ParticipantInfo participant={participant} />
+      {/* 처리 중에는 disabled 대신 aria-disabled로 상태만 전달해 시각
+          스타일과 포커스를 유지한다. 중복 탭 차단은 훅에서 처리한다. */}
       <Button
+        aria-disabled={isUpdating || undefined}
+        data-attendance-action={status}
+        data-user-id={participant.userId}
         level={status === 'waiting' ? 'primary' : 'quaternary'}
         size="s"
         onClick={() => {

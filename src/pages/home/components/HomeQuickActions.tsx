@@ -11,7 +11,7 @@ type ActionTone = 'teal' | 'cyan';
 
 export const HomeQuickActions = (): ReactElement => {
   return (
-    <Section>
+    <Section aria-label="바로가기">
       <ActionLink $tone="cyan" to={APP_PATH.MY_EVENTS}>
         <ActionLabel>
           <Text color="text.primary" font="body-l-sb">

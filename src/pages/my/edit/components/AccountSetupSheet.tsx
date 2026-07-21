@@ -1,23 +1,39 @@
-import type { ReactElement } from 'react';
+import { useState, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
-import { BottomSheet, Button, Input } from '@/components';
+import { BottomSheet, Button, HiddenText, Input } from '@/components';
+import { useAnnouncedMessage } from '@/hooks/useAnnouncedMessage';
 
 import { useAccountSetup } from '../hooks/useAccountSetup';
 
 const PASSWORD_HELPER_TEXT =
   '영문, 특수문자를 포함해 8자 이상 32자 미만 입력해주세요';
 
+// helperText는 셸이 라이브 리전으로 미러링하지 않아 포커스가 버튼에 있는
+// 스크린리더 사용자에게 낭독되지 않으므로, 'available' 결과만 시트 내부
+// 상시 마운트 리전으로 안내한다. errorText('taken')는 InputFieldShell의
+// 오류 미러 리전이 자동 낭독하므로 여기서 재안내하면 이중 낭독이 된다.
+const CHECK_AVAILABLE_MESSAGE = '사용 가능한 아이디예요';
+const CHECK_FAILURE_MESSAGE = '중복 확인에 실패했어요. 다시 시도해주세요.';
+const SUBMIT_FAILURE_MESSAGE = '아이디 설정에 실패했어요. 다시 시도해주세요.';
+
+type Announcement = { message: string; revision: number };
+
+const EMPTY_ANNOUNCEMENT: Announcement = { message: '', revision: 0 };
+
 type AccountSetupSheetProps = {
   open: boolean;
   onClose: () => void;
+  /** 아이디 설정 성공 시 시트가 닫히기 전에 호출된다. (성공 안내·포커스 복귀용) */
+  onSetupSuccess: () => void;
   accountId?: string | null; // 이미 설정된 아이디. 아이디는 수정할 수 없다.
 };
 
 export const AccountSetupSheet = ({
   open,
   onClose,
+  onSetupSuccess,
   accountId: existingAccountId,
 }: AccountSetupSheetProps): ReactElement => {
   const {
@@ -38,17 +54,69 @@ export const AccountSetupSheet = ({
     reset,
   } = useAccountSetup(existingAccountId);
 
+  const [checkNotice, setCheckNotice] = useState(EMPTY_ANNOUNCEMENT);
+  const [failureNotice, setFailureNotice] = useState(EMPTY_ANNOUNCEMENT);
+  const announcedCheckNotice = useAnnouncedMessage(
+    checkNotice.message,
+    checkNotice.revision,
+  );
+  const announcedFailureNotice = useAnnouncedMessage(
+    failureNotice.message,
+    failureNotice.revision,
+  );
+
   const handleClose = () => {
     onClose();
     reset();
+    // 다음에 시트를 다시 열 때 이전 안내가 낭독되지 않도록 비운다.
+    setCheckNotice((previous) => ({ message: '', revision: previous.revision + 1 }));
+    setFailureNotice((previous) => ({ message: '', revision: previous.revision + 1 }));
+  };
+
+  const handleCheckAccountId = async () => {
+    const result = await checkAccountIdDuplicate();
+
+    if (result === null) {
+      return;
+    }
+
+    if (result === 'error') {
+      setFailureNotice((previous) => ({
+        message: CHECK_FAILURE_MESSAGE,
+        revision: previous.revision + 1,
+      }));
+      return;
+    }
+
+    if (result === 'taken') {
+      // 낭독은 Input errorText의 자동 미러에 맡기고, 이전 'available' 안내가
+      // 리전에 남지 않도록 비우기만 한다. (빈 문자열 주입은 낭독되지 않음)
+      setCheckNotice((previous) => ({
+        message: '',
+        revision: previous.revision + 1,
+      }));
+      return;
+    }
+
+    setCheckNotice((previous) => ({
+      message: CHECK_AVAILABLE_MESSAGE,
+      revision: previous.revision + 1,
+    }));
   };
 
   const handleSubmit = async () => {
     const isSucceeded = await submit();
 
     if (isSucceeded) {
+      onSetupSuccess();
       handleClose();
+      return;
     }
+
+    setFailureNotice((previous) => ({
+      message: SUBMIT_FAILURE_MESSAGE,
+      revision: previous.revision + 1,
+    }));
   };
 
   return (
@@ -88,7 +156,7 @@ export const AccountSetupSheet = ({
                 accountIdStatus !== 'unchecked'
               }
               size="s"
-              onClick={checkAccountIdDuplicate}
+              onClick={handleCheckAccountId}
             >
               중복확인
             </CheckButton>
@@ -113,6 +181,9 @@ export const AccountSetupSheet = ({
           value={passwordConfirm}
           onChange={(event) => setPasswordConfirm(event.target.value)}
         />
+        {/* 모달이 배경을 aria-hidden 처리하므로 라이브 리전은 시트 내부에 상시 마운트한다. */}
+        <HiddenText role="status">{announcedCheckNotice}</HiddenText>
+        <HiddenText role="alert">{announcedFailureNotice}</HiddenText>
       </Fields>
     </BottomSheet>
   );

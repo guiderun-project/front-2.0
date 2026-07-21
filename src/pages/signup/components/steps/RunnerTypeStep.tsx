@@ -6,7 +6,7 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { Icon, Text } from '@/components';
 import { RUNNER_TYPE, RUNNER_TYPE_LABELS } from '@/constants';
 
-import { SIGNUP_FIELD } from '@/pages/signup/constants';
+import { SIGNUP_FIELD, SIGNUP_STEP_STAGE } from '@/pages/signup/constants';
 import { SIGNUP_COPY } from '@/pages/signup/copy';
 import type { RunnerType, SignupFormValues } from '@/pages/signup/types';
 import { SelectCardGroup } from '@/pages/signup/components/SelectCardGroup';
@@ -22,7 +22,10 @@ export const RunnerTypeStep = (): ReactElement => {
   const info = SIGNUP_COPY.runnerType.info;
 
   return (
-    <StepLayout title={SIGNUP_COPY.runnerType.title}>
+    <StepLayout
+      stage={SIGNUP_STEP_STAGE.runnerType}
+      title={SIGNUP_COPY.runnerType.title}
+    >
       <Controller
         control={control}
         name={SIGNUP_FIELD.DISABILITY_TYPE}

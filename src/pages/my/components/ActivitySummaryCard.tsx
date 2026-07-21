@@ -35,7 +35,7 @@ export const ActivitySummaryCard = ({
           {breakdown.map((item, index) => (
             <Fragment key={item.label}>
               {index > 0 ? (
-                <Text color="text.secondary" font="body-m-m">
+                <Text aria-hidden={true} color="text.secondary" font="body-m-m">
                   ・
                 </Text>
               ) : null}

@@ -19,6 +19,9 @@ const isValidPassword = (password: string): boolean =>
 
 type AccountIdStatus = 'unchecked' | 'available' | 'taken';
 
+/** 중복확인 실행 결과. 스크린리더 안내 등 호출부 후처리에 사용한다. */
+export type AccountIdCheckResult = 'available' | 'taken' | 'error';
+
 export const useAccountSetup = (existingAccountId?: string | null) => {
   const queryClient = useQueryClient();
   const { user } = useAuth();
@@ -65,22 +68,27 @@ export const useAccountSetup = (existingAccountId?: string | null) => {
     setIsCheckedUnique(false);
   };
 
-  /** 아이디 중복 여부를 확인한다. */
-  const checkAccountIdDuplicate = async () => {
-    if (!accountId || duplicateCheckMutation.isPending || isAccountIdChecked) {
-      return;
-    }
+  /** 아이디 중복 여부를 확인한다. 확인을 수행하지 않았으면 null 을 반환한다. */
+  const checkAccountIdDuplicate =
+    async (): Promise<AccountIdCheckResult | null> => {
+      if (!accountId || duplicateCheckMutation.isPending || isAccountIdChecked) {
+        return null;
+      }
 
-    try {
-      const { isUnique } = await duplicateCheckMutation.mutateAsync(accountId);
+      try {
+        const { isUnique } = await duplicateCheckMutation.mutateAsync(accountId);
 
-      setCheckedAccountId(accountId);
-      setIsCheckedUnique(isUnique);
-    } catch {
-      setCheckedAccountId(null);
-      setIsCheckedUnique(false);
-    }
-  };
+        setCheckedAccountId(accountId);
+        setIsCheckedUnique(isUnique);
+
+        return isUnique ? 'available' : 'taken';
+      } catch {
+        setCheckedAccountId(null);
+        setIsCheckedUnique(false);
+
+        return 'error';
+      }
+    };
 
   const hasPasswordError = password.length > 0 && !isValidPassword(password);
   const hasPasswordConfirmError =

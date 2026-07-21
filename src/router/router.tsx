@@ -99,11 +99,28 @@ const AccountDeletePage = lazy(() =>
 const createRouteFallback = (
   background: PageLayoutBackground = 'bg.default',
   gradient?: PageLayoutGradientBackground,
-): ReactElement => (
-  <PageLayout background={background} gradient={gradient}>
-    <LoaderScreen />
-  </PageLayout>
-);
+  title?: string,
+): ReactElement => {
+  const fallback = (
+    <PageLayout background={background} gradient={gradient}>
+      <LoaderScreen />
+    </PageLayout>
+  );
+
+  if (!title) {
+    return fallback;
+  }
+
+  // 정적 title이 없는 lazy 라우트는 청크 로딩 중 이전 페이지 title이 남아
+  // 라우트 어나운서가 잘못된 페이지 이름을 낭독할 수 있으므로, fallback에 기본
+  // PageTitle을 포함한다. fallback이 언마운트되면 페이지의 PageTitle이 대체한다.
+  return (
+    <>
+      <PageTitle title={title} />
+      {fallback}
+    </>
+  );
+};
 // TODO: 스켈레톤 정책이 정해지면 route fallback에서 PageLayout 안에 페이지별 skeleton을 렌더링하도록 확장한다.
 
 const withRouteAccess = (
@@ -194,7 +211,7 @@ export const router = createBrowserRouter([
               EventsPage,
               'public',
               createRouteFallback('bg.default'),
-              '전체 모임',
+              ROUTE_PAGE_TITLES.EVENTS,
             ),
           },
           {
@@ -203,7 +220,7 @@ export const router = createBrowserRouter([
               DesignPage,
               'public',
               createRouteFallback('bg.subtle'),
-              '디자인 시스템',
+              ROUTE_PAGE_TITLES.DESIGN,
             ),
           },
           {
@@ -212,7 +229,7 @@ export const router = createBrowserRouter([
               MyPage,
               'authenticated',
               createRouteFallback('bg.subtle'),
-              '마이페이지',
+              ROUTE_PAGE_TITLES.MY,
             ),
           },
         ],
@@ -223,7 +240,7 @@ export const router = createBrowserRouter([
           EventSearchPage,
           'public',
           createRouteFallback('bg.default'),
-          '모임 검색',
+          ROUTE_PAGE_TITLES.EVENT_SEARCH,
         ),
       },
       {
@@ -232,7 +249,7 @@ export const router = createBrowserRouter([
           FormDesignPage,
           'public',
           createRouteFallback('bg.subtle'),
-          '폼 디자인',
+          ROUTE_PAGE_TITLES.DESIGN_FORM,
         ),
       },
       {
@@ -241,7 +258,7 @@ export const router = createBrowserRouter([
           IntroPage,
           'public',
           createRouteFallback('bg.subtle', 'gradient.bg.brand-main'),
-          '시작하기',
+          ROUTE_PAGE_TITLES.INTRO,
         ),
       },
       {
@@ -250,7 +267,7 @@ export const router = createBrowserRouter([
           KakaoOAuthPage,
           'public',
           createRouteFallback('bg.subtle'),
-          '로그인 처리',
+          ROUTE_PAGE_TITLES.OAUTH,
         ),
       },
       {
@@ -259,7 +276,7 @@ export const router = createBrowserRouter([
           LoginPage,
           'guest-only',
           createRouteFallback('bg.default'),
-          '로그인',
+          ROUTE_PAGE_TITLES.LOGIN,
         ),
       },
       {
@@ -268,7 +285,7 @@ export const router = createBrowserRouter([
           SignupPage,
           'guest-only',
           createRouteFallback('bg.subtle'),
-          '회원가입',
+          ROUTE_PAGE_TITLES.SIGNUP,
         ),
       },
       {
@@ -276,7 +293,7 @@ export const router = createBrowserRouter([
         element: createLazyRouteElement(
           AccountFindPage,
           'guest-only',
-          createRouteFallback('bg.default'),
+          createRouteFallback('bg.default', undefined, '계정 찾기'),
         ),
       },
       {
@@ -285,7 +302,7 @@ export const router = createBrowserRouter([
           TermsPage,
           'public',
           createRouteFallback('bg.subtle'),
-          '약관',
+          ROUTE_PAGE_TITLES.TERMS,
         ),
       },
       {
@@ -294,7 +311,7 @@ export const router = createBrowserRouter([
           EventNewPage,
           'approved',
           createRouteFallback('bg.subtle'),
-          '모임 만들기',
+          ROUTE_PAGE_TITLES.EVENT_NEW,
         ),
       },
       {
@@ -353,7 +370,7 @@ export const router = createBrowserRouter([
           EventSupportPage,
           'public',
           createRouteFallback('bg.subtle'),
-          '이동지원 연락처',
+          ROUTE_PAGE_TITLES.EVENT_SUPPORT,
         ),
       },
       {
@@ -362,7 +379,7 @@ export const router = createBrowserRouter([
           MyEventsPage,
           'authenticated',
           createRouteFallback('bg.subtle'),
-          '나의 활동',
+          ROUTE_PAGE_TITLES.MY_EVENTS,
         ),
       },
       {
@@ -379,7 +396,7 @@ export const router = createBrowserRouter([
           AccountDeletePage,
           'authenticated',
           createRouteFallback('bg.subtle'),
-          '회원 탈퇴',
+          ROUTE_PAGE_TITLES.ACCOUNT_DELETE,
         ),
       },
       {

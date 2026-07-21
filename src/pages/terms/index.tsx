@@ -3,7 +3,7 @@ import { useId, useState, type ReactElement } from "react";
 import styled from "@emotion/styled";
 import { useNavigate } from "react-router-dom";
 
-import { Icon, PageLayout, Text, TopNavigation } from "@/components";
+import { HiddenText, Icon, PageLayout, Text, TopNavigation } from "@/components";
 
 import { TERMS_SECTIONS, type BodyBlock, type TermsSection } from "./constants";
 
@@ -12,12 +12,16 @@ export const TermsPage = (): ReactElement => {
 
   return (
     <PageLayout background="bg.subtle">
+      {/* HiddenText 제목은 시각 변화 없이 접근 가능한 이름 "약관"의 h1을 만든다.
+          (titleAs 기본값 h1, 절대배치 hidden span이라 높이 0 + TitleSpacer와
+          동일한 flex라 레이아웃 불변) */}
       <TopNavigation
         left={{
           icon: "chevron-left-lined",
           ariaLabel: "뒤로가기",
           onClick: () => navigate(-1),
         }}
+        title={<HiddenText>약관</HiddenText>}
       />
       <Content>
         {TERMS_SECTIONS.map((section) => (
@@ -38,24 +42,28 @@ const TermsAccordionItem = ({
 
   return (
     <Card>
-      <HeaderButton
-        aria-controls={panelId}
-        aria-expanded={isOpen}
-        type="button"
-        onClick={() => setIsOpen((current) => !current)}
-      >
-        <Title color="text.primary" font="body-l-sb">
-          {section.title}
-        </Title>
-        <ChevronIcon $isOpen={isOpen}>
-          <Icon
-            aria-hidden={true}
-            color="icon.secondary"
-            icon="chevron-down-lined"
-            size={20}
-          />
-        </ChevronIcon>
-      </HeaderButton>
+      {/* APG 아코디언 패턴: heading이 버튼을 감싸야 VoiceOver 로터·TalkBack
+          제목 탐색으로 섹션 간 이동이 가능하다. margin 0 블록 래퍼라 시각 불변. */}
+      <HeaderHeading>
+        <HeaderButton
+          aria-controls={panelId}
+          aria-expanded={isOpen}
+          type="button"
+          onClick={() => setIsOpen((current) => !current)}
+        >
+          <Title color="text.primary" font="body-l-sb">
+            {section.title}
+          </Title>
+          <ChevronIcon $isOpen={isOpen}>
+            <Icon
+              aria-hidden={true}
+              color="icon.secondary"
+              icon="chevron-down-lined"
+              size={20}
+            />
+          </ChevronIcon>
+        </HeaderButton>
+      </HeaderHeading>
       <Panel
         data-state={isOpen ? "open" : "closed"}
         id={panelId}
@@ -121,6 +129,10 @@ const Card = styled.section(({ theme }) => ({
   borderRadius: "1.25rem",
   backgroundColor: theme.color.bg.elevated,
 }));
+
+const HeaderHeading = styled.h2({
+  margin: 0,
+});
 
 const HeaderButton = styled.button(({ theme }) => ({
   display: "flex",

@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
 import {
   useMutation,
@@ -51,12 +51,29 @@ type SelectionAnnouncementInput = {
   person: SelectablePerson;
   selectedGuideIds: string[];
   selectedViId: string | null;
+  // 시각장애러너를 다른 사람으로 교체한 경우 기존 선택자의 이름.
+  replacedViName?: string | null;
+};
+
+const getMatchingCompleteAnnouncement = (
+  viName: string | undefined,
+  waitingCount: number,
+): string => {
+  const completeMessage = viName
+    ? `${viName}님과 가이드러너 매칭을 완료했어요.`
+    : MATCHING_COMPLETE_MESSAGE;
+
+  // 대기 인원이 0명이면 매칭대기 빈 상태 문구·페이지 제목 변경과 같은 결론을 안내한다.
+  return waitingCount === 0
+    ? `${completeMessage} 모든 참여자가 매칭되었어요.`
+    : `${completeMessage} 매칭 대기 ${waitingCount}명 남았어요.`;
 };
 
 const getSelectionAnnouncement = ({
   person,
   selectedGuideIds,
   selectedViId,
+  replacedViName,
 }: SelectionAnnouncementInput): string => {
   const isSelected =
     person.type === 'VI'
@@ -67,15 +84,21 @@ const getSelectionAnnouncement = ({
     return `${person.name}님의 선택을 취소했습니다.`;
   }
 
+  // 시각장애러너를 교체한 경우 기존 선택이 빠졌음을 명시한다. 그 외에는
+  // 새로 선택한 사실만 안내한다.
+  const selectionText = replacedViName
+    ? `${replacedViName}에서 ${person.name}님으로 바꿨습니다.`
+    : `${person.name}님을 선택했습니다.`;
+
   if (selectedViId === null) {
-    return `${person.name}님을 선택했습니다. 시각장애러너 파트너를 선택해주세요.`;
+    return `${selectionText} 시각장애러너 파트너를 선택해주세요.`;
   }
 
   if (selectedGuideIds.length === 0) {
-    return `${person.name}님을 선택했습니다. 가이드러너 파트너를 선택해주세요.`;
+    return `${selectionText} 가이드러너 파트너를 선택해주세요.`;
   }
 
-  return `${person.name}님을 선택했습니다. 이대로 매칭하기를 눌러주세요.`;
+  return `${selectionText} 화면 최하단에 이대로 매칭하기를 눌러주세요.`;
 };
 
 export const useEventMatchRoute = () => {
@@ -121,6 +144,12 @@ export const useEventMatchPage = (eventId: number) => {
     useState<LiveAnnouncement>(EMPTY_ANNOUNCEMENT);
   const [selectedViId, setSelectedViId] = useState<string | null>(null);
   const [selectedGuideIds, setSelectedGuideIds] = useState<string[]>([]);
+  // 매칭 요청이 실제로 성공했을 때만 증가하는 카운터. 화면은 이 값으로 성공을
+  // 감지해 포커스를 복구한다(선택 해제·실패 등 다른 전이와 구분하기 위함).
+  const [matchingSuccessCount, setMatchingSuccessCount] = useState(0);
+  // 매칭 완료 안내 문구는 즉시 낭독하지 않고 보관해 두었다가, 화면이 포커스
+  // 복구를 마친 뒤 announceMatchingCompletion 으로 소비한다.
+  const pendingCompletionAnnouncementRef = useRef<string | null>(null);
   const isCreatingMatchingGuardRef = useRef(false);
 
   const [waitingQuery, completedQuery] = useSuspenseQueries({
@@ -211,11 +240,28 @@ export const useEventMatchPage = (eventId: number) => {
     setAnnouncement({ message, politeness: 'assertive' });
   };
 
+  // 선택 해제 확인 문구는 여기서 바로 주입하지 않는다. 해제 시 선택 바
+  // 언마운트로 포커스 이동이 뒤따르는데, 즉시 주입하면 포커스 낭독에 잘리기
+  // 때문에 호출부가 포커스 복구 후 announceSelectionCleared 로 지연 안내한다.
   const clearSelection = () => {
     setSelectedViId(null);
     setSelectedGuideIds([]);
+  };
+
+  const announceSelectionCleared = () => {
     announcePolitely('선택한 참가자를 모두 해제했습니다.');
   };
+
+  // 보관해 둔 매칭 완료 안내를 소비한다. 포커스 복구(매칭대기 제목 낭독)가
+  // 끝난 뒤 호출되므로 polite 리전으로도 완료 문장 전체가 끊기지 않는다.
+  const announceMatchingCompletion = useCallback(() => {
+    const message = pendingCompletionAnnouncementRef.current;
+    pendingCompletionAnnouncementRef.current = null;
+
+    if (message !== null) {
+      setAnnouncement({ message, politeness: 'polite' });
+    }
+  }, []);
 
   const invalidateMatchingQueries = async () => {
     await Promise.all([
@@ -235,9 +281,19 @@ export const useEventMatchPage = (eventId: number) => {
         },
         eventId,
       }),
-    onSuccess: async () => {
+    onSuccess: async (data, variables) => {
+      const viName = personMap.get(variables.viId)?.name;
+
       clearSelection();
-      announceAssertively(MATCHING_COMPLETE_MESSAGE);
+      // 완료 안내를 즉시 assertive 로 주입하면 곧 이어지는 매칭대기 제목
+      // 포커스 이동이 낭독을 중간에 끊는다. 문구를 보관해 두고 성공 카운터만
+      // 올리면, 화면이 포커스를 먼저 복구한 뒤 안내를 지연 주입한다
+      // (한 이벤트 = 한 낭독 채널).
+      pendingCompletionAnnouncementRef.current = getMatchingCompleteAnnouncement(
+        viName,
+        data.summary.waitingCount,
+      );
+      setMatchingSuccessCount((count) => count + 1);
       showToast({
         type: 'success',
         icon: 'check-thick-lined',
@@ -256,9 +312,14 @@ export const useEventMatchPage = (eventId: number) => {
 
   const toggleParticipant = (person: SelectablePerson) => {
     if (person.type === 'VI') {
-      // 체크박스는 각각 독립적으로 동작한다. VI 선택은 VI만 토글한다.
-      const nextSelectedViId =
-        selectedViId === person.userId ? null : person.userId;
+      const isDeselect = selectedViId === person.userId;
+      const nextSelectedViId = isDeselect ? null : person.userId;
+      // 다른 시각장애러너가 이미 선택돼 있었다면 이번 선택은 교체이므로,
+      // 기존 선택이 조용히 빠지지 않도록 기존 이름을 함께 안내한다.
+      const replacedViName =
+        !isDeselect && selectedViId !== null
+          ? (personMap.get(selectedViId)?.name ?? null)
+          : null;
 
       setSelectedViId(nextSelectedViId);
       announcePolitely(
@@ -266,6 +327,7 @@ export const useEventMatchPage = (eventId: number) => {
           person,
           selectedGuideIds,
           selectedViId: nextSelectedViId,
+          replacedViName,
         }),
       );
       return;
@@ -298,12 +360,15 @@ export const useEventMatchPage = (eventId: number) => {
   };
 
   return {
+    announceMatchingCompletion,
+    announceSelectionCleared,
     announcement,
     canCreateMatching,
     clearSelection,
     createMatching,
     hasSelection,
     isCreatingMatching: createMutation.isPending,
+    matchingSuccessCount,
     pageState,
     selectedGuides,
     selectedUserIds,

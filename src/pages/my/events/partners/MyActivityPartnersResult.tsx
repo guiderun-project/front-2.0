@@ -14,10 +14,12 @@ const FIRST_PAGE = 1;
 type MyActivityPartnersResultProps = {
   page: number;
   sort: MyActivityPartnerSort;
+  onLoaded?: (totalCount: number) => void;
   onPageChange: (page: number) => void;
 };
 
 export const MyActivityPartnersResult = ({
+  onLoaded,
   onPageChange,
   page,
   sort,
@@ -31,6 +33,11 @@ export const MyActivityPartnersResult = ({
       onPageChange(FIRST_PAGE);
     }
   }, [onPageChange, shouldClampPage]);
+
+  // 정렬 변경 등으로 새 데이터가 로드되면 상위의 SR 안내 리전에 알린다.
+  useEffect(() => {
+    onLoaded?.(data.pagination.totalCount);
+  }, [data, onLoaded]);
 
   if (data.pagination.totalCount === 0) {
     return <EmptyPartners />;

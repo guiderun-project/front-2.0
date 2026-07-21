@@ -6,6 +6,8 @@ import { Text } from '@/components';
 
 type AttendanceSectionProps = {
   hasDivider?: boolean;
+  /** 출석 처리 후 목록이 비었을 때 포커스를 되돌릴 제목임을 표시하는 키 */
+  headingFocusKey?: string;
   children: ReactNode;
   count: number;
   title: string;
@@ -13,6 +15,7 @@ type AttendanceSectionProps = {
 
 export const AttendanceSection = ({
   hasDivider = false,
+  headingFocusKey,
   children,
   count,
   title,
@@ -22,7 +25,11 @@ export const AttendanceSection = ({
   return (
     <SectionContainer $hasDivider={hasDivider} aria-labelledby={titleId}>
       <SectionHeader>
-        <SectionHeading id={titleId}>
+        <SectionHeading
+          data-attendance-section={headingFocusKey}
+          id={titleId}
+          tabIndex={headingFocusKey === undefined ? undefined : -1}
+        >
           <SectionHeadingText role="text">
             <Text as="span" color="text.primary" font="body-l-sb">
               {title}

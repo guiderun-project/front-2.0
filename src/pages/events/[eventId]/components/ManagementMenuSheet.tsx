@@ -8,11 +8,13 @@ import {
   BottomSheet,
   ConfirmPopup,
   CONFIRM_POPUP_VARIANT,
+  HiddenText,
   Icon,
   Text,
 } from '@/components';
 import { APP_PATH } from '@/router/path';
 
+import { useAnnouncedMessage } from '@/hooks/useAnnouncedMessage';
 import { useEventManagementActions } from '../hooks/useEventManagementActions';
 import {
   getEventDateStartTimestamp,
@@ -47,6 +49,16 @@ export const ManagementMenuSheet = ({
   const navigate = useNavigate();
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(() => Date.now());
+  const [announcement, setAnnouncement] = useState({
+    message: '',
+    revision: 0,
+  });
+  // CSV 다운로드 성공처럼 시각 UI 가 없는 결과를 스크린리더에만 안내하는 리전.
+  // 재다운로드 시 같은 문자열도 다시 낭독되도록 revision 으로 재주입을 트리거한다.
+  const announcedMessage = useAnnouncedMessage(
+    announcement.message,
+    announcement.revision,
+  );
   const isEventDateStarted =
     recruitStatus !== 'RECRUIT_UPCOMING' &&
     hasEventDateStarted(eventDate, currentTime);
@@ -71,6 +83,12 @@ export const ManagementMenuSheet = ({
     eventDate,
     eventId,
     eventName,
+    onAnnounce: (message) => {
+      setAnnouncement((previous) => ({
+        message,
+        revision: previous.revision + 1,
+      }));
+    },
     onClose,
     onDeleteSuccess: () => {
       setIsDeleteConfirmOpen(false);
@@ -142,6 +160,7 @@ export const ManagementMenuSheet = ({
 
   return (
     <>
+      <HiddenText role="status">{announcedMessage}</HiddenText>
       <BottomSheet ariaLabel="이벤트 관리 메뉴" open={open} onClose={onClose}>
         <ManagementMenuList>
           {shouldShowMatchingAction ? (

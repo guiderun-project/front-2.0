@@ -1,4 +1,4 @@
-import { useState, type ReactElement } from 'react';
+import { useEffect, useState, type ReactElement } from 'react';
 
 import { ConfirmPopup, HiddenText } from '@/components';
 
@@ -48,6 +48,25 @@ const MatchReadyPageContent = ({
     pageState,
   } = matchPage;
   const [isExitConfirmOpen, setIsExitConfirmOpen] = useState(false);
+
+  // 로딩 화면과 실제 콘텐츠가 같은 페이지 제목(h1)을 렌더링해 텍스트만으로는
+  // 준비 완료를 알 수 없으므로, 콘텐츠가 준비된 마운트 시점에 제목으로
+  // 포커스를 옮겨 스크린리더에 탐색 시작 지점을 알린다(apply의
+  // focusFirstHeading 패턴과 동일). 프로그램적 포커스라 시각 변화는 없다.
+  useEffect(() => {
+    const frameId = window.requestAnimationFrame(() => {
+      const heading = document.querySelector<HTMLElement>('main h1');
+
+      if (heading) {
+        heading.setAttribute('tabindex', '-1');
+        heading.focus();
+      }
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+    };
+  }, []);
   const waitingCount = pageState.waiting.summary.waitingCount;
   const pageTitle =
     waitingCount > 0

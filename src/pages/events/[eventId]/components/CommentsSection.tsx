@@ -1,14 +1,32 @@
-import { useState, type FormEvent, type ReactElement } from 'react';
+import {
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type ReactElement,
+} from 'react';
 
 import styled from '@emotion/styled';
 
 import { getApiErrorMessage } from '@/api/core';
-import { Button, Icon, IconButton, Text, useToast } from '@/components';
+import {
+  Button,
+  HiddenText,
+  Icon,
+  IconButton,
+  Text,
+  useToast,
+} from '@/components';
 
+import { useAnnouncedMessage } from '@/hooks/useAnnouncedMessage';
 import { useEventComments } from '../hooks/useEventComments';
 import { formatRelativeTime } from '../utils';
-import { PanelState } from './PanelState';
+import { AnnouncedPanelState } from './PanelState';
 import { ProfileAvatar } from './ProfileAvatar';
+
+const COMMENT_LABEL_PREVIEW_LENGTH = 20;
+
+type CommentFocusTarget = 'heading' | 'textarea';
 
 export const CommentsSection = (): ReactElement => {
   const {
@@ -25,9 +43,50 @@ export const CommentsSection = (): ReactElement => {
   const { showToast } = useToast();
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
   const [commentFormValue, setCommentFormValue] = useState('');
+  const [announcement, setAnnouncement] = useState({
+    message: '',
+    revision: 0,
+  });
+  const [pendingFocusTarget, setPendingFocusTarget] =
+    useState<CommentFocusTarget | null>(null);
+  const commentInputRef = useRef<HTMLTextAreaElement>(null);
+  const sectionInnerRef = useRef<HTMLDivElement>(null);
+  const announcedMessage = useAnnouncedMessage(
+    announcement.message,
+    announcement.revision,
+  );
   const isEditing = editingCommentId !== null;
   const isSubmitDisabled =
     commentFormValue.trim().length === 0 || isCommentMutating;
+
+  const announce = (message: string) => {
+    setAnnouncement((previous) => ({
+      message,
+      revision: previous.revision + 1,
+    }));
+  };
+
+  // 제출/삭제 중 disabled 처리와 댓글 언마운트로 DOM 포커스가 body 로 떨어지므로,
+  // mutation 이 끝난 뒤 다음 프레임에 예약된 목적지로 포커스를 복귀시킨다.
+  useEffect(() => {
+    if (isCommentMutating || pendingFocusTarget === null) {
+      return;
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
+      if (pendingFocusTarget === 'textarea') {
+        commentInputRef.current?.focus();
+      } else {
+        sectionInnerRef.current?.querySelector<HTMLElement>('h2')?.focus();
+      }
+
+      setPendingFocusTarget(null);
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+    };
+  }, [isCommentMutating, pendingFocusTarget]);
 
   const handleSubmitComment = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -38,6 +97,8 @@ export const CommentsSection = (): ReactElement => {
       return;
     }
 
+    const wasEditing = editingCommentId !== null;
+
     try {
       if (editingCommentId !== null) {
         await updateComment(editingCommentId, trimmedContent);
@@ -47,17 +108,18 @@ export const CommentsSection = (): ReactElement => {
       }
 
       setCommentFormValue('');
+      announce(wasEditing ? '댓글을 수정했어요.' : '댓글을 등록했어요.');
     } catch (submitError) {
       showToast({
         type: 'error',
         icon: 'alert-circle-filled',
         content: getApiErrorMessage(
           submitError,
-          editingCommentId !== null
-            ? '댓글 수정에 실패했습니다.'
-            : '댓글 등록에 실패했습니다.',
+          wasEditing ? '댓글 수정에 실패했습니다.' : '댓글 등록에 실패했습니다.',
         ),
       });
+    } finally {
+      setPendingFocusTarget('textarea');
     }
   };
 
@@ -69,28 +131,58 @@ export const CommentsSection = (): ReactElement => {
         setEditingCommentId(null);
         setCommentFormValue('');
       }
+
+      announce('댓글을 삭제했어요.');
     } catch (deleteError) {
       showToast({
         type: 'error',
         icon: 'alert-circle-filled',
         content: getApiErrorMessage(deleteError, '댓글 삭제에 실패했습니다.'),
       });
+    } finally {
+      // 삭제 중 disabled 처리로 포커스가 body 로 떨어진 상태가 실패 시에도 남으므로,
+      // 등록/수정과 동일하게 성공/실패 모두 포커스 복귀를 예약한다.
+      setPendingFocusTarget('heading');
     }
+  };
+
+  const handleStartEditComment = (commentId: number, content: string) => {
+    setEditingCommentId(commentId);
+    setCommentFormValue(content);
+    // 값이 채워진 뒤 입력창으로 포커스를 옮겨 수정 모드 진입을 낭독시킨다.
+    window.requestAnimationFrame(() => {
+      const input = commentInputRef.current;
+
+      if (!input) {
+        return;
+      }
+
+      input.focus();
+      input.setSelectionRange(input.value.length, input.value.length);
+    });
   };
 
   return (
     <CommentSectionRoot>
-      <CommentSectionInner>
-        <Text as="h2" color="text.secondary" font="heading-s-sb">
+      <CommentSectionInner ref={sectionInnerRef}>
+        <HiddenText role="status">{announcedMessage}</HiddenText>
+        <Text
+          as="h2"
+          color="text.secondary"
+          font="heading-s-sb"
+          tabIndex={-1}
+        >
           댓글
         </Text>
 
         <CommentForm onSubmit={handleSubmitComment}>
-          <CommentAuthor>
+          {/* 아바타 유형이 VI 로 하드코딩되어 있어 가이드러너에게 잘못 낭독되므로 장식 처리한다. */}
+          <CommentAuthor aria-hidden={true}>
             <ProfileAvatar name="나" type="VI" />
           </CommentAuthor>
           <CommentInput
-            aria-label="댓글 입력"
+            ref={commentInputRef}
+            aria-label={isEditing ? '댓글 수정 입력' : '댓글 입력'}
             disabled={isCommentMutating}
             placeholder="해당 모임에 관련한 이야기를 해주세요!"
             value={commentFormValue}
@@ -104,11 +196,13 @@ export const CommentsSection = (): ReactElement => {
         </CommentForm>
 
         {isPending ? (
-          <PanelState>댓글을 불러오는 중입니다.</PanelState>
+          <AnnouncedPanelState role="status">
+            댓글을 불러오는 중입니다.
+          </AnnouncedPanelState>
         ) : isError ? (
-          <PanelState>
+          <AnnouncedPanelState role="alert">
             {getApiErrorMessage(error, '댓글을 불러오지 못했습니다.')}
-          </PanelState>
+          </AnnouncedPanelState>
         ) : comments && comments.items.length > 0 ? (
           <CommentList>
             {comments.items.map((comment) => {
@@ -124,7 +218,7 @@ export const CommentsSection = (): ReactElement => {
                     {isOwnComment ? (
                       <>
                         <CommentIconButton
-                          aria-label="댓글 삭제"
+                          aria-label={`댓글 삭제: ${getCommentPreview(comment.content)}`}
                           disabled={isCommentMutating}
                           icon="trash-lined"
                           iconSize={20}
@@ -134,14 +228,16 @@ export const CommentsSection = (): ReactElement => {
                           }}
                         />
                         <CommentIconButton
-                          aria-label="댓글 수정"
+                          aria-label={`댓글 수정: ${getCommentPreview(comment.content)}`}
                           disabled={isCommentMutating}
                           icon="edit-lined"
                           iconSize={20}
                           size={24}
                           onClick={() => {
-                            setEditingCommentId(comment.commentId);
-                            setCommentFormValue(comment.content);
+                            handleStartEditComment(
+                              comment.commentId,
+                              comment.content,
+                            );
                           }}
                         />
                       </>
@@ -170,6 +266,11 @@ export const CommentsSection = (): ReactElement => {
       </CommentSectionInner>
     </CommentSectionRoot>
   );
+};
+
+// 로터/스와이프로 버튼만 탐색해도 대상 댓글을 구분할 수 있게 내용 앞부분을 라벨에 포함한다.
+const getCommentPreview = (content: string) => {
+  return content.slice(0, COMMENT_LABEL_PREVIEW_LENGTH);
 };
 
 const CommentSectionRoot = styled.section(({ theme }) => ({

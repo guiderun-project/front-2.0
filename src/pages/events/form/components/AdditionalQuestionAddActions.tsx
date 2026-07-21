@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import type { ReactElement, Ref } from "react";
 
 import styled from "@emotion/styled";
 
@@ -9,6 +9,8 @@ import type { EventFormValues } from "../schema";
 type AdditionalQuestionAddActionsProps = {
   isSelectAddDisabled: boolean;
   isTextAddDisabled: boolean;
+  /** 마지막 질문 카드 삭제 후 포커스를 복구할 목적지로 쓰인다. */
+  textAddButtonRef?: Ref<HTMLButtonElement>;
   onAddQuestion: (
     type: EventFormValues["additionalQuestions"][number]["type"],
   ) => void;
@@ -17,10 +19,12 @@ type AdditionalQuestionAddActionsProps = {
 export const AdditionalQuestionAddActions = ({
   isSelectAddDisabled,
   isTextAddDisabled,
+  textAddButtonRef,
   onAddQuestion,
 }: AdditionalQuestionAddActionsProps): ReactElement => (
   <AddActions>
     <Button
+      ref={textAddButtonRef}
       disabled={isTextAddDisabled}
       fullWidth
       level="line-type"

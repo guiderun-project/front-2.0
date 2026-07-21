@@ -1369,18 +1369,23 @@ export const DesignPage = () => {
                         {level}
                       </Text>
                     </ButtonMatrixLabelCell>
-                    {BUTTON_STATUS_EXAMPLES.map(({ disabled, status }) => (
-                      <ButtonMatrixButtonCell key={status}>
-                        <Button
-                          disabled={disabled}
-                          level={level}
-                          size={size}
-                          status={status}
-                        >
-                          확인
-                        </Button>
-                      </ButtonMatrixButtonCell>
-                    ))}
+                    {BUTTON_STATUS_EXAMPLES.map(
+                      ({ disabled, label: statusLabel, status }) => (
+                        <ButtonMatrixButtonCell key={status}>
+                          {/* div 그리드라 헤더 셀과 연결이 없어, SR 전용
+                              이름으로 level·status 변형을 구분한다. */}
+                          <Button
+                            aria-label={`확인, ${level} ${statusLabel}`}
+                            disabled={disabled}
+                            level={level}
+                            size={size}
+                            status={status}
+                          >
+                            확인
+                          </Button>
+                        </ButtonMatrixButtonCell>
+                      ),
+                    )}
                   </ButtonMatrixRow>
                 ))}
               </ButtonMatrixTable>
@@ -1391,7 +1396,7 @@ export const DesignPage = () => {
           <Text color="text.tertiary" font="detail-m-m">
             Full width
           </Text>
-          <Button fullWidth size="l">
+          <Button aria-label="신청하기, full width" fullWidth size="l">
             신청하기
           </Button>
         </ButtonFullWidthPreview>
@@ -1585,8 +1590,26 @@ export const DesignPage = () => {
               options={RECRUITMENT_STATUS_OPTIONS}
               sheetTitle="모집 상태"
               value={recruitmentStatus}
-              renderTrigger={({ disabled, open, selectedOption }) => (
-                <StatusChip disabled={disabled} type="button" onClick={open}>
+              renderTrigger={({
+                disabled,
+                errorId,
+                hasError,
+                isOpen,
+                open,
+                selectedOption,
+              }) => (
+                /* 커스텀 트리거도 기본 SelectTrigger처럼 용도·팝업 여부·
+                   확장 상태·오류 상태를 SR에 전달하는 레퍼런스 패턴. */
+                <StatusChip
+                  aria-describedby={hasError ? errorId : undefined}
+                  aria-expanded={isOpen}
+                  aria-haspopup="dialog"
+                  aria-invalid={hasError || undefined}
+                  aria-label={`모집 상태, 현재 선택: ${selectedOption?.label ?? "모집중"}`}
+                  disabled={disabled}
+                  type="button"
+                  onClick={open}
+                >
                   <Text as="span" color="text.brand" font="body-s-sb">
                     {selectedOption?.label ?? "모집중"}
                   </Text>
@@ -2131,7 +2154,14 @@ export const DesignPage = () => {
             ),
           )}
         </PopupSampleGrid>
-        <Text color="text.secondary" font="body-s-r">
+        {/* 팝업 확인·취소 결과가 유일한 피드백이라 상시 마운트 status
+            리전으로 갱신 시 낭독한다. 시각 변화 없음. */}
+        <Text
+          aria-live="polite"
+          color="text.secondary"
+          font="body-s-r"
+          role="status"
+        >
           {lastConfirmPopupAction}
         </Text>
         <CodeExamples examples={CONFIRM_POPUP_CODE_EXAMPLES} />

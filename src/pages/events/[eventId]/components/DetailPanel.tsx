@@ -1,13 +1,14 @@
 import type { ReactElement, ReactNode } from "react";
 
 import styled from "@emotion/styled";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import type { EventDetailResponse } from "@/api/types";
 import { HiddenText, Icon, Text } from "@/components";
 import { APP_PATH } from "@/router/path";
+import { formatTimeRangeSrLabel } from "@/utils";
 
-import { formatKoreanDate, formatTimeRange } from "../utils";
+import { formatKoreanDate, formatKoreanTime, formatTimeRange } from "../utils";
 import { CommentsSection } from "./CommentsSection";
 
 type DetailPanelProps = {
@@ -23,16 +24,17 @@ export const DetailPanel = ({
   onCopyLink,
   onKakaoShare,
 }: DetailPanelProps): ReactElement => {
-  const navigate = useNavigate();
   const scheduleDateLabel = formatKoreanDate(event.schedule.date);
   const scheduleTimeLabel = formatTimeRange(
     event.schedule.startTime,
     event.schedule.endTime,
   );
-
-  const handleSupportClick = () => {
-    navigate(APP_PATH.EVENT_SUPPORT);
-  };
+  // '~' 는 스크린리더가 생략하거나 '물결표'로 읽어 범위 의미가 전달되지 않으므로
+  // SR 전용 문자열은 '부터/까지'로 표현한다.
+  const scheduleTimeSrLabel = formatTimeRangeSrLabel(
+    formatKoreanTime(event.schedule.startTime),
+    formatKoreanTime(event.schedule.endTime),
+  );
   const hasExpectedRunningDistance = event.expectedRunningDistanceKm !== null;
 
   return (
@@ -46,7 +48,7 @@ export const DetailPanel = ({
           </DetailInfoRow>
           <DetailInfoRow label="훈련일자">
             <StackedValue>
-              <HiddenText>{`${scheduleDateLabel} ${scheduleTimeLabel}`}</HiddenText>
+              <HiddenText>{`${scheduleDateLabel} ${scheduleTimeSrLabel}`}</HiddenText>
               <Text aria-hidden={true} color="text.primary" font="body-m-m">
                 {scheduleDateLabel}
               </Text>
@@ -60,7 +62,7 @@ export const DetailPanel = ({
               <Text color="text.primary" font="body-m-m">
                 {event.place}
               </Text>
-              <SupportButton type="button" onClick={handleSupportClick}>
+              <SupportButton to={APP_PATH.EVENT_SUPPORT}>
                 <Text color="text.secondary" font="detail-m-m">
                   지역별 이동지원 연락처
                 </Text>
@@ -76,7 +78,7 @@ export const DetailPanel = ({
           {hasExpectedRunningDistance ? (
             <DetailInfoRow label="예상 러닝거리">
               <Text color="text.primary" font="body-m-m">
-                <HiddenText>{`${event.expectedRunningDistanceKm} KM`}</HiddenText>
+                <HiddenText>{`${event.expectedRunningDistanceKm}킬로미터`}</HiddenText>
                 <span aria-hidden={true}>
                   {event.expectedRunningDistanceKm}KM
                 </span>
@@ -184,7 +186,8 @@ const PlaceValue = styled(StackedValue)(({ theme }) => ({
   gap: theme.spacing.md,
 }));
 
-const SupportButton = styled.button(({ theme }) => ({
+// 별도 라우트로 이동하는 컨트롤이라 버튼 대신 링크로 노출한다. 스타일은 기존 버튼과 동일.
+const SupportButton = styled(Link)(({ theme }) => ({
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",
@@ -195,10 +198,12 @@ const SupportButton = styled.button(({ theme }) => ({
   padding: `${theme.spacing.md} ${theme.spacing.md} ${theme.spacing.md} ${theme.spacing.lg}`,
   border: `1px solid ${theme.color.border.default}`,
   borderRadius: theme.radius.full,
+  boxSizing: "border-box",
   backgroundColor: "transparent",
   cursor: "pointer",
   touchAction: "manipulation",
   textAlign: "center",
+  textDecoration: "none",
 
   "&:focus-visible": {
     outline: `2px solid ${theme.color.border.focused}`,

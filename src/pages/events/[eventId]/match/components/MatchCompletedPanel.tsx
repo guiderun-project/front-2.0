@@ -7,7 +7,7 @@ import type {
   MatchingCompletedRow,
   MatchingUser,
 } from '@/api/types';
-import { CheckBox, Icon, RunnerTypeAvatar, Text } from '@/components';
+import { CheckBox, HiddenText, Icon, RunnerTypeAvatar, Text } from '@/components';
 import { RUNNER_TYPE_LABELS } from '@/constants';
 import type { AppTheme } from '@/styles/theme';
 
@@ -61,7 +61,8 @@ export const MatchCompletedPanel = ({
                 </GroupCountText>
               </GroupHeadingText>
             </GroupHeading>
-            <PairList>
+            {/* WebKit은 list-style: none인 목록의 list 역할을 제거하므로 role을 명시한다. */}
+            <PairList role="list">
               {group.rows.map((row) => (
                 <li key={row.vi.userId}>
                   <CompletedPair
@@ -90,11 +91,17 @@ const CompletedPair = ({
   selectedUserIds,
   onToggleParticipant,
 }: CompletedPairProps): ReactElement => {
+  // iOS VoiceOver는 role=group의 aria-label을 낭독하지 않으므로, 페어 관계를
+  // 각 체크박스 옆 숨김 문장(partnerText)으로 전달한다.
+  const viPartnerText = getGuidesPartnerLabel(row.guides);
+  const guidePartnerText = getViPartnerLabel(row.vi);
+
   return (
-    <PairRoot aria-label={getCompletedPairDescription(row)} role="group">
+    <PairRoot>
       <PairBoxes>
         <ViSlot>
           <PersonBox
+            partnerText={viPartnerText}
             person={row.vi}
             selected={selectedUserIds.has(row.vi.userId)}
             onToggle={onToggleParticipant}
@@ -110,6 +117,7 @@ const CompletedPair = ({
             <Fragment key={guide.userId}>
               {index > 0 ? <GuideDivider /> : null}
               <PersonRow
+                partnerText={guidePartnerText}
                 person={guide}
                 selected={selectedUserIds.has(guide.userId)}
                 onToggle={onToggleParticipant}
@@ -125,16 +133,18 @@ const CompletedPair = ({
 type PersonSelectProps = {
   person: MatchingUser;
   selected: boolean;
+  partnerText?: string;
   onToggle: (person: SelectablePerson) => void;
 };
 
 const PersonContent = ({
+  partnerText,
   person,
   selected,
   onToggle,
 }: PersonSelectProps): ReactElement => {
-  const selectLabel =
-    `${RUNNER_TYPE_LABELS[person.type]} ${person.name} ${selected ? '선택 취소' : '선택'}`;
+  // 체크박스 이름은 짧게 유지하고 매칭 상대는 아래 숨김 문장으로 전달한다.
+  const selectLabel = `${RUNNER_TYPE_LABELS[person.type]} ${person.name} 선택`;
 
   return (
     <>
@@ -145,8 +155,10 @@ const PersonContent = ({
           onToggle(toSelectablePerson(person));
         }}
       />
-      <PersonAvatarName>
-        <RunnerTypeAvatar size="m" type={person.type} />
+      {partnerText ? <HiddenText>{partnerText}</HiddenText> : null}
+      {/* 시각 전용 아바타·이름 블록은 체크박스·숨김 문장과 중복되므로 숨긴다. */}
+      <PersonAvatarName aria-hidden={true}>
+        <RunnerTypeAvatar aria-hidden={true} size="m" type={person.type} />
         <PersonName color="text.primary" font="body-m-sb">
           {person.name}
         </PersonName>
@@ -171,15 +183,29 @@ const PersonRow = (props: PersonSelectProps): ReactElement => {
   );
 };
 
-const getCompletedPairDescription = (row: MatchingCompletedRow) => {
-  if (row.guides.length === 0) {
-    return `${row.vi.name}의 가이드러너 없음`;
+// 뒤에 '와/과'를 이름 받침에 맞춰 붙인다.
+const withWaGwa = (word: string): string => {
+  const lastCode = word.charCodeAt(word.length - 1);
+  const hasFinalConsonant =
+    lastCode >= 0xac00 && lastCode <= 0xd7a3 && (lastCode - 0xac00) % 28 !== 0;
+
+  return `${word}${hasFinalConsonant ? '과' : '와'}`;
+};
+
+// 시각장애러너 체크박스에서 낭독할 가이드러너 매칭 정보.
+const getGuidesPartnerLabel = (guides: MatchingUser[]): string => {
+  if (guides.length === 0) {
+    return '가이드러너 매칭 없음';
   }
 
-  return `${row.vi.name}의 가이드러너 ${row.guides
-    .map((guide) => guide.name)
-    .join(', ')}`;
+  const names = guides.map((guide) => guide.name).join(', ');
+
+  return `${withWaGwa(`가이드러너 ${names}`)} 매칭`;
 };
+
+// 가이드러너 체크박스에서 낭독할 시각장애러너 매칭 정보.
+const getViPartnerLabel = (vi: MatchingUser): string =>
+  `${withWaGwa(`시각장애러너 ${vi.name}`)} 매칭`;
 
 const GroupStack = styled.div(({ theme }) => ({
   display: 'flex',

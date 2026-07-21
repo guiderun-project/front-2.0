@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactElement } from 'react';
 
+import styled from '@emotion/styled';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { getApiErrorMessage } from '@/api/core';
@@ -19,6 +20,22 @@ export const KakaoOAuthPage = (): ReactElement => {
   const [status, setStatus] = useState<Status>('processing');
   const [errorMessage, setErrorMessage] = useState(OAUTH_ERROR_MESSAGE);
   const handledRef = useRef(false);
+
+  const statusMessage =
+    status === 'processing' ? '카카오 로그인 처리 중이에요...' : errorMessage;
+  // 라이브 리전은 빈 상태로 먼저 마운트한 뒤 다음 프레임에 메시지를 채워야
+  // 처리 중 안내와 실패 전환이 스크린리더에 안정적으로 낭독된다.
+  const [announcedMessage, setAnnouncedMessage] = useState('');
+
+  useEffect(() => {
+    const frameId = window.requestAnimationFrame(() => {
+      setAnnouncedMessage(statusMessage);
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+    };
+  }, [statusMessage]);
 
   useEffect(() => {
     // React StrictMode 의 effect 이중 실행 및 인가 코드 재사용 방지
@@ -60,11 +77,25 @@ export const KakaoOAuthPage = (): ReactElement => {
 
   return (
     <PageLayout background="bg.subtle">
-      <Text align="center" color="text.secondary" font="body-m-m">
-        {status === 'processing'
-          ? '카카오 로그인 처리 중이에요...'
-          : errorMessage}
+      <HiddenHeading>카카오 로그인</HiddenHeading>
+      <Text align="center" color="text.secondary" font="body-m-m" role="status">
+        {announcedMessage}
       </Text>
     </PageLayout>
   );
 };
+
+// HiddenText 공용 컴포넌트는 span 고정이라 헤딩 시맨틱용 h1을 페이지 로컬로 정의
+const HiddenHeading = styled.h1({
+  // 고정값은 표준 visually-hidden 접근성 패턴을 따른다.
+  position: 'absolute',
+  width: '1px',
+  height: '1px',
+  margin: '-1px',
+  padding: 0,
+  border: 0,
+  overflow: 'hidden',
+  clip: 'rect(0 0 0 0)',
+  clipPath: 'inset(50%)',
+  whiteSpace: 'nowrap',
+});

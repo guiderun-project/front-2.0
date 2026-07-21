@@ -1,4 +1,4 @@
-import { Suspense, useMemo, type ReactElement } from 'react';
+import { Suspense, useEffect, useMemo, type ReactElement } from 'react';
 
 import { QueryErrorResetBoundary, useSuspenseQuery } from '@tanstack/react-query';
 import { Outlet, useLocation, useParams } from 'react-router-dom';
@@ -7,6 +7,7 @@ import { getApiErrorMessage } from '@/api/core';
 import { api } from '@/api/services';
 import type { EventDetailResponse } from '@/api/types';
 import { ErrorBoundary, LoaderScreen, PageTitle } from '@/components';
+import { cancelLoaderCompletionAnnouncement } from '@/components/Loader';
 import { PageLayout } from '@/components/PageLayout';
 import { useAuth } from '@/contexts';
 import { RoutePlaceholder } from '@/pages/_shared/RoutePlaceholder';
@@ -58,10 +59,16 @@ const EventDetailRouteState = ({
   description,
   title,
 }: EventDetailRouteStateProps): ReactElement => {
+  // 오류 fallback 은 LoaderScreen 언마운트 직후 마운트되는데, 이때 Loader 가
+  // 예약해 둔 '불러왔어요.' 완료 안내가 나가면 오류인데 완료처럼 들리므로 취소한다.
+  useEffect(() => {
+    cancelLoaderCompletionAnnouncement();
+  }, []);
+
   return (
     <PageLayout background="bg.subtle">
       <PageTitle title={EVENT_DETAIL_DEFAULT_PAGE_TITLE} />
-      <RoutePlaceholder title={title} description={description} />
+      <RoutePlaceholder status title={title} description={description} />
     </PageLayout>
   );
 };

@@ -1,14 +1,28 @@
+import { useEffect, useRef } from 'react';
+
 import styled from '@emotion/styled';
 import { Link } from 'react-router-dom';
 
 import { Icon, PageLayout, PageTitle, Text } from '@/components';
 
 export const NotFoundPage = () => {
+  const contentRef = useRef<HTMLElement>(null);
+
+  // SPA 라우트 전환으로 404에 도달하면 스크린리더에 아무 안내도 없으므로,
+  // 제목(h1)으로 포커스를 옮겨 "페이지를 찾을 수 없어요"가 즉시 낭독되게 한다.
+  // (회원가입 단계 전환의 h1 포커스 패턴과 동일: src/pages/signup/index.tsx)
+  useEffect(() => {
+    const heading = contentRef.current?.querySelector<HTMLElement>('h1');
+    if (!heading) return;
+    heading.setAttribute('tabindex', '-1');
+    heading.focus();
+  }, []);
+
   return (
     <>
       <PageTitle title="페이지를 찾을 수 없음" />
       <PageLayout background="bg.subtle">
-        <Content aria-labelledby="not-found-title">
+        <Content ref={contentRef} aria-labelledby="not-found-title">
           <Icon
             aria-hidden={true}
             color="icon.tertiary"

@@ -54,7 +54,8 @@ export const MatchWaitingPanel = ({
                 </GroupHeadingText>
               </GroupHeading>
             </GroupHeader>
-            <ParticipantList>
+            {/* WebKit은 list-style: none인 목록의 list 역할을 제거하므로 role을 명시한다. */}
+            <ParticipantList role="list">
               {group.participants.map((participant) => (
                 <li key={participant.userId}>
                   <MatchParticipantCard

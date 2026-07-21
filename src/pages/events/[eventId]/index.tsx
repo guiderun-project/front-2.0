@@ -94,7 +94,8 @@ export const EventDetailPage = (): ReactElement => {
       ? [
           {
             icon: "more-vertical-lined",
-            ariaLabel: "더보기",
+            ariaLabel: "이벤트 관리 메뉴",
+            "aria-haspopup": "dialog",
             onClick: openManagementSheet,
           } satisfies TopNavigationIconButtonProps,
         ]
@@ -130,7 +131,7 @@ export const EventDetailPage = (): ReactElement => {
         selectedKey={activeTab}
         onSelectionChange={handleTabSelectionChange}
       >
-        <Tabs.List>
+        <Tabs.List aria-label="이벤트 상세 정보">
           {EVENT_DETAIL_TABS.map((tab) => (
             <Tabs.Tab key={tab.id} id={tab.id}>
               {tab.label}

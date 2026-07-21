@@ -11,7 +11,7 @@ import {
   getEventGroupDisplayLabel,
   type EventGroupLabelContext,
 } from "../utils";
-import { PanelState } from "./PanelState";
+import { AnnouncedPanelState } from "./PanelState";
 import { ProfileAvatar } from "./ProfileAvatar";
 
 type ApplicantsPanelProps = {
@@ -34,21 +34,29 @@ export const ApplicantsPanel = ({
   onApplicantClick,
 }: ApplicantsPanelProps): ReactElement => {
   if (isPending) {
-    return <PanelState>신청자 명단을 불러오는 중이에요.</PanelState>;
+    return (
+      <AnnouncedPanelState role="status">
+        신청자 명단을 불러오는 중이에요.
+      </AnnouncedPanelState>
+    );
   }
 
   if (isError || !data) {
     return (
-      <PanelState>
+      <AnnouncedPanelState role="alert">
         {getApiErrorMessage(error, "신청자 명단을 불러오지 못했어요.")}
-      </PanelState>
+      </AnnouncedPanelState>
     );
   }
 
   const { groups, summary } = data;
 
   if (summary.totalCount === 0 || groups.length === 0) {
-    return <PanelState>아직 신청자가 없어요.</PanelState>;
+    return (
+      <AnnouncedPanelState role="status">
+        아직 신청자가 없어요.
+      </AnnouncedPanelState>
+    );
   }
 
   return (

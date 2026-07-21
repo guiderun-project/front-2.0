@@ -60,7 +60,14 @@ export const useEventEditMutations = ({
       void queryClient.invalidateQueries({
         queryKey: eventDetailQueryKeys.root,
       });
-      navigate(APP_PATH.EVENTS);
+      // 삭제 확인 팝업이 페이지와 함께 사라지면 포커스가 body 로 떨어지고
+      // 아무 낭독도 없으므로, 앱 셸의 라우트 어나운서(App.tsx RouteAnnouncer)가
+      // 삭제 성공 사실을 페이지 제목 대신 낭독하도록 srAnnouncement 를 전달한다.
+      navigate(APP_PATH.EVENTS, {
+        state: {
+          srAnnouncement: '모임 게시글을 삭제했어요. 모임 목록으로 이동했어요.',
+        },
+      });
     },
     onError: (error) => {
       window.alert(getApiErrorMessage(error, '모집 게시글 삭제에 실패했어요.'));

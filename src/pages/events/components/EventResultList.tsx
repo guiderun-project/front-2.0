@@ -24,7 +24,9 @@ export const EventResultList = ({
 }: EventResultListProps): ReactElement => {
   return (
     <>
-      <List>
+      {/* list-style 이 제거된 목록은 iOS VoiceOver(WebKit)가 목록 시맨틱을
+          지우므로 role="list" 로 개수·경계 안내를 복원한다. */}
+      <List aria-label="모임 목록" role="list">
         {items.map((event) => (
           <EventListCard event={event} key={event.id} />
         ))}

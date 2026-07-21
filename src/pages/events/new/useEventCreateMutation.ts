@@ -34,7 +34,13 @@ export const useEventCreateMutation = ({
       void queryClient.invalidateQueries({
         queryKey: eventDetailQueryKeys.root,
       });
-      navigate(APP_PATH.EVENT_DETAIL(response.eventId), { replace: true });
+      // SPA 라우트 전환은 스크린리더에 자동으로 안내되지 않으므로, 앱 셸의
+      // 라우트 어나운서(App.tsx RouteAnnouncer)가 생성 성공 사실을 페이지
+      // 제목 대신 낭독하도록 srAnnouncement 를 함께 전달한다.
+      navigate(APP_PATH.EVENT_DETAIL(response.eventId), {
+        replace: true,
+        state: { srAnnouncement: '모임을 만들었어요. 모임 상세 페이지로 이동했어요.' },
+      });
     },
     onError: (error) => {
       window.alert(getApiErrorMessage(error, '모임 만들기에 실패했어요.'));
