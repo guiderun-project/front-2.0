@@ -51,6 +51,8 @@ type SelectionAnnouncementInput = {
   person: SelectablePerson;
   selectedGuideIds: string[];
   selectedViId: string | null;
+  // 시각장애러너를 다른 사람으로 교체한 경우 기존 선택자의 이름.
+  replacedViName?: string | null;
 };
 
 const getMatchingCompleteAnnouncement = (
@@ -71,6 +73,7 @@ const getSelectionAnnouncement = ({
   person,
   selectedGuideIds,
   selectedViId,
+  replacedViName,
 }: SelectionAnnouncementInput): string => {
   const isSelected =
     person.type === 'VI'
@@ -81,15 +84,21 @@ const getSelectionAnnouncement = ({
     return `${person.name}님의 선택을 취소했습니다.`;
   }
 
+  // 시각장애러너를 교체한 경우 기존 선택이 빠졌음을 명시한다. 그 외에는
+  // 새로 선택한 사실만 안내한다.
+  const selectionText = replacedViName
+    ? `${replacedViName}에서 ${person.name}님으로 바꿨습니다.`
+    : `${person.name}님을 선택했습니다.`;
+
   if (selectedViId === null) {
-    return `${person.name}님을 선택했습니다. 시각장애러너 파트너를 선택해주세요.`;
+    return `${selectionText} 시각장애러너 파트너를 선택해주세요.`;
   }
 
   if (selectedGuideIds.length === 0) {
-    return `${person.name}님을 선택했습니다. 가이드러너 파트너를 선택해주세요.`;
+    return `${selectionText} 가이드러너 파트너를 선택해주세요.`;
   }
 
-  return `${person.name}님을 선택했습니다. 화면 최하단에 이대로 매칭하기를 눌러주세요.`;
+  return `${selectionText} 화면 최하단에 이대로 매칭하기를 눌러주세요.`;
 };
 
 export const useEventMatchRoute = () => {
@@ -309,8 +318,14 @@ export const useEventMatchPage = (eventId: number) => {
   const toggleParticipant = (person: SelectablePerson) => {
     if (person.type === 'VI') {
       // 체크박스는 각각 독립적으로 동작한다. VI 선택은 VI만 토글한다.
-      const nextSelectedViId =
-        selectedViId === person.userId ? null : person.userId;
+      const isDeselect = selectedViId === person.userId;
+      const nextSelectedViId = isDeselect ? null : person.userId;
+      // 다른 시각장애러너가 이미 선택돼 있었다면 이번 선택은 교체이므로,
+      // 기존 선택이 조용히 빠지지 않도록 기존 이름을 함께 안내한다.
+      const replacedViName =
+        !isDeselect && selectedViId !== null
+          ? (personMap.get(selectedViId)?.name ?? null)
+          : null;
 
       setSelectedViId(nextSelectedViId);
       announcePolitely(
@@ -318,6 +333,7 @@ export const useEventMatchPage = (eventId: number) => {
           person,
           selectedGuideIds,
           selectedViId: nextSelectedViId,
+          replacedViName,
         }),
       );
       return;
