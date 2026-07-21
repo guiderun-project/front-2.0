@@ -74,6 +74,7 @@ export const MemberUpcomingEventCard = ({
               {partners.map((partner, index) => (
                 <PartnerChip key={`${partner.type}-${partner.name}-${index}`}>
                   <RunnerTypeAvatar
+                    aria-hidden
                     size="s"
                     type={partner.type}
                   />
