@@ -89,6 +89,7 @@ export const EventSearchPage = (): ReactElement => {
             autoFocus
             aria-label="모임 검색"
             enterKeyHint="search"
+            lang="ko"
             placeholder={SEARCH_PLACEHOLDER}
             type="text"
             value={keyword}
