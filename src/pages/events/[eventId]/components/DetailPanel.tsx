@@ -204,6 +204,7 @@ const SupportButton = styled(Link)(({ theme }) => ({
   touchAction: "manipulation",
   textAlign: "center",
   textDecoration: "none",
+  wordBreak: "keep-all",
 
   "&:focus-visible": {
     outline: `2px solid ${theme.color.border.focused}`,
