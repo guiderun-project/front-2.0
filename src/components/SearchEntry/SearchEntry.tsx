@@ -3,6 +3,7 @@ import type { ReactElement } from "react";
 import styled from "@emotion/styled";
 import { Link } from "react-router-dom";
 
+import { HiddenText } from "@/components/HiddenText";
 import { Icon } from "@/components/Icon";
 import { Text } from "@/components/Text";
 
@@ -18,7 +19,7 @@ export const SearchEntry = ({
   to,
 }: SearchEntryProps): ReactElement => {
   return (
-    <SearchLink aria-label={`${placeholder} 검색하러 가기`} to={to}>
+    <SearchLink to={to}>
       <Icon
         aria-hidden={true}
         color="icon.secondary"
@@ -26,6 +27,7 @@ export const SearchEntry = ({
         size={20}
       />
       <Placeholder color="text.tertiary" font="body-m-m">
+        <HiddenText>검색 버튼</HiddenText>
         {placeholder}
       </Placeholder>
     </SearchLink>
