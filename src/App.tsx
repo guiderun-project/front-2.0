@@ -1,26 +1,26 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import styled from '@emotion/styled';
-import { useFeatureFlagEnabled } from '@posthog/react';
+import styled from "@emotion/styled";
+import { useFeatureFlagEnabled } from "@posthog/react";
 import {
   Outlet,
   useLocation,
   useNavigate,
   useNavigationType,
-} from 'react-router-dom';
+} from "react-router-dom";
 
-import { HiddenText } from '@/components/HiddenText';
+import { HiddenText } from "@/components/HiddenText";
 import {
   cancelLoaderCompletionAnnouncement,
   LoaderScreen,
-} from '@/components/Loader';
-import { PageLayout } from '@/components/PageLayout';
-import { ToastViewport } from '@/components/Toast';
-import { useAuth } from '@/contexts';
-import { ComingSoonPage } from '@/pages/ComingSoonPage';
-import { APP_PATH } from '@/router/path';
+} from "@/components/Loader";
+import { PageLayout } from "@/components/PageLayout";
+import { ToastViewport } from "@/components/Toast";
+import { useAuth } from "@/contexts";
+import { ComingSoonPage } from "@/pages/ComingSoonPage";
+import { APP_PATH } from "@/router/path";
 
-const FIRST_VISIT_STORAGE_KEY = 'guiderun.firstVisitSeen';
+const FIRST_VISIT_STORAGE_KEY = "guiderun.firstVisitSeen";
 const FIRST_VISIT_REDIRECT_EXCLUDED_PATHS = [
   APP_PATH.INTRO,
   APP_PATH.OAUTH,
@@ -30,11 +30,7 @@ const FIRST_VISIT_REDIRECT_EXCLUDED_PATHS = [
   APP_PATH.TERMS,
 ] as const;
 
-// 오픈 전 게이트용 PostHog boolean flag. 모든 배포가 같은 PostHog 프로젝트
-// 토큰을 공유하므로, VITE_PRE_LAUNCH_GATE_ENABLED가 켜진 배포(Production)에서만
-// 이 flag 값을 실제로 반영한다. flag/네트워크가 아직 준비되지 않았을 때는
-// fail-open으로 실제 서비스를 노출한다.
-const PRE_LAUNCH_FEATURE_FLAG = 'pre-launch-mode';
+const PRE_LAUNCH_FEATURE_FLAG = "pre-launch-mode";
 
 const App = () => {
   const isServiceLive = useServiceLiveGate();
@@ -65,7 +61,7 @@ export default App;
 
 const useServiceLiveGate = (): boolean => {
   const isPreLaunchGateEnabled =
-    import.meta.env.VITE_PRE_LAUNCH_GATE_ENABLED === 'true';
+    import.meta.env.VITE_PRE_LAUNCH_GATE_ENABLED === "true";
   const isPreLaunchModeOn = useFeatureFlagEnabled(
     PRE_LAUNCH_FEATURE_FLAG,
     false,
@@ -78,7 +74,7 @@ const ScrollToTop = () => {
   const { pathname } = useLocation();
 
   useLayoutEffect(() => {
-    window.scrollTo({ left: 0, top: 0, behavior: 'auto' });
+    window.scrollTo({ left: 0, top: 0, behavior: "auto" });
   }, [pathname]);
 
   return null;
@@ -107,14 +103,14 @@ const RouteFocusManager = () => {
         return;
       }
 
-      const main = document.querySelector('main');
+      const main = document.querySelector("main");
       if (!(main instanceof HTMLElement)) {
         return;
       }
 
-      main.setAttribute('tabindex', '-1');
+      main.setAttribute("tabindex", "-1");
       // 프로그래매틱 포커스로 인한 포커스 링이 시각적으로 드러나지 않도록 한다.
-      main.style.outline = 'none';
+      main.style.outline = "none";
       main.focus({ preventScroll: true });
     });
 
@@ -129,10 +125,10 @@ const ROUTE_ANNOUNCE_DELAY_MS = 150;
 const getSrAnnouncement = (state: unknown): string | null => {
   if (
     state !== null &&
-    typeof state === 'object' &&
-    'srAnnouncement' in state &&
-    typeof state.srAnnouncement === 'string' &&
-    state.srAnnouncement !== ''
+    typeof state === "object" &&
+    "srAnnouncement" in state &&
+    typeof state.srAnnouncement === "string" &&
+    state.srAnnouncement !== ""
   ) {
     return state.srAnnouncement;
   }
@@ -148,7 +144,7 @@ const getSrAnnouncement = (state: unknown): string | null => {
 const RouteAnnouncer = () => {
   const location = useLocation();
   const navigationType = useNavigationType();
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const isInitialNavigationRef = useRef(true);
   const prevPathnameRef = useRef(location.pathname);
 
@@ -166,7 +162,7 @@ const RouteAnnouncer = () => {
     // srAnnouncement는 history state에 직렬화되어 남으므로, 뒤로/앞으로(POP)
     // 이동에서는 과거 리다이렉트 사유가 스테일 정보로 재낭독되지 않도록 무시한다.
     const srAnnouncement =
-      navigationType === 'POP' ? null : getSrAnnouncement(location.state);
+      navigationType === "POP" ? null : getSrAnnouncement(location.state);
 
     // 탭 전환·페이지네이션·정렬처럼 search/hash만 바뀐 내비게이션은 라우트 이동이
     // 아니므로 낭독하지 않는다. (ScrollToTop·RouteFocusManager와 동일한 기준)
@@ -181,7 +177,7 @@ const RouteAnnouncer = () => {
     }
 
     // iOS VoiceOver는 동일 문자열 재주입을 재낭독하지 않으므로 먼저 비운 뒤 다시 채운다.
-    setMessage('');
+    setMessage("");
 
     const timeoutId = window.setTimeout(() => {
       if (srAnnouncement !== null) {
@@ -214,8 +210,11 @@ const useFirstVisitIntroGate = (): boolean => {
   const { isAuthReady, user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const isFirstVisitTarget = isAuthReady && user === null && !hasSeenFirstVisit();
-  const isRedirectExcluded = isFirstVisitRedirectExcludedPath(location.pathname);
+  const isFirstVisitTarget =
+    isAuthReady && user === null && !hasSeenFirstVisit();
+  const isRedirectExcluded = isFirstVisitRedirectExcludedPath(
+    location.pathname,
+  );
   const shouldRedirect = isFirstVisitTarget && !isRedirectExcluded;
 
   useEffect(() => {
@@ -245,24 +244,24 @@ const isFirstVisitRedirectExcludedPath = (pathname: string): boolean => {
 };
 
 const hasSeenFirstVisit = (): boolean => {
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     return true;
   }
 
   try {
-    return window.localStorage.getItem(FIRST_VISIT_STORAGE_KEY) === 'true';
+    return window.localStorage.getItem(FIRST_VISIT_STORAGE_KEY) === "true";
   } catch {
     return true;
   }
 };
 
 const recordFirstVisitSeen = (): boolean => {
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     return false;
   }
 
   try {
-    window.localStorage.setItem(FIRST_VISIT_STORAGE_KEY, 'true');
+    window.localStorage.setItem(FIRST_VISIT_STORAGE_KEY, "true");
     return true;
   } catch {
     return false;
@@ -285,7 +284,8 @@ const AppWrapper = styled.div`
 `;
 
 const MobileViewport = styled.div`
-  --app-mobile-viewport-width: ${({ theme }) => theme.layout.mobileViewportMaxWidth};
+  --app-mobile-viewport-width: ${({ theme }) =>
+    theme.layout.mobileViewportMaxWidth};
 
   width: 100%;
   max-width: var(--app-mobile-viewport-width);
