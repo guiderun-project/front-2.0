@@ -1,6 +1,30 @@
-import styled from '@emotion/styled';
+import { Suspense, lazy } from "react";
 
-import { Icon, PageLayout, PageTitle, Text } from '@/components';
+import styled from "@emotion/styled";
+
+import mainDarkLottie from "@/assets/lotties/main_dark.json";
+import mainLightLottie from "@/assets/lotties/main_light.json";
+import { PageLayout, PageTitle, Text } from "@/components";
+import { useColorMode } from "@/styles/useColorMode";
+
+const Lottie = lazy(() => import("lottie-react"));
+
+const ComingSoonGraphic = () => {
+  const { colorMode } = useColorMode();
+  const animationData = colorMode === "dark" ? mainDarkLottie : mainLightLottie;
+
+  return (
+    <Suspense fallback={null}>
+      <Lottie
+        key={colorMode}
+        animationData={animationData}
+        autoplay={true}
+        loop={true}
+        style={{ width: "100%", height: "100%" }}
+      />
+    </Suspense>
+  );
+};
 
 export const ComingSoonPage = () => {
   return (
@@ -8,12 +32,9 @@ export const ComingSoonPage = () => {
       <PageTitle title="오픈 준비 중" />
       <PageLayout background="bg.subtle" gradient="gradient.bg.brand-main">
         <Content aria-labelledby="coming-soon-title">
-          <Icon
-            aria-hidden={true}
-            color="icon.tertiary"
-            icon="calendar-lined"
-            size={64}
-          />
+          <GraphicBox aria-hidden={true}>
+            <ComingSoonGraphic />
+          </GraphicBox>
           <CopyGroup>
             <Text
               align="center"
@@ -21,10 +42,12 @@ export const ComingSoonPage = () => {
               font="heading-m-b"
               id="coming-soon-title"
             >
-              곧 만나요
+              8월 1일부터 다시 볼 수 있어요!
             </Text>
             <Text align="center" as="p" color="text.secondary" font="body-m-m">
-              가이드런을 준비하고 있어요. 조금만 기다려 주세요.
+              리뉴얼을 준비하고 있어요.
+              <br />
+              조금만 기다려주세요.
             </Text>
           </CopyGroup>
         </Content>
@@ -34,18 +57,25 @@ export const ComingSoonPage = () => {
 };
 
 const Content = styled.section(({ theme }) => ({
-  display: 'flex',
-  minHeight: '100dvh',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: theme.spacing['2xl'],
-  boxSizing: 'border-box',
-  padding: `${theme.spacing['6xl']} ${theme.spacing['2xl']}`,
+  display: "flex",
+  minHeight: "100dvh",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: theme.spacing["2xl"],
+  boxSizing: "border-box",
+  padding: `${theme.spacing["6xl"]} ${theme.spacing["2xl"]}`,
+}));
+
+const GraphicBox = styled.div(({ theme }) => ({
+  display: "grid",
+  placeItems: "center",
+  width: theme.pxToRem(200),
+  height: theme.pxToRem(200),
 }));
 
 const CopyGroup = styled.div(({ theme }) => ({
-  display: 'grid',
+  display: "grid",
   gap: theme.spacing.md,
   maxWidth: theme.pxToRem(320),
 }));
