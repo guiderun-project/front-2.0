@@ -10,6 +10,7 @@ interface ImportMetaEnv {
   readonly VITE_MOCK_AUTHENTICATED?: 'true' | 'false';
   readonly VITE_POSTHOG_PROJECT_TOKEN?: string;
   readonly VITE_POSTHOG_HOST?: string;
+  readonly VITE_PRE_LAUNCH_GATE_ENABLED?: 'true' | 'false';
 }
 
 interface ImportMeta {

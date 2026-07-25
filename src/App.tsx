@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import styled from '@emotion/styled';
+import { useFeatureFlagEnabled } from '@posthog/react';
 import {
   Outlet,
   useLocation,
@@ -16,6 +17,7 @@ import {
 import { PageLayout } from '@/components/PageLayout';
 import { ToastViewport } from '@/components/Toast';
 import { useAuth } from '@/contexts';
+import { ComingSoonPage } from '@/pages/ComingSoonPage';
 import { APP_PATH } from '@/router/path';
 
 const FIRST_VISIT_STORAGE_KEY = 'guiderun.firstVisitSeen';
@@ -28,7 +30,14 @@ const FIRST_VISIT_REDIRECT_EXCLUDED_PATHS = [
   APP_PATH.TERMS,
 ] as const;
 
+// 오픈 전 게이트용 PostHog boolean flag. 모든 배포가 같은 PostHog 프로젝트
+// 토큰을 공유하므로, VITE_PRE_LAUNCH_GATE_ENABLED가 켜진 배포(Production)에서만
+// 이 flag 값을 실제로 반영한다. flag/네트워크가 아직 준비되지 않았을 때는
+// fail-open으로 실제 서비스를 노출한다.
+const PRE_LAUNCH_FEATURE_FLAG = 'pre-launch-mode';
+
 const App = () => {
+  const isServiceLive = useServiceLiveGate();
   const shouldRenderOutlet = useFirstVisitIntroGate();
 
   return (
@@ -36,7 +45,9 @@ const App = () => {
       <ScrollToTop />
       <RouteFocusManager />
       <MobileViewport>
-        {shouldRenderOutlet ? (
+        {!isServiceLive ? (
+          <ComingSoonPage />
+        ) : shouldRenderOutlet ? (
           <Outlet />
         ) : (
           <PageLayout background="bg.subtle" gradient="gradient.bg.brand-main">
@@ -51,6 +62,17 @@ const App = () => {
 };
 
 export default App;
+
+const useServiceLiveGate = (): boolean => {
+  const isPreLaunchGateEnabled =
+    import.meta.env.VITE_PRE_LAUNCH_GATE_ENABLED === 'true';
+  const isPreLaunchModeOn = useFeatureFlagEnabled(
+    PRE_LAUNCH_FEATURE_FLAG,
+    false,
+  );
+
+  return !isPreLaunchGateEnabled || !isPreLaunchModeOn;
+};
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
