@@ -36,7 +36,10 @@ const MAX_SEGMENT_LENGTH = 2;
 
 // 분/초는 0~59만 유효하다. (시는 상한을 두지 않는다.)
 const MINUTE_SECOND_MAX = 59;
-const CAPPED_SEGMENT_KEYS: ReadonlySet<SegmentKey> = new Set(["minutes", "seconds"]);
+const CAPPED_SEGMENT_KEYS: ReadonlySet<SegmentKey> = new Set([
+  "minutes",
+  "seconds",
+]);
 
 export const TimeInput = ({
   label,
@@ -105,8 +108,14 @@ export const TimeInput = ({
 
       commit({ ...current, [key]: next });
 
+      // 한 칸을 다 채우면 다음 칸으로 넘겨 연속 입력을 돕되, 다음 칸이 비어 있을 때만 넘긴다.
+      // 생성 흐름(시→분→초)에서는 다음 칸이 늘 비어 있어 그대로 넘어가나,
+      // 6자리가 다 찬 수정 흐름에서는 다음 칸에 이미 값이 있어 포커스를 뺏지 않고 방금 고친 칸에 머문다.
       if (isComplete && index < SEGMENTS.length - 1) {
-        segmentRefs.current[index + 1]?.focus();
+        const nextKey = SEGMENTS[index + 1].key;
+        if (current[nextKey].length === 0) {
+          segmentRefs.current[index + 1]?.focus();
+        }
       }
     };
 
@@ -131,12 +140,11 @@ export const TimeInput = ({
     input.setSelectionRange(end, end);
   };
 
-  // 박스 여백/구분자/라벨을 클릭하면 미완성 칸의 끝(비어 있으면 맨 앞)으로
-  // 포커스를 고정해 세 칸을 하나의 인풋처럼 다룬다. 단, 세그먼트 input을 직접
-  // 탭한 경우에는 브라우저 기본 포커스를 존중한다 — 스크린리더 더블탭은
-  // 접근성 포커스된 칸의 중앙에 합성 탭을 보내므로, 여기서 preventDefault 후
-  // 다른 칸으로 리다이렉트하면 VoiceOver/TalkBack 사용자가 선택한 칸이 아닌
-  // 칸으로 포커스가 튕긴다.
+  // input 바깥(박스 여백·구분자 `:`·칸 사이 간격·라벨)을 클릭했을 때만 실행되며,
+  // 세 칸을 하나의 인풋처럼 다루려고 포커스를 직접 지정한다.
+  // input 바깥엔 정해진 칸이 없어 아래 규칙으로 목표 칸을 정한다.
+  // input을 직접 탭한 경우는 early-return으로 브라우저 기본 포커스를 따른다
+  // 스크린리더 더블탭은 접근성 포커스된 칸 중앙에 합성 탭을 보내므로, 여기서 리다이렉트하면 선택한 칸이 아닌 칸으로 튕긴다.
   //
   // 세그먼트가 보이지 않는 상태(비어 있고 포커스도 없어 opacity:0)에서는
   // FieldBox 스타일이 [data-segments]의 pointer-events를 꺼서 탭이 이 핸들러로
@@ -154,12 +162,44 @@ export const TimeInput = ({
     const firstIncompleteIndex = SEGMENTS.findIndex(
       (segment) => current[segment.key].length < MAX_SEGMENT_LENGTH,
     );
+    // 미완성 칸이 있으면(주로 생성 흐름) 다음 입력 위치인 첫 미완성 칸으로 이동한다.
+    // 모든 칸이 다 찬 수정 흐름에서는 눌린 x좌표에 가장 가까운 칸으로 포커스해,
+    // 마지막 칸으로만 튕기지 않고 고치려는 칸을 바로 편집할 수 있게 한다.
     const targetIndex =
-      firstIncompleteIndex === -1 ? SEGMENTS.length - 1 : firstIncompleteIndex;
+      firstIncompleteIndex === -1
+        ? getNearestSegmentIndex(event.clientX)
+        : firstIncompleteIndex;
     const target = segmentRefs.current[targetIndex];
     target?.focus();
     const end = target?.value.length ?? 0;
     target?.setSelectionRange(end, end);
+  };
+
+  // 클릭한 x좌표에 가장 가까운 세그먼트 index 를 찾는다. 세그먼트 범위 안이면
+  // 거리 0, 밖이면 좌/우 가장자리까지의 거리로 비교한다. (여백·구분자·칸 사이
+  // 간격을 눌렀을 때도 방향에 맞는 칸을 고른다.)
+  const getNearestSegmentIndex = (clientX: number): number => {
+    let nearestIndex = SEGMENTS.length - 1;
+    let nearestDistance = Number.POSITIVE_INFINITY;
+
+    segmentRefs.current.forEach((node, index) => {
+      if (!node) {
+        return;
+      }
+      const rect = node.getBoundingClientRect();
+      const distance =
+        clientX < rect.left
+          ? rect.left - clientX
+          : clientX > rect.right
+            ? clientX - rect.right
+            : 0;
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestIndex = index;
+      }
+    });
+
+    return nearestIndex;
   };
 
   return (
