@@ -108,8 +108,14 @@ export const TimeInput = ({
 
       commit({ ...current, [key]: next });
 
+      // 한 칸을 다 채우면 다음 칸으로 넘겨 연속 입력을 돕되, 다음 칸이 비어 있을 때만 넘긴다.
+      // 생성 흐름(시→분→초)에서는 다음 칸이 늘 비어 있어 그대로 넘어가나,
+      // 6자리가 다 찬 수정 흐름에서는 다음 칸에 이미 값이 있어 포커스를 뺏지 않고 방금 고친 칸에 머문다.
       if (isComplete && index < SEGMENTS.length - 1) {
-        segmentRefs.current[index + 1]?.focus();
+        const nextKey = SEGMENTS[index + 1].key;
+        if (current[nextKey].length === 0) {
+          segmentRefs.current[index + 1]?.focus();
+        }
       }
     };
 
