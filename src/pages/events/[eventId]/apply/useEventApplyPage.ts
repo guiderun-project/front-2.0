@@ -5,7 +5,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { getApiErrorMessage, isNotFoundApiError } from '@/api/core';
+import {
+  ANALYTICS_EVENT,
+  getApiErrorMessage,
+  isNotFoundApiError,
+  trackEvent,
+} from '@/api/core';
 import { userQueryKeys } from '@/api/queryKeys';
 import { api } from '@/api/services';
 import type {
@@ -162,6 +167,7 @@ export const useEventApplyPage = () => {
     },
     onSuccess: () => {
       void invalidateEventQueries();
+      trackEvent(ANALYTICS_EVENT.APPLICATION_SUBMITTED, { eventId });
       setIsCompleted(true);
     },
     onError: (error) => {
