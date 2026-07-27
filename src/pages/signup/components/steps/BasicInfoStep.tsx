@@ -2,9 +2,9 @@ import { useId, type ReactElement } from 'react';
 
 import { Controller, useFormContext } from 'react-hook-form';
 
-import { DateInput, HiddenText, Input } from '@/components';
+import { HiddenText, Input } from '@/components';
 import { RUNNER_TYPE } from '@/constants';
-import { getTodayISODate, PHONE_DIGIT_LENGTH } from '@/utils';
+import { formatBirthDateInput, PHONE_DIGIT_LENGTH } from '@/utils';
 
 import {
   SIGNUP_FIELD,
@@ -51,15 +51,18 @@ export const BasicInfoStep = (): ReactElement => {
         control={control}
         name={SIGNUP_FIELD.BIRTH_DATE}
         render={({ field, fieldState }) => (
-          <DateInput
+          <Input
             aria-required={true}
             controlRef={field.ref}
             error={Boolean(fieldState.error)}
             errorText={fieldState.error?.message}
-            label="생년월일"
-            max={getTodayISODate()}
+            inputMode="numeric"
+            label="생년월일 8자리"
+            placeholder="YYYY.MM.DD"
             value={field.value}
-            onChange={field.onChange}
+            onChange={(event) =>
+              field.onChange(formatBirthDateInput(event.target.value))
+            }
           />
         )}
       />

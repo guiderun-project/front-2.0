@@ -7,17 +7,34 @@ export const getTodayISODate = (): string => {
   return `${year}-${month}-${day}`;
 };
 
-const ISO_DATE_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
-
 /**
- * ISO(YYYY-MM-DD) 생년월일이 실재하는 날짜이고 오늘 이전인지 검사한다.
- * date picker 는 값을 ISO 로 주므로 별도 변환 없이 이 함수로 검증한다.
+ * "YYYY.MM.DD" 입력 문자열의 최대 길이.
+ * 디자인상 점 뒤 공백이 있지만, 편집 가능한 input 은 표시값 = 스크린리더 낭독값이라
+ * 공백을 넣으면 SR 이 공백을 읽는다. 접근성 우선으로 값에는 공백을 두지 않는다.
  */
-export const isValidBirthDateISO = (isoDate: string): boolean => {
-  const match = ISO_DATE_PATTERN.exec(isoDate);
+export const BIRTH_DATE_MAX_LENGTH = 10;
+
+const BIRTH_DATE_DIGIT_LENGTH = 8;
+
+/** 입력값에서 숫자만 추출해 "YYYY.MM.DD" 형태로 만든다. */
+export const formatBirthDateInput = (raw: string): string => {
+  const digits = raw.replace(/\D/g, '').slice(0, BIRTH_DATE_DIGIT_LENGTH);
+
+  return [digits.slice(0, 4), digits.slice(4, 6), digits.slice(6, 8)]
+    .filter(Boolean)
+    .join('.');
+};
+
+/** ISO(YYYY-MM-DD) 날짜를 입력 표시용 "YYYY.MM.DD" 로 변환한다. */
+export const formatISODateToBirthDateInput = (isoDate: string): string =>
+  formatBirthDateInput(isoDate.replace(/-/g, ''));
+
+/** "YYYY.MM.DD" 입력값을 검증해 ISO(YYYY-MM-DD) 로 변환한다. 유효하지 않으면 null. */
+export const toBirthDateISO = (formatted: string): string | null => {
+  const match = /^(\d{4})\.(\d{2})\.(\d{2})$/.exec(formatted);
 
   if (!match) {
-    return false;
+    return null;
   }
 
   const [, year, month, day] = match;
@@ -26,7 +43,11 @@ export const isValidBirthDateISO = (isoDate: string): boolean => {
     date.getFullYear() === Number(year) &&
     date.getMonth() === Number(month) - 1 &&
     date.getDate() === Number(day);
+  const isoDate = `${year}-${month}-${day}`;
 
-  return isRealDate && isoDate <= getTodayISODate();
+  if (!isRealDate || isoDate > getTodayISODate()) {
+    return null;
+  }
+
+  return isoDate;
 };
-
