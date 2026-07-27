@@ -1,7 +1,9 @@
 import type { ReactElement, ReactNode } from 'react';
+import { useEffect } from 'react';
 
 import { Navigate, useLocation } from 'react-router-dom';
 
+import { ANALYTICS_EVENT, trackEvent } from '@/api/core';
 import type { UserInfoGetResponse } from '@/api/types';
 import { APPROVED_ROLES } from '@/constants';
 import { useAuth } from '@/contexts';
@@ -37,6 +39,19 @@ export const ProtectedRoute = ({
 }: ProtectedRouteProps): ReactElement | null => {
   const { user, isAuthReady } = useAuth();
   const location = useLocation();
+  const isBlockedByApproval =
+    isAuthReady && user !== null && !canAccessProtectedRoute(user, access);
+
+  useEffect(() => {
+    if (!isBlockedByApproval) {
+      return;
+    }
+
+    trackEvent(ANALYTICS_EVENT.APPROVAL_GATE_BLOCKED, {
+      requiredAccess: access,
+      pathname: location.pathname,
+    });
+  }, [access, isBlockedByApproval, location.pathname]);
 
   if (!isAuthReady) {
     return fallback ?? null;
