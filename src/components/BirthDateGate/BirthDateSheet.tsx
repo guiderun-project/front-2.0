@@ -7,12 +7,16 @@ import { getApiErrorMessage } from '@/api/core';
 import { api } from '@/api/services';
 import { useAuth } from '@/contexts';
 import { useAnnouncedMessage } from '@/hooks/useAnnouncedMessage';
-import { getTodayISODate, isValidBirthDateISO } from '@/utils';
+import {
+  BIRTH_DATE_MAX_LENGTH,
+  formatBirthDateInput,
+  toBirthDateISO,
+} from '@/utils';
 
 import { BottomSheet } from '../BottomSheet';
 import { Button } from '../Button';
 import { HiddenText } from '../HiddenText';
-import { DateInput } from '../Input';
+import { Input } from '../Input';
 
 const BIRTH_DATE_ERROR_MESSAGE = '올바른 생년월일을 입력해주세요';
 
@@ -38,8 +42,9 @@ export const BirthDateSheet = ({
     },
   });
 
-  const isoDate = isValidBirthDateISO(birthDate) ? birthDate : null;
-  const hasFormatError = birthDate.length > 0 && isoDate === null;
+  const isoDate = toBirthDateISO(birthDate);
+  const hasFormatError =
+    birthDate.length === BIRTH_DATE_MAX_LENGTH && isoDate === null;
   const errorText = isError
     ? getApiErrorMessage(
         error,
@@ -99,18 +104,20 @@ export const BirthDateSheet = ({
     >
       <HiddenText role="status">{announcedPendingMessage}</HiddenText>
       <Content>
-        <DateInput
+        <Input
           controlRef={birthDateInputRef}
           errorText={errorText}
-          label="생년월일"
-          max={getTodayISODate()}
+          inputMode="numeric"
+          label="생년월일 8자리"
+          maxLength={BIRTH_DATE_MAX_LENGTH}
+          placeholder="YYYY.MM.DD"
           value={birthDate}
-          onChange={(value) => {
+          onChange={(event) => {
             if (isError) {
               reset();
             }
 
-            setBirthDate(value);
+            setBirthDate(formatBirthDateInput(event.target.value));
           }}
         />
       </Content>
