@@ -11,7 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { getApiErrorMessage } from '@/api/core';
+import { ANALYTICS_EVENT, getApiErrorMessage, trackEvent } from '@/api/core';
 import { api } from '@/api/services';
 import {
   ConfirmPopup,
@@ -166,6 +166,9 @@ export const SignupPage = (): ReactElement => {
         body: toSignupRequest(values),
       });
       setIssuedAccessToken(response.accessToken);
+      trackEvent(ANALYTICS_EVENT.SIGNUP_COMPLETED, {
+        disabilityType: values.disabilityType,
+      });
       goNext();
     } catch (error) {
       window.alert(
