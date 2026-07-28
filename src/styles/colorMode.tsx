@@ -6,6 +6,8 @@ import {
   type ReactNode,
 } from 'react';
 
+import { registerSuperProperties } from '@/api/core';
+
 import { ColorModeContext } from './colorModeContext';
 import {
   applyDocumentColorMode,
@@ -46,6 +48,10 @@ export const ColorModeProvider = ({ children }: ColorModeProviderProps) => {
   useEffect(() => {
     applyDocumentColorMode(state.hasExplicitColorMode ? state.colorMode : null);
   }, [state.colorMode, state.hasExplicitColorMode]);
+
+  useEffect(() => {
+    registerSuperProperties({ colorMode: state.colorMode });
+  }, [state.colorMode]);
 
   useEffect(() => {
     if (state.hasExplicitColorMode || typeof window === 'undefined') {

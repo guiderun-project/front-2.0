@@ -7,8 +7,8 @@ import {
 } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
-import { getApiErrorMessage } from '@/api/core';
-import type { AttendanceParticipant } from '@/api/types';
+import { ANALYTICS_EVENT, getApiErrorMessage, trackEvent } from '@/api/core';
+import type { AttendanceParticipant, UserType } from '@/api/types';
 import { api } from '@/api/services';
 import { useToast } from '@/components';
 import { useAuth } from '@/contexts';
@@ -24,8 +24,12 @@ import { attendanceQueryKeys } from './queryKeys';
 import { useEventDetailRoute } from '../EventDetailRouteContext';
 import { canManageEventOperations } from '../utils/eventDetailPermissions';
 
+// participantName 과 participantType 은 API 입력이 아니라 낭독 문구·계측 속성용
+// 맥락 값이다. 성공 콜백에서 참가자 정보를 다시 조회하지 않도록 함께 실어 보낸다.
 type AttendanceMutationInput = {
+  isFirstParticipation: boolean;
   participantName: string;
+  participantType: UserType;
   userId: string;
 };
 
@@ -177,7 +181,7 @@ export const useEventAttendancePage = (eventId: number) => {
   const attendMutation = useMutation({
     mutationFn: ({ userId }: AttendanceMutationInput) =>
       api.attendance.attendPost({ eventId, userId }),
-    onSuccess: async (_, participant) => {
+    onSuccess: async (data, participant) => {
       const successMessage = `${participant.participantName}님 출석을 완료했어요`;
 
       announceAssertively(successMessage);
@@ -186,6 +190,16 @@ export const useEventAttendancePage = (eventId: number) => {
         icon: 'check-thick-lined',
         content: successMessage,
         announce: false,
+      });
+      // 계측 값은 옵셔널 체이닝으로 읽는다. 여기서 예외가 나면 성공 낭독 직후
+      // onError 가 실패를 덧낭독하고, 목록 갱신과 포커스 복구까지 건너뛴다.
+      // 계측 하나 때문에 성공한 출석이 실패로 안내되는 일은 없어야 한다.
+      trackEvent(ANALYTICS_EVENT.ATTENDANCE_CHECKED, {
+        attendedCountAfter: data?.summary?.attendedCount,
+        eventId,
+        isFirstParticipation: participant.isFirstParticipation,
+        participantType: participant.participantType,
+        waitingCountAfter: data?.summary?.waitingCount,
       });
       await invalidateAttendanceStatus();
       restoreFocusAfterUpdate(participant.userId);
@@ -208,7 +222,7 @@ export const useEventAttendancePage = (eventId: number) => {
   const cancelAttendanceMutation = useMutation({
     mutationFn: ({ userId }: AttendanceMutationInput) =>
       api.attendance.attendDelete({ eventId, userId }),
-    onSuccess: async (_, participant) => {
+    onSuccess: async (data, participant) => {
       const successMessage = `${participant.participantName}님 출석을 취소했어요`;
 
       announceAssertively(successMessage);
@@ -217,6 +231,12 @@ export const useEventAttendancePage = (eventId: number) => {
         icon: 'delete-lined',
         content: successMessage,
         announce: false,
+      });
+      trackEvent(ANALYTICS_EVENT.ATTENDANCE_CANCELED, {
+        attendedCountAfter: data?.summary?.attendedCount,
+        eventId,
+        participantType: participant.participantType,
+        waitingCountAfter: data?.summary?.waitingCount,
       });
       await invalidateAttendanceStatus();
       restoreFocusAfterUpdate(participant.userId);
@@ -247,7 +267,9 @@ export const useEventAttendancePage = (eventId: number) => {
       captureNextActionFocusTarget('waiting', participant.userId),
     );
     attendMutation.mutate({
+      isFirstParticipation: participant.isFirstParticipation,
       participantName: participant.name,
+      participantType: participant.type,
       userId: participant.userId,
     });
   };
@@ -263,7 +285,9 @@ export const useEventAttendancePage = (eventId: number) => {
       captureNextActionFocusTarget('attended', participant.userId),
     );
     cancelAttendanceMutation.mutate({
+      isFirstParticipation: participant.isFirstParticipation,
       participantName: participant.name,
+      participantType: participant.type,
       userId: participant.userId,
     });
   };

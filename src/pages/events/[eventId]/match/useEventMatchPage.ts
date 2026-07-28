@@ -7,7 +7,7 @@ import {
 } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
-import { getApiErrorMessage } from '@/api/core';
+import { ANALYTICS_EVENT, getApiErrorMessage, trackEvent } from '@/api/core';
 import type { UserType } from '@/api/types';
 import { api } from '@/api/services';
 import { useToast } from '@/components';
@@ -299,6 +299,14 @@ export const useEventMatchPage = (eventId: number) => {
         icon: 'check-thick-lined',
         content: MATCHING_COMPLETE_MESSAGE,
         announce: false,
+      });
+      const isReMatch = completedQuery.data.groups.some((group) =>
+        group.rows.some((row) => row.vi.userId === variables.viId),
+      );
+      trackEvent(ANALYTICS_EVENT.MATCHING_CREATED, {
+        eventId,
+        isReMatch,
+        waitingCountAfter: data.summary.waitingCount,
       });
       await invalidateMatchingQueries();
     },

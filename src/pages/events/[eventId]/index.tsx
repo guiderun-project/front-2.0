@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 
+import { ANALYTICS_EVENT, trackEvent } from "@/api/core";
 import {
   PageLayout,
   Tabs,
@@ -74,6 +75,10 @@ export const EventDetailPage = (): ReactElement => {
     canViewApplicants: canAccessProtectedTabs,
     eventId,
   });
+  const handleApplicantClick = (applicantId: string) => {
+    trackEvent(ANALYTICS_EVENT.APPLICANT_ROW_CLICKED, { eventId, applicantId });
+    openApplicantForm(applicantId);
+  };
   const navigationLeftAction: TopNavigationIconButtonProps = {
     icon: "chevron-left-lined",
     ariaLabel: "뒤로가기",
@@ -156,7 +161,7 @@ export const EventDetailPage = (): ReactElement => {
               isError={applicantsQuery.isError}
               isPending={applicantsQuery.isPending}
               onApplicantClick={
-                canManageEventActions ? openApplicantForm : undefined
+                canManageEventActions ? handleApplicantClick : undefined
               }
             />
           </Tabs.Panel>

@@ -3,6 +3,7 @@ import type { ReactElement } from 'react';
 import styled from '@emotion/styled';
 import { Link, useNavigate } from 'react-router-dom';
 
+import { ANALYTICS_EVENT, trackEvent } from '@/api/core';
 import {
   Button,
   Graphic,
@@ -27,11 +28,18 @@ export const IntroPage = (): ReactElement => {
       response_type: 'code',
     });
 
+    trackEvent(ANALYTICS_EVENT.INTRO_CTA_CLICKED, { variant: 'kakao' });
+
     window.location.href = `https://kauth.kakao.com/oauth/authorize?${params.toString()}`;
   };
 
   const handleIdLogin = () => {
+    trackEvent(ANALYTICS_EVENT.INTRO_CTA_CLICKED, { variant: 'id' });
     navigate(APP_PATH.LOGIN);
+  };
+
+  const handleBrowseClick = () => {
+    trackEvent(ANALYTICS_EVENT.INTRO_CTA_CLICKED, { variant: 'browse' });
   };
 
   return (
@@ -70,7 +78,7 @@ export const IntroPage = (): ReactElement => {
         </GuideRunInfoSection>
 
         <ActionSection>
-          <BrowseLink to={APP_PATH.HOME}>
+          <BrowseLink to={APP_PATH.HOME} onClick={handleBrowseClick}>
             <Text color="text.brand" font="body-m-sb">
               가입없이 둘러보기
             </Text>

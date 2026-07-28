@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
-import { getApiErrorMessage } from '@/api/core';
+import { ANALYTICS_EVENT, getApiErrorMessage, trackEvent } from '@/api/core';
 import { api } from '@/api/services';
 import { useToast } from '@/components';
 import { APP_PATH } from '@/router/path';
@@ -84,6 +84,10 @@ export const useEventManagementActions = ({
         });
 
         downloadCsvFile({ content, filename });
+        trackEvent(ANALYTICS_EVENT.ATTENDANCE_LIST_EXPORTED, {
+          eventId,
+          guideCount: items.length,
+        });
         onClose();
         // 다운로드 성공은 기존처럼 시각 UI 를 띄우지 않으므로,
         // 스크린리더 전용 라이브 리전으로만 완료를 안내한다.

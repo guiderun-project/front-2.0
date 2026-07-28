@@ -11,6 +11,7 @@ import {
   formatDday,
   formatDdayLabel,
   getDdayBadgeVariant,
+  trackUpcomingEventCardClick,
   type UpcomingMemberEvent,
 } from '@/pages/home/utils';
 
@@ -30,7 +31,11 @@ export const MemberUpcomingEventCard = ({
 
   return (
     <CardItem>
-      <CardLink aria-label={ariaLabel} to={APP_PATH.EVENT_DETAIL(event.id)}>
+      <CardLink
+        aria-label={ariaLabel}
+        onClick={() => trackUpcomingEventCardClick(event.id, 'member')}
+        to={APP_PATH.EVENT_DETAIL(event.id)}
+      >
         {/* 링크 접근 가능한 이름은 aria-label 로만 제공하고 내부 시각 콘텐츠는
             전부 aria-hidden 처리한다. iOS VoiceOver 는 aria-label 이 있어도
             링크 안 텍스트 블록이 여러 개면 개별 항목으로 쪼개 읽으므로,

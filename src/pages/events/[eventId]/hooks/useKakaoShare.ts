@@ -62,7 +62,7 @@ export const useKakaoShare = (): { shareLink: ShareLink } => {
 
       const baseUrl = getEventDetailBaseUrl();
       const eventDetailUrl = url ?? baseUrl;
-      const applicationStatusUrl = statusUrl ?? `${baseUrl}?section=matching`;
+      const applicationStatusUrl = statusUrl ?? `${baseUrl}?section=applicants`;
 
       // SDK 미초기화 등으로 Share 호출이 동기 예외를 던지면 스크린리더 사용자는
       // 실패를 알 수 없으므로, 기존 실패 경로와 동일하게 alert 로 안내한다.

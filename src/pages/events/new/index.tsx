@@ -5,6 +5,7 @@ import styled from '@emotion/styled';
 import { useForm, useFormState, useWatch } from 'react-hook-form';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
+import { ANALYTICS_EVENT, trackEvent } from '@/api/core';
 import type { EventType } from '@/api/types';
 import { BottomSheet, Button, HiddenText, PageLayout } from '@/components';
 import { APP_PATH } from '@/router/path';
@@ -177,6 +178,9 @@ export const EventNewPage = (): ReactElement => {
   ]);
 
   const handleSelectEventType = (nextEventType: EventType) => {
+    trackEvent(ANALYTICS_EVENT.EVENT_TYPE_SELECTED, {
+      eventType: nextEventType,
+    });
     setSearchParams(
       { type: getQueryValueFromEventType(nextEventType) },
       { replace: true },

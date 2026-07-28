@@ -2,6 +2,7 @@ import { useEffect, useRef, type ReactElement } from "react";
 
 import styled from "@emotion/styled";
 
+import { ANALYTICS_EVENT, trackEvent } from "@/api/core";
 import type { EventDetailResponse } from "@/api/types";
 import {
   FooterButton,
@@ -21,6 +22,13 @@ type EventApplyCompletedProps = {
   onViewEvent: () => void;
 };
 
+// 완료 화면의 이탈 경로는 이벤트 하나로 모으고 action 으로만 구분한다.
+type CompletedAction =
+  | "back"
+  | "view_event_top_nav"
+  | "add_calendar"
+  | "view_event_footer";
+
 export const EventApplyCompleted = ({
   event,
   onBack,
@@ -32,7 +40,31 @@ export const EventApplyCompleted = ({
     focusFirstHeading(completedContentRef.current);
   }, []);
 
+  const trackCompletedAction = (action: CompletedAction) => {
+    trackEvent(ANALYTICS_EVENT.APPLICATION_COMPLETED_ACTION, {
+      eventId: event.eventId,
+      action,
+    });
+  };
+
+  const handleBack = () => {
+    trackCompletedAction("back");
+    onBack();
+  };
+
+  const handleViewEventFromTopNav = () => {
+    trackCompletedAction("view_event_top_nav");
+    onViewEvent();
+  };
+
+  const handleViewEventFromFooter = () => {
+    trackCompletedAction("view_event_footer");
+    onViewEvent();
+  };
+
   const handleAddGoogleCalendar = () => {
+    trackCompletedAction("add_calendar");
+
     const calendarUrl = createGoogleCalendarEventUrl(event);
     const calendarWindow = window.open("", "_blank");
 
@@ -52,13 +84,13 @@ export const EventApplyCompleted = ({
           left={{
             ariaLabel: "이전 페이지로 이동",
             icon: "chevron-left-lined",
-            onClick: onBack,
+            onClick: handleBack,
           }}
           right={[
             {
               ariaLabel: "이벤트 상세로 이동",
               icon: "delete-lined",
-              onClick: onViewEvent,
+              onClick: handleViewEventFromTopNav,
             },
           ]}
         />
@@ -82,7 +114,7 @@ export const EventApplyCompleted = ({
             구글 캘린더에 일정 저장
             <HiddenText>새창 열림</HiddenText>
           </FooterButton.Button>
-          <FooterButton.Button size="l" onClick={onViewEvent}>
+          <FooterButton.Button size="l" onClick={handleViewEventFromFooter}>
             신청한 모임 보기
           </FooterButton.Button>
         </FooterButton>

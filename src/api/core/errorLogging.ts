@@ -1,14 +1,11 @@
 import posthog from 'posthog-js';
 
+import { isPostHogEnabled } from '@/api/core/analytics';
 import type { ApiError } from '@/api/core/apiError';
 import { isApiError } from '@/api/core/apiError';
 
 const IDENTIFIER_SEGMENT_PATTERN =
   /^(?:\d+|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|(?=.{8,}$)(?=.*\d)[A-Za-z0-9_-]+)$/i;
-
-const isPostHogEnabled = () => {
-  return Boolean(import.meta.env.VITE_POSTHOG_PROJECT_TOKEN);
-};
 
 export const captureApiError = (error: unknown) => {
   if (!isPostHogEnabled()) {

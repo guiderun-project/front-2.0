@@ -1,3 +1,4 @@
+import { ANALYTICS_EVENT, trackEvent } from "@/api/core";
 import type { UpcomingEventsGetResponse } from "@/api/types";
 
 export type UpcomingGuestEvent = Extract<
@@ -9,6 +10,17 @@ export type UpcomingMemberEvent = Extract<
   UpcomingEventsGetResponse,
   { viewerType: "MEMBER" }
 >["items"][number];
+
+// 게스트/회원 카드는 레이아웃만 다르고 같은 이벤트를 보내므로 viewer 만 구분한다.
+export const trackUpcomingEventCardClick = (
+  eventId: number,
+  variant: "guest" | "member",
+) => {
+  trackEvent(ANALYTICS_EVENT.UPCOMING_EVENT_CARD_CLICKED, {
+    eventId,
+    variant,
+  });
+};
 
 const WEEKDAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"] as const;
 

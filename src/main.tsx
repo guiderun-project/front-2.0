@@ -11,7 +11,11 @@ import {
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 
-import { captureApiError } from '@/api/core';
+import {
+  POSTHOG_PROJECT_TOKEN,
+  captureApiError,
+  registerSessionProperties,
+} from '@/api/core';
 import { baseURL } from '@/api/core/client';
 import { BirthDateGate } from '@/components/BirthDateGate';
 import { LoaderScreen } from '@/components/Loader';
@@ -45,7 +49,6 @@ const EVENT_DETAIL_RESERVED_PATHS = [
   APP_PATH.EVENT_SEARCH,
   APP_PATH.EVENT_SUPPORT,
 ] as const;
-const postHogProjectToken = import.meta.env.VITE_POSTHOG_PROJECT_TOKEN;
 const postHogOptions = {
   api_host: import.meta.env.VITE_POSTHOG_HOST,
   defaults: '2026-05-30',
@@ -54,6 +57,7 @@ const postHogOptions = {
     capture_unhandled_rejections: true,
     capture_console_errors: false,
   },
+  loaded: registerSessionProperties,
 } as const;
 
 type BootstrapLoaderState = {
@@ -154,12 +158,12 @@ const renderBootstrapLoader = () => {
 };
 
 const renderWithPostHogProvider = (children: ReactNode) => {
-  if (!postHogProjectToken) {
+  if (!POSTHOG_PROJECT_TOKEN) {
     return children;
   }
 
   return (
-    <PostHogProvider apiKey={postHogProjectToken} options={postHogOptions}>
+    <PostHogProvider apiKey={POSTHOG_PROJECT_TOKEN} options={postHogOptions}>
       {children}
     </PostHogProvider>
   );
