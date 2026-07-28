@@ -17,6 +17,9 @@ export const ANALYTICS_EVENT = {
   EVENT_TYPE_SELECTED: 'event_type_selected',
   EVENT_CREATED: 'event_created',
   MATCHING_CREATED: 'matching_created',
+  ATTENDANCE_CHECKED: 'attendance_checked',
+  ATTENDANCE_CANCELED: 'attendance_canceled',
+  ATTENDANCE_LIST_EXPORTED: 'attendance_list_exported',
   APPLICANT_ROW_CLICKED: 'applicant_row_clicked',
   UPCOMING_EVENT_CARD_CLICKED: 'upcoming_event_card_clicked',
 } as const;
