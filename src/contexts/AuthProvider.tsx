@@ -3,7 +3,11 @@ import { useCallback, useEffect, useMemo } from 'react';
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { identifyUser, isUnauthorizedApiError } from '@/api/core';
+import {
+  identifyUser,
+  isUnauthorizedApiError,
+  resetIdentity,
+} from '@/api/core';
 import { api } from '@/api/services';
 import type { UserInfoGetResponse } from '@/api/types';
 import {
@@ -101,6 +105,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
   const clearSession = useCallback(() => {
     clearAccessToken();
     queryClient.setQueryData(AUTH_USER_QUERY_KEY, null);
+    resetIdentity();
   }, [queryClient]);
 
   const startSession = useCallback(

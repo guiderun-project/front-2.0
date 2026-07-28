@@ -191,12 +191,15 @@ export const useEventAttendancePage = (eventId: number) => {
         content: successMessage,
         announce: false,
       });
+      // 계측 값은 옵셔널 체이닝으로 읽는다. 여기서 예외가 나면 성공 낭독 직후
+      // onError 가 실패를 덧낭독하고, 목록 갱신과 포커스 복구까지 건너뛴다.
+      // 계측 하나 때문에 성공한 출석이 실패로 안내되는 일은 없어야 한다.
       trackEvent(ANALYTICS_EVENT.ATTENDANCE_CHECKED, {
-        attendedCountAfter: data.summary.attendedCount,
+        attendedCountAfter: data?.summary?.attendedCount,
         eventId,
         isFirstParticipation: participant.isFirstParticipation,
         participantType: participant.participantType,
-        waitingCountAfter: data.summary.waitingCount,
+        waitingCountAfter: data?.summary?.waitingCount,
       });
       await invalidateAttendanceStatus();
       restoreFocusAfterUpdate(participant.userId);
@@ -230,10 +233,10 @@ export const useEventAttendancePage = (eventId: number) => {
         announce: false,
       });
       trackEvent(ANALYTICS_EVENT.ATTENDANCE_CANCELED, {
-        attendedCountAfter: data.summary.attendedCount,
+        attendedCountAfter: data?.summary?.attendedCount,
         eventId,
         participantType: participant.participantType,
-        waitingCountAfter: data.summary.waitingCount,
+        waitingCountAfter: data?.summary?.waitingCount,
       });
       await invalidateAttendanceStatus();
       restoreFocusAfterUpdate(participant.userId);
