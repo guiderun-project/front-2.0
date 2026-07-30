@@ -1,40 +1,49 @@
 import type { ReactElement } from 'react';
 
 import styled from '@emotion/styled';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
-import { Button, Icon, PageLayout, Text } from '@/components';
+import { ANALYTICS_EVENT, trackEvent } from '@/api/core';
+import {
+  Button,
+  Graphic,
+  HiddenText,
+  Icon,
+  PageLayout,
+  Text,
+} from '@/components';
 import { APP_PATH } from '@/router/path';
-import { useColorMode } from '@/styles/useColorMode';
 
-import introRunnersDark from './assets/intro-runners-dark.png';
-import introRunners from './assets/intro-runners.png';
 import { KakaoLoginButton } from './components/KakaoLoginButton';
 
 const GUIDERUN_LANDING_URL = 'https://about.guiderun.org/';
 
 export const IntroPage = (): ReactElement => {
   const navigate = useNavigate();
-  const { colorMode } = useColorMode();
-
-  const handleGuideRunInfoClick = () => {
-    window.open(GUIDERUN_LANDING_URL, '_blank', 'noopener,noreferrer');
-  };
-
-  const handleBrowseWithoutSignup = () => {
-    navigate(APP_PATH.HOME);
-  };
 
   const handleKakaoLogin = () => {
-    // TODO: 카카오 OAuth 인증 URL로 리다이렉트
+    const params = new URLSearchParams({
+      client_id: import.meta.env.VITE_KAKAO_REST_API_KEY ?? '',
+      redirect_uri: import.meta.env.VITE_KAKAO_REDIRECT_URI ?? '',
+      response_type: 'code',
+    });
+
+    trackEvent(ANALYTICS_EVENT.INTRO_CTA_CLICKED, { variant: 'kakao' });
+
+    window.location.href = `https://kauth.kakao.com/oauth/authorize?${params.toString()}`;
   };
 
   const handleIdLogin = () => {
+    trackEvent(ANALYTICS_EVENT.INTRO_CTA_CLICKED, { variant: 'id' });
     navigate(APP_PATH.LOGIN);
   };
 
+  const handleBrowseClick = () => {
+    trackEvent(ANALYTICS_EVENT.INTRO_CTA_CLICKED, { variant: 'browse' });
+  };
+
   return (
-    <PageLayout background="gradient.bg.brand-main">
+    <PageLayout background="bg.subtle" gradient="gradient.bg.brand-main">
       <Content>
         <TitleSection>
           <Text align="center" as="h1" font="heading-m-sb">
@@ -47,31 +56,33 @@ export const IntroPage = (): ReactElement => {
           </Text>
         </TitleSection>
 
-        <Illustration
-          alt="끈으로 연결되어 함께 달리는 두 러너"
-          src={colorMode === 'light' ? introRunners : introRunnersDark}
-        />
+        <Illustration aria-hidden={true} color="icon.primary" graphic="welcome" />
 
         <GuideRunInfoSection>
-          <GuideRunInfoButton type="button" onClick={handleGuideRunInfoClick}>
-            <Text align="center" color="text.tertiary" font="body-s-sb">
+          <GuideRunInfoLink
+            href={GUIDERUN_LANDING_URL}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            <Text align="center" color="text.primary" font="body-s-sb">
               가이드런 알아보기
+              <HiddenText>새창 열림</HiddenText>
             </Text>
             <Icon
               aria-hidden={true}
-              color="text.tertiary"
+              color="text.primary"
               icon="external-link-lined"
               size={16}
             />
-          </GuideRunInfoButton>
+          </GuideRunInfoLink>
         </GuideRunInfoSection>
 
         <ActionSection>
-          <BrowseLinkButton type="button" onClick={handleBrowseWithoutSignup}>
+          <BrowseLink to={APP_PATH.HOME} onClick={handleBrowseClick}>
             <Text color="text.brand" font="body-m-sb">
               가입없이 둘러보기
             </Text>
-          </BrowseLinkButton>
+          </BrowseLink>
 
           <LoginButtonGroup>
             <KakaoLoginButton onClick={handleKakaoLogin} />
@@ -105,12 +116,8 @@ const TitleSection = styled.section`
     `${theme.spacing['6xl']} ${theme.spacing['2xl']} ${theme.spacing['4xl']}`};
 `;
 
-const Illustration = styled.img`
-  width: ${({ theme }) => theme.pxToRem(299)};
-  height: ${({ theme }) => theme.pxToRem(120)};
+const Illustration = styled(Graphic)`
   align-self: center;
-  object-fit: contain;
-  image-rendering: pixelated;
 `;
 
 const GuideRunInfoSection = styled.section`
@@ -119,17 +126,19 @@ const GuideRunInfoSection = styled.section`
   padding: ${({ theme }) => `${theme.spacing.xl} ${theme.spacing['2xl']}`};
 `;
 
-const GuideRunInfoButton = styled.button`
+const GuideRunInfoLink = styled.a`
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: ${({ theme }) => theme.spacing.md};
   padding: ${({ theme }) => `${theme.spacing.xl} ${theme.spacing['3xl']}`};
-  border: 1px solid ${({ theme }) => theme.color.border.default};
+  border: ${({ theme }) => theme.pxToRem(1.4)} solid
+    ${({ theme }) => theme.color.border.strong};
   border-radius: ${({ theme }) => theme.radius.full};
-  background-color: transparent;
+  background-color: ${({ theme }) => theme.color.bg.subtle};
   cursor: pointer;
   appearance: none;
+  text-decoration: none;
 
   &:focus-visible {
     outline: 2px solid ${({ theme }) => theme.color.border.focused};
@@ -148,13 +157,15 @@ const ActionSection = styled.section`
     `${theme.spacing.xl} ${theme.spacing['2xl']} ${theme.spacing.xl}`};
 `;
 
-const BrowseLinkButton = styled.button`
+const BrowseLink = styled(Link)`
+  display: inline-block;
   padding: ${({ theme }) => `${theme.pxToRem(3)} 0`};
   border: 0;
   border-bottom: 1px solid ${({ theme }) => theme.color.text.brand};
   background-color: transparent;
   cursor: pointer;
   appearance: none;
+  text-decoration: none;
 
   &:focus-visible {
     outline: 2px solid ${({ theme }) => theme.color.border.focused};

@@ -1,14 +1,19 @@
-import type { ReactElement } from 'react';
-import { useMemo } from 'react';
+import type { KeyboardEvent, ReactElement } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import styled from '@emotion/styled';
-import { Controller, type UseFormReturn } from 'react-hook-form';
+import {
+  Controller,
+  type SubmitErrorHandler,
+  type UseFormReturn,
+} from 'react-hook-form';
 
 import type { EventDetailResponse, UserInfoGetResponse } from '@/api/types';
 import {
   Badge,
   FooterButton,
   FormPageLayout,
+  HiddenText,
   Input,
   PageLayout,
   Select,
@@ -28,13 +33,22 @@ import {
   GROUP_TRAINING_OPTIONS,
   type EventApplyGroupValue,
 } from './constants';
+import { focusFirstHeading } from './focusFirstHeading';
 import type { EventApplyFormValues } from './schema';
+import {
+  getFirstInvalidEventApplyFieldName,
+  type EventApplyInvalidFocusFieldName,
+} from './validationFocus';
+
+const AGREEMENT_ANNOUNCE_DELAY_MS = 150;
 
 type EventApplyFormProps = {
   event: EventDetailResponse;
   form: UseFormReturn<EventApplyFormValues>;
+  hasJustAgreedTrainingSafety: boolean;
   isEditMode: boolean;
   isSubmitting: boolean;
+  submitErrorCount: number;
   user: UserInfoGetResponse;
   onBack: () => void;
   onSubmit: (values: EventApplyFormValues) => void;
@@ -43,8 +57,10 @@ type EventApplyFormProps = {
 export const EventApplyForm = ({
   event,
   form,
+  hasJustAgreedTrainingSafety,
   isEditMode,
   isSubmitting,
+  submitErrorCount,
   user,
   onBack,
   onSubmit,
@@ -57,6 +73,113 @@ export const EventApplyForm = ({
     () => createPrimarySelectOptions(event, user),
     [event, user],
   );
+  const [invalidFocusRequest, setInvalidFocusRequest] = useState<{
+    id: number;
+    fieldName?: EventApplyInvalidFocusFieldName;
+  }>({ id: 0 });
+  const submitButtonRef = useRef<HTMLButtonElement>(null);
+  // 면책 동의 저장 안내. 상시 마운트된 status 리전을 빈 상태로 두고 잠시 후
+  // 텍스트를 주입해야 iOS VoiceOver/TalkBack이 변경을 안정적으로 낭독한다.
+  const [agreementAnnouncement, setAgreementAnnouncement] = useState('');
+
+  // 로딩 화면(또는 면책 동의 시트)이 폼으로 교체될 때 스크린리더가 전환을
+  // 인지하도록 페이지 제목 h1으로 포커스를 옮긴다(EventApplyCompleted와 동일 패턴).
+  useEffect(() => {
+    const frameId = window.requestAnimationFrame(() => {
+      focusFirstHeading(document.querySelector('main'));
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!hasJustAgreedTrainingSafety) {
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setAgreementAnnouncement(
+        '동의가 저장되어 신청서 입력 화면으로 이동했어요.',
+      );
+    }, AGREEMENT_ANNOUNCE_DELAY_MS);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [hasJustAgreedTrainingSafety]);
+
+  // 제출 실패 시 포커스가 body(alert 닫힘)로 떨어지지 않도록 제출 버튼으로
+  // 복귀시킨다. 이 effect 시점에는 unlockSubmit 이 반영되어 버튼이 다시
+  // 활성화된 뒤라 rAF 후 focus 가 실제로 동작한다.
+  useEffect(() => {
+    if (submitErrorCount === 0) {
+      return undefined;
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
+      submitButtonRef.current?.focus();
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+    };
+  }, [submitErrorCount]);
+
+  useEffect(() => {
+    const fieldName = invalidFocusRequest.fieldName;
+
+    if (!fieldName) {
+      return undefined;
+    }
+
+    const activeElement = document.activeElement;
+
+    if (activeElement instanceof HTMLElement) {
+      activeElement.blur();
+    }
+
+    const animationFrameId = window.requestAnimationFrame(() => {
+      form.setFocus(fieldName);
+    });
+
+    return () => {
+      window.cancelAnimationFrame(animationFrameId);
+    };
+  }, [form, invalidFocusRequest]);
+
+  const handleInvalidSubmit: SubmitErrorHandler<EventApplyFormValues> = (
+    errors,
+  ) => {
+    const invalidFieldName = getFirstInvalidEventApplyFieldName({
+      additionalQuestions: event.additionalQuestions,
+      errors,
+    });
+
+    if (!invalidFieldName) {
+      return;
+    }
+
+    setInvalidFocusRequest((previous) => ({
+      id: previous.id + 1,
+      fieldName: invalidFieldName,
+    }));
+  };
+
+  // 단일 라인 입력에서 Enter 로 폼이 암묵적으로 제출되는 것을 막는다.
+  // IME 조합 중에는 무시하고, textarea 줄바꿈과 버튼 동작은 그대로 둔다.
+  const handleFormKeyDown = (event: KeyboardEvent<HTMLFormElement>) => {
+    if (
+      event.key !== 'Enter' ||
+      event.nativeEvent.isComposing ||
+      !(event.target instanceof HTMLInputElement)
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+  };
 
   return (
     <PageLayout background="bg.subtle">
@@ -84,7 +207,11 @@ export const EventApplyForm = ({
           ],
         }}
       >
-        <Form noValidate onSubmit={form.handleSubmit(onSubmit)}>
+        <Form
+          noValidate
+          onKeyDown={handleFormKeyDown}
+          onSubmit={form.handleSubmit(onSubmit, handleInvalidSubmit)}
+        >
           <FormSection>
             <SectionHeader>
               <Text as="h2" color="text.secondary" font="body-m-sb">
@@ -102,6 +229,7 @@ export const EventApplyForm = ({
                     label={primarySelectLabel}
                     options={primarySelectOptions}
                     placeholder={primarySelectLabel}
+                    required
                     sheetTitle={primarySelectLabel}
                     triggerRef={field.ref}
                     value={field.value}
@@ -169,8 +297,14 @@ export const EventApplyForm = ({
             </FieldStack>
           </FormSection>
 
+          <HiddenText role="status">{agreementAnnouncement}</HiddenText>
+          <HiddenText role="status">
+            {isSubmitting ? '신청서를 제출하고 있어요.' : ''}
+          </HiddenText>
+
           <FooterButton>
             <FooterButton.Button
+              ref={submitButtonRef}
               disabled={isSubmitting}
               fullWidth
               size="l"

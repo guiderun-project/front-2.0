@@ -84,9 +84,9 @@ const CheckBoxVisual = styled.span`
   width: 100%;
   height: 100%;
   place-items: center;
-  border: 1.2px solid ${({ theme }) => theme.color.border.default};
+  border: 1.4px solid ${({ theme }) => theme.color.border.default};
   border-radius: ${({ theme }) => theme.radius.sm};
-  background-color: transparent;
+  background-color: ${({ theme }) => theme.color.bg.default};
   pointer-events: none;
   transition:
     background-color 120ms ease-out,

@@ -1,16 +1,17 @@
-import type { ReactElement } from 'react';
+import { useId, type ReactElement } from 'react';
 
 import { keyframes } from '@emotion/react';
 import styled from '@emotion/styled';
 
-import type { MatchingWaitingParticipant } from '@/api/types';
-import { IconButton, Text } from '@/components';
+import { HiddenText, IconButton, Text } from '@/components';
+
+import type { SelectablePerson } from '../useEventMatchPage';
 
 type MatchSelectionBarProps = {
   canCreateMatching: boolean;
   isCreatingMatching: boolean;
-  selectedGuides: MatchingWaitingParticipant[];
-  selectedVi: MatchingWaitingParticipant | null;
+  selectedGuides: SelectablePerson[];
+  selectedVi: SelectablePerson | null;
   onClear: () => void;
   onCreateMatching: () => void;
 };
@@ -23,6 +24,7 @@ export const MatchSelectionBar = ({
   onClear,
   onCreateMatching,
 }: MatchSelectionBarProps): ReactElement | null => {
+  const selectionLabelId = useId();
   const hasSelection = selectedVi !== null || selectedGuides.length > 0;
 
   if (!hasSelection) {
@@ -30,13 +32,21 @@ export const MatchSelectionBar = ({
   }
 
   const actionText = canCreateMatching ? '이대로 매칭하기' : '파트너를 선택해주세요';
-  const isActionDisabled = !canCreateMatching || isCreatingMatching;
+  const isActionDisabled = !canCreateMatching;
+  const selectionDescription = getSelectionDescription(
+    selectedVi,
+    selectedGuides,
+  );
 
   return (
     <FixedSelectionArea>
-      <SelectionPanel aria-label="선택된 매칭 참가자">
+      <SelectionPanel aria-labelledby={selectionLabelId} role="group">
+        {/* 그룹 라벨(aria-labelledby)은 iOS VoiceOver가 낭독하지 않으므로,
+            '선택 현황' 맥락을 아래 낭독용 문장 앞에 직접 포함해 확실히 전달한다. */}
+        <HiddenText id={selectionLabelId}>선택 현황</HiddenText>
         <SelectionContent>
-          <SelectionItems>
+          <HiddenText>{`선택 현황, ${selectionDescription}`}</HiddenText>
+          <SelectionItems aria-hidden={true}>
             <SelectionItem
               isPlaceholder={selectedVi === null}
               label="시각장애러너"
@@ -60,9 +70,9 @@ export const MatchSelectionBar = ({
             )}
           </SelectionItems>
           <SelectionClearButton
-            aria-label="선택한 참가자 모두 해제"
+            aria-label="선택 모두 해제"
             color="badge.text.primitive"
-            icon="delete-lined"
+            icon="close-lined"
             iconSize={19.2}
             shape="round"
             size={32}
@@ -70,6 +80,7 @@ export const MatchSelectionBar = ({
           />
         </SelectionContent>
         <SelectionActionButton
+          aria-busy={isCreatingMatching || undefined}
           disabled={isActionDisabled}
           type="button"
           onClick={onCreateMatching}
@@ -79,6 +90,20 @@ export const MatchSelectionBar = ({
       </SelectionPanel>
     </FixedSelectionArea>
   );
+};
+
+const getSelectionDescription = (
+  selectedVi: SelectablePerson | null,
+  selectedGuides: SelectablePerson[],
+) => {
+  const viDescription = selectedVi
+    ? `시각장애러너 ${selectedVi.name}`
+    : '시각장애러너 선택전';
+  const guideDescription = selectedGuides.length > 0
+    ? `가이드러너 ${selectedGuides.map((guide) => guide.name).join(', ')}`
+    : '가이드러너 선택전';
+
+  return `${viDescription}, ${guideDescription}`;
 };
 
 type SelectionItemProps = {
@@ -126,7 +151,7 @@ const FixedSelectionArea = styled.div(({ theme }) => ({
   transform: 'translateX(-50%)',
 }));
 
-const SelectionPanel = styled.aside(({ theme }) => ({
+const SelectionPanel = styled.div(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   gap: theme.spacing.lg,

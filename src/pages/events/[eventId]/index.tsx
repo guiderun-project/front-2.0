@@ -1,52 +1,67 @@
-import type { ReactElement } from 'react';
+import type { ReactElement } from "react";
 
+import { ANALYTICS_EVENT, trackEvent } from "@/api/core";
 import {
   PageLayout,
   Tabs,
   TopNavigation,
   type TopNavigationIconButtonProps,
-} from '@/components';
+} from "@/components";
 
-import { ApplicantFormSheet } from './components/ApplicantFormSheet';
-import { ApplicantsPanel } from './components/ApplicantsPanel';
-import { DetailPanel } from './components/DetailPanel';
-import { EventDetailCta } from './components/EventDetailCta';
-import { EventHero } from './components/EventHero';
-import { ManagementMenuSheet } from './components/ManagementMenuSheet';
-import { MatchingPanel } from './components/MatchingPanel';
-import { PageState } from './components/PanelState';
-import { RestrictedAccessSheet } from './components/RestrictedAccessSheet';
-import { EVENT_DETAIL_TABS } from './constants';
-import { useEventApplicants } from './hooks/useEventApplicants';
-import { useEventDetailPage } from './hooks/useEventDetailPage';
-import { useEventMatchingStatus } from './hooks/useEventMatchingStatus';
+import { ApplicantFormSheet } from "./components/ApplicantFormSheet";
+import { ApplicantsPanel } from "./components/ApplicantsPanel";
+import { DetailPanel } from "./components/DetailPanel";
+import { EventDetailCta } from "./components/EventDetailCta";
+import { EventHero } from "./components/EventHero";
+import { ManagementMenuSheet } from "./components/ManagementMenuSheet";
+import { MatchingPanel } from "./components/MatchingPanel";
+import { PageState } from "./components/PanelState";
+import { RestrictedAccessSheet } from "./components/RestrictedAccessSheet";
+import { TrainingSafetyPermissionSheet } from "./components/TrainingSafetyPermissionSheet";
+import { EVENT_DETAIL_TABS } from "./constants";
+import { useEventApplicants } from "./hooks/useEventApplicants";
+import { useEventDetailPage } from "./hooks/useEventDetailPage";
+import { useEventMatchingStatus } from "./hooks/useEventMatchingStatus";
+import { useNavigate } from "react-router-dom";
 
 export const EventDetailPage = (): ReactElement => {
+  const navigate = useNavigate();
   const {
     activeTab,
     canAccessProtectedTabs,
-    canManageEvent,
+    canExtractAttendanceList,
+    canManageEventActions,
+    canManagePost,
+    canOpenManagementSheet,
     closeManagementSheet,
     closeRestrictedSheet,
+    closeTrainingSafetySheet,
     event,
     eventId,
+    handleApply,
     handleBack,
     handleCopyLink,
     handleKakaoShare,
     handleLogin,
     handleTabSelectionChange,
+    handleTrainingSafetyAgreement,
     isApprovalPending,
+    isApplyPermissionChecking,
     isAuthenticated,
+    isOrganizer,
     isManagementSheetOpen,
     isRestrictedSheetOpen,
+    isTrainingSafetyAgreementPending,
+    isTrainingSafetySheetOpen,
     isValidEventId,
     openManagementSheet,
     openRestrictedSheet,
+    shouldShowOperationActionsInMenu,
   } = useEventDetailPage();
   const matchingStatus = useEventMatchingStatus({
     eventId,
     enabled:
-      isValidEventId && canAccessProtectedTabs && activeTab === 'matching',
+      isValidEventId && canAccessProtectedTabs && activeTab === "matching",
   });
   const {
     applicantFormQuery,
@@ -56,26 +71,36 @@ export const EventDetailPage = (): ReactElement => {
     selectedApplicantId,
   } = useEventApplicants({
     activeTab,
-    canViewApplicantForm: canManageEvent,
+    canViewApplicantForm: canManageEventActions,
     canViewApplicants: canAccessProtectedTabs,
     eventId,
   });
+  const handleApplicantClick = (applicantId: string) => {
+    trackEvent(ANALYTICS_EVENT.APPLICANT_ROW_CLICKED, { eventId, applicantId });
+    openApplicantForm(applicantId);
+  };
   const navigationLeftAction: TopNavigationIconButtonProps = {
-    icon: 'chevron-left-lined',
-    ariaLabel: '뒤로가기',
+    icon: "chevron-left-lined",
+    ariaLabel: "뒤로가기",
     onClick: handleBack,
   };
   const navigationRightActions: TopNavigationIconButtonProps[] = [
     {
-      icon: 'share-lined',
-      ariaLabel: '카카오톡 공유하기 새창 열림',
+      icon: "home-lined",
+      ariaLabel: "홈으로 이동",
+      onClick: () => navigate("/"),
+    },
+    {
+      icon: "share-lined",
+      ariaLabel: "카카오톡 공유하기 새창 열림",
       onClick: handleKakaoShare,
     },
-    ...(canManageEvent
+    ...(canOpenManagementSheet
       ? [
           {
-            icon: 'more-vertical-lined',
-            ariaLabel: '더보기',
+            icon: "more-vertical-lined",
+            ariaLabel: "이벤트 관리 메뉴",
+            "aria-haspopup": "dialog",
             onClick: openManagementSheet,
           } satisfies TopNavigationIconButtonProps,
         ]
@@ -84,7 +109,10 @@ export const EventDetailPage = (): ReactElement => {
 
   if (!isValidEventId) {
     return (
-      <PageLayout background="gradient.bg.brand-event">
+      <PageLayout
+        background="bg.brand-event"
+        gradient="gradient.bg.brand-event"
+      >
         <TopNavigation
           aria-label="이벤트 상세 상단 메뉴"
           left={navigationLeftAction}
@@ -96,7 +124,7 @@ export const EventDetailPage = (): ReactElement => {
   }
 
   return (
-    <PageLayout background="gradient.bg.brand-event">
+    <PageLayout background="bg.brand-event" gradient="gradient.bg.brand-event">
       <TopNavigation
         aria-label="이벤트 상세 상단 메뉴"
         left={navigationLeftAction}
@@ -104,8 +132,11 @@ export const EventDetailPage = (): ReactElement => {
       />
       <EventHero event={event} />
 
-      <Tabs selectedKey={activeTab} onSelectionChange={handleTabSelectionChange}>
-        <Tabs.List>
+      <Tabs
+        selectedKey={activeTab}
+        onSelectionChange={handleTabSelectionChange}
+      >
+        <Tabs.List aria-label="이벤트 상세 정보">
           {EVENT_DETAIL_TABS.map((tab) => (
             <Tabs.Tab key={tab.id} id={tab.id}>
               {tab.label}
@@ -124,16 +155,20 @@ export const EventDetailPage = (): ReactElement => {
           <Tabs.Panel id="applicants">
             <ApplicantsPanel
               data={applicantsQuery.data}
+              error={applicantsQuery.error}
               eventCategory={event.eventCategory}
               eventType={event.eventType}
               isError={applicantsQuery.isError}
               isPending={applicantsQuery.isPending}
-              onApplicantClick={canManageEvent ? openApplicantForm : undefined}
+              onApplicantClick={
+                canManageEventActions ? handleApplicantClick : undefined
+              }
             />
           </Tabs.Panel>
           <Tabs.Panel id="matching">
             <MatchingPanel
               data={matchingStatus.data}
+              error={matchingStatus.error}
               eventCategory={event.eventCategory}
               eventType={event.eventType}
               isError={matchingStatus.isError}
@@ -146,8 +181,10 @@ export const EventDetailPage = (): ReactElement => {
 
       <EventDetailCta
         canAccessProtectedTabs={canAccessProtectedTabs}
-        canManageEvent={canManageEvent}
         event={event}
+        isApplyPermissionChecking={isApplyPermissionChecking}
+        isEventOrganizer={isOrganizer}
+        onApply={handleApply}
         onRestrictedAccess={openRestrictedSheet}
       />
 
@@ -159,14 +196,25 @@ export const EventDetailPage = (): ReactElement => {
         onLogin={handleLogin}
       />
       <ManagementMenuSheet
+        canExtractAttendanceList={canExtractAttendanceList}
+        canManagePost={canManagePost}
         eventDate={event.schedule.date}
         eventId={eventId}
         eventName={event.name}
         open={isManagementSheetOpen}
+        recruitStatus={event.recruitStatus}
+        showOperationActions={shouldShowOperationActionsInMenu}
         onClose={closeManagementSheet}
+      />
+      <TrainingSafetyPermissionSheet
+        isSubmitting={isTrainingSafetyAgreementPending}
+        open={isTrainingSafetySheetOpen}
+        onAgree={handleTrainingSafetyAgreement}
+        onClose={closeTrainingSafetySheet}
       />
       <ApplicantFormSheet
         data={applicantFormQuery.data}
+        error={applicantFormQuery.error}
         eventCategory={event.eventCategory}
         eventType={event.eventType}
         isError={applicantFormQuery.isError}

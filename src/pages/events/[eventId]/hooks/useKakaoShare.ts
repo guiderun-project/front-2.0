@@ -62,50 +62,56 @@ export const useKakaoShare = (): { shareLink: ShareLink } => {
 
       const baseUrl = getEventDetailBaseUrl();
       const eventDetailUrl = url ?? baseUrl;
-      const applicationStatusUrl = statusUrl ?? `${baseUrl}?section=matching`;
+      const applicationStatusUrl = statusUrl ?? `${baseUrl}?section=applicants`;
 
-      if (organizer === KAKAO_DEFAULT_TEMPLATE_ORGANIZER) {
-        kakao.Share.sendDefault({
-          objectType: 'feed',
-          content: {
-            title,
-            description: content,
-            imageUrl: KAKAO_SHARE_IMAGE_URL,
-            link: {
-              mobileWebUrl: eventDetailUrl,
-              webUrl: eventDetailUrl,
-            },
-          },
-          buttons: [
-            {
-              title: '이벤트 상세',
+      // SDK 미초기화 등으로 Share 호출이 동기 예외를 던지면 스크린리더 사용자는
+      // 실패를 알 수 없으므로, 기존 실패 경로와 동일하게 alert 로 안내한다.
+      try {
+        if (organizer === KAKAO_DEFAULT_TEMPLATE_ORGANIZER) {
+          kakao.Share.sendDefault({
+            objectType: 'feed',
+            content: {
+              title,
+              description: content,
+              imageUrl: KAKAO_SHARE_IMAGE_URL,
               link: {
                 mobileWebUrl: eventDetailUrl,
                 webUrl: eventDetailUrl,
               },
             },
-            {
-              title: '신청 현황',
-              link: {
-                mobileWebUrl: applicationStatusUrl,
-                webUrl: applicationStatusUrl,
+            buttons: [
+              {
+                title: '이벤트 상세',
+                link: {
+                  mobileWebUrl: eventDetailUrl,
+                  webUrl: eventDetailUrl,
+                },
               },
-            },
-          ],
-        });
-        return;
-      }
+              {
+                title: '신청 현황',
+                link: {
+                  mobileWebUrl: applicationStatusUrl,
+                  webUrl: applicationStatusUrl,
+                },
+              },
+            ],
+          });
+          return;
+        }
 
-      kakao.Share.sendCustom({
-        templateId: KAKAO_CUSTOM_TEMPLATE_ID,
-        templateArgs: {
-          title,
-          content,
-          REGI_WEB_DOMAIN: eventDetailUrl,
-          EVENT_URL: eventDetailUrl,
-          STATUS_URL: applicationStatusUrl,
-        },
-      });
+        kakao.Share.sendCustom({
+          templateId: KAKAO_CUSTOM_TEMPLATE_ID,
+          templateArgs: {
+            title,
+            content,
+            REGI_WEB_DOMAIN: eventDetailUrl,
+            EVENT_URL: eventDetailUrl,
+            STATUS_URL: applicationStatusUrl,
+          },
+        });
+      } catch {
+        window.alert('카카오톡 공유를 준비하지 못했어요.');
+      }
     },
     [],
   );

@@ -4,15 +4,20 @@ import styled from '@emotion/styled';
 import { Link } from 'react-router-dom';
 
 import { Badge, Icon, RunnerTypeAvatar, Text } from '@/components';
+import { RUNNER_TYPE_LABELS } from '@/constants';
 import { APP_PATH } from '@/router/path';
 
-import { formatDday, formatDdayLabel, type UpcomingMemberEvent } from '../utils';
+import {
+  formatDday,
+  formatDdayLabel,
+  getDdayBadgeVariant,
+  trackUpcomingEventCardClick,
+  type UpcomingMemberEvent,
+} from '@/pages/home/utils';
 
 type MemberUpcomingEventCardProps = {
   event: UpcomingMemberEvent;
 };
-
-const PARTNER_TYPE_LABEL = { VI: '시각장애러너', GUIDE: '가이드러너' } as const;
 
 export const MemberUpcomingEventCard = ({
   event,
@@ -20,15 +25,23 @@ export const MemberUpcomingEventCard = ({
   const partners = event.myPartner ?? [];
   const isMatched = partners.length > 0;
   const partnerText = isMatched
-    ? `파트너 ${partners.map((partner) => `${PARTNER_TYPE_LABEL[partner.type]} ${partner.name}`).join(', ')}`
+    ? `파트너 ${partners.map((partner) => `${RUNNER_TYPE_LABELS[partner.type]} ${partner.name}`).join(', ')}`
     : '아직 파트너 매칭 전이에요';
   const ariaLabel = `${event.name}, ${formatDdayLabel(event.dDay)}, ${event.place}, ${event.scheduleText}, ${partnerText}`;
 
   return (
     <CardItem>
-      <CardLink aria-label={ariaLabel} to={APP_PATH.EVENT_DETAIL(event.id)}>
-        <TitleRow>
-          <Badge size="s" tone="cyan" variant="solid">
+      <CardLink
+        aria-label={ariaLabel}
+        onClick={() => trackUpcomingEventCardClick(event.id, 'member')}
+        to={APP_PATH.EVENT_DETAIL(event.id)}
+      >
+        {/* 링크 접근 가능한 이름은 aria-label 로만 제공하고 내부 시각 콘텐츠는
+            전부 aria-hidden 처리한다. iOS VoiceOver 는 aria-label 이 있어도
+            링크 안 텍스트 블록이 여러 개면 개별 항목으로 쪼개 읽으므로,
+            자식을 숨겨 매칭 유무와 무관하게 카드가 한 덩어리로 낭독되게 한다. */}
+        <TitleRow aria-hidden={true}>
+          <Badge size="s" tone="cyan" variant={getDdayBadgeVariant(event.dDay)}>
             {formatDday(event.dDay)}
           </Badge>
           <CardName color="text.primary" font="body-l-sb">
@@ -42,14 +55,14 @@ export const MemberUpcomingEventCard = ({
           />
         </TitleRow>
 
-        <InfoRow>
+        <InfoRow aria-hidden={true}>
           <Icon aria-hidden={true} color="icon.secondary" icon="map-lined" size={16} />
           <Text color="text.secondary" font="detail-m-r">
             {event.place}
           </Text>
         </InfoRow>
 
-        <InfoRow>
+        <InfoRow aria-hidden={true}>
           <Icon
             aria-hidden={true}
             color="icon.secondary"
@@ -62,17 +75,14 @@ export const MemberUpcomingEventCard = ({
         </InfoRow>
 
         {isMatched ? (
-          <MatchedPartnerBox>
-            <Text color="text.secondary" font="detail-m-m">
+          <MatchedPartnerBox aria-hidden={true}>
+            <PartnerLabel color="text.secondary" font="detail-m-m">
               내 파트너
-            </Text>
+            </PartnerLabel>
             <PartnerChips>
               {partners.map((partner, index) => (
                 <PartnerChip key={`${partner.type}-${partner.name}-${index}`}>
-                  <RunnerTypeAvatar
-                    size="s"
-                    type={partner.type}
-                  />
+                  <RunnerTypeAvatar size="s" type={partner.type} />
                   <Text color="text.primary" font="detail-m-sb">
                     {partner.name}
                   </Text>
@@ -81,11 +91,9 @@ export const MemberUpcomingEventCard = ({
             </PartnerChips>
           </MatchedPartnerBox>
         ) : (
-          <MatchPendingNotice>
+          <MatchPendingNotice aria-hidden={true}>
             <Text align="center" as="p" color="text.tertiary" font="detail-m-m">
-              아직 파트너 매칭 전이에요.
-              <br />
-              대략 러닝 2-3일 전에 매칭될 예정이에요.
+              아직 파트너 매칭 전이에요
             </Text>
           </MatchPendingNotice>
         )}
@@ -141,21 +149,30 @@ const InfoRow = styled.div(({ theme }) => ({
 const MatchedPartnerBox = styled.div(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  flexWrap: 'wrap',
+  justifyContent: 'space-between',
   gap: theme.spacing['3xl'],
   padding: theme.spacing.lg,
   borderRadius: theme.pxToRem(10),
   backgroundColor: theme.color.bg['brand-soft'],
 }));
 
+const PartnerLabel = styled(Text)({
+  flex: '0 0 auto',
+  whiteSpace: 'nowrap',
+});
+
 const PartnerChips = styled.div(({ theme }) => ({
   display: 'flex',
+  flex: '1 1 0',
   flexWrap: 'wrap',
+  justifyContent: 'flex-end',
   gap: theme.spacing.md,
+  minWidth: 0,
 }));
 
 const PartnerChip = styled.span(({ theme }) => ({
   display: 'inline-flex',
+  flex: '0 0 auto',
   alignItems: 'center',
   gap: theme.spacing.s,
 }));

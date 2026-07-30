@@ -1,13 +1,34 @@
-import { StrictMode } from 'react';
+import { StrictMode, type ReactNode } from 'react';
 
 import { Global, ThemeProvider } from '@emotion/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { PostHogProvider } from '@posthog/react';
+import {
+  MutationCache,
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 
+import {
+  POSTHOG_PROJECT_TOKEN,
+  captureApiError,
+  registerSessionProperties,
+} from '@/api/core';
 import { baseURL } from '@/api/core/client';
 import { BirthDateGate } from '@/components/BirthDateGate';
+import { LoaderScreen } from '@/components/Loader';
+import {
+  PageLayout,
+  type PageLayoutBackground,
+  type PageLayoutGradientBackground,
+} from '@/components/PageLayout';
+import { RunningRecordGate } from '@/components/RunningRecordGate';
+import { ToastProvider } from '@/components/Toast';
+import { UserPermissionBootstrap } from '@/components/UserPermissionBootstrap';
 import { AuthProvider } from '@/contexts';
+import { APP_PATH } from '@/router/path';
 import { router } from '@/router/router';
 import { ColorModeProvider } from '@/styles/colorMode';
 import { globalStyles } from '@/styles/globalStyles';
@@ -21,7 +42,41 @@ if (!rootElement) {
 
 void baseURL;
 
+const root = createRoot(rootElement);
+const EVENT_DETAIL_PATH_PREFIX = `${APP_PATH.EVENTS}/`;
+const EVENT_DETAIL_RESERVED_PATHS = [
+  APP_PATH.EVENT_NEW,
+  APP_PATH.EVENT_SEARCH,
+  APP_PATH.EVENT_SUPPORT,
+] as const;
+const postHogOptions = {
+  api_host: import.meta.env.VITE_POSTHOG_HOST,
+  defaults: '2026-05-30',
+  capture_exceptions: {
+    capture_unhandled_errors: true,
+    capture_unhandled_rejections: true,
+    capture_console_errors: false,
+  },
+  loaded: registerSessionProperties,
+} as const;
+
+type BootstrapLoaderState = {
+  background: PageLayoutBackground;
+  gradient?: PageLayoutGradientBackground;
+  showLoader: boolean;
+};
+
 const queryClient = new QueryClient({
+  mutationCache: new MutationCache({
+    onError: (error) => {
+      captureApiError(error);
+    },
+  }),
+  queryCache: new QueryCache({
+    onError: (error) => {
+      captureApiError(error);
+    },
+  }),
   defaultOptions: {
     queries: {
       retry: 1,
@@ -42,22 +97,102 @@ const enableMocking = async () => {
   });
 };
 
+const isEventDetailPath = (pathname: string) => {
+  if (!pathname.startsWith(EVENT_DETAIL_PATH_PREFIX)) {
+    return false;
+  }
+
+  return EVENT_DETAIL_RESERVED_PATHS.every(
+    (path) => pathname !== path && !pathname.startsWith(`${path}/`),
+  );
+};
+
+const getBootstrapLoaderState = (): BootstrapLoaderState => {
+  const { pathname } = window.location;
+
+  if (pathname === APP_PATH.HOME) {
+    return {
+      background: 'bg.subtle',
+      gradient: 'gradient.bg.brand-main',
+      showLoader: true,
+    };
+  }
+
+  if (pathname === APP_PATH.INTRO) {
+    return {
+      background: 'bg.subtle',
+      gradient: 'gradient.bg.brand-main',
+      showLoader: false,
+    };
+  }
+
+  if (isEventDetailPath(pathname)) {
+    return {
+      background: 'bg.brand-event',
+      gradient: 'gradient.bg.brand-event',
+      showLoader: true,
+    };
+  }
+
+  return {
+    background: 'bg.default',
+    showLoader: false,
+  };
+};
+
+const renderBootstrapLoader = () => {
+  const { background, gradient, showLoader } = getBootstrapLoaderState();
+
+  root.render(
+    <StrictMode>
+      <ThemeProvider theme={theme}>
+        <Global styles={globalStyles} />
+        <ColorModeProvider>
+          <PageLayout background={background} gradient={gradient}>
+            {showLoader ? <LoaderScreen /> : null}
+          </PageLayout>
+        </ColorModeProvider>
+      </ThemeProvider>
+    </StrictMode>,
+  );
+};
+
+const renderWithPostHogProvider = (children: ReactNode) => {
+  if (!POSTHOG_PROJECT_TOKEN) {
+    return children;
+  }
+
+  return (
+    <PostHogProvider apiKey={POSTHOG_PROJECT_TOKEN} options={postHogOptions}>
+      {children}
+    </PostHogProvider>
+  );
+};
+
 const bootstrap = async () => {
+  renderBootstrapLoader();
+
   await enableMocking();
 
-  createRoot(rootElement).render(
+  root.render(
     <StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <ThemeProvider theme={theme}>
-            <Global styles={globalStyles} />
-            <ColorModeProvider>
-              <RouterProvider router={router} />
-              <BirthDateGate />
-            </ColorModeProvider>
-          </ThemeProvider>
-        </AuthProvider>
-      </QueryClientProvider>
+      {renderWithPostHogProvider(
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <ThemeProvider theme={theme}>
+              <Global styles={globalStyles} />
+              <ColorModeProvider>
+                <ToastProvider>
+                  <RouterProvider router={router} />
+                  <UserPermissionBootstrap />
+                  <BirthDateGate />
+                  <RunningRecordGate />
+                </ToastProvider>
+              </ColorModeProvider>
+            </ThemeProvider>
+          </AuthProvider>
+        </QueryClientProvider>,
+      )}
     </StrictMode>,
   );
 };

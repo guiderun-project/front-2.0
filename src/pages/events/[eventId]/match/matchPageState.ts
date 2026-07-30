@@ -8,6 +8,8 @@ export type MatchMessageState = {
   role: 'alert' | 'status';
 };
 
+export type MatchSectionId = 'waiting' | 'completed';
+
 export type MatchReadyState = {
   completed: MatchingCompletedResponse;
   waiting: MatchingWaitingResponse;

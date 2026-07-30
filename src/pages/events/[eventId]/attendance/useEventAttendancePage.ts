@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import {
   useMutation,
@@ -7,20 +7,45 @@ import {
 } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
-import type { AttendanceParticipant } from '@/api/types';
+import { ANALYTICS_EVENT, getApiErrorMessage, trackEvent } from '@/api/core';
+import type { AttendanceParticipant, UserType } from '@/api/types';
 import { api } from '@/api/services';
-import { USER_ROLES } from '@/constants/roles';
+import { useToast } from '@/components';
 import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
 
+import {
+  captureNextActionFocusTarget,
+  focusAttendanceTarget,
+  type AttendanceFocusTarget,
+} from './attendanceActionFocus';
 import type { AttendancePageState } from './attendancePageState';
 import { attendanceQueryKeys } from './queryKeys';
 import { useEventDetailRoute } from '../EventDetailRouteContext';
+import { canManageEventOperations } from '../utils/eventDetailPermissions';
 
+// participantName 과 participantType 은 API 입력이 아니라 낭독 문구·계측 속성용
+// 맥락 값이다. 성공 콜백에서 참가자 정보를 다시 조회하지 않도록 함께 실어 보낸다.
 type AttendanceMutationInput = {
+  isFirstParticipation: boolean;
   participantName: string;
+  participantType: UserType;
   userId: string;
 };
+
+type LiveAnnouncement = {
+  id: number;
+  message: string;
+  politeness: 'polite' | 'assertive';
+};
+
+const EMPTY_ANNOUNCEMENT: LiveAnnouncement = {
+  id: 0,
+  message: '',
+  politeness: 'polite',
+};
+
+const UPDATING_ANNOUNCEMENT_MESSAGE = '처리 중이에요';
 
 export const useEventAttendanceRoute = () => {
   const navigate = useNavigate();
@@ -49,18 +74,44 @@ export const useEventAttendancePermission = () => {
   const { event } = useEventDetailRoute();
 
   return {
-    canManageAttendance:
-      user !== null &&
-      (event.viewer?.isOrganizer === true || user.role === USER_ROLES.ADMIN),
+    canManageAttendance: canManageEventOperations({ event, user }),
   };
 };
 
 export const useEventAttendancePage = (eventId: number) => {
   const queryClient = useQueryClient();
-  const [announcement, setAnnouncement] = useState('');
+  const { showToast } = useToast();
+  const [announcement, setAnnouncement] =
+    useState<LiveAnnouncement>(EMPTY_ANNOUNCEMENT);
   const [updatingParticipantIds, setUpdatingParticipantIds] = useState<
     ReadonlySet<string>
-  >(() => new Set());
+  >(new Set<string>());
+  const updatingParticipantIdsRef = useRef(new Set<string>());
+  // 출석 체크인은 연속 탭이 기본 흐름이라 여러 뮤테이션이 겹칠 수 있다.
+  // 참가자별로 포커스 복구 목적지를 보관해 각 성공이 자기 목적지만 소비한다.
+  const pendingFocusTargetsRef = useRef(
+    new Map<string, AttendanceFocusTarget>(),
+  );
+
+  const announce = (
+    message: string,
+    politeness: LiveAnnouncement['politeness'],
+  ) => {
+    // 같은 메시지가 연속 발생해도 재낭독되도록 id를 함께 증가시킨다.
+    setAnnouncement((previous) => ({
+      id: previous.id + 1,
+      message,
+      politeness,
+    }));
+  };
+
+  const announceAssertively = (message: string) => {
+    announce(message, 'assertive');
+  };
+
+  const announcePolitely = (message: string) => {
+    announce(message, 'polite');
+  };
 
   const [attendanceQuery, canceledApplicantsQuery] = useSuspenseQueries({
     queries: [
@@ -81,74 +132,162 @@ export const useEventAttendancePage = (eventId: number) => {
     });
   };
 
-  const addUpdatingParticipant = (userId: string) => {
-    setUpdatingParticipantIds((previousIds) => {
-      const nextIds = new Set(previousIds);
-      nextIds.add(userId);
+  const startParticipantUpdate = (userId: string): boolean => {
+    if (updatingParticipantIdsRef.current.has(userId)) {
+      return false;
+    }
 
-      return nextIds;
-    });
+    updatingParticipantIdsRef.current.add(userId);
+    setUpdatingParticipantIds(new Set(updatingParticipantIdsRef.current));
+    return true;
   };
 
-  const removeUpdatingParticipant = (userId: string) => {
-    setUpdatingParticipantIds((previousIds) => {
-      const nextIds = new Set(previousIds);
-      nextIds.delete(userId);
+  const finishParticipantUpdate = (userId: string) => {
+    updatingParticipantIdsRef.current.delete(userId);
+    setUpdatingParticipantIds(new Set(updatingParticipantIdsRef.current));
+  };
 
-      return nextIds;
+  const restoreFocusAfterUpdate = (userId: string) => {
+    const focusTarget = pendingFocusTargetsRef.current.get(userId);
+    pendingFocusTargetsRef.current.delete(userId);
+
+    if (focusTarget === undefined) {
+      return;
+    }
+
+    // 재조회로 카드가 다른 섹션으로 옮겨진 다음 프레임에 포커스를 되돌려
+    // 스크린리더 커서가 페이지 처음으로 리셋되지 않게 한다.
+    window.requestAnimationFrame(() => {
+      // RouteFocusManager(App.tsx)와 같은 원칙으로, 이미 포커스가 살아 있으면
+      // 개입하지 않는다. 포커스가 body 로 떨어졌거나(카드 언마운트), 방금
+      // 처리한 참가자의 액션 버튼(곧 이동·언마운트될 요소)에 남아 있는
+      // 경우에만 기억해 둔 목적지로 복구한다.
+      const active = document.activeElement;
+      const isFocusLost =
+        active === null || active === document.body || !active.isConnected;
+      const isOnProcessedActionButton =
+        active instanceof HTMLElement &&
+        active.dataset.attendanceAction !== undefined &&
+        active.dataset.userId === userId;
+
+      if (!isFocusLost && !isOnProcessedActionButton) {
+        return;
+      }
+
+      focusAttendanceTarget(focusTarget);
     });
   };
 
   const attendMutation = useMutation({
     mutationFn: ({ userId }: AttendanceMutationInput) =>
       api.attendance.attendPost({ eventId, userId }),
-    onSuccess: async (_, participant) => {
-      setAnnouncement(`${participant.participantName}님을 출석 처리했어요.`);
+    onSuccess: async (data, participant) => {
+      const successMessage = `${participant.participantName}님 출석을 완료했어요`;
+
+      announceAssertively(successMessage);
+      showToast({
+        type: 'success',
+        icon: 'check-thick-lined',
+        content: successMessage,
+        announce: false,
+      });
+      // 계측 값은 옵셔널 체이닝으로 읽는다. 여기서 예외가 나면 성공 낭독 직후
+      // onError 가 실패를 덧낭독하고, 목록 갱신과 포커스 복구까지 건너뛴다.
+      // 계측 하나 때문에 성공한 출석이 실패로 안내되는 일은 없어야 한다.
+      trackEvent(ANALYTICS_EVENT.ATTENDANCE_CHECKED, {
+        attendedCountAfter: data?.summary?.attendedCount,
+        eventId,
+        isFirstParticipation: participant.isFirstParticipation,
+        participantType: participant.participantType,
+        waitingCountAfter: data?.summary?.waitingCount,
+      });
       await invalidateAttendanceStatus();
+      restoreFocusAfterUpdate(participant.userId);
     },
-    onError: (_, participant) => {
-      setAnnouncement(`${participant.participantName}님 출석 처리에 실패했어요.`);
+    onError: (error, participant) => {
+      // 실패 시에는 포커스 복구가 실행되지 않으므로 stale 목적지를 정리한다.
+      pendingFocusTargetsRef.current.delete(participant.userId);
+      announceAssertively(
+        getApiErrorMessage(
+          error,
+          `${participant.participantName}님 출석 처리에 실패했어요.`,
+        ),
+      );
     },
     onSettled: (_, __, participant) => {
-      removeUpdatingParticipant(participant.userId);
+      finishParticipantUpdate(participant.userId);
     },
   });
 
   const cancelAttendanceMutation = useMutation({
     mutationFn: ({ userId }: AttendanceMutationInput) =>
       api.attendance.attendDelete({ eventId, userId }),
-    onSuccess: async (_, participant) => {
-      setAnnouncement(`${participant.participantName}님 출석을 취소했어요.`);
+    onSuccess: async (data, participant) => {
+      const successMessage = `${participant.participantName}님 출석을 취소했어요`;
+
+      announceAssertively(successMessage);
+      showToast({
+        type: 'error',
+        icon: 'delete-lined',
+        content: successMessage,
+        announce: false,
+      });
+      trackEvent(ANALYTICS_EVENT.ATTENDANCE_CANCELED, {
+        attendedCountAfter: data?.summary?.attendedCount,
+        eventId,
+        participantType: participant.participantType,
+        waitingCountAfter: data?.summary?.waitingCount,
+      });
       await invalidateAttendanceStatus();
+      restoreFocusAfterUpdate(participant.userId);
     },
-    onError: (_, participant) => {
-      setAnnouncement(`${participant.participantName}님 출석 취소에 실패했어요.`);
+    onError: (error, participant) => {
+      // 실패 시에는 포커스 복구가 실행되지 않으므로 stale 목적지를 정리한다.
+      pendingFocusTargetsRef.current.delete(participant.userId);
+      announceAssertively(
+        getApiErrorMessage(
+          error,
+          `${participant.participantName}님 출석 취소에 실패했어요.`,
+        ),
+      );
     },
     onSettled: (_, __, participant) => {
-      removeUpdatingParticipant(participant.userId);
+      finishParticipantUpdate(participant.userId);
     },
   });
 
   const attendParticipant = (participant: AttendanceParticipant) => {
-    if (updatingParticipantIds.has(participant.userId)) {
+    if (!startParticipantUpdate(participant.userId)) {
+      announcePolitely(UPDATING_ANNOUNCEMENT_MESSAGE);
       return;
     }
 
-    addUpdatingParticipant(participant.userId);
+    pendingFocusTargetsRef.current.set(
+      participant.userId,
+      captureNextActionFocusTarget('waiting', participant.userId),
+    );
     attendMutation.mutate({
+      isFirstParticipation: participant.isFirstParticipation,
       participantName: participant.name,
+      participantType: participant.type,
       userId: participant.userId,
     });
   };
 
   const cancelAttendance = (participant: AttendanceParticipant) => {
-    if (updatingParticipantIds.has(participant.userId)) {
+    if (!startParticipantUpdate(participant.userId)) {
+      announcePolitely(UPDATING_ANNOUNCEMENT_MESSAGE);
       return;
     }
 
-    addUpdatingParticipant(participant.userId);
+    pendingFocusTargetsRef.current.set(
+      participant.userId,
+      captureNextActionFocusTarget('attended', participant.userId),
+    );
     cancelAttendanceMutation.mutate({
+      isFirstParticipation: participant.isFirstParticipation,
       participantName: participant.name,
+      participantType: participant.type,
       userId: participant.userId,
     });
   };

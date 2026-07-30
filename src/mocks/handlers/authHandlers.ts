@@ -8,7 +8,12 @@ import type {
   SignupPostRequest,
   SmsVerificationExtendRequest,
 } from '@/api/types/auth';
-import { mockDb } from '@/mocks/fixtures';
+import {
+  DEFAULT_MOCK_SESSION_USER_ID,
+  mockDb,
+  resetMockSessionUser,
+  setMockSessionUser,
+} from '@/mocks/fixtures';
 import {
   activateMockRefreshSession,
   apiUrl,
@@ -17,9 +22,19 @@ import {
   expiredRefreshTokenCookie,
   isMockRefreshSessionActive,
   noContent,
+  notFound,
   refreshTokenCookie,
   unauthorized,
 } from '@/mocks/http';
+
+// 아이디 찾기 가입일 표기용 고정값. MockUser에는 createdAt 필드가 없다.
+const ACCOUNT_CREATED_AT = '2025-01-10T09:00:00.000Z';
+
+// 전화번호 비교를 위해 숫자 이외 문자를 제거한다.
+const normalizePhone = (value: string): string => value.replace(/[^0-9]/g, '');
+
+// 아이디 찾기에서 마지막으로 인증을 요청한 전화번호를 기억해 /accountId 조회에 사용한다.
+let lastAccountIdLookupPhone: string | null = null;
 
 const createVerificationResponse = (
   verificationId: string,
@@ -39,7 +54,7 @@ const createVerificationResponse = (
 };
 
 export const authHandlers: HttpHandler[] = [
-  http.post(apiUrl('/oauth/login/kakao'), ({ request }) => {
+  http.post(apiUrl('/oauth/login/kakao'), ({ request }: { request: Request }) => {
     const code = new URL(request.url).searchParams.get('code');
 
     if (code === 'signup-required') {
@@ -50,15 +65,18 @@ export const authHandlers: HttpHandler[] = [
       });
     }
 
+    const mockKakaoUserId = DEFAULT_MOCK_SESSION_USER_ID;
+
     activateMockRefreshSession();
+    setMockSessionUser(mockKakaoUserId);
 
     return HttpResponse.json(
       {
         status: 'LOGIN_SUCCESS',
         accessToken: 'mock-access-token',
         user: {
-          userId: 'user-vi-1',
-          role: 'ROLE_USER',
+          userId: mockKakaoUserId,
+          role: 'USER',
           disabilityType: 'VI',
         },
       },
@@ -81,6 +99,7 @@ export const authHandlers: HttpHandler[] = [
     }
 
     activateMockRefreshSession();
+    setMockSessionUser(user.userId);
 
     return HttpResponse.json(
       { accessToken: 'mock-access-token' },
@@ -111,6 +130,7 @@ export const authHandlers: HttpHandler[] = [
 
   http.post(apiUrl('/logout'), () => {
     deactivateMockRefreshSession();
+    resetMockSessionUser();
 
     return new HttpResponse(null, {
       status: 204,
@@ -123,8 +143,14 @@ export const authHandlers: HttpHandler[] = [
   http.post(apiUrl('/signup'), async ({ request }) => {
     const body = (await request.json()) as SignupPostRequest;
 
-    if (!body.common.privacy || !body.common.portraitRights) {
-      return badRequest('privacy and portraitRights must be true.');
+    if (
+      !body.common.privacy ||
+      !body.common.portraitRights ||
+      !body.common.trainingSafety
+    ) {
+      return badRequest(
+        'privacy, portraitRights and trainingSafety must be true.',
+      );
     }
 
     const nextUserId = `user-${body.disabilityType.toLowerCase()}-${mockDb.users.length + 1}`;
@@ -134,19 +160,20 @@ export const authHandlers: HttpHandler[] = [
     mockDb.users.push({
       userId: nextUserId,
       name: body.common.name,
-      gender: 'FEMALE',
+      gender: body.common.gender,
       phoneNumber: body.common.phoneNumber,
       birthDate: body.common.birthDate,
       recordDegree: runningInfo.runningGroup,
       snsId: body.common.snsId,
       id1365: body.disabilityType === 'GUIDE' ? body.guide.id1365 ?? null : null,
-      role: 'ROLE_WAIT',
+      role: 'WAIT',
       type: body.disabilityType,
       accountId: null,
       password: 'password123!',
       detailRecord: runningInfo.detailRecord,
       hopePrefs: runningInfo.hopePrefs,
       firstParticipation: true,
+      trainingSafety: body.common.trainingSafety,
     });
 
     activateMockRefreshSession();
@@ -155,7 +182,7 @@ export const authHandlers: HttpHandler[] = [
       {
         userId: nextUserId,
         accessToken: 'mock-access-token',
-        role: 'ROLE_WAIT',
+        role: 'WAIT',
         disabilityType: body.disabilityType,
       },
       {
@@ -173,6 +200,9 @@ export const authHandlers: HttpHandler[] = [
       return badRequest('phoneNum is required.');
     }
 
+    // 가입 여부와 무관하게 인증번호는 발송하고, 조회는 /accountId에서 판정한다.
+    lastAccountIdLookupPhone = normalizePhone(body.phoneNum);
+
     return HttpResponse.json(
       createVerificationResponse('mock-account-id-verification', 'ACCOUNT_ID'),
     );
@@ -181,7 +211,9 @@ export const authHandlers: HttpHandler[] = [
   http.post(apiUrl('/sms/password'), async ({ request }) => {
     const body = (await request.json()) as PasswordVerificationIssueRequest;
     const user = mockDb.users.find(
-      (item) => item.accountId === body.accountId && item.phoneNumber === body.phoneNum,
+      (item) =>
+        item.accountId === body.accountId &&
+        normalizePhone(item.phoneNumber) === normalizePhone(body.phoneNum),
     );
 
     if (!user) {
@@ -222,9 +254,21 @@ export const authHandlers: HttpHandler[] = [
   }),
 
   http.post(apiUrl('/accountId'), () => {
+    const user = lastAccountIdLookupPhone
+      ? mockDb.users.find(
+          (item) =>
+            item.accountId !== null &&
+            normalizePhone(item.phoneNumber) === lastAccountIdLookupPhone,
+        )
+      : undefined;
+
+    if (!user || user.accountId === null) {
+      return notFound('No account matches the request.');
+    }
+
     return HttpResponse.json({
-      accountId: 'minseo',
-      createdAt: '2025-01-10T09:00:00.000Z',
+      accountId: user.accountId,
+      createdAt: ACCOUNT_CREATED_AT,
     });
   }),
 

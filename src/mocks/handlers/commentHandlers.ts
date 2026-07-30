@@ -2,7 +2,7 @@ import { http, HttpResponse, type HttpHandler } from 'msw';
 
 import type { EventCommentPostBody } from '@/api/types/comment';
 import {
-  createPage,
+  createZeroBasedPage,
   getCurrentUser,
   getFormUser,
   mockDb,
@@ -14,12 +14,12 @@ export const commentHandlers: HttpHandler[] = [
     apiUrl('/event/:eventId/comments'),
     ({ params, request }) => {
       const eventId = Number(params.eventId);
-      const page = getSearchNumber(request, 'page', 1);
+      const page = getSearchNumber(request, 'page', 0);
       const size = getSearchNumber(request, 'size', 10);
       const comments = mockDb.comments
         .filter((comment) => comment.eventId === eventId)
         .sort((left, right) => right.createdAt.localeCompare(left.createdAt));
-      const startIndex = (page - 1) * size;
+      const startIndex = page * size;
       const items = comments.slice(startIndex, startIndex + size).map((comment) => {
         const formLikeUser = mockDb.forms.find(
           (form) => form.userId === comment.userId,
@@ -37,14 +37,15 @@ export const commentHandlers: HttpHandler[] = [
           type: user?.type ?? 'VI',
         };
       });
+      const pagination = createZeroBasedPage(page, size, comments.length);
 
       return HttpResponse.json({
         items,
         page: {
-          page,
-          size,
-          totalCount: comments.length,
-          totalPages: createPage(page, size, comments.length).totalPages,
+          page: pagination.page,
+          size: pagination.size,
+          totalCount: pagination.totalCount,
+          totalPages: pagination.totalPages,
         },
       });
     },

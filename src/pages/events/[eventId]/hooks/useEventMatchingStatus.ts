@@ -17,6 +17,7 @@ type UseEventMatchingStatusParams = {
 
 type UseEventMatchingStatusResult = {
   data?: MatchingStatusViewModel;
+  error: Error | null;
   isEmpty: boolean;
   isError: boolean;
   isPending: boolean;
@@ -45,6 +46,7 @@ export const useEventMatchingStatus = ({
 
   return {
     data,
+    error: matchingStatusQuery.error,
     isEmpty: data?.isEmpty ?? false,
     isError: matchingStatusQuery.isError,
     isPending: shouldFetch ? matchingStatusQuery.isPending : false,

@@ -1,3 +1,4 @@
+import { ANALYTICS_EVENT, trackEvent } from "@/api/core";
 import type { UpcomingEventsGetResponse } from "@/api/types";
 
 export type UpcomingGuestEvent = Extract<
@@ -9,6 +10,17 @@ export type UpcomingMemberEvent = Extract<
   UpcomingEventsGetResponse,
   { viewerType: "MEMBER" }
 >["items"][number];
+
+// 게스트/회원 카드는 레이아웃만 다르고 같은 이벤트를 보내므로 viewer 만 구분한다.
+export const trackUpcomingEventCardClick = (
+  eventId: number,
+  variant: "guest" | "member",
+) => {
+  trackEvent(ANALYTICS_EVENT.UPCOMING_EVENT_CARD_CLICKED, {
+    eventId,
+    variant,
+  });
+};
 
 const WEEKDAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"] as const;
 
@@ -31,3 +43,35 @@ export const formatDday = (dDay: number): string =>
 
 export const formatDdayLabel = (dDay: number): string =>
   dDay <= 0 ? "오늘" : `${dDay}일 뒤`;
+
+export const getDdayBadgeVariant = (dDay: number): "solid" | "soft" =>
+  dDay <= 0 ? "solid" : "soft";
+
+type RunnerStageHeadline = {
+  connector: string;
+  body: string;
+};
+
+const RUNNER_STAGE_HEADLINES: ReadonlyArray<
+  RunnerStageHeadline & { maxCount: number }
+> = [
+  { maxCount: 1, connector: ",", body: "드디어 첫 발을 뗐어요!" },
+  { maxCount: 3, connector: "은", body: "슬슬 달리기 맛을 알아가는 중" },
+  { maxCount: 5, connector: "은", body: "나만의 페이스를 찾는 중" },
+  { maxCount: 9, connector: "은", body: "이제 제법 러너 티가 나기 시작했어요." },
+  { maxCount: 14, connector: "은", body: "바쁠 때도 어떻게든 뛰어요" },
+  { maxCount: 25, connector: "은", body: "안 뛰면 하루가 허전한 사람" },
+  { maxCount: 30, connector: "은", body: "거의 러닝 고인물이에요" },
+  { maxCount: Infinity, connector: "은", body: "직업이 러너신가요..?" },
+];
+
+export const getRunnerStageHeadline = (
+  participationCount: number,
+): RunnerStageHeadline => {
+  const stage =
+    RUNNER_STAGE_HEADLINES.find(
+      ({ maxCount }) => participationCount <= maxCount,
+    ) ?? RUNNER_STAGE_HEADLINES[RUNNER_STAGE_HEADLINES.length - 1];
+
+  return { connector: stage.connector, body: stage.body };
+};

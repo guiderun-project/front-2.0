@@ -7,6 +7,8 @@ import type {
 } from '@/api/types';
 
 import {
+  ADDITIONAL_SELECT_OPTION_DEFAULT_COUNT,
+  ADDITIONAL_SELECT_OPTION_MAX_COUNT,
   DEFAULT_EVENT_END_TIME,
   DEFAULT_EVENT_MIN_NUM_G,
   DEFAULT_EVENT_MIN_NUM_V,
@@ -17,7 +19,6 @@ import {
 } from './constants';
 import type { EventFormValues } from './schema';
 
-const DATE_INPUT_MAX_LENGTH = 8;
 const DATE_VALUE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const TIME_INPUT_MAX_LENGTH = 4;
 const TIME_VALUE_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/;
@@ -30,6 +31,10 @@ type AdditionalQuestionDraftType = EventFormValues['additionalQuestions'][number
 type EventRequestParams = {
   eventType: EventType;
   values: EventFormValues;
+};
+
+type CreateDefaultEventFormValuesOptions = {
+  eventDate?: string;
 };
 
 export const getTodayDateValue = (): string => {
@@ -47,19 +52,6 @@ export const getCurrentTimeValue = (): string => {
   const minutes = String(now.getMinutes()).padStart(2, '0');
 
   return `${hours}:${minutes}`;
-};
-
-export const formatDateInput = (value: string): string => {
-  const digits = value.replace(/\D/g, '').slice(0, DATE_INPUT_MAX_LENGTH);
-  const year = digits.slice(0, 4);
-  const month = digits.slice(4, 6);
-  const date = digits.slice(6, 8);
-
-  return [year, month, date].filter(Boolean).join('-');
-};
-
-export const formatDateDisplay = (value: string): string => {
-  return value.replaceAll('-', '.');
 };
 
 export const isValidDateValue = (value: string): boolean => {
@@ -87,6 +79,21 @@ export const formatTimeInput = (value: string): string => {
 
 export const isValidTimeValue = (value: string): boolean => {
   return TIME_VALUE_PATTERN.test(value);
+};
+
+/**
+ * 'HH:MM' 시간 값을 스크린리더 안내용 한국어 라벨로 바꾼다.
+ * 예: '09:30' → '9시 30분', '18:00' → '18시 정각'
+ * '정각'/'분' 모두 받침으로 끝나 뒤에 조사 '으로'를 그대로 붙일 수 있다.
+ */
+export const formatTimeValueSrLabel = (value: string): string => {
+  if (!isValidTimeValue(value)) {
+    return value;
+  }
+
+  const [hours, minutes] = value.split(':').map(Number);
+
+  return minutes === 0 ? `${hours}시 정각` : `${hours}시 ${minutes}분`;
 };
 
 export const isTimeAfter = (time: string, baseTime: string): boolean => {
@@ -166,14 +173,16 @@ export const getQueryValueFromEventType = (
 
 export const createDefaultEventFormValues = (
   eventType: EventType,
+  options: CreateDefaultEventFormValuesOptions = {},
 ): EventFormValues => {
   const today = getTodayDateValue();
+  const eventDate = options.eventDate ?? today;
 
   return {
     recruitStartDate: today,
     recruitEndDate: today,
     name: '',
-    date: today,
+    date: eventDate,
     startTime: DEFAULT_EVENT_START_TIME,
     endTime: DEFAULT_EVENT_END_TIME,
     operationType: eventType === 'TRAINING' ? 'GENERAL' : undefined,
@@ -205,7 +214,10 @@ export const createAdditionalQuestionDraft = (
     formId,
     type: 'SELECT',
     title: '',
-    options: [''],
+    options: Array.from(
+      { length: ADDITIONAL_SELECT_OPTION_DEFAULT_COUNT },
+      () => '',
+    ),
   };
 };
 
@@ -274,15 +286,12 @@ export const createEventUpdateRequest = ({
   eventType,
   values,
 }: EventRequestParams): EventUpdateRequest => {
-  const additionalQuestions = createAdditionalQuestions(values);
-
   return {
-    ...createBaseEventRequest({ eventType, values, additionalQuestions }),
+    ...createBaseEventRequest({ eventType, values, additionalQuestions: [] }),
     isPrivate: values.isPrivate,
     expectedRunningDistanceKm: parseRunningDistanceValue(
       values.expectedRunningDistanceKm,
     ),
-    additionalQuestions,
   };
 };
 
@@ -348,7 +357,7 @@ const createAdditionalQuestions = (
       const options = question.options
         .map((option) => option.trim())
         .filter(Boolean)
-        .slice(0, 3);
+        .slice(0, ADDITIONAL_SELECT_OPTION_MAX_COUNT);
 
       if (options.length > 0) {
         questions.push({ type: 'SELECT', title, options });

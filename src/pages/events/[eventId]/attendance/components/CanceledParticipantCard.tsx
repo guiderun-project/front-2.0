@@ -1,9 +1,8 @@
 import type { ReactElement } from 'react';
 
-import styled from '@emotion/styled';
-
 import type { CanceledApplicant } from '@/api/types/application';
 
+import { ParticipantCard } from './ParticipantCard';
 import { ParticipantInfo } from './ParticipantInfo';
 
 type CanceledParticipantCardProps = {
@@ -14,20 +13,8 @@ export const CanceledParticipantCard = ({
   participant,
 }: CanceledParticipantCardProps): ReactElement => {
   return (
-    <CanceledCard>
+    <ParticipantCard>
       <ParticipantInfo participant={participant} />
-    </CanceledCard>
+    </ParticipantCard>
   );
 };
-
-const CanceledCard = styled.article(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  minHeight: theme.pxToRem(48),
-  width: '100%',
-  minWidth: 0,
-  padding: theme.spacing.lg,
-  borderRadius: theme.radius.md,
-  boxSizing: 'border-box',
-  backgroundColor: theme.color.bg.surface,
-}));

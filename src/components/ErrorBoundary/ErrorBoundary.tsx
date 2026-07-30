@@ -1,4 +1,6 @@
-import { Component, type ReactNode } from 'react';
+import { Component, type ErrorInfo, type ReactNode } from 'react';
+
+import { captureRenderError, isApiError } from '@/api/core';
 
 type ErrorBoundaryFallbackProps = {
   error: Error;
@@ -31,6 +33,16 @@ export class ErrorBoundary extends Component<
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { error };
+  }
+
+  componentDidCatch(error: Error, info: ErrorInfo): void {
+    if (isApiError(error)) {
+      return;
+    }
+
+    captureRenderError(error, {
+      componentStack: info.componentStack ?? undefined,
+    });
   }
 
   private reset = () => {

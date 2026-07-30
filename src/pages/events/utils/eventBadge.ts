@@ -35,7 +35,7 @@ const EVENT_BADGE_CONFIGS = {
     tone: 'cyan2',
   },
   RECRUIT_CLOSE: {
-    label: '모집완료',
+    label: '모집마감',
     variant: 'soft',
     tone: 'gray',
   },
@@ -44,7 +44,10 @@ const EVENT_BADGE_CONFIGS = {
     variant: 'soft',
     tone: 'gray',
   },
-} as const satisfies Record<EventType | RecruitStatus, EventBadgeConfig>;
+} as const satisfies Record<
+  EventType | RecruitStatus,
+  EventBadgeConfig
+>;
 
 export const getEventTypeBadgeConfig = (eventType: EventType) => {
   return EVENT_BADGE_CONFIGS[eventType];

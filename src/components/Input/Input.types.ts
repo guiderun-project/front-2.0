@@ -1,5 +1,10 @@
 import type { ComponentPropsWithoutRef, ReactNode, Ref } from "react";
 
+import type { ButtonLevel, ButtonStatus } from "../Button";
+
+/** 필드의 필수/선택 여부. 지정하면 스크린리더가 라벨보다 먼저 읽어준다. */
+export type InputRequirement = "required" | "optional";
+
 export type InputFieldOwnProps = {
   label: string;
   helperText?: ReactNode;
@@ -7,6 +12,7 @@ export type InputFieldOwnProps = {
   /** errorText 없이 에러 스타일(테두리/라벨)만 적용할 때 사용 */
   error?: boolean;
   maxLength?: number;
+  requirement?: InputRequirement;
 };
 
 type NativeInputProps = Omit<
@@ -40,6 +46,8 @@ export type TimerInputProps = Omit<InputProps, "trailing"> & {
   timerText?: string;
   timerLabel?: string;
   confirmLabel?: string;
+  confirmLevel?: ButtonLevel;
+  confirmStatus?: ButtonStatus;
   onConfirm?: () => void;
   confirmDisabled?: boolean;
 };
@@ -58,4 +66,5 @@ export type TimeInputProps = {
   defaultValue?: TimeValue;
   onChange?: (value: TimeValue) => void;
   className?: string;
+  requirement?: InputRequirement;
 };

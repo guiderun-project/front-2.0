@@ -1,17 +1,15 @@
-import type { ReactElement, ReactNode } from 'react';
+import type { ReactElement, ReactNode } from "react";
 
-import styled from '@emotion/styled';
-import { useNavigate } from 'react-router-dom';
+import styled from "@emotion/styled";
+import { Link } from "react-router-dom";
 
-import type { EventDetailResponse } from '@/api/types';
-import { HiddenText, Icon, Text } from '@/components';
-import { APP_PATH } from '@/router/path';
+import type { EventDetailResponse } from "@/api/types";
+import { HiddenText, Icon, Text } from "@/components";
+import { APP_PATH } from "@/router/path";
+import { formatTimeRangeSrLabel } from "@/utils";
 
-import {
-  formatKoreanDate,
-  formatTimeRange,
-} from '../utils';
-import { CommentsSection } from './CommentsSection';
+import { formatKoreanDate, formatKoreanTime, formatTimeRange } from "../utils";
+import { CommentsSection } from "./CommentsSection";
 
 type DetailPanelProps = {
   canShowComments: boolean;
@@ -26,13 +24,18 @@ export const DetailPanel = ({
   onCopyLink,
   onKakaoShare,
 }: DetailPanelProps): ReactElement => {
-  const navigate = useNavigate();
-
-  const handleSupportClick = () => {
-    navigate(APP_PATH.EVENT_SUPPORT);
-  };
-  const hasExpectedRunningDistance =
-    event.expectedRunningDistanceKm !== null;
+  const scheduleDateLabel = formatKoreanDate(event.schedule.date);
+  const scheduleTimeLabel = formatTimeRange(
+    event.schedule.startTime,
+    event.schedule.endTime,
+  );
+  // '~' 는 스크린리더가 생략하거나 '물결표'로 읽어 범위 의미가 전달되지 않으므로
+  // SR 전용 문자열은 '부터/까지'로 표현한다.
+  const scheduleTimeSrLabel = formatTimeRangeSrLabel(
+    formatKoreanTime(event.schedule.startTime),
+    formatKoreanTime(event.schedule.endTime),
+  );
+  const hasExpectedRunningDistance = event.expectedRunningDistanceKm !== null;
 
   return (
     <>
@@ -45,14 +48,12 @@ export const DetailPanel = ({
           </DetailInfoRow>
           <DetailInfoRow label="훈련일자">
             <StackedValue>
-              <Text color="text.primary" font="body-m-m">
-                {formatKoreanDate(event.schedule.date)}
+              <HiddenText>{`${scheduleDateLabel} ${scheduleTimeSrLabel}`}</HiddenText>
+              <Text aria-hidden={true} color="text.primary" font="body-m-m">
+                {scheduleDateLabel}
               </Text>
-              <Text color="text.primary" font="body-m-m">
-                {formatTimeRange(
-                  event.schedule.startTime,
-                  event.schedule.endTime,
-                )}
+              <Text aria-hidden={true} color="text.primary" font="body-m-m">
+                {scheduleTimeLabel}
               </Text>
             </StackedValue>
           </DetailInfoRow>
@@ -61,7 +62,7 @@ export const DetailPanel = ({
               <Text color="text.primary" font="body-m-m">
                 {event.place}
               </Text>
-              <SupportButton type="button" onClick={handleSupportClick}>
+              <SupportButton to={APP_PATH.EVENT_SUPPORT}>
                 <Text color="text.secondary" font="detail-m-m">
                   지역별 이동지원 연락처
                 </Text>
@@ -77,7 +78,10 @@ export const DetailPanel = ({
           {hasExpectedRunningDistance ? (
             <DetailInfoRow label="예상 러닝거리">
               <Text color="text.primary" font="body-m-m">
-                {event.expectedRunningDistanceKm}KM
+                <HiddenText>{`${event.expectedRunningDistanceKm}킬로미터`}</HiddenText>
+                <span aria-hidden={true}>
+                  {event.expectedRunningDistanceKm}KM
+                </span>
               </Text>
             </DetailInfoRow>
           ) : null}
@@ -134,7 +138,7 @@ const DetailInfoRow = ({
 }: DetailInfoRowProps): ReactElement => {
   return (
     <InfoRow>
-      <Text color="text.tertiary" font="body-m-m">
+      <Text color="text.primary" font="body-m-sb">
         {label}
       </Text>
       <InfoValue>{children}</InfoValue>
@@ -143,29 +147,29 @@ const DetailInfoRow = ({
 };
 
 const DetailSection = styled.section(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
+  display: "flex",
+  flexDirection: "column",
   gap: theme.spacing.lg,
-  width: '100%',
-  padding: `${theme.spacing['3xl']} ${theme.spacing.none} ${theme.spacing.none}`,
-  boxSizing: 'border-box',
+  width: "100%",
+  padding: `${theme.spacing["3xl"]} ${theme.spacing.none} ${theme.spacing.none}`,
+  boxSizing: "border-box",
 }));
 
 const DetailCard = styled.article(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: theme.spacing['3xl'],
-  marginInline: theme.spacing['2xl'],
-  padding: theme.spacing['2xl'],
+  display: "flex",
+  flexDirection: "column",
+  gap: theme.spacing["3xl"],
+  marginInline: theme.spacing["2xl"],
+  padding: theme.spacing["2xl"],
   borderRadius: theme.pxToRem(20),
   backgroundColor: theme.color.bg.elevated,
 }));
 
 const InfoRow = styled.div(({ theme }) => ({
-  display: 'grid',
+  display: "grid",
   gridTemplateColumns: `${theme.pxToRem(86)} minmax(0, 1fr)`,
-  gap: theme.spacing['5xl'],
-  alignItems: 'start',
+  gap: theme.spacing["5xl"],
+  alignItems: "start",
 }));
 
 const InfoValue = styled.div({
@@ -173,8 +177,8 @@ const InfoValue = styled.div({
 });
 
 const StackedValue = styled.div(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
+  display: "flex",
+  flexDirection: "column",
   gap: theme.spacing.xs,
 }));
 
@@ -182,107 +186,111 @@ const PlaceValue = styled(StackedValue)(({ theme }) => ({
   gap: theme.spacing.md,
 }));
 
-const SupportButton = styled.button(({ theme }) => ({
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
+// 별도 라우트로 이동하는 컨트롤이라 버튼 대신 링크로 노출한다. 스타일은 기존 버튼과 동일.
+const SupportButton = styled(Link)(({ theme }) => ({
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
   gap: theme.spacing.xs,
-  width: 'fit-content',
-  maxWidth: '100%',
+  width: "fit-content",
+  maxWidth: "100%",
   minHeight: theme.pxToRem(36),
   padding: `${theme.spacing.md} ${theme.spacing.md} ${theme.spacing.md} ${theme.spacing.lg}`,
   border: `1px solid ${theme.color.border.default}`,
   borderRadius: theme.radius.full,
-  backgroundColor: 'transparent',
-  cursor: 'pointer',
-  touchAction: 'manipulation',
-  textAlign: 'center',
+  boxSizing: "border-box",
+  backgroundColor: "transparent",
+  cursor: "pointer",
+  touchAction: "manipulation",
+  textAlign: "center",
+  textDecoration: "none",
+  wordBreak: "keep-all",
 
-  '&:focus-visible': {
+  "&:focus-visible": {
     outline: `2px solid ${theme.color.border.focused}`,
     outlineOffset: theme.spacing.xs,
   },
 }));
 
 const Divider = styled.div(({ theme }) => ({
-  width: '100%',
+  width: "100%",
   height: theme.pxToRem(1),
   backgroundColor: theme.color.border.subtle,
 }));
 
 const ContentText = styled(Text)({
-  whiteSpace: 'pre-wrap',
-  wordBreak: 'keep-all',
-  overflowWrap: 'anywhere',
+  whiteSpace: "pre-wrap",
+  wordBreak: "keep-all",
+  overflowWrap: "anywhere",
 });
 
 const ShareActions = styled.div(({ theme }) => ({
-  display: 'flex',
-  justifyContent: 'center',
+  display: "flex",
+  justifyContent: "center",
   gap: theme.pxToRem(30),
-  width: '100%',
-  padding: `${theme.spacing['3xl']} ${theme.spacing['2xl']} ${theme.spacing['4xl']}`,
-  boxSizing: 'border-box',
+  width: "100%",
+  padding: `${theme.spacing["3xl"]} ${theme.spacing["2xl"]} ${theme.spacing["4xl"]}`,
+  boxSizing: "border-box",
 }));
 
 const ShareIconCircle = styled.span(({ theme }) => ({
-  display: 'inline-grid',
-  placeItems: 'center',
+  display: "inline-grid",
+  placeItems: "center",
   width: theme.pxToRem(48),
   height: theme.pxToRem(48),
   borderRadius: theme.radius.full,
   backgroundColor: theme.color.bg.elevated,
   transition:
-    'background-color 120ms ease, opacity 120ms ease, transform 120ms ease',
+    "background-color 120ms ease, opacity 120ms ease, transform 120ms ease",
 }));
 
 const ShareActionButton = styled.button(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
   gap: theme.spacing.lg,
   minWidth: 0,
   padding: 0,
   border: 0,
-  backgroundColor: 'transparent',
-  cursor: 'pointer',
-  touchAction: 'manipulation',
-  transition: 'opacity 120ms ease',
+  backgroundColor: "transparent",
+  cursor: "pointer",
+  touchAction: "manipulation",
+  transition: "opacity 120ms ease",
 
-  '&:focus-visible': {
+  "&:focus-visible": {
     outline: `2px solid ${theme.color.border.focused}`,
     outlineOffset: theme.spacing.sm,
   },
 
-  '@media (hover: hover)': {
-    '&:hover:not(:disabled) > span:first-of-type': {
+  "@media (hover: hover)": {
+    "&:hover:not(:disabled) > span:first-of-type": {
       opacity: 0.88,
     },
   },
 
-  '&:active:not(:disabled) > span:first-of-type': {
+  "&:active:not(:disabled) > span:first-of-type": {
     opacity: 0.8,
-    transform: 'scale(0.96)',
+    transform: "scale(0.96)",
   },
 
-  '&:disabled': {
-    cursor: 'not-allowed',
+  "&:disabled": {
+    cursor: "not-allowed",
     opacity: 0.48,
   },
 
-  '&:disabled:active > span:first-of-type': {
-    transform: 'none',
+  "&:disabled:active > span:first-of-type": {
+    transform: "none",
   },
 
-  '@media (prefers-reduced-motion: reduce)': {
-    transition: 'none',
+  "@media (prefers-reduced-motion: reduce)": {
+    transition: "none",
 
-    '& > span:first-of-type': {
-      transition: 'none',
+    "& > span:first-of-type": {
+      transition: "none",
     },
 
-    '&:active:not(:disabled) > span:first-of-type': {
-      transform: 'none',
+    "&:active:not(:disabled) > span:first-of-type": {
+      transform: "none",
     },
   },
 }));

@@ -88,6 +88,10 @@ export const copyTextToClipboard = async (text: string): Promise<boolean> => {
     }
   }
 
+  const previousActiveElement =
+    document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null;
   const textarea = document.createElement('textarea');
 
   textarea.value = text;
@@ -107,5 +111,8 @@ export const copyTextToClipboard = async (text: string): Promise<boolean> => {
     return false;
   } finally {
     document.body.removeChild(textarea);
+    // 임시 textarea 제거로 포커스가 body 로 초기화되면 스크린리더 커서가
+    // 문서 처음으로 튀므로, 복사를 실행한 원래 요소로 포커스를 복원한다.
+    previousActiveElement?.focus();
   }
 };

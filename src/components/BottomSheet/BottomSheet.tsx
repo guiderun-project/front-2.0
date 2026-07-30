@@ -10,6 +10,7 @@ import {
 
 import { IconButton } from '@/components/Icon';
 import { Text } from '@/components/Text';
+import { useKeyboardInset } from '@/hooks/useKeyboardInset';
 
 import type { BottomSheetHeading } from './BottomSheet.types';
 
@@ -70,6 +71,7 @@ export const BottomSheet = ({
   open,
   topBarTitle,
 }: BottomSheetProps): ReactElement => {
+  const keyboardInset = useKeyboardInset(open);
   const topBarTitleId = useId();
   const headingTitleId = useId();
   const headingDescriptionId = useId();
@@ -101,6 +103,7 @@ export const BottomSheet = ({
       isDismissable={!isBackdropCloseDisabled}
       isKeyboardDismissDisabled={isEscapeCloseDisabled}
       isOpen={open}
+      style={keyboardInset ? { paddingBottom: `${keyboardInset}px` } : undefined}
       onOpenChange={handleOpenChange}
     >
       <Positioner>
@@ -109,7 +112,11 @@ export const BottomSheet = ({
           aria-label={labelledById ? undefined : ariaLabel}
           aria-labelledby={labelledById}
         >
-          <Sheet $maxHeight={maxHeight} className={className}>
+          <Sheet
+            $keyboardInset={keyboardInset}
+            $maxHeight={maxHeight}
+            className={className}
+          >
             {hasTopBar ? (
               <TopBar>
                 {hasTopBarTitle ? (
@@ -122,7 +129,7 @@ export const BottomSheet = ({
                     aria-label="닫기"
                     icon="delete-lined"
                     iconSize={24}
-                    size={24}
+                    size={32}
                     onClick={handleClose}
                   />
                 ) : null}
@@ -270,26 +277,25 @@ const Positioner = styled(AriaModal)(({ theme }) => ({
   },
 }));
 
-const Dialog = styled(AriaDialog)(({ theme }) => ({
+const Dialog = styled(AriaDialog)({
   outline: 'none',
+});
 
-  '&:focus-visible': {
-    outline: `2px solid ${theme.color.border.focused}`,
-    outlineOffset: `-${theme.spacing.sm}`,
-  },
-}));
-
-const Sheet = styled.div<{ $maxHeight: string }>(({ $maxHeight, theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  width: '100%',
-  maxHeight: $maxHeight,
-  overflow: 'hidden',
-  borderTopLeftRadius: theme.pxToRem(20),
-  borderTopRightRadius: theme.pxToRem(20),
-  backgroundColor: theme.color.bg.default,
-  boxShadow: theme.effect['bottom-shadow'],
-}));
+const Sheet = styled.div<{ $maxHeight: string; $keyboardInset: number }>(
+  ({ $keyboardInset, $maxHeight, theme }) => ({
+    display: 'flex',
+    flexDirection: 'column',
+    width: '100%',
+    maxHeight: $keyboardInset
+      ? `calc(${$maxHeight} - ${$keyboardInset}px)`
+      : $maxHeight,
+    overflow: 'hidden',
+    borderTopLeftRadius: theme.pxToRem(20),
+    borderTopRightRadius: theme.pxToRem(20),
+    backgroundColor: theme.color.bg.default,
+    boxShadow: theme.effect['bottom-shadow'],
+  }),
+);
 
 const TopBar = styled.header(({ theme }) => ({
   display: 'flex',

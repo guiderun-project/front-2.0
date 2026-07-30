@@ -2,15 +2,18 @@ import type { FormEvent, ReactElement } from 'react';
 import { useState } from 'react';
 
 import styled from '@emotion/styled';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
+import { getApiErrorMessage } from '@/api/core';
+import { api } from '@/api/services';
 import {
   FooterButton,
   FormPageLayout,
+  HiddenText,
   Input,
   PageLayout,
 } from '@/components';
-import { api } from '@/api/services';
+import { ACCOUNT_FIND_TYPE } from '@/constants';
 import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
 
@@ -42,19 +45,11 @@ export const LoginPage = (): ReactElement => {
       const { accessToken } = await api.auth.loginPost({ accountId, password });
       await startSession(accessToken);
       navigate(APP_PATH.HOME, { replace: true });
-    } catch {
-      setErrorText(LOGIN_ERROR_MESSAGE);
+    } catch (error) {
+      setErrorText(getApiErrorMessage(error, LOGIN_ERROR_MESSAGE));
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleFindId = () => {
-    navigate(APP_PATH.ACCOUNT_FIND);
-  };
-
-  const handleFindPassword = () => {
-    navigate(APP_PATH.ACCOUNT_FIND);
   };
 
   return (
@@ -107,14 +102,23 @@ export const LoginPage = (): ReactElement => {
           />
 
           <FindAccountRow>
-            <FindAccountButton type="button" onClick={handleFindId}>
+            <FindAccountLink
+              to={`${APP_PATH.ACCOUNT_FIND}?type=${ACCOUNT_FIND_TYPE.ID}`}
+            >
               아이디 찾기
-            </FindAccountButton>
+            </FindAccountLink>
             <Divider aria-hidden={true} />
-            <FindAccountButton type="button" onClick={handleFindPassword}>
+            <FindAccountLink
+              to={`${APP_PATH.ACCOUNT_FIND}?type=${ACCOUNT_FIND_TYPE.PASSWORD}`}
+            >
               비밀번호 찾기
-            </FindAccountButton>
+            </FindAccountLink>
           </FindAccountRow>
+
+          {/* 제출 진행 상태 스크린리더 안내 — 상시 마운트 리전에 텍스트만 교체 */}
+          <HiddenText role="status">
+            {isSubmitting ? '로그인 중이에요' : ''}
+          </HiddenText>
         </Container>
 
         <FooterButton>
@@ -148,11 +152,16 @@ const FindAccountRow = styled.div(({ theme }) => ({
   gap: theme.spacing['2xl'],
 }));
 
-const FindAccountButton = styled.button(({ theme }) => ({
+// 페이지 이동 동작이라 button 대신 Link(앵커) 시맨틱 사용 — 스크린리더 '링크' 탐색에 노출
+const FindAccountLink = styled(Link)(({ theme }) => ({
+  // 전환 전 button UA 기본 패딩은 엔진별로 달랐음(Blink 1px/6px, WebKit iOS 0/6px,
+  // WebKit macOS 2px 3px/6px, Gecko 1px/4px). 주 타겟인 iOS Safari 값 기준
+  // 0 / 6px(spacing.sm)로 전 브라우저 통일 — 기존 렌더 대비 차이는 엔진별 1~2px 이내
+  padding: `0 ${theme.spacing.sm}`,
   border: 0,
   backgroundColor: 'transparent',
   cursor: 'pointer',
-  appearance: 'none',
+  textDecoration: 'none',
   // 디자인 전용 타이포 — 매칭되는 typography 토큰이 없어 raw 값 사용 (fontWeight만 토큰)
   color: theme.color.text.primary,
   textAlign: 'center',

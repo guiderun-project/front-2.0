@@ -6,7 +6,13 @@ import { resolveColorToken } from '@/styles/tokens';
 
 import { Icon } from '../Icon';
 import { Text } from '../Text';
-import { BUTTON_COLOR_TOKENS, BUTTON_ICON_SIZE, BUTTON_SIZE_STYLES } from './Button.constants';
+import {
+  BUTTON_COLOR_TOKENS,
+  BUTTON_ICON_SIZE,
+  BUTTON_SIZE_STYLES,
+  BUTTON_TYPOGRAPHY,
+  resolveButtonBorderWidth,
+} from './Button.constants';
 import type { ButtonLevel, ButtonProps, ButtonSize, ButtonStatus } from './Button.types';
 
 type ButtonStyleProps = {
@@ -32,7 +38,7 @@ export const Button = ({
   const resolvedStatus = disabled ? 'disabled' : status;
   const isDisabled = disabled || resolvedStatus === 'disabled';
   const defaultIconColor = BUTTON_COLOR_TOKENS[level][resolvedStatus].content;
-  const labelFont = BUTTON_SIZE_STYLES[size].typography;
+  const labelFont = size === 'l' && level === 'primary' ? 'body-l-b' : BUTTON_TYPOGRAPHY[size];
 
   return (
     <StyledButton
@@ -81,13 +87,13 @@ const StyledButton = styled.button<ButtonStyleProps>(
     const width = 'width' in sizeStyle ? sizeStyle.width : undefined;
     const minWidth = 'minWidth' in sizeStyle ? sizeStyle.minWidth : undefined;
     const borderStyle = defaultTokens.border
-      ? `${theme.pxToRem(defaultTokens.border.width)} solid ${resolveColorToken(defaultTokens.border.color)}`
+      ? `${theme.pxToRem(resolveButtonBorderWidth(defaultTokens.border.width, $size))} solid ${resolveColorToken(defaultTokens.border.color)}`
       : 0;
     const activeBorderStyle = pressedTokens.border
-      ? `${theme.pxToRem(pressedTokens.border.width)} solid ${resolveColorToken(pressedTokens.border.color)}`
+      ? `${theme.pxToRem(resolveButtonBorderWidth(pressedTokens.border.width, $size))} solid ${resolveColorToken(pressedTokens.border.color)}`
       : 0;
     const disabledBorderStyle = disabledTokens.border
-      ? `${theme.pxToRem(disabledTokens.border.width)} solid ${resolveColorToken(disabledTokens.border.color)}`
+      ? `${theme.pxToRem(resolveButtonBorderWidth(disabledTokens.border.width, $size))} solid ${resolveColorToken(disabledTokens.border.color)}`
       : 0;
     const pressedColorStyles = {
       border: activeBorderStyle,

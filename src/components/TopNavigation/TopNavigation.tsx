@@ -5,6 +5,9 @@ import styled from '@emotion/styled';
 import { IconButton, type IconName } from '../Icon';
 import { Text } from '../Text';
 
+const TOP_NAVIGATION_ICON_SIZE = 24;
+const TOP_NAVIGATION_BUTTON_SIZE = 32;
+
 export type TopNavigationIconButtonProps = {
   icon: IconName;
   ariaLabel: string;
@@ -21,8 +24,10 @@ export type TopNavigationProps = {
   'aria-label'?: string;
 };
 
+// nav 랜드마크는 스크린리더가 역할('탐색'/'내비게이션')을 덧붙여 낭독하므로
+// 라벨에 역할어를 넣지 않는다. 하단의 '하단 메뉴'와 명명을 맞춘다.
 export const TopNavigation = ({
-  'aria-label': ariaLabel = '상단 내비게이션',
+  'aria-label': ariaLabel = '상단 메뉴',
   className,
   left,
   right,
@@ -70,9 +75,9 @@ const TopNavigationIconButton = ({
     <StyledIconButton
       aria-label={ariaLabel}
       icon={icon}
-      iconSize={24}
+      iconSize={TOP_NAVIGATION_ICON_SIZE}
       shape="square"
-      size={24}
+      size={TOP_NAVIGATION_BUTTON_SIZE}
       type={type}
       {...buttonProps}
     />
@@ -95,8 +100,8 @@ const LeftSlot = styled.div`
   flex: 0 0 auto;
   align-items: center;
   justify-content: flex-start;
-  width: ${({ theme }) => theme.pxToRem(24)};
-  height: ${({ theme }) => theme.pxToRem(24)};
+  width: ${({ theme }) => theme.pxToRem(TOP_NAVIGATION_BUTTON_SIZE)};
+  height: ${({ theme }) => theme.pxToRem(TOP_NAVIGATION_BUTTON_SIZE)};
 `;
 
 const RightSlot = styled.div`
@@ -105,7 +110,7 @@ const RightSlot = styled.div`
   align-items: center;
   justify-content: flex-end;
   gap: ${({ theme }) => theme.spacing.xl};
-  min-height: ${({ theme }) => theme.pxToRem(24)};
+  min-height: ${({ theme }) => theme.pxToRem(TOP_NAVIGATION_BUTTON_SIZE)};
 `;
 
 const Title = styled(Text)({

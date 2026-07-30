@@ -1,81 +1,104 @@
-import { useId, type ReactElement } from "react";
+import { Suspense, lazy, type ReactElement } from "react";
 
 import styled from "@emotion/styled";
 
+import mainDarkLottie from "@/assets/lotties/main_dark.json";
+import mainLightLottie from "@/assets/lotties/main_light.json";
 import { HiddenText, Text } from "@/components";
 import { useAuth } from "@/contexts";
-
-import runnerImageUrl from "@/assets/images/home-summary-runner.png";
-
-import { useHomeSummary } from "../hooks/useHomeSummary";
-
-// TODO: 회원 헤드라인 2번째 줄 실제 카피 확정 후 반영
-const MEMBER_HEADLINE_SUBTITLE = "오늘도 함께 달릴 준비됐어요";
+import { useHomeSummary } from "@/pages/home/hooks/useHomeSummary";
+import { getRunnerStageHeadline } from "@/pages/home/utils";
+import { useColorMode } from "@/styles/useColorMode";
 
 const formatNumber = (value: number) => value.toLocaleString("ko-KR");
+const Lottie = lazy(() => import("lottie-react"));
+
+const MainRunnerLottie = (): ReactElement => {
+  const { colorMode } = useColorMode();
+  const animationData = colorMode === "dark" ? mainDarkLottie : mainLightLottie;
+
+  return (
+    <Suspense fallback={null}>
+      <Lottie
+        key={colorMode}
+        animationData={animationData}
+        autoplay={true}
+        loop={true}
+        style={{ width: "100%", height: "100%" }}
+      />
+    </Suspense>
+  );
+};
 
 export const ActivitySummary = (): ReactElement => {
-  const headingId = useId();
   const { user } = useAuth();
   const {
     data: { mySummary, publicSummary },
   } = useHomeSummary();
 
   if (mySummary && user) {
+    const stageHeadline = getRunnerStageHeadline(
+      mySummary.totalParticipationCount,
+    );
+    const participationCount = formatNumber(mySummary.totalParticipationCount);
+    const runningDistanceKm = formatNumber(mySummary.totalRunningDistanceKm);
+    const metricsLabel = `지금까지 함께한 모임 총 ${participationCount}회, 누적 ${runningDistanceKm}킬로미터`;
+
     return (
-      <Section aria-labelledby={headingId}>
+      <Section aria-label="활동 요약">
         <HeadlineRow>
-          <Headline id={headingId}>
-            <NameLine>
+          <Headline>
+            <HiddenText>
+              {`${user.name}님${stageHeadline.connector} ${stageHeadline.body}`}
+            </HiddenText>
+            <NameLine aria-hidden={true}>
               <Text as="span" color="text.primary" font="heading-m-sb">
                 {user.name}님
               </Text>
               <Text as="span" color="text.primary" font="heading-m-r">
-                은
+                {stageHeadline.connector}
               </Text>
             </NameLine>
-            <Text as="span" color="text.primary" font="heading-m-r">
-              {MEMBER_HEADLINE_SUBTITLE}
-            </Text>
+            <HeadlineBody
+              aria-hidden={true}
+              as="span"
+              color="text.primary"
+              font="heading-m-r"
+            >
+              {stageHeadline.body}
+            </HeadlineBody>
           </Headline>
-          <RunnerImageBox aria-hidden={true}>
-            <RunnerImage alt="" src={runnerImageUrl} />
-          </RunnerImageBox>
+          <RunnerGraphicBox aria-hidden={true}>
+            <MainRunnerLottie />
+          </RunnerGraphicBox>
         </HeadlineRow>
 
         <Metrics>
-          <Text
-            aria-hidden={true}
-            as="span"
-            color="text.primary"
-            font="display-l"
-          >
-            총 {formatNumber(mySummary.totalParticipationCount)}회
-          </Text>
-          <MetricDot aria-hidden={true} />
-          <Text
-            aria-hidden={true}
-            as="span"
-            color="text.brand"
-            font="display-l"
-          >
-            {formatNumber(mySummary.totalRunningDistanceKm)}KM
-          </Text>
-          <HiddenText>
-            지금까지 함께한 모임 총{" "}
-            {formatNumber(mySummary.totalParticipationCount)}회, 누적{" "}
-            {formatNumber(mySummary.totalRunningDistanceKm)}킬로미터
-          </HiddenText>
+          <HiddenText>{metricsLabel}</HiddenText>
+          <VisibleMetrics aria-hidden={true}>
+            <Text as="span" color="text.primary" font="display-l">
+              총 {participationCount}회
+            </Text>
+            <MetricDot />
+            <Text as="span" color="text.brand" font="display-l">
+              {runningDistanceKm}KM
+            </Text>
+          </VisibleMetrics>
         </Metrics>
       </Section>
     );
   }
 
+  const eventCount = formatNumber(publicSummary.totalEventCount);
+  const runningDistanceKm = formatNumber(publicSummary.totalRunningDistanceKm);
+  const metricsLabel = `올해 러너들이 함께한 모임 총 ${eventCount}회, 누적 ${runningDistanceKm}킬로미터`;
+
   return (
-    <Section aria-labelledby={headingId}>
+    <Section aria-label="활동 요약">
       <HeadlineRow>
-        <Headline id={headingId}>
-          <TitleLine>
+        <Headline>
+          <HiddenText>올해도 러너들은 열심히 달리고 있어요</HiddenText>
+          <TitleLine aria-hidden={true}>
             <Text as="span" color="text.primary" font="heading-m-r">
               올해도
             </Text>
@@ -83,33 +106,31 @@ export const ActivitySummary = (): ReactElement => {
               러너들은
             </Text>
           </TitleLine>
-          <Text as="span" color="text.primary" font="heading-m-r">
+          <Text
+            aria-hidden={true}
+            as="span"
+            color="text.primary"
+            font="heading-m-r"
+          >
             열심히 달리고 있어요
           </Text>
         </Headline>
-        <RunnerImageBox aria-hidden={true}>
-          <RunnerImage alt="" src={runnerImageUrl} />
-        </RunnerImageBox>
+        <RunnerGraphicBox aria-hidden={true}>
+          <MainRunnerLottie />
+        </RunnerGraphicBox>
       </HeadlineRow>
 
       <Metrics>
-        <Text
-          aria-hidden={true}
-          as="span"
-          color="text.primary"
-          font="display-l"
-        >
-          총 {formatNumber(publicSummary.totalEventCount)}회
-        </Text>
-        <MetricDot aria-hidden={true} />
-        <Text aria-hidden={true} as="span" color="text.brand" font="display-l">
-          {formatNumber(publicSummary.totalRunningDistanceKm)}KM
-        </Text>
-        <HiddenText>
-          올해 러너들이 함께한 모임 총{" "}
-          {formatNumber(publicSummary.totalEventCount)}회, 누적{" "}
-          {formatNumber(publicSummary.totalRunningDistanceKm)}킬로미터
-        </HiddenText>
+        <HiddenText>{metricsLabel}</HiddenText>
+        <VisibleMetrics aria-hidden={true}>
+          <Text as="span" color="text.primary" font="display-l">
+            총 {eventCount}회
+          </Text>
+          <MetricDot />
+          <Text as="span" color="text.brand" font="display-l">
+            {runningDistanceKm}KM
+          </Text>
+        </VisibleMetrics>
       </Metrics>
     </Section>
   );
@@ -145,37 +166,23 @@ const TitleLine = styled.span(({ theme }) => ({
 }));
 
 const NameLine = styled.span({
-  display: "flex",
-  alignItems: "flex-end",
+  whiteSpace: "normal",
+  wordBreak: "keep-all",
+  overflowWrap: "anywhere",
 });
 
-const RunnerImageBox = styled.span(({ theme }) => ({
-  position: "relative",
+const HeadlineBody = styled(Text)({
+  whiteSpace: "normal",
+  wordBreak: "keep-all",
+});
+
+const RunnerGraphicBox = styled.span(({ theme }) => ({
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
   flexShrink: 0,
   width: theme.pxToRem(94),
-  height: theme.pxToRem(64),
-  overflow: "hidden",
-}));
-
-const RunnerImage = styled.img(({ theme }) => ({
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  width: theme.pxToRem(140),
-  height: theme.pxToRem(140),
-  transform: "translate(-50%, -50%)",
-
-  filter: "none",
-
-  "html[data-color-mode='dark'] &": {
-    filter: "brightness(0) invert(1)",
-  },
-
-  "@media (prefers-color-scheme: dark)": {
-    "html:not([data-color-mode='light']) &": {
-      filter: "brightness(0) invert(1)",
-    },
-  },
+  height: theme.pxToRem(70),
 }));
 
 const Metrics = styled.div(({ theme }) => ({
@@ -184,6 +191,12 @@ const Metrics = styled.div(({ theme }) => ({
   justifyContent: "flex-end",
   gap: theme.spacing.md,
   width: "100%",
+}));
+
+const VisibleMetrics = styled.span(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  gap: theme.spacing.md,
 }));
 
 const MetricDot = styled.span(({ theme }) => ({

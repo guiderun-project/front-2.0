@@ -28,13 +28,13 @@ export type RecruitStatus =
 export type RecruitStatusFilter = ValueOf<typeof RECRUIT_STATUS_FILTERS>;
 
 export type RoleEnum =
-  | 'ROLE_NEW'
-  | 'ROLE_WAIT'
-  | 'ROLE_USER'
-  | 'ROLE_ADMIN'
-  | 'ROLE_REJECT'
-  | 'ROLE_COACH'
-  | 'ROLE_WITHDRAWAL';
+  | 'NEW'
+  | 'WAIT'
+  | 'USER'
+  | 'ADMIN'
+  | 'REJECT'
+  | 'COACH'
+  | 'WITHDRAWAL';
 
 export type AdditionalQuestionType = 'TEXT' | 'SELECT';
 

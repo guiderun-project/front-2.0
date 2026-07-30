@@ -1,4 +1,9 @@
-import type { DisabilityType, RoleEnum, RunningGroup } from './common';
+import type {
+  DisabilityType,
+  Gender,
+  RoleEnum,
+  RunningGroup,
+} from '@/api/types/common';
 
 export type KakaoOAuthLoginQuery = {
   code: string;
@@ -40,11 +45,13 @@ export type AccessTokenReissueErrorResponse = {
 
 export type SignupCommonInfo = {
   name: string;
+  gender: Gender;
   birthDate: string;
   phoneNumber: string;
   snsId: string | null;
   privacy: true;
   portraitRights: true;
+  trainingSafety: true;
 };
 
 export type ViSignupInfo = {
@@ -83,7 +90,7 @@ export type SignupPostInput = {
 export type SignupPostResponse = {
   userId: string;
   accessToken: string;
-  role: 'ROLE_WAIT';
+  role: 'WAIT';
   disabilityType: DisabilityType;
 };
 

@@ -1,14 +1,17 @@
-import { Suspense, useMemo, type ReactElement } from 'react';
+import { Suspense, useEffect, useMemo, type ReactElement } from 'react';
 
 import { QueryErrorResetBoundary, useSuspenseQuery } from '@tanstack/react-query';
-import { Outlet, useParams } from 'react-router-dom';
+import { Outlet, useLocation, useParams } from 'react-router-dom';
 
+import { getApiErrorMessage } from '@/api/core';
 import { api } from '@/api/services';
 import type { EventDetailResponse } from '@/api/types';
-import { ErrorBoundary } from '@/components';
+import { ErrorBoundary, LoaderScreen, PageTitle } from '@/components';
+import { cancelLoaderCompletionAnnouncement } from '@/components/Loader';
 import { PageLayout } from '@/components/PageLayout';
 import { useAuth } from '@/contexts';
 import { RoutePlaceholder } from '@/pages/_shared/RoutePlaceholder';
+import { APP_PATH } from '@/router/path';
 
 import {
   EventDetailRouteContext,
@@ -26,13 +29,55 @@ type EventDetailRouteContentProps = {
   viewerKey: string;
 };
 
+const EVENT_DETAIL_DEFAULT_PAGE_TITLE = '모임 상세';
+
+const getEventDetailPageTitle = (
+  pathname: string,
+  eventId: number,
+  eventName: string,
+): string => {
+  if (pathname === APP_PATH.EVENT_APPLY(eventId)) {
+    return `모임 신청 - ${eventName}`;
+  }
+
+  if (pathname === APP_PATH.EVENT_EDIT(eventId)) {
+    return `모임 수정 - ${eventName}`;
+  }
+
+  if (pathname === APP_PATH.EVENT_MATCH(eventId)) {
+    return `모임 매칭 - ${eventName}`;
+  }
+
+  if (pathname === APP_PATH.EVENT_ATTENDANCE(eventId)) {
+    return `출석 관리 - ${eventName}`;
+  }
+
+  return eventName;
+};
+
 const EventDetailRouteState = ({
   description,
   title,
 }: EventDetailRouteStateProps): ReactElement => {
+  // 오류 fallback 은 LoaderScreen 언마운트 직후 마운트되는데, 이때 Loader 가
+  // 예약해 둔 '불러왔어요.' 완료 안내가 나가면 오류인데 완료처럼 들리므로 취소한다.
+  useEffect(() => {
+    cancelLoaderCompletionAnnouncement();
+  }, []);
+
   return (
     <PageLayout background="bg.subtle">
-      <RoutePlaceholder title={title} description={description} />
+      <PageTitle title={EVENT_DETAIL_DEFAULT_PAGE_TITLE} />
+      <RoutePlaceholder status title={title} description={description} />
+    </PageLayout>
+  );
+};
+
+const EventDetailRouteLoader = (): ReactElement => {
+  return (
+    <PageLayout background="bg.brand-event" gradient="gradient.bg.brand-event">
+      <PageTitle title={EVENT_DETAIL_DEFAULT_PAGE_TITLE} />
+      <LoaderScreen label="이벤트 정보를 불러오는 중이에요." />
     </PageLayout>
   );
 };
@@ -41,10 +86,12 @@ const EventDetailRouteContent = ({
   eventId,
   viewerKey,
 }: EventDetailRouteContentProps): ReactElement => {
+  const { pathname } = useLocation();
   const { data: event } = useSuspenseQuery<EventDetailResponse>({
     queryKey: eventDetailQueryKeys.detail(eventId, viewerKey),
     queryFn: () => api.event.detailGet({ eventId }),
   });
+  const pageTitle = getEventDetailPageTitle(pathname, eventId, event.name);
   const value = useMemo<EventDetailRouteContextValue>(
     () => ({
       event,
@@ -56,6 +103,7 @@ const EventDetailRouteContent = ({
 
   return (
     <EventDetailRouteContext.Provider value={value}>
+      <PageTitle title={pageTitle} />
       <Outlet />
     </EventDetailRouteContext.Provider>
   );
@@ -78,12 +126,7 @@ export const EventDetailRouteProvider = (): ReactElement => {
   }
 
   if (!isAuthReady) {
-    return (
-      <EventDetailRouteState
-        title="이벤트 정보를 불러오고 있어요"
-        description="잠시만 기다려주세요."
-      />
-    );
+    return <EventDetailRouteLoader />;
   }
 
   return (
@@ -91,22 +134,18 @@ export const EventDetailRouteProvider = (): ReactElement => {
       {({ reset }) => (
         <ErrorBoundary
           key={eventId}
-          fallback={
+          fallback={({ error }) => (
             <EventDetailRouteState
-              title="이벤트 정보를 불러오지 못했어요"
+              title={getApiErrorMessage(
+                error,
+                '이벤트 정보를 불러오지 못했어요',
+              )}
               description="잠시 후 다시 시도해주세요."
             />
-          }
+          )}
           onReset={reset}
         >
-          <Suspense
-            fallback={
-              <EventDetailRouteState
-                title="이벤트 정보를 불러오고 있어요"
-                description="잠시만 기다려주세요."
-              />
-            }
-          >
+          <Suspense fallback={<EventDetailRouteLoader />}>
             <EventDetailRouteContent eventId={eventId} viewerKey={viewerKey} />
           </Suspense>
         </ErrorBoundary>

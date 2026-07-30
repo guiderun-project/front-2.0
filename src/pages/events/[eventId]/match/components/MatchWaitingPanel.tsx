@@ -16,7 +16,6 @@ import { MatchParticipantCard } from './MatchParticipantCard';
 import { AllMatchedState } from './MatchStates';
 
 type MatchWaitingPanelProps = {
-  disabledParticipantAction: boolean;
   eventGroupLabelContext: EventGroupLabelContext;
   selectedUserIds: ReadonlySet<string>;
   waiting: MatchingWaitingResponse;
@@ -24,7 +23,6 @@ type MatchWaitingPanelProps = {
 };
 
 export const MatchWaitingPanel = ({
-  disabledParticipantAction,
   eventGroupLabelContext,
   selectedUserIds,
   waiting,
@@ -45,19 +43,23 @@ export const MatchWaitingPanel = ({
         return (
           <GroupSection key={group.runningGroup} $hasDivider={index > 0}>
             <GroupHeader>
-              <Text as="h2" color="text.primary" font="body-l-sb">
-                {groupLabel}
-              </Text>
-              <Text color="text.tertiary" font="body-m-m">
-                {group.totalCount}명
-              </Text>
+              <GroupHeading>
+                <GroupHeadingText role="text">
+                  <Text as="span" color="text.primary" font="body-l-sb">
+                    {groupLabel}
+                  </Text>{' '}
+                  <GroupCountText color="text.tertiary" font="body-m-m">
+                    {group.totalCount}명
+                  </GroupCountText>
+                </GroupHeadingText>
+              </GroupHeading>
             </GroupHeader>
-            <ParticipantList>
+            {/* WebKit은 list-style: none인 목록의 list 역할을 제거하므로 role을 명시한다. */}
+            <ParticipantList role="list">
               {group.participants.map((participant) => (
                 <li key={participant.userId}>
                   <MatchParticipantCard
                     applicationGroup={group.runningGroup}
-                    disabled={disabledParticipantAction}
                     eventGroupLabelContext={eventGroupLabelContext}
                     isSelected={selectedUserIds.has(participant.userId)}
                     participant={participant}
@@ -94,6 +96,18 @@ const GroupHeader = styled.div(({ theme }) => ({
   alignItems: 'center',
   gap: theme.spacing.md,
   minWidth: 0,
+}));
+
+const GroupHeading = styled.h3({
+  margin: 0,
+});
+
+const GroupHeadingText = styled.span({
+  display: 'inline',
+});
+
+const GroupCountText = styled(Text)(({ theme }) => ({
+  marginLeft: theme.spacing.md,
 }));
 
 const ParticipantList = styled.ul(({ theme }) => ({

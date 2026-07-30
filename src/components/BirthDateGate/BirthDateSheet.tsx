@@ -1,82 +1,83 @@
-import { useState, type ReactElement } from 'react';
+import { useRef, useState, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 import { useMutation } from '@tanstack/react-query';
 
+import { getApiErrorMessage } from '@/api/core';
 import { api } from '@/api/services';
 import { useAuth } from '@/contexts';
-import { getTodayISODate } from '@/utils';
+import { useAnnouncedMessage } from '@/hooks/useAnnouncedMessage';
+import {
+  BIRTH_DATE_MAX_LENGTH,
+  formatBirthDateInput,
+  toBirthDateISO,
+} from '@/utils';
 
 import { BottomSheet } from '../BottomSheet';
 import { Button } from '../Button';
+import { HiddenText } from '../HiddenText';
 import { Input } from '../Input';
 
-const BIRTH_DATE_MAX_LENGTH = 10;
-const BIRTH_DATE_HELPER_TEXT = 'YYYY.MM.DD 형식으로 입력해주세요';
-
-const formatBirthDateInput = (raw: string): string => {
-  const digits = raw.replace(/\D/g, '').slice(0, 8);
-
-  return [digits.slice(0, 4), digits.slice(4, 6), digits.slice(6, 8)]
-    .filter(Boolean)
-    .join('.');
-};
-
-const toISODate = (formatted: string): string | null => {
-  const match = /^(\d{4})\.(\d{2})\.(\d{2})$/.exec(formatted);
-
-  if (!match) {
-    return null;
-  }
-
-  const [, year, month, day] = match;
-  const date = new Date(Number(year), Number(month) - 1, Number(day));
-  const isRealDate =
-    date.getFullYear() === Number(year) &&
-    date.getMonth() === Number(month) - 1 &&
-    date.getDate() === Number(day);
-  const isoDate = `${year}-${month}-${day}`;
-
-  if (!isRealDate || isoDate > getTodayISODate()) {
-    return null;
-  }
-
-  return isoDate;
-};
+const BIRTH_DATE_ERROR_MESSAGE = '올바른 생년월일을 입력해주세요';
 
 type BirthDateSheetProps = {
   userName: string;
+  onRegistered: () => void;
 };
 
 export const BirthDateSheet = ({
+  onRegistered,
   userName,
 }: BirthDateSheetProps): ReactElement => {
   const { refreshUser } = useAuth();
   const [birthDate, setBirthDate] = useState('');
+  const birthDateInputRef = useRef<HTMLInputElement>(null);
 
-  const { isError, isPending, mutate, reset } = useMutation({
+  const { error, isError, isPending, mutate, reset } = useMutation({
     mutationFn: (isoDate: string) =>
       api.user.birthDatePatch({ birthDate: isoDate }),
     onSuccess: async () => {
+      onRegistered();
       await refreshUser();
     },
   });
 
-  const isoDate = toISODate(birthDate);
+  const isoDate = toBirthDateISO(birthDate);
   const hasFormatError =
     birthDate.length === BIRTH_DATE_MAX_LENGTH && isoDate === null;
   const errorText = isError
-    ? '생년월일을 등록하지 못했어요. 다시 시도해주세요.'
+    ? getApiErrorMessage(
+        error,
+        '생년월일을 등록하지 못했어요. 다시 시도해주세요.',
+      )
     : hasFormatError
-      ? '올바른 생년월일을 입력해주세요.'
+      ? BIRTH_DATE_ERROR_MESSAGE
       : undefined;
+
+  // 제출 중에는 버튼이 disabled 되며 포커스가 사라지므로, 진행 상태를
+  // 다이얼로그 내부의 상시 마운트 라이브 리전으로 안내한다.
+  // (등록 실패 오류는 onError의 포커스 이동으로 aria-describedby가 낭독하는
+  //  단일 채널이다. Input 오류 미러는 포커스가 막 도착한 오류의 주입을 생략하고,
+  //  타이핑 중 형식 오류만 미러가 낭독한다.)
+  const announcedPendingMessage = useAnnouncedMessage(
+    isPending ? '등록 중이에요' : '',
+  );
 
   const handleSubmit = () => {
     if (isoDate === null || isPending) {
       return;
     }
 
-    mutate(isoDate);
+    mutate(isoDate, {
+      onError: () => {
+        // 오류 텍스트가 렌더된 다음 프레임에 입력으로 포커스를 옮겨
+        // 라벨과 aria-describedby 오류가 함께 낭독되게 한다.
+        // (검증-포커스 흐름에서는 Input 오류 미러가 주입을 생략해 중복 낭독이 없다.)
+        window.requestAnimationFrame(() => {
+          birthDateInputRef.current?.focus();
+        });
+      },
+    });
   };
 
   return (
@@ -101,13 +102,15 @@ export const BirthDateSheet = ({
         </Button>
       }
     >
+      <HiddenText role="status">{announcedPendingMessage}</HiddenText>
       <Content>
         <Input
+          controlRef={birthDateInputRef}
           errorText={errorText}
-          helperText={BIRTH_DATE_HELPER_TEXT}
           inputMode="numeric"
-          label="생년월일"
+          label="생년월일 8자리"
           maxLength={BIRTH_DATE_MAX_LENGTH}
+          placeholder="YYYY.MM.DD"
           value={birthDate}
           onChange={(event) => {
             if (isError) {

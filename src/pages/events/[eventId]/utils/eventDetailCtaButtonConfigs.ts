@@ -1,7 +1,7 @@
 import type { RecruitStatus } from '@/api/types';
 import type { ButtonLevel } from '@/components';
 
-export type EventDetailCtaAction =
+export type EventDetailCtaButtonAction =
   | 'apply'
   | 'cancelApplication'
   | 'editApplication'
@@ -10,14 +10,24 @@ export type EventDetailCtaAction =
   | 'disabled';
 
 export type EventDetailCtaButtonConfig = {
-  action: EventDetailCtaAction;
+  action: EventDetailCtaButtonAction;
   label: string;
   level?: ButtonLevel;
   disabled?: boolean;
 };
 
+export type EventDetailCtaNoticeConfig = {
+  action: 'notice';
+  label: string;
+};
+
+export type EventDetailCtaConfig =
+  | EventDetailCtaButtonConfig
+  | EventDetailCtaNoticeConfig;
+
 type EventDetailCtaParams = {
-  canManageEvent: boolean;
+  isEventOrganizer: boolean;
+  isEventDateStarted: boolean;
   isApplied: boolean;
   recruitStatus: RecruitStatus;
 };
@@ -28,46 +38,110 @@ const EVENT_UPCOMING_DISABLED_BUTTON = {
   label: '이벤트가 곧 열릴 예정이에요',
 } satisfies EventDetailCtaButtonConfig;
 
+const EVENT_CLOSED_NOTICE = {
+  action: 'notice',
+  label: '모임 신청이 마감되었어요',
+} satisfies EventDetailCtaNoticeConfig;
+
+const EVENT_UPCOMING_NOTICE = {
+  action: 'notice',
+  label: '모임이 곧 열릴 예정이에요',
+} satisfies EventDetailCtaNoticeConfig;
+
+const EVENT_DATE_STARTED_MANAGEMENT_BUTTONS = [
+  {
+    action: 'match',
+    label: '매칭수정',
+    level: 'secondary',
+  },
+  {
+    action: 'attendance',
+    label: '출석하기',
+  },
+] satisfies EventDetailCtaButtonConfig[];
+
 export const getEventDetailCtaButtonConfigs = ({
-  canManageEvent,
+  isEventOrganizer,
+  isEventDateStarted,
   isApplied,
   recruitStatus,
-}: EventDetailCtaParams): EventDetailCtaButtonConfig[] => {
-  if (canManageEvent) {
-    return getManagementCtaButtonConfigs(recruitStatus);
+}: EventDetailCtaParams): EventDetailCtaConfig[] => {
+  if (isEventOrganizer) {
+    return getManagementCtaButtonConfigs({
+      isEventDateStarted,
+      recruitStatus,
+    });
   }
 
   return getParticipantCtaButtonConfigs({ isApplied, recruitStatus });
 };
 
-const getManagementCtaButtonConfigs = (
-  recruitStatus: RecruitStatus,
-): EventDetailCtaButtonConfig[] => {
+type ManagementCtaParams = Pick<
+  EventDetailCtaParams,
+  'isEventDateStarted' | 'recruitStatus'
+>;
+
+const getManagementCtaButtonConfigs = ({
+  isEventDateStarted,
+  recruitStatus,
+}: ManagementCtaParams): EventDetailCtaButtonConfig[] => {
+  if (isEventDateStarted) {
+    return EVENT_DATE_STARTED_MANAGEMENT_BUTTONS;
+  }
+
   switch (recruitStatus) {
     case 'RECRUIT_OPEN':
       return [{ action: 'match', label: '매칭하기' }];
     case 'RECRUIT_CLOSE':
     case 'RECRUIT_END':
-      return [
-        {
-          action: 'match',
-          label: '매칭수정',
-          level: 'secondary',
-        },
-        {
-          action: 'attendance',
-          label: '출석하기',
-        },
-      ];
+      return EVENT_DATE_STARTED_MANAGEMENT_BUTTONS;
     case 'RECRUIT_UPCOMING':
       return [EVENT_UPCOMING_DISABLED_BUTTON];
   }
 };
 
+const EVENT_DATE_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
+
+export const getEventDateStartTimestamp = (eventDate: string): number | null => {
+  const match = EVENT_DATE_PATTERN.exec(eventDate);
+
+  if (!match) {
+    return null;
+  }
+
+  const [, year, month, date] = match;
+  const eventDateStart = new Date(
+    Number(year),
+    Number(month) - 1,
+    Number(date),
+    0,
+    0,
+    0,
+    0,
+  );
+
+  return eventDateStart.getTime();
+};
+
+export const hasEventDateStarted = (
+  eventDate: string,
+  currentTime: number,
+): boolean => {
+  const eventDateStartTimestamp = getEventDateStartTimestamp(eventDate);
+
+  return (
+    eventDateStartTimestamp !== null &&
+    currentTime >= eventDateStartTimestamp
+  );
+};
+
 const getParticipantCtaButtonConfigs = ({
   isApplied,
   recruitStatus,
-}: Omit<EventDetailCtaParams, 'canManageEvent'>): EventDetailCtaButtonConfig[] => {
+}: Omit<
+  EventDetailCtaParams,
+  'isEventOrganizer' | 'isEventDateStarted'
+>): EventDetailCtaConfig[] => {
   switch (recruitStatus) {
     case 'RECRUIT_OPEN':
       if (isApplied) {
@@ -86,22 +160,10 @@ const getParticipantCtaButtonConfigs = ({
 
       return [{ action: 'apply', label: '참여 신청하기' }];
     case 'RECRUIT_CLOSE':
-      return [
-        {
-          action: 'disabled',
-          disabled: true,
-          label: '현재 참여신청이 불가해요',
-        },
-      ];
+      return [EVENT_CLOSED_NOTICE];
     case 'RECRUIT_UPCOMING':
-      return [EVENT_UPCOMING_DISABLED_BUTTON];
+      return [EVENT_UPCOMING_NOTICE];
     case 'RECRUIT_END':
-      return [
-        {
-          action: 'disabled',
-          disabled: true,
-          label: '이벤트 신청이 마감되었어요',
-        },
-      ];
+      return [EVENT_CLOSED_NOTICE];
   }
 };

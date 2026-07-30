@@ -2,8 +2,9 @@ import type { ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
+import { getApiErrorMessage } from '@/api/core';
 import type { EventApplicantFormResponse, RunningGroup } from '@/api/types';
-import { BottomSheet, ButtonGroup, Text } from '@/components';
+import { BottomSheet, ButtonGroup, Text, useToast } from '@/components';
 
 import {
   copyTextToClipboard,
@@ -11,12 +12,13 @@ import {
   getEventPrimaryGroupLabel,
   type EventGroupLabelContext,
 } from '../utils';
-import { PanelState } from './PanelState';
+import { AnnouncedPanelState, PanelState } from './PanelState';
 
 const EMPTY_VALUE = '미입력';
 
 type ApplicantFormSheetProps = {
   data?: EventApplicantFormResponse;
+  error: unknown;
   eventCategory: EventGroupLabelContext['eventCategory'];
   eventType: EventGroupLabelContext['eventType'];
   isError: boolean;
@@ -33,6 +35,7 @@ type ApplicantFormRow = {
 
 export const ApplicantFormSheet = ({
   data,
+  error,
   eventCategory,
   eventType,
   isError,
@@ -40,6 +43,7 @@ export const ApplicantFormSheet = ({
   onClose,
   open,
 }: ApplicantFormSheetProps): ReactElement => {
+  const { showToast } = useToast();
   const eventGroupLabelContext = { eventCategory, eventType };
   const rows = data ? createApplicantFormRows(data, eventGroupLabelContext) : [];
   const canCopy = rows.length > 0 && !isPending && !isError;
@@ -50,12 +54,13 @@ export const ApplicantFormSheet = ({
     }
 
     void copyTextToClipboard(formatRowsForCopy(rows)).then((isCopied) => {
-      // TODO: 공용 토스트나 스낵바가 준비되면 window.alert 대체
-      window.alert(
-        isCopied
+      showToast({
+        type: isCopied ? 'success' : 'error',
+        icon: isCopied ? 'check-lined' : 'alert-circle-filled',
+        content: isCopied
           ? '신청서 내용을 복사했어요.'
           : '신청서 내용 복사에 실패했어요.',
-      );
+      });
     });
   };
 
@@ -82,10 +87,14 @@ export const ApplicantFormSheet = ({
     >
       {/* TODO: 디자인 확정 시 신청서 로딩/에러/빈 상태 UI로 교체 */}
       {isPending ? (
-        <PanelState>신청서를 불러오는 중입니다.</PanelState>
+        <AnnouncedPanelState role="status">
+          신청서를 불러오는 중입니다.
+        </AnnouncedPanelState>
       ) : null}
       {isError ? (
-        <PanelState>신청서를 불러오지 못했습니다.</PanelState>
+        <AnnouncedPanelState role="alert">
+          {getApiErrorMessage(error, '신청서를 불러오지 못했습니다.')}
+        </AnnouncedPanelState>
       ) : null}
       {!isPending && !isError && !data ? (
         <PanelState>신청서 정보를 선택해주세요.</PanelState>

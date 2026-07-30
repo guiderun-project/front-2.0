@@ -7,21 +7,33 @@ import { APP_PATH } from './path';
 
 type GuestOnlyRouteProps = {
   children: ReactNode;
+  fallback?: ReactElement;
 };
 
 export const GuestOnlyRoute = ({
   children,
+  fallback,
 }: GuestOnlyRouteProps): ReactElement | null => {
   const { user, isAuthReady } = useAuth();
   const location = useLocation();
 
   if (!isAuthReady) {
-    // TODO: 인증 로딩 UI가 확정되면 직접 진입/새로고침 중 빈 화면 대신 표시한다.
-    return null;
+    return fallback ?? null;
   }
 
   if (user) {
-    return <Navigate replace state={{ from: location }} to={APP_PATH.HOME} />;
+    // 앱 셸의 라우트 어나운서(App.tsx RouteAnnouncer)가 srAnnouncement를
+    // 라이브 리전으로 낭독해 무음 리다이렉트를 막는다.
+    return (
+      <Navigate
+        replace
+        state={{
+          from: location,
+          srAnnouncement: '이미 로그인되어 있어 홈화면으로 이동했어요.',
+        }}
+        to={APP_PATH.HOME}
+      />
+    );
   }
 
   return <>{children}</>;

@@ -14,9 +14,11 @@ import type {
   UpdatePersonalInfoResponse,
   UpdateRunningInfoRequest,
   UpdateRunningInfoResponse,
+  UpdateTrainingSafetyPermissionRequest,
   UserBirthDatePatchRequest,
   UserBirthDatePatchResponse,
   UserInfoGetResponse,
+  UserPermissionGetResponse,
   UserWithdrawalDeleteRequest,
 } from '@/api/types/user';
 
@@ -131,13 +133,43 @@ class UserApi {
   };
 
   /**
+   * 로그인된 사용자의 권한 동의 상태를 조회한다.
+   */
+  permissionGet = async () => {
+    return handleApiRequest(async () => {
+      const response =
+        await privateApi.get<UserPermissionGetResponse>('/user/permission');
+
+      return response.data;
+    });
+  };
+
+  /**
+   * 로그인된 사용자의 훈련 참여 및 안전 면책 동의 권한을 저장한다.
+   */
+  trainingSafetyPermissionPatch = async (
+    body: UpdateTrainingSafetyPermissionRequest,
+  ) => {
+    return handleApiRequest(async () => {
+      const response = await privateApi.patch<void>(
+        '/user/permission/training-safety',
+        body,
+      );
+
+      return response.data;
+    });
+  };
+
+  /**
    * 선택한 탈퇴 사유를 저장하고 회원 탈퇴를 처리한다.
    *
    * @see https://www.notion.so/35e9802df4968121bbedcb83130b8049?pvs=1
    */
   withdrawalDelete = async (body: UserWithdrawalDeleteRequest) => {
     return handleApiRequest(async () => {
-      const response = await privateApi.delete<void>('/user', { data: body });
+      const response = await privateApi.delete<void>('/withdrawal', {
+        data: body,
+      });
 
       return response.data;
     });

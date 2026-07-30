@@ -56,7 +56,7 @@ export type EventListGetRequest = {
 export type EventListGetResponse = {
   items: Array<{
     id: number;
-    recruitStatus: 'RECRUIT_UPCOMING' | 'RECRUIT_OPEN' | 'RECRUIT_CLOSE';
+    recruitStatus: Exclude<RecruitStatus, 'RECRUIT_END'>;
     name: string;
     type: EventType;
     dateText: string;
@@ -154,7 +154,6 @@ export type EventUpdateRequest = Omit<
 > & {
   isPrivate: boolean;
   expectedRunningDistanceKm?: number | null;
-  additionalQuestions: AdditionalQuestion[];
 };
 
 export type EventUpdateResponse = EventCreateResponse;
@@ -178,4 +177,11 @@ export type EventRunningDistancePatchRequest = {
 export type EventRunningDistancePatchResponse = {
   eventId: number;
   expectedRunningDistanceKm: number;
+};
+
+export type EventRunningDistanceSkipPath = EventDetailPath;
+
+export type EventRunningDistanceSkipResponse = {
+  eventId: number;
+  isSkipped: boolean;
 };

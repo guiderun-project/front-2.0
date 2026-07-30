@@ -2,6 +2,7 @@ import { Suspense, type ReactElement, type ReactNode } from 'react';
 
 import { QueryErrorResetBoundary } from '@tanstack/react-query';
 
+import { getApiErrorMessage } from '@/api/core';
 import { ErrorBoundary } from '@/components';
 
 import type { AttendanceMessageState } from '../attendancePageState';
@@ -22,9 +23,14 @@ export const AttendancePageBoundary = ({
     <QueryErrorResetBoundary>
       {({ reset }) => (
         <ErrorBoundary
-          fallback={
-            <AttendanceMessagePage pageState={errorState} />
-          }
+          fallback={({ error }) => (
+            <AttendanceMessagePage
+              pageState={{
+                ...errorState,
+                message: getApiErrorMessage(error, errorState.message),
+              }}
+            />
+          )}
           onReset={reset}
         >
           <Suspense

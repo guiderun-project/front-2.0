@@ -37,6 +37,7 @@ import {
   type PageLayoutBackground,
   type SelectOptions,
   type TimeValue,
+  useToast,
 } from "@/components";
 import { type ColorToken, type TypographyToken } from "@/styles/tokens";
 
@@ -209,6 +210,12 @@ const FOOTER_BUTTON_CODE_EXAMPLES = [
   <FooterButton.Button size="l">바로 신청</FooterButton.Button>
 </FooterButton>`,
   },
+  {
+    label: "Subtle background",
+    code: `<FooterButton background="subtle">
+  <FooterButton.Button size="l">신청하기</FooterButton.Button>
+</FooterButton>`,
+  },
 ] as const;
 
 const TEXT_EXAMPLES: ReadonlyArray<{
@@ -331,6 +338,7 @@ const ICON_EXAMPLES: ReadonlyArray<{ icon: IconName; color?: ColorToken }> = [
   { icon: "link-lined", color: "text.brand" },
   { icon: "list-filled" },
   { icon: "list-lined" },
+  { icon: "lock-filled", color: "icon.secondary" },
   { icon: "map-lined", color: "text.brand" },
   { icon: "more-vertical-lined" },
   { icon: "plus-lined", color: "text.brand" },
@@ -491,6 +499,32 @@ const ICON_BUTTON_CODE_EXAMPLES = [
   },
 ] as const;
 
+const TOAST_LONG_CONTENT =
+  "참가자 출석 처리 결과를 확인할 수 없어요. 네트워크 상태를 확인한 뒤 다시 시도해주세요.";
+
+const TOAST_CODE_EXAMPLES = [
+  {
+    label: "Success",
+    code: `const { showToast } = useToast();
+
+showToast({
+  type: 'success',
+  icon: 'check-lined',
+  content: '김가나님 출석을 완료했어요',
+});`,
+  },
+  {
+    label: "Error",
+    code: `const { showToast } = useToast();
+
+showToast({
+  type: 'error',
+  icon: 'alert-circle-filled',
+  content: '출석 처리에 실패했어요',
+});`,
+  },
+] as const;
+
 const COLOR_MODE_TOGGLE_CODE_EXAMPLES = [
   {
     label: "Default",
@@ -509,18 +543,18 @@ const RUNNER_TYPE_AVATAR_SIZES = [
 ] as const;
 
 const RUNNER_TYPE_AVATAR_EXAMPLES = [
-  { label: "시각장애러너", type: "vi" },
-  { label: "가이드러너", type: "guide" },
+  { label: "시각장애러너", type: "VI" },
+  { label: "가이드러너", type: "GUIDE" },
 ] as const;
 
 const RUNNER_TYPE_AVATAR_CODE_EXAMPLES = [
   {
     label: "Default size",
-    code: `<RunnerTypeAvatar type="vi" />`,
+    code: `<RunnerTypeAvatar type="VI" />`,
   },
   {
     label: "XL guide",
-    code: `<RunnerTypeAvatar type="guide" size="xl" />`,
+    code: `<RunnerTypeAvatar type="GUIDE" size="xl" />`,
   },
 ] as const;
 
@@ -919,6 +953,22 @@ const INPUT_CODE_EXAMPLES = [
 />`,
   },
   {
+    label: "Requirement",
+    code: `// requirement 를 주면 스크린리더가 라벨보다 '필수'/'선택'을 먼저 읽고,
+// required 일 때만 라벨 오른쪽에 빨간 점이 붙는다.
+<Input
+  label="필수 입력 항목"
+  placeholder="필수 항목이에요"
+  requirement="required"
+/>
+
+<Input
+  label="선택 입력 항목"
+  placeholder="선택 항목이에요"
+  requirement="optional"
+/>`,
+  },
+  {
     label: "Error prop",
     code: `<Input
   error
@@ -1128,6 +1178,7 @@ export const DesignPage = () => {
     minutes: "",
     seconds: "",
   });
+  const { showToast } = useToast();
   const confirmPopupLoadingTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -1318,18 +1369,23 @@ export const DesignPage = () => {
                         {level}
                       </Text>
                     </ButtonMatrixLabelCell>
-                    {BUTTON_STATUS_EXAMPLES.map(({ disabled, status }) => (
-                      <ButtonMatrixButtonCell key={status}>
-                        <Button
-                          disabled={disabled}
-                          level={level}
-                          size={size}
-                          status={status}
-                        >
-                          확인
-                        </Button>
-                      </ButtonMatrixButtonCell>
-                    ))}
+                    {BUTTON_STATUS_EXAMPLES.map(
+                      ({ disabled, label: statusLabel, status }) => (
+                        <ButtonMatrixButtonCell key={status}>
+                          {/* div 그리드라 헤더 셀과 연결이 없어, SR 전용
+                              이름으로 level·status 변형을 구분한다. */}
+                          <Button
+                            aria-label={`확인, ${level} ${statusLabel}`}
+                            disabled={disabled}
+                            level={level}
+                            size={size}
+                            status={status}
+                          >
+                            확인
+                          </Button>
+                        </ButtonMatrixButtonCell>
+                      ),
+                    )}
                   </ButtonMatrixRow>
                 ))}
               </ButtonMatrixTable>
@@ -1340,7 +1396,7 @@ export const DesignPage = () => {
           <Text color="text.tertiary" font="detail-m-m">
             Full width
           </Text>
-          <Button fullWidth size="l">
+          <Button aria-label="신청하기, full width" fullWidth size="l">
             신청하기
           </Button>
         </ButtonFullWidthPreview>
@@ -1534,8 +1590,26 @@ export const DesignPage = () => {
               options={RECRUITMENT_STATUS_OPTIONS}
               sheetTitle="모집 상태"
               value={recruitmentStatus}
-              renderTrigger={({ disabled, open, selectedOption }) => (
-                <StatusChip disabled={disabled} type="button" onClick={open}>
+              renderTrigger={({
+                disabled,
+                errorId,
+                hasError,
+                isOpen,
+                open,
+                selectedOption,
+              }) => (
+                /* 커스텀 트리거도 기본 SelectTrigger처럼 용도·팝업 여부·
+                   확장 상태·오류 상태를 SR에 전달하는 레퍼런스 패턴. */
+                <StatusChip
+                  aria-describedby={hasError ? errorId : undefined}
+                  aria-expanded={isOpen}
+                  aria-haspopup="dialog"
+                  aria-invalid={hasError || undefined}
+                  aria-label={`모집 상태, 현재 선택: ${selectedOption?.label ?? "모집중"}`}
+                  disabled={disabled}
+                  type="button"
+                  onClick={open}
+                >
                   <Text as="span" color="text.brand" font="body-s-sb">
                     {selectedOption?.label ?? "모집중"}
                   </Text>
@@ -1700,6 +1774,59 @@ export const DesignPage = () => {
           )}
         </IconButtonGrid>
         <CodeExamples examples={ICON_BUTTON_CODE_EXAMPLES} />
+      </ShowcaseSection>
+
+      <ShowcaseSection>
+        <SectionTitle>
+          <Text as="h2" font="heading-s-m">
+            Toast
+          </Text>
+          <Text color="text.tertiary" font="detail-m-r">
+            Success, error, long content
+          </Text>
+        </SectionTitle>
+        <PopupSampleGrid>
+          <Button
+            level="secondary"
+            size="s"
+            onClick={() =>
+              showToast({
+                type: "success",
+                icon: "check-lined",
+                content: "김가나님 출석을 완료했어요",
+              })
+            }
+          >
+            Success toast
+          </Button>
+          <Button
+            level="secondary"
+            size="s"
+            onClick={() =>
+              showToast({
+                type: "error",
+                icon: "alert-circle-filled",
+                content: "출석 처리에 실패했어요",
+              })
+            }
+          >
+            Error toast
+          </Button>
+          <Button
+            level="secondary"
+            size="s"
+            onClick={() =>
+              showToast({
+                type: "error",
+                icon: "alert-circle-filled",
+                content: TOAST_LONG_CONTENT,
+              })
+            }
+          >
+            Long content
+          </Button>
+        </PopupSampleGrid>
+        <CodeExamples examples={TOAST_CODE_EXAMPLES} />
       </ShowcaseSection>
 
       <ShowcaseSection>
@@ -2027,7 +2154,14 @@ export const DesignPage = () => {
             ),
           )}
         </PopupSampleGrid>
-        <Text color="text.secondary" font="body-s-r">
+        {/* 팝업 확인·취소 결과가 유일한 피드백이라 상시 마운트 status
+            리전으로 갱신 시 낭독한다. 시각 변화 없음. */}
+        <Text
+          aria-live="polite"
+          color="text.secondary"
+          font="body-s-r"
+          role="status"
+        >
           {lastConfirmPopupAction}
         </Text>
         <CodeExamples examples={CONFIRM_POPUP_CODE_EXAMPLES} />
@@ -2043,6 +2177,16 @@ export const DesignPage = () => {
           </Text>
         </SectionTitle>
         <FieldList>
+          <Input
+            label="필수 입력 항목"
+            placeholder="필수 항목이에요"
+            requirement="required"
+          />
+          <Input
+            label="선택 입력 항목"
+            placeholder="선택 항목이에요"
+            requirement="optional"
+          />
           <Input
             clearable
             helperText="안내 메시지"

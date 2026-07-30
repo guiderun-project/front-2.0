@@ -9,8 +9,12 @@ export type EventMatchingStatusPath = {
 };
 
 export type EventMatchingStatusResponse = {
-  myPartners: MatchingUser[];
+  myPartners: MatchingPartner[];
   groups: MatchingGroup[];
+};
+
+export type MatchingPartner = MatchingUser & {
+  defaultGroup: RunningGroup;
 };
 
 export type MatchingGroup = {

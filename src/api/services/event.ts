@@ -12,6 +12,8 @@ import type {
   EventRunningDistancePatchRequest,
   EventRunningDistancePatchResponse,
   EventRunningDistancePath,
+  EventRunningDistanceSkipPath,
+  EventRunningDistanceSkipResponse,
   EventSearchGetRequest,
   EventSearchGetResponse,
   EventsSummaryGetResponse,
@@ -192,6 +194,24 @@ class EventApi {
         `/event/${eventId}/running-distance`,
         body,
       );
+
+      return response.data;
+    });
+  };
+
+  /**
+   * 러닝 거리 입력 안내를 건너뛴다. 이후 미입력 조회 대상에서 제외된다.
+   *
+   * @see https://www.notion.so/35e9802df496816db2f5e231ce44c156?pvs=1
+   */
+  runningDistanceSkipPatch = async ({
+    eventId,
+  }: EventRunningDistanceSkipPath) => {
+    return handleApiRequest(async () => {
+      const response =
+        await privateApi.patch<EventRunningDistanceSkipResponse>(
+          `/event/${eventId}/running-distance/skip`,
+        );
 
       return response.data;
     });

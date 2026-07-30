@@ -13,6 +13,8 @@ import styled from "@emotion/styled";
 import { HiddenText } from "@/components/HiddenText";
 import { IconButton } from "@/components/Icon";
 
+import { FieldLabelContent } from "./FieldLabelContent";
+
 import {
   CARET_BAR_HEIGHT,
   CARET_BAR_WIDTH,
@@ -21,7 +23,6 @@ import {
   COUNTER_TOTAL_TYPOGRAPHY,
   DEFAULT_CLEAR_LABEL,
   FIELD_MIN_HEIGHT,
-  FLOATED_LABEL_SCALE,
   INFO_TYPOGRAPHY,
   LABEL_TYPOGRAPHY,
   MULTILINE_CARET_BAR_HEIGHT,
@@ -29,6 +30,7 @@ import {
   typographyStyle,
 } from "./fieldStyles";
 import type { InputFieldOwnProps } from "./Input.types";
+import { useFieldErrorAnnouncement } from "./useFieldErrorAnnouncement";
 
 type FieldValue = string | number | readonly string[];
 
@@ -59,6 +61,12 @@ type InputFieldShellProps<E extends HTMLInputElement | HTMLTextAreaElement> =
     className?: string;
     describedById?: string;
     controlRef?: Ref<E>;
+    /**
+     * 값이 비어 있어도 라벨을 항상 위로 띄운다.
+     * input[type=date]처럼 브라우저가 자체 플레이스홀더(mm/dd/yyyy)를 항상 그리는
+     * 컨트롤에서 라벨과 겹치는 것을 막는 용도다.
+     */
+    alwaysFloatLabel?: boolean;
     renderControl: (control: InputControlRenderProps<E>) => ReactNode;
   };
 
@@ -100,6 +108,8 @@ export const InputFieldShell = <
   errorText,
   error = false,
   maxLength,
+  requirement,
+  alwaysFloatLabel = false,
   placeholder,
   value,
   defaultValue,
@@ -143,6 +153,15 @@ export const InputFieldShell = <
   const message = hasError ? errorText : helperText;
   const hasMessage = Boolean(message);
   const showCounter = maxLength != null;
+  // 오류는 aria-describedby 외에 상시 마운트된 라이브 리전으로도 미러링해야
+  // 포커스가 다른 곳에 있을 때 나타나는 오류를 스크린리더가 놓치지 않는다.
+  // 단, 오류 등장 직후 이 컨트롤로 포커스가 옮겨온 검증-포커스 흐름에서는
+  // describedby가 낭독을 담당하므로 미러를 생략한다(중복 낭독 방지).
+  const errorAnnouncement = useFieldErrorAnnouncement(
+    hasError ? errorText : null,
+    controlRef,
+  );
+  const isAtMaxLength = maxLength != null && length >= maxLength;
 
   const describedBy =
     [
@@ -175,11 +194,13 @@ export const InputFieldShell = <
   return (
     <Root className={className} data-error={hasError || undefined}>
       <FieldBox
-        data-filled={hasValue || undefined}
+        data-filled={hasValue || alwaysFloatLabel || undefined}
         data-multiline={multiline || undefined}
       >
         <Field>
-          <FloatingLabel htmlFor={controlId}>{label}</FloatingLabel>
+          <FloatingLabel htmlFor={controlId}>
+            <FieldLabelContent label={label} requirement={requirement} />
+          </FloatingLabel>
           <Caret aria-hidden="true" data-caret="" />
           {renderControl({
             id: controlId,
@@ -212,7 +233,6 @@ export const InputFieldShell = <
               $error={hasError}
               data-helper={!hasError || undefined}
               id={messageId}
-              role={hasError ? "alert" : undefined}
             >
               {message}
             </Message>
@@ -230,6 +250,14 @@ export const InputFieldShell = <
             </Counter>
           )}
         </InfoRow>
+      )}
+      <HiddenText role="status">{errorAnnouncement}</HiddenText>
+      {showCounter && (
+        // 최대 글자 수에 도달해 이후 입력이 무시되기 시작하는 시점을 알린다.
+        // 도달/해제 시에만 내용이 바뀌므로 타이핑마다 반복 낭독되지 않는다.
+        <HiddenText role="status">
+          {isAtMaxLength ? `최대 ${maxLength}자에 도달했어요` : ""}
+        </HiddenText>
       )}
     </Root>
   );
@@ -263,7 +291,9 @@ const FieldBox = styled.div(({ theme }) => ({
   },
 
   '&[data-multiline="true"] [data-caret]': {
-    top: theme.pxToRem(CONTROL_TOP_SPACE),
+    top: theme.pxToRem(
+      CONTROL_TOP_SPACE + (24 - MULTILINE_CARET_BAR_HEIGHT) / 2,
+    ),
     bottom: "auto",
     height: theme.pxToRem(MULTILINE_CARET_BAR_HEIGHT),
   },
@@ -285,9 +315,10 @@ const FieldBox = styled.div(({ theme }) => ({
 
   '&:focus-within label, &[data-filled="true"] label': {
     top: 0,
-    transform: `translateY(0) scale(${FLOATED_LABEL_SCALE})`,
+    transform: "translateY(0)",
     transformOrigin: "left top",
     color: theme.color.text.tertiary,
+    ...typographyStyle(theme, INFO_TYPOGRAPHY),
   },
 
   "&:focus-within label": {
@@ -301,6 +332,10 @@ const FieldBox = styled.div(({ theme }) => ({
 
   "[data-error='true'] & label": {
     color: theme.color.text.danger,
+  },
+
+  "[data-error='true'] & [data-caret]": {
+    backgroundColor: theme.color.text.danger,
   },
 
   "@media (prefers-reduced-motion: reduce)": {
@@ -344,7 +379,8 @@ const FloatingLabel = styled.label(({ theme }) => ({
   pointerEvents: "none",
   color: theme.color.text.tertiary,
   ...typographyStyle(theme, LABEL_TYPOGRAPHY),
-  transition: "transform 120ms ease, color 120ms ease, top 120ms ease",
+  transition:
+    "transform 120ms ease, color 120ms ease, top 120ms ease, font-size 120ms ease, line-height 120ms ease, letter-spacing 120ms ease",
 
   "@media (prefers-reduced-motion: reduce)": {
     transition: "color 120ms ease",

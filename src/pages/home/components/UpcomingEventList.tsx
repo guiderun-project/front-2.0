@@ -4,10 +4,10 @@ import styled from "@emotion/styled";
 
 import { Text } from "@/components";
 
-import { useUpcomingEvents } from "../hooks/useUpcomingEvents";
-import { HomeSectionMessage } from "./HomeSectionMessage";
-import { MemberUpcomingEventCard } from "./MemberUpcomingEventCard";
-import { UpcomingEventCard } from "./UpcomingEventCard";
+import { useUpcomingEvents } from "@/pages/home/hooks/useUpcomingEvents";
+import { HomeSectionMessage } from "@/pages/home/components/HomeSectionMessage";
+import { MemberUpcomingEventCard } from "@/pages/home/components/MemberUpcomingEventCard";
+import { UpcomingEventCard } from "@/pages/home/components/UpcomingEventCard";
 
 export const UpcomingEventList = (): ReactElement => {
   const headingId = useId();
@@ -16,7 +16,7 @@ export const UpcomingEventList = (): ReactElement => {
   return (
     <Section aria-labelledby={headingId}>
       <Text id={headingId} as="h2" color="text.primary" font="heading-s-sb">
-        다가오는 러닝 모임
+        {data.viewerType === "MEMBER" ? "나의 러닝 일정" : "다가오는 러닝 모임"}
       </Text>
 
       {data.viewerType === "MEMBER" ? (

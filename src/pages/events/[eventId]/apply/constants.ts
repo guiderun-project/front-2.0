@@ -1,5 +1,10 @@
 import type { EventCategory, EventType, UserType } from '@/api/types';
 import type { SelectOptions } from '@/components';
+import {
+  RUNNER_TYPE_LABELS,
+  TRAINING_RECORD_LABELS,
+  TRAINING_RECORD_SR_LABELS,
+} from '@/constants';
 
 import {
   COMPETITION_COURSE_OPTIONS,
@@ -13,28 +18,6 @@ export type EventApplyGroupValue = EventVisibleRunningGroup;
 
 export const EVENT_APPLY_GROUP_VALUES = EVENT_VISIBLE_RUNNING_GROUPS;
 export const EVENT_APPLY_DETAIL_MAX_LENGTH = 100;
-
-const TRAINING_RECORD_LABELS: Record<UserType, Record<EventApplyGroupValue, string>> = {
-  VI: {
-    A: '~50분',
-    B: '51~56분',
-    C: '57~65분',
-    D: '66분~',
-    E: '기록 없음',
-  },
-  GUIDE: {
-    A: '~45분',
-    B: '46~52분',
-    C: '53~59분',
-    D: '60분~',
-    E: '기록 없음',
-  },
-};
-
-const RUNNER_TYPE_LABELS: Record<UserType, string> = {
-  VI: '시각장애러너',
-  GUIDE: '가이드러너',
-};
 
 export const GROUP_TRAINING_OPTIONS = [
   {
@@ -62,6 +45,9 @@ export const createGeneralTrainingOptions = (
   return EVENT_APPLY_GROUP_VALUES.map((value) => ({
     value,
     label: `${RUNNER_TYPE_LABELS[userType]} ${value} (${TRAINING_RECORD_LABELS[userType][value]})`,
+    // 시각 라벨의 물결표 구간(~50분 등)은 스크린리더가 '이하/이상' 의미를
+    // 살리지 못하므로 범위를 풀어 쓴 문장형 라벨로 낭독한다.
+    srLabel: `${RUNNER_TYPE_LABELS[userType]} ${value}, 10km ${TRAINING_RECORD_SR_LABELS[userType][value]}`,
   }));
 };
 

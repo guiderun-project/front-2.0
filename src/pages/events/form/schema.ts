@@ -19,6 +19,7 @@ type EventFormSchemaOptions = {
     date: string;
     time: string;
   };
+  validateAdditionalQuestions?: boolean;
 };
 
 const isValidDateValue = (value: string): boolean => {
@@ -81,12 +82,26 @@ const additionalQuestionSchema = z.discriminatedUnion('type', [
       .array(requiredTextSchema)
       .min(
         ADDITIONAL_SELECT_OPTION_MIN_COUNT,
-        '선택지는 최소 1개 이상 입력해주세요.',
+        `선택지는 최소 ${ADDITIONAL_SELECT_OPTION_MIN_COUNT}개 이상 입력해주세요.`,
       )
       .max(
         ADDITIONAL_SELECT_OPTION_MAX_COUNT,
-        '선택지는 최대 3개까지 입력할 수 있어요.',
+        '선택지는 최대 5개까지 입력할 수 있어요.',
       ),
+  }),
+]);
+
+const readOnlyAdditionalQuestionSchema = z.discriminatedUnion('type', [
+  z.object({
+    formId: z.string().min(1),
+    type: z.literal('TEXT'),
+    title: z.string(),
+  }),
+  z.object({
+    formId: z.string().min(1),
+    type: z.literal('SELECT'),
+    title: z.string(),
+    options: z.array(z.string()),
   }),
 ]);
 
@@ -106,6 +121,9 @@ export const createEventFormSchema = (
   eventType: EventType,
   options: EventFormSchemaOptions = {},
 ) => {
+  const shouldValidateAdditionalQuestions =
+    options.validateAdditionalQuestions ?? true;
+
   return z
     .object({
       recruitStartDate: dateValueSchema,
@@ -125,7 +143,11 @@ export const createEventFormSchema = (
         ),
       expectedRunningDistanceKm: runningDistanceSchema,
       isPrivate: z.boolean(),
-      additionalQuestions: z.array(additionalQuestionSchema),
+      additionalQuestions: z.array(
+        shouldValidateAdditionalQuestions
+          ? additionalQuestionSchema
+          : readOnlyAdditionalQuestionSchema,
+      ),
     })
     .superRefine((value, context) => {
       const minimumEventDateTime = options.minimumEventDateTime;

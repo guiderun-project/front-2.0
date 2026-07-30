@@ -1,15 +1,247 @@
-import type { ReactElement } from 'react';
+import { useId, useState, type ReactElement } from "react";
 
-import { PageLayout } from '@/components/PageLayout';
-import { RoutePlaceholder } from '@/pages/_shared/RoutePlaceholder';
+import styled from "@emotion/styled";
+import { useNavigate } from "react-router-dom";
+
+import { HiddenText, Icon, PageLayout, Text, TopNavigation } from "@/components";
+
+import { TERMS_SECTIONS, type BodyBlock, type TermsSection } from "./constants";
 
 export const TermsPage = (): ReactElement => {
+  const navigate = useNavigate();
+
   return (
     <PageLayout background="bg.subtle">
-      <RoutePlaceholder
-        title="약관 보기"
-        description="서비스 이용 약관과 개인정보 관련 내용을 확인할 페이지입니다."
+      {/* HiddenText 제목은 시각 변화 없이 접근 가능한 이름 "약관"의 h1을 만든다.
+          (titleAs 기본값 h1, 절대배치 hidden span이라 높이 0 + TitleSpacer와
+          동일한 flex라 레이아웃 불변) */}
+      <TopNavigation
+        left={{
+          icon: "chevron-left-lined",
+          ariaLabel: "뒤로가기",
+          onClick: () => navigate(-1),
+        }}
+        title={<HiddenText>약관</HiddenText>}
       />
+      <Content>
+        {TERMS_SECTIONS.map((section) => (
+          <TermsAccordionItem key={section.key} section={section} />
+        ))}
+      </Content>
     </PageLayout>
   );
 };
+
+const TermsAccordionItem = ({
+  section,
+}: {
+  section: TermsSection;
+}): ReactElement => {
+  const [isOpen, setIsOpen] = useState(true);
+  const panelId = useId();
+
+  return (
+    <Card>
+      {/* APG 아코디언 패턴: heading이 버튼을 감싸야 VoiceOver 로터·TalkBack
+          제목 탐색으로 섹션 간 이동이 가능하다. margin 0 블록 래퍼라 시각 불변. */}
+      <HeaderHeading>
+        <HeaderButton
+          aria-controls={panelId}
+          aria-expanded={isOpen}
+          type="button"
+          onClick={() => setIsOpen((current) => !current)}
+        >
+          <Title color="text.primary" font="body-l-sb">
+            {section.title}
+          </Title>
+          <ChevronIcon $isOpen={isOpen}>
+            <Icon
+              aria-hidden={true}
+              color="icon.secondary"
+              icon="chevron-down-lined"
+              size={20}
+            />
+          </ChevronIcon>
+        </HeaderButton>
+      </HeaderHeading>
+      <Panel
+        data-state={isOpen ? "open" : "closed"}
+        id={panelId}
+        inert={!isOpen ? true : undefined}
+      >
+        <PanelInner $isOpen={isOpen}>
+          <Divider aria-hidden={true} />
+          <BodyRenderer blocks={section.body} />
+        </PanelInner>
+      </Panel>
+    </Card>
+  );
+};
+
+const BodyRenderer = ({ blocks }: { blocks: BodyBlock[] }): ReactElement => (
+  <BodyContent>
+    {blocks.map((block, i) => {
+      if (block.type === "paragraph") {
+        return (
+          <Text key={i} color="text.tertiary" font="body-s-m">
+            {block.text}
+          </Text>
+        );
+      }
+      return (
+        <OrderedList key={i}>
+          {block.items.map((item, j) => (
+            <li key={j}>
+              <Text color="text.tertiary" font="body-s-m">
+                {item.text}
+              </Text>
+              {item.bullets && item.bullets.length > 0 && (
+                <UnorderedList>
+                  {item.bullets.map((bullet, k) => (
+                    <li key={k}>
+                      <Text color="text.tertiary" font="body-s-m">
+                        {bullet}
+                      </Text>
+                    </li>
+                  ))}
+                </UnorderedList>
+              )}
+            </li>
+          ))}
+        </OrderedList>
+      );
+    })}
+  </BodyContent>
+);
+
+const Content = styled.div(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  gap: theme.spacing.lg,
+  paddingInline: theme.spacing["2xl"],
+}));
+
+const Card = styled.section(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  width: "100%",
+  overflow: "hidden",
+  borderRadius: "1.25rem",
+  backgroundColor: theme.color.bg.elevated,
+}));
+
+const HeaderHeading = styled.h2({
+  margin: 0,
+});
+
+const HeaderButton = styled.button(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  gap: theme.spacing.md,
+  width: "100%",
+  padding: theme.spacing["2xl"],
+  paddingTop: theme.spacing["3xl"],
+  border: 0,
+  background: "transparent",
+  cursor: "pointer",
+  textAlign: "left",
+  touchAction: "manipulation",
+
+  "&:focus-visible": {
+    outline: `2px solid ${theme.color.border.focused}`,
+    outlineOffset: `-${theme.spacing.xs}`,
+  },
+}));
+
+const Title = styled(Text)({
+  flex: "1 1 0",
+  minWidth: 0,
+});
+
+const ChevronIcon = styled.span<{ $isOpen: boolean }>(({ $isOpen }) => ({
+  display: "inline-flex",
+  flex: "0 0 auto",
+  transform: $isOpen ? "rotate(180deg)" : "rotate(0deg)",
+  transition: "transform 160ms ease-out",
+
+  "@media (prefers-reduced-motion: reduce)": {
+    transition: "none",
+  },
+}));
+
+const Panel = styled.div({
+  display: "grid",
+  gridTemplateRows: "0fr",
+  overflow: "hidden",
+  transition: "grid-template-rows 180ms ease-out, visibility 0s linear 180ms",
+  visibility: "hidden",
+
+  '&[data-state="open"]': {
+    gridTemplateRows: "1fr",
+    transition: "grid-template-rows 180ms ease-out",
+    visibility: "visible",
+  },
+
+  "@media (prefers-reduced-motion: reduce)": {
+    transition: "none",
+  },
+});
+
+const PanelInner = styled.div<{ $isOpen: boolean }>(({ $isOpen, theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  gap: theme.spacing["2xl"],
+  minHeight: 0,
+  overflow: "hidden",
+  padding: $isOpen
+    ? `0 ${theme.spacing["2xl"]} ${theme.spacing["3xl"]}`
+    : `0 ${theme.spacing["2xl"]}`,
+  transition: "padding 180ms ease-out",
+
+  "@media (prefers-reduced-motion: reduce)": {
+    transition: "none",
+  },
+}));
+
+const Divider = styled.hr(({ theme }) => ({
+  width: "100%",
+  height: 0,
+  margin: 0,
+  border: 0,
+  borderTop: `1px solid ${theme.color.border.subtle}`,
+}));
+
+const BodyContent = styled.div(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  gap: theme.spacing.lg,
+}));
+
+const OrderedList = styled.ol(({ theme }) => ({
+  ...theme.typography["body-s-m"],
+  color: theme.color.text.tertiary,
+  margin: 0,
+  paddingLeft: theme.spacing["2xl"],
+  listStyleType: "decimal",
+
+  "& > li": {
+    paddingLeft: theme.spacing.xs,
+  },
+
+  "& > li + li": {
+    marginTop: theme.spacing.md,
+  },
+}));
+
+const UnorderedList = styled.ul(({ theme }) => ({
+  ...theme.typography["body-s-m"],
+  color: theme.color.text.tertiary,
+  margin: 0,
+  marginTop: theme.spacing.sm,
+  paddingLeft: theme.spacing.xl,
+  listStyleType: "disc",
+
+  "& > li + li": {
+    marginTop: theme.spacing.sm,
+  },
+}));

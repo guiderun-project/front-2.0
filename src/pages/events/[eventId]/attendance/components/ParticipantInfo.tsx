@@ -4,6 +4,7 @@ import styled from '@emotion/styled';
 
 import type { AttendanceParticipant } from '@/api/types';
 import { Badge, HiddenText, RunnerTypeAvatar, Text } from '@/components';
+import { RUNNER_TYPE_LABELS } from '@/constants';
 
 type ParticipantInfoData = Pick<AttendanceParticipant, 'name' | 'type'> & {
   isFirstParticipation?: boolean;
@@ -14,40 +15,53 @@ type ParticipantInfoProps = {
   participant: ParticipantInfoData;
 };
 
-const RUNNER_TYPE_LABEL = {
-  VI: '시각장애러너',
-  GUIDE: '가이드러너',
-} as const satisfies Record<ParticipantInfoData['type'], string>;
-
 export const ParticipantInfo = ({
   id,
   participant,
 }: ParticipantInfoProps): ReactElement => {
+  const description = getParticipantDescription(participant);
+
   return (
     <ParticipantInfoRoot id={id}>
-      <AvatarSlot aria-hidden={true}>
-        <RunnerTypeAvatar
-          size="m"
-          type={participant.type}
-        />
-      </AvatarSlot>
-      <ParticipantName color="text.primary" font="body-m-sb">
-        {participant.name}
-      </ParticipantName>
-      <HiddenText>{RUNNER_TYPE_LABEL[participant.type]}</HiddenText>
-      {participant.isFirstParticipation ? (
-        <Badge size="s" tone="cyan">
-          첫참여
-        </Badge>
-      ) : null}
+      <HiddenText>{description}</HiddenText>
+      <ParticipantInfoVisual aria-hidden={true}>
+        <AvatarSlot>
+          <RunnerTypeAvatar
+            size="m"
+            type={participant.type}
+          />
+        </AvatarSlot>
+        <ParticipantName color="text.primary" font="body-m-sb">
+          {participant.name}
+        </ParticipantName>
+        {participant.isFirstParticipation ? (
+          <Badge size="s" tone="cyan">
+            첫참여
+          </Badge>
+        ) : null}
+      </ParticipantInfoVisual>
     </ParticipantInfoRoot>
   );
 };
 
-const ParticipantInfoRoot = styled.span(({ theme }) => ({
+const getParticipantDescription = (participant: ParticipantInfoData) => {
+  const participationDescription = participant.isFirstParticipation
+    ? ', 첫참여'
+    : '';
+
+  return `${RUNNER_TYPE_LABELS[participant.type]} ${participant.name}${participationDescription}`;
+};
+
+const ParticipantInfoRoot = styled.span({
   display: 'flex',
   alignItems: 'center',
   flex: '1 1 0',
+  minWidth: 0,
+});
+
+const ParticipantInfoVisual = styled.span(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
   gap: theme.spacing.s,
   minWidth: 0,
 }));

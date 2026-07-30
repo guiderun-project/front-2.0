@@ -16,10 +16,11 @@ import {
   getMatchingSummary,
   isMatched,
   mockDb,
+  toMatchingPartner,
   toMatchingUser,
   visibleRunningGroups,
 } from '@/mocks/fixtures';
-import { apiUrl, notFound } from '@/mocks/http';
+import { apiUrl, badRequest, notFound } from '@/mocks/http';
 
 type CompletedRowEntry = {
   runningGroup: RunningGroup;
@@ -39,6 +40,12 @@ const getMatchingUser = (eventId: number, userId: string) => {
   const form = findAppliedForm(eventId, userId);
 
   return form ? toMatchingUser(form) : null;
+};
+
+const getMatchingPartner = (eventId: number, userId: string) => {
+  const form = findAppliedForm(eventId, userId);
+
+  return form ? toMatchingPartner(form) : null;
 };
 
 const isMatchingUser = (user: MatchingUser | null): user is MatchingUser => {
@@ -177,7 +184,7 @@ export const matchingHandlers: HttpHandler[] = [
             ...currentMatching.guideIds,
           ]
             .filter((userId) => userId !== currentUser.userId)
-            .map((userId) => getMatchingUser(eventId, userId))
+            .map((userId) => getMatchingPartner(eventId, userId))
             .filter((user) => Boolean(user))
         : [];
 
@@ -244,6 +251,27 @@ export const matchingHandlers: HttpHandler[] = [
         return guideForm && getFormUser(guideForm).type === 'GUIDE';
       });
 
+      if (guideIds.length === 0) {
+        return badRequest('가이드러너를 최소 1명 선택해주세요.');
+      }
+
+      // steal: remove requested guides from any other VI's matching in this event.
+      const guideIdSet = new Set(guideIds);
+
+      mockDb.matchings = mockDb.matchings.filter((matching) => {
+        if (matching.eventId !== eventId || matching.viId === body.viId) {
+          return true;
+        }
+
+        matching.guideIds = matching.guideIds.filter(
+          (guideId) => !guideIdSet.has(guideId),
+        );
+
+        // drop the other VI's matching if stealing emptied it.
+        return matching.guideIds.length > 0;
+      });
+
+      // replace (upsert): set the target VI's guides to exactly the requested set.
       const existingMatching = getMatching(eventId, body.viId);
 
       if (existingMatching) {

@@ -60,4 +60,5 @@ const HeroTitle = styled(Text)(({ theme }) => ({
   textAlign: 'center',
   whiteSpace: 'pre-wrap',
   wordBreak: 'keep-all',
+  overflowWrap: 'anywhere',
 }));

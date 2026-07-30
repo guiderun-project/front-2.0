@@ -2,8 +2,12 @@ import type { ReactElement, ReactNode } from 'react';
 import { useCallback, useEffect, useMemo } from 'react';
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
 
+import {
+  identifyUser,
+  isUnauthorizedApiError,
+  resetIdentity,
+} from '@/api/core';
 import { api } from '@/api/services';
 import type { UserInfoGetResponse } from '@/api/types';
 import {
@@ -23,7 +27,7 @@ type AuthProviderProps = {
 };
 
 const isUnauthorizedError = (error: unknown) => {
-  return isAxiosError(error) && error.response?.status === 401;
+  return isUnauthorizedApiError(error);
 };
 
 const shouldRetryAuthUserQuery = (failureCount: number, error: unknown) => {
@@ -101,6 +105,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
   const clearSession = useCallback(() => {
     clearAccessToken();
     queryClient.setQueryData(AUTH_USER_QUERY_KEY, null);
+    resetIdentity();
   }, [queryClient]);
 
   const startSession = useCallback(
@@ -129,6 +134,17 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
   }, [queryClient]);
 
   const user = authUserQuery.data ?? null;
+
+  // 로그인/가입/OAuth/세션복원 등 사용자 식별 방식과 무관하게, user가 채워지는
+  // 이 지점 한 곳에서만 identify 하면 모든 진입 경로가 커버된다.
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+
+    identifyUser(user);
+  }, [user]);
+
   const value = useMemo<AuthContextValue>(
     () => ({
       user,

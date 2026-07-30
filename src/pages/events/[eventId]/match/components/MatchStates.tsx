@@ -37,7 +37,7 @@ export const AllMatchedState = (): ReactElement => {
   return (
     <AllMatchedRoot>
       <AllMatchedIcon aria-hidden={true}>
-        <Icon color="icon.tertiary" icon="check-lined" size={42} />
+        <Icon color="icon.tertiary" icon="check-lined" size={36} />
       </AllMatchedIcon>
       <Text align="center" as="p" color="text.tertiary" font="heading-s-m">
         모든 참여자가
@@ -64,15 +64,14 @@ const AllMatchedRoot = styled.div(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'center',
   gap: theme.spacing['2xl'],
-  minHeight: theme.pxToRem(520),
-  paddingBottom: theme.pxToRem(120),
+  paddingBottom: theme.spacing['5xl'],
   boxSizing: 'border-box',
 }));
 
 const AllMatchedIcon = styled.span(({ theme }) => ({
   display: 'grid',
-  width: theme.pxToRem(64),
-  height: theme.pxToRem(64),
+  width: theme.pxToRem(54),
+  height: theme.pxToRem(54),
   placeItems: 'center',
   borderRadius: theme.radius.full,
   backgroundColor: theme.color.bg.overlay,

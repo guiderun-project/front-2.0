@@ -77,8 +77,8 @@ const getRestrictedAccessHeading = ({
         <>
           안전한 러닝 환경을 위해 정보를 확인하고 있어요.
           <br />
-          <DescriptionEmphasis>하루 이내</DescriptionEmphasis>에 카카오톡으로
-          안내드릴게요
+          빠른 시일 내에 <DescriptionEmphasis>카카오톡</DescriptionEmphasis>으로
+          안내드릴게요!
         </>
       ),
     };

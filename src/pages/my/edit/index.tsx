@@ -1,15 +1,23 @@
 import type { ReactElement } from 'react';
 
-import { PageLayout } from '@/components/PageLayout';
-import { RoutePlaceholder } from '@/pages/_shared/RoutePlaceholder';
+import { useSearchParams } from 'react-router-dom';
+
+import { PageTitle } from '@/components';
+
+import { MY_EDIT_INFO, MY_EDIT_INFO_PARAM } from './constants';
+import { ProfileEditView } from './ProfileEditView';
+import { RunningEditView } from './RunningEditView';
 
 export const MyEditPage = (): ReactElement => {
+  const [searchParams] = useSearchParams();
+  const isRunningSection =
+    searchParams.get(MY_EDIT_INFO_PARAM) === MY_EDIT_INFO.RUNNING;
+  const title = isRunningSection ? '러닝 정보 수정' : '내 정보 수정';
+
   return (
-    <PageLayout background="bg.subtle">
-      <RoutePlaceholder
-        title="나의 정보 수정"
-        description="내 정보와 러닝 정보를 수정할 페이지입니다."
-      />
-    </PageLayout>
+    <>
+      <PageTitle title={title} />
+      {isRunningSection ? <RunningEditView /> : <ProfileEditView />}
+    </>
   );
 };

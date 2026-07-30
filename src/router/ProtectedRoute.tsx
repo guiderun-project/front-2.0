@@ -1,7 +1,9 @@
 import type { ReactElement, ReactNode } from 'react';
+import { useEffect } from 'react';
 
 import { Navigate, useLocation } from 'react-router-dom';
 
+import { ANALYTICS_EVENT, trackEvent } from '@/api/core';
 import type { UserInfoGetResponse } from '@/api/types';
 import { APPROVED_ROLES } from '@/constants';
 import { useAuth } from '@/contexts';
@@ -12,6 +14,7 @@ type ProtectedRouteAccess = 'authenticated' | 'approved';
 type ProtectedRouteProps = {
   access?: ProtectedRouteAccess;
   children: ReactNode;
+  fallback?: ReactElement;
 };
 
 const canAccessProtectedRoute = (
@@ -32,18 +35,43 @@ const canAccessProtectedRoute = (
 export const ProtectedRoute = ({
   access = 'authenticated',
   children,
+  fallback,
 }: ProtectedRouteProps): ReactElement | null => {
   const { user, isAuthReady } = useAuth();
   const location = useLocation();
+  const isBlockedByApproval =
+    isAuthReady && user !== null && !canAccessProtectedRoute(user, access);
+
+  useEffect(() => {
+    if (!isBlockedByApproval) {
+      return;
+    }
+
+    trackEvent(ANALYTICS_EVENT.APPROVAL_GATE_BLOCKED, {
+      requiredAccess: access,
+      pathname: location.pathname,
+    });
+  }, [access, isBlockedByApproval, location.pathname]);
 
   if (!isAuthReady) {
-    // TODO: 인증 로딩 UI가 확정되면 직접 진입/새로고침 중 빈 화면 대신 표시한다.
-    return null;
+    return fallback ?? null;
   }
 
   if (canAccessProtectedRoute(user, access)) {
     return <>{children}</>;
   }
 
-  return <Navigate replace state={{ from: location }} to={APP_PATH.INTRO} />;
+  // 무음 리다이렉트를 막기 위해 사유를 담아 보내면, 앱 셸의 라우트 어나운서
+  // (App.tsx RouteAnnouncer)가 srAnnouncement를 라이브 리전으로 낭독한다.
+  const srAnnouncement = user
+    ? '아직 이용 승인이 완료되지 않아 시작하기 페이지로 이동했어요.'
+    : '로그인이 필요해 시작하기 페이지로 이동했어요.';
+
+  return (
+    <Navigate
+      replace
+      state={{ from: location, srAnnouncement }}
+      to={APP_PATH.INTRO}
+    />
+  );
 };

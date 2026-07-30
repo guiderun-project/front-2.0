@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react';
+import { useEffect, useState, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
@@ -51,17 +51,35 @@ const isReadyContentProps = (
   return props.pageState.status === 'ready';
 };
 
+const AttendanceMessageContent = ({
+  pageState,
+}: AttendanceMessageContentProps): ReactElement => {
+  // 라이브 리전은 비어 있는 상태로 먼저 마운트한 뒤 다음 프레임에 메시지를
+  // 채워야 status/alert 변경이 스크린리더에 안정적으로 안내된다.
+  const [announcedMessage, setAnnouncedMessage] = useState('');
+
+  useEffect(() => {
+    const frameId = window.requestAnimationFrame(() => {
+      setAnnouncedMessage(pageState.message);
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+    };
+  }, [pageState.message]);
+
+  return (
+    <Content>
+      <PanelState role={pageState.role}>{announcedMessage}</PanelState>
+    </Content>
+  );
+};
+
 export const AttendancePageContent = (
   props: AttendancePageContentProps,
 ): ReactElement => {
   if (!isReadyContentProps(props)) {
-    return (
-      <Content>
-        <PanelState role={props.pageState.role}>
-          {props.pageState.message}
-        </PanelState>
-      </Content>
-    );
+    return <AttendanceMessageContent pageState={props.pageState} />;
   }
 
   const { attendance, canceledParticipants } = props.pageState;
@@ -79,6 +97,7 @@ export const AttendancePageContent = (
       <SectionStack>
         <AttendanceSection
           count={attendance.summary.waitingCount}
+          headingFocusKey="waiting"
           title="출석 대기"
         >
           <ParticipantList
@@ -86,7 +105,7 @@ export const AttendancePageContent = (
             participants={waitingParticipants}
             renderParticipant={(participant) => (
               <ParticipantActionCard
-                disabled={updatingParticipantIds.has(participant.userId)}
+                isUpdating={updatingParticipantIds.has(participant.userId)}
                 participant={participant}
                 status="waiting"
                 onAction={onAttend}
@@ -98,6 +117,7 @@ export const AttendancePageContent = (
         <AttendanceSection
           hasDivider={true}
           count={attendance.summary.attendedCount}
+          headingFocusKey="attended"
           title="출석 완료"
         >
           <ParticipantList
@@ -105,7 +125,7 @@ export const AttendancePageContent = (
             participants={attendedParticipants}
             renderParticipant={(participant) => (
               <ParticipantActionCard
-                disabled={updatingParticipantIds.has(participant.userId)}
+                isUpdating={updatingParticipantIds.has(participant.userId)}
                 participant={participant}
                 status="attended"
                 onAction={onCancelAttendance}
