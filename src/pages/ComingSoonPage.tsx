@@ -4,7 +4,7 @@ import styled from "@emotion/styled";
 
 import mainDarkLottie from "@/assets/lotties/main_dark.json";
 import mainLightLottie from "@/assets/lotties/main_light.json";
-import { PageLayout, PageTitle, Text } from "@/components";
+import { ColorModeToggle, PageLayout, PageTitle, Text } from "@/components";
 import { useColorMode } from "@/styles/useColorMode";
 
 const Lottie = lazy(() => import("lottie-react"));
@@ -31,30 +31,52 @@ export const ComingSoonPage = () => {
     <>
       <PageTitle title="오픈 준비 중" />
       <PageLayout background="bg.subtle" gradient="gradient.bg.brand-main">
-        <Content aria-labelledby="coming-soon-title">
-          <GraphicBox aria-hidden={true}>
-            <ComingSoonGraphic />
-          </GraphicBox>
-          <CopyGroup>
-            <Text
-              align="center"
-              as="h1"
-              font="heading-m-b"
-              id="coming-soon-title"
-            >
-              8월 1일부터 다시 볼 수 있어요!
-            </Text>
-            <Text align="center" as="p" color="text.secondary" font="body-m-m">
-              리뉴얼을 준비하고 있어요.
-              <br />
-              조금만 기다려주세요.
-            </Text>
-          </CopyGroup>
-        </Content>
+        <Page>
+          <Header>
+            <ColorModeToggle aria-label="화면 테마 전환" />
+          </Header>
+          <Content aria-labelledby="coming-soon-title">
+            <GraphicBox aria-hidden={true}>
+              <ComingSoonGraphic />
+            </GraphicBox>
+            <CopyGroup>
+              <Text
+                align="center"
+                as="h1"
+                font="heading-m-b"
+                id="coming-soon-title"
+              >
+                8월 1일부터 다시 볼 수 있어요!
+              </Text>
+              <Text
+                align="center"
+                as="p"
+                color="text.secondary"
+                font="body-m-m"
+              >
+                리뉴얼을 준비하고 있어요.
+                <br />
+                조금만 기다려주세요.
+              </Text>
+            </CopyGroup>
+          </Content>
+        </Page>
       </PageLayout>
     </>
   );
 };
+
+const Page = styled.div({
+  position: "relative",
+  minHeight: "100dvh",
+});
+
+const Header = styled.header(({ theme }) => ({
+  position: "absolute",
+  top: 0,
+  right: 0,
+  padding: `${theme.spacing.xl} ${theme.spacing["2xl"]}`,
+}));
 
 const Content = styled.section(({ theme }) => ({
   display: "flex",

@@ -9,13 +9,16 @@ import {
   useNavigationType,
 } from "react-router-dom";
 
+import { BirthDateGate } from "@/components/BirthDateGate";
 import { HiddenText } from "@/components/HiddenText";
 import {
   cancelLoaderCompletionAnnouncement,
   LoaderScreen,
 } from "@/components/Loader";
 import { PageLayout } from "@/components/PageLayout";
+import { RunningRecordGate } from "@/components/RunningRecordGate";
 import { ToastViewport } from "@/components/Toast";
+import { UserPermissionBootstrap } from "@/components/UserPermissionBootstrap";
 import { useAuth } from "@/contexts";
 import { ComingSoonPage } from "@/pages/ComingSoonPage";
 import { APP_PATH } from "@/router/path";
@@ -50,6 +53,13 @@ const App = () => {
             <LoaderScreen label="사용자 정보를 불러오는 중이에요." />
           </PageLayout>
         )}
+        {isServiceLive ? (
+          <>
+            <UserPermissionBootstrap />
+            <BirthDateGate />
+            <RunningRecordGate />
+          </>
+        ) : null}
         <ToastViewport />
         <RouteAnnouncer />
       </MobileViewport>
