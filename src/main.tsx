@@ -17,16 +17,13 @@ import {
   registerSessionProperties,
 } from '@/api/core';
 import { baseURL } from '@/api/core/client';
-import { BirthDateGate } from '@/components/BirthDateGate';
 import { LoaderScreen } from '@/components/Loader';
 import {
   PageLayout,
   type PageLayoutBackground,
   type PageLayoutGradientBackground,
 } from '@/components/PageLayout';
-import { RunningRecordGate } from '@/components/RunningRecordGate';
 import { ToastProvider } from '@/components/Toast';
-import { UserPermissionBootstrap } from '@/components/UserPermissionBootstrap';
 import { AuthProvider } from '@/contexts';
 import { APP_PATH } from '@/router/path';
 import { router } from '@/router/router';
@@ -184,9 +181,6 @@ const bootstrap = async () => {
               <ColorModeProvider>
                 <ToastProvider>
                   <RouterProvider router={router} />
-                  <UserPermissionBootstrap />
-                  <BirthDateGate />
-                  <RunningRecordGate />
                 </ToastProvider>
               </ColorModeProvider>
             </ThemeProvider>
