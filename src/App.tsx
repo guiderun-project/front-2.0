@@ -9,6 +9,7 @@ import {
   useNavigationType,
 } from "react-router-dom";
 
+import { registerSuperProperties } from "@/api/core";
 import { BirthDateGate } from "@/components/BirthDateGate";
 import { HiddenText } from "@/components/HiddenText";
 import {
@@ -34,6 +35,8 @@ const FIRST_VISIT_REDIRECT_EXCLUDED_PATHS = [
 ] as const;
 
 const PRE_LAUNCH_FEATURE_FLAG = "pre-launch-mode";
+const PREVIEW_ACCESS_QUERY_PARAM = "preview";
+const PREVIEW_ACCESS_STORAGE_KEY = "guiderun.preLaunchPreview";
 
 const App = () => {
   const isServiceLive = useServiceLiveGate();
@@ -72,12 +75,74 @@ export default App;
 const useServiceLiveGate = (): boolean => {
   const isPreLaunchGateEnabled =
     import.meta.env.VITE_PRE_LAUNCH_GATE_ENABLED === "true";
+  // 플래그 조회는 네트워크 왕복이라 첫 방문에서 늦게 도착한다. 프리뷰 판정은 첫
+  // 렌더에서 동기로 끝내 테스터에게 '오픈 준비 중' 화면이 스쳐 보이지 않게 한다.
+  const [hasPreviewAccess] = useState(syncPreviewAccessFromQuery);
   const isPreLaunchModeOn = useFeatureFlagEnabled(
     PRE_LAUNCH_FEATURE_FLAG,
     false,
   );
 
-  return !isPreLaunchGateEnabled || !isPreLaunchModeOn;
+  useEffect(() => {
+    if (!hasPreviewAccess) {
+      return;
+    }
+
+    // 오픈 전 테스터 트래픽을 실제 방문자와 분리해서 볼 수 있게 표시한다.
+    registerSuperProperties({ isPreLaunchPreview: true });
+  }, [hasPreviewAccess]);
+
+  return !isPreLaunchGateEnabled || hasPreviewAccess || !isPreLaunchModeOn;
+};
+
+// 게이트를 통과할 브라우저에 표식을 남긴다. 테스터가 링크 없이 재방문해도 유지되고,
+// ?preview=false 로는 실제 '오픈 준비 중' 화면을 다시 확인할 수 있다.
+// 라우터 컨텍스트 타이밍에 묶이지 않도록 useSearchParams 대신 location 을 직접 읽는다.
+const syncPreviewAccessFromQuery = (): boolean => {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  const requested = new URLSearchParams(window.location.search).get(
+    PREVIEW_ACCESS_QUERY_PARAM,
+  );
+
+  if (requested === "true") {
+    recordPreviewAccess();
+    // 스토리지가 막힌 환경(사파리 프라이빗 모드 등)에서도 이번 방문은 통과시킨다.
+    return true;
+  }
+
+  if (requested === "false") {
+    clearPreviewAccess();
+    return false;
+  }
+
+  return hasStoredPreviewAccess();
+};
+
+const hasStoredPreviewAccess = (): boolean => {
+  try {
+    return window.localStorage.getItem(PREVIEW_ACCESS_STORAGE_KEY) === "true";
+  } catch {
+    return false;
+  }
+};
+
+const recordPreviewAccess = () => {
+  try {
+    window.localStorage.setItem(PREVIEW_ACCESS_STORAGE_KEY, "true");
+  } catch {
+    // 저장에 실패해도 이번 방문은 통과하므로 다음 방문에 링크를 다시 쓰면 된다.
+  }
+};
+
+const clearPreviewAccess = () => {
+  try {
+    window.localStorage.removeItem(PREVIEW_ACCESS_STORAGE_KEY);
+  } catch {
+    // 표식을 읽을 수 없는 환경이면 게이트가 그대로 유지되므로 무시한다.
+  }
 };
 
 const ScrollToTop = () => {
