@@ -29,6 +29,13 @@ export const formatBirthDateInput = (raw: string): string => {
 export const formatISODateToBirthDateInput = (isoDate: string): string =>
   formatBirthDateInput(isoDate.replace(/-/g, ''));
 
+/**
+ * 서버에 저장된 생년월일이 ISO(YYYY-MM-DD) 형식인지 검사한다.
+ * 값이 없거나 형식이 다르면(예: "", "1994.03.12", "1994-3-12") false 다.
+ */
+export const isBirthDateISO = (value: string | null | undefined): boolean =>
+  typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value);
+
 /** "YYYY.MM.DD" 입력값을 검증해 ISO(YYYY-MM-DD) 로 변환한다. 유효하지 않으면 null. */
 export const toBirthDateISO = (formatted: string): string | null => {
   const match = /^(\d{4})\.(\d{2})\.(\d{2})$/.exec(formatted);
