@@ -1,24 +1,24 @@
-import { useRef, useState, type ReactElement } from 'react';
+import { useRef, useState, type ReactElement } from "react";
 
-import styled from '@emotion/styled';
-import { useMutation } from '@tanstack/react-query';
+import styled from "@emotion/styled";
+import { useMutation } from "@tanstack/react-query";
 
-import { getApiErrorMessage } from '@/api/core';
-import { api } from '@/api/services';
-import { useAuth } from '@/contexts';
-import { useAnnouncedMessage } from '@/hooks/useAnnouncedMessage';
+import { getApiErrorMessage } from "@/api/core";
+import { api } from "@/api/services";
+import { useAuth } from "@/contexts";
+import { useAnnouncedMessage } from "@/hooks/useAnnouncedMessage";
 import {
   BIRTH_DATE_MAX_LENGTH,
   formatBirthDateInput,
   toBirthDateISO,
-} from '@/utils';
+} from "@/utils";
 
-import { BottomSheet } from '../BottomSheet';
-import { Button } from '../Button';
-import { HiddenText } from '../HiddenText';
-import { Input } from '../Input';
+import { BottomSheet } from "../BottomSheet";
+import { Button } from "../Button";
+import { HiddenText } from "../HiddenText";
+import { Input } from "../Input";
 
-const BIRTH_DATE_ERROR_MESSAGE = '올바른 생년월일을 입력해주세요';
+const BIRTH_DATE_ERROR_MESSAGE = "올바른 생년월일을 입력해주세요";
 
 type BirthDateSheetProps = {
   userName: string;
@@ -30,7 +30,7 @@ export const BirthDateSheet = ({
   userName,
 }: BirthDateSheetProps): ReactElement => {
   const { refreshUser } = useAuth();
-  const [birthDate, setBirthDate] = useState('');
+  const [birthDate, setBirthDate] = useState("");
   const birthDateInputRef = useRef<HTMLInputElement>(null);
 
   const { error, isError, isPending, mutate, reset } = useMutation({
@@ -48,7 +48,7 @@ export const BirthDateSheet = ({
   const errorText = isError
     ? getApiErrorMessage(
         error,
-        '생년월일을 등록하지 못했어요. 다시 시도해주세요.',
+        "생년월일을 등록하지 못했어요. 다시 시도해주세요.",
       )
     : hasFormatError
       ? BIRTH_DATE_ERROR_MESSAGE
@@ -60,7 +60,7 @@ export const BirthDateSheet = ({
   //  단일 채널이다. Input 오류 미러는 포커스가 막 도착한 오류의 주입을 생략하고,
   //  타이핑 중 형식 오류만 미러가 낭독한다.)
   const announcedPendingMessage = useAnnouncedMessage(
-    isPending ? '등록 중이에요' : '',
+    isPending ? "등록 중이에요" : "",
   );
 
   const handleSubmit = () => {
@@ -86,7 +86,7 @@ export const BirthDateSheet = ({
       isCloseButtonHidden
       isEscapeCloseDisabled
       heading={{
-        subtitle: '더 편한 러닝경험을 위해',
+        subtitle: "더 편한 러닝경험을 위해",
         title: `${userName}님의 생년월일을 알려주세요`,
       }}
       open
@@ -98,7 +98,7 @@ export const BirthDateSheet = ({
           type="button"
           onClick={handleSubmit}
         >
-          다음
+          입력 완료
         </Button>
       }
     >
@@ -126,5 +126,5 @@ export const BirthDateSheet = ({
 };
 
 const Content = styled.div(({ theme }) => ({
-  padding: `${theme.spacing.none} ${theme.spacing['2xl']} ${theme.spacing['3xl']}`,
+  padding: `${theme.spacing.none} ${theme.spacing["2xl"]} ${theme.spacing["3xl"]}`,
 }));
