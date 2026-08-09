@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
@@ -22,6 +24,12 @@ type EventDetailCtaActionProps = {
   onClick?: () => void;
 };
 
+export type EventDetailCancelApplicationConfirm = {
+  isOpen: boolean;
+  onCancel: () => void;
+  onConfirm: () => void;
+};
+
 export const useEventDetailCtaActionProps = ({
   canAccessProtectedTabs,
   eventId,
@@ -32,10 +40,13 @@ export const useEventDetailCtaActionProps = ({
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { showToast } = useToast();
+  const [isCancelApplicationConfirmOpen, setIsCancelApplicationConfirmOpen] =
+    useState(false);
 
   const cancelApplicationMutation = useMutation({
     mutationFn: () => api.application.cancelDelete({ eventId }),
     onSuccess: () => {
+      setIsCancelApplicationConfirmOpen(false);
       showToast({
         type: 'success',
         icon: 'check-lined',
@@ -89,7 +100,7 @@ export const useEventDetailCtaActionProps = ({
         return {
           disabled: button.disabled || cancelApplicationMutation.isPending,
           onClick: () => {
-            cancelApplicationMutation.mutate();
+            setIsCancelApplicationConfirmOpen(true);
           },
         };
       case 'match':
@@ -109,7 +120,22 @@ export const useEventDetailCtaActionProps = ({
     }
   };
 
+  const cancelApplicationConfirm: EventDetailCancelApplicationConfirm = {
+    isOpen: isCancelApplicationConfirmOpen,
+    onCancel: () => {
+      if (cancelApplicationMutation.isPending) {
+        return;
+      }
+
+      setIsCancelApplicationConfirmOpen(false);
+    },
+    onConfirm: () => {
+      cancelApplicationMutation.mutate();
+    },
+  };
+
   return {
+    cancelApplicationConfirm,
     getEventDetailCtaActionProps,
     isCancelApplicationPending: cancelApplicationMutation.isPending,
   };
