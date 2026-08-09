@@ -123,7 +123,6 @@ export const useEventDetailCtaActionProps = ({
   const cancelApplicationConfirm: EventDetailCancelApplicationConfirm = {
     isOpen: isCancelApplicationConfirmOpen,
     onCancel: () => {
-      // 처리 중에는 확인 팝업을 닫지 않아 취소 요청이 무음으로 진행되는 것을 막는다.
       if (cancelApplicationMutation.isPending) {
         return;
       }
