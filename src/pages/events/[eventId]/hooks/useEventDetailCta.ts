@@ -3,7 +3,10 @@ import { useEffect, useMemo, useState } from 'react';
 import type { EventDetailResponse } from '@/api/types';
 import type { ButtonGroupRatio } from '@/components';
 
-import { useEventDetailCtaActionProps } from './useEventDetailCtaActionProps';
+import {
+  useEventDetailCtaActionProps,
+  type EventDetailCancelApplicationConfirm,
+} from './useEventDetailCtaActionProps';
 import {
   getEventDateStartTimestamp,
   getEventDetailCtaButtonConfigs,
@@ -31,6 +34,7 @@ type EventDetailCtaNotice = EventDetailCtaNoticeConfig;
 type EventDetailCtaItem = EventDetailCtaButton | EventDetailCtaNotice;
 
 type UseEventDetailCtaResult = {
+  cancelApplicationConfirm: EventDetailCancelApplicationConfirm;
   ctaItems: EventDetailCtaItem[];
   isCancelApplicationPending: boolean;
   ratio?: ButtonGroupRatio;
@@ -53,8 +57,11 @@ export const useEventDetailCta = ({
   const eventId = event.eventId;
   const eventDate = event.schedule.date;
   const [currentTime, setCurrentTime] = useState(() => Date.now());
-  const { getEventDetailCtaActionProps, isCancelApplicationPending } =
-    useEventDetailCtaActionProps({
+  const {
+    cancelApplicationConfirm,
+    getEventDetailCtaActionProps,
+    isCancelApplicationPending,
+  } = useEventDetailCtaActionProps({
       canAccessProtectedTabs,
       eventId,
       isApplyPermissionChecking,
@@ -116,6 +123,7 @@ export const useEventDetailCta = ({
   const buttonCount = ctaItems.filter(isEventDetailCtaButtonConfig).length;
 
   return {
+    cancelApplicationConfirm,
     ctaItems,
     isCancelApplicationPending,
     ratio: buttonCount === 2 ? '35:65' : undefined,
