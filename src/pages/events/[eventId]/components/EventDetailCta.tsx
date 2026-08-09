@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef, type ReactElement } from 'react';
 
 import type { EventDetailResponse } from '@/api/types';
-import { FooterButton, HiddenText } from '@/components';
+import { ConfirmPopup, FooterButton, HiddenText } from '@/components';
 
 import { useEventDetailCta } from '../hooks/useEventDetailCta';
 
@@ -22,7 +22,12 @@ export const EventDetailCta = ({
   onApply,
   onRestrictedAccess,
 }: EventDetailCtaProps): ReactElement => {
-  const { ctaItems, isCancelApplicationPending, ratio } = useEventDetailCta({
+  const {
+    cancelApplicationConfirm,
+    ctaItems,
+    isCancelApplicationPending,
+    ratio,
+  } = useEventDetailCta({
     canAccessProtectedTabs,
     event,
     isApplyPermissionChecking,
@@ -34,11 +39,10 @@ export const EventDetailCta = ({
   const hadCancelActionRef = useRef(false);
   // 진행 중 CTA 는 native disabled 로 전환돼 아무 안내 없이 무음이 되므로
   // 상시 마운트된 status 리전으로 진행 상태를 낭독시킨다.
+  // 신청 취소 진행 상태는 확인 팝업이 자체 status 리전으로 안내하므로 제외한다.
   const pendingMessage = isApplyPermissionChecking
     ? '신청 가능 여부를 확인하고 있어요.'
-    : isCancelApplicationPending
-      ? '신청 취소를 처리하고 있어요.'
-      : '';
+    : '';
 
   // 신청취소 성공 시 CTA 버튼 구성이 통째로 교체되며 포커스가 body 로 떨어지므로,
   // 남아 있는 CTA 영역으로 포커스를 복귀시켜 읽기 위치 초기화를 막는다.
@@ -94,6 +98,16 @@ export const EventDetailCta = ({
           ),
         )}
       </FooterButton>
+      <ConfirmPopup
+        cancelDisabled={isCancelApplicationPending}
+        cancelText="아니요"
+        confirmLoading={isCancelApplicationPending}
+        confirmText="네, 취소할게요"
+        open={cancelApplicationConfirm.isOpen}
+        title="참여를 취소하시겠어요?"
+        onCancel={cancelApplicationConfirm.onCancel}
+        onConfirm={cancelApplicationConfirm.onConfirm}
+      />
     </>
   );
 };
