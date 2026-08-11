@@ -9,7 +9,10 @@ import {
   useNavigationType,
 } from "react-router-dom";
 
-import { registerSuperProperties } from "@/api/core";
+import {
+  registerSuperProperties,
+  subscribeAccessTokenChange,
+} from "@/api/core";
 import { BirthDateGate } from "@/components/BirthDateGate";
 import { HiddenText } from "@/components/HiddenText";
 import {
@@ -18,11 +21,12 @@ import {
 } from "@/components/Loader";
 import { PageLayout } from "@/components/PageLayout";
 import { RunningRecordGate } from "@/components/RunningRecordGate";
-import { ToastViewport } from "@/components/Toast";
+import { ToastViewport, useToast } from "@/components/Toast";
 import { UserPermissionBootstrap } from "@/components/UserPermissionBootstrap";
 import { useAuth } from "@/contexts";
 import { ComingSoonPage } from "@/pages/ComingSoonPage";
 import { APP_PATH } from "@/router/path";
+import { clearReturnPath, isAuthFlowPath } from "@/router/returnPath";
 
 const FIRST_VISIT_STORAGE_KEY = "guiderun.firstVisitSeen";
 const FIRST_VISIT_REDIRECT_EXCLUDED_PATHS = [
@@ -41,6 +45,9 @@ const PREVIEW_ACCESS_STORAGE_KEY = "guiderun.preLaunchPreview";
 const App = () => {
   const isServiceLive = useServiceLiveGate();
   const shouldRenderOutlet = useFirstVisitIntroGate();
+
+  useSessionExpiryNotice();
+  useReturnPathCleanup();
 
   return (
     <AppWrapper>
@@ -71,6 +78,69 @@ const App = () => {
 };
 
 export default App;
+
+const useReturnPathCleanup = (): void => {
+  const { isAuthenticated } = useAuth();
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    if (!isAuthenticated || isAuthFlowPath(pathname)) {
+      return;
+    }
+
+    clearReturnPath();
+  }, [isAuthenticated, pathname]);
+};
+
+const SESSION_EXPIRY_TOAST_CONTENT = "로그인이 만료됐어요";
+const SESSION_EXPIRY_SR_ANNOUNCEMENT =
+  "로그인이 만료돼 시작하기 페이지로 이동했어요.";
+
+const useSessionExpiryNotice = (): void => {
+  const { isAuthenticated } = useAuth();
+  const { showToast } = useToast();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const wasAuthenticatedRef = useRef(isAuthenticated);
+  const locationRef = useRef(location);
+
+  useEffect(() => {
+    wasAuthenticatedRef.current = isAuthenticated;
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    locationRef.current = location;
+  }, [location]);
+
+  useEffect(() => {
+    return subscribeAccessTokenChange((accessToken, reason) => {
+      if (accessToken !== null || reason !== "sessionExpired") {
+        return;
+      }
+
+      if (!wasAuthenticatedRef.current) {
+        return;
+      }
+
+      wasAuthenticatedRef.current = false;
+
+      showToast({
+        announce: false,
+        content: SESSION_EXPIRY_TOAST_CONTENT,
+        icon: "alert-circle-filled",
+        type: "error",
+      });
+
+      navigate(APP_PATH.INTRO, {
+        replace: true,
+        state: {
+          from: locationRef.current,
+          srAnnouncement: SESSION_EXPIRY_SR_ANNOUNCEMENT,
+        },
+      });
+    });
+  }, [navigate, showToast]);
+};
 
 const useServiceLiveGate = (): boolean => {
   const isPreLaunchGateEnabled =

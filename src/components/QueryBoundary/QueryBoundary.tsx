@@ -11,11 +11,13 @@ import {
 
 import styled from "@emotion/styled";
 import { QueryErrorResetBoundary } from "@tanstack/react-query";
+import { useLocation, useNavigate } from "react-router-dom";
 
-import { getApiErrorMessage } from "@/api/core";
+import { getApiErrorMessage, isUnauthorizedApiError } from "@/api/core";
 import { Button } from "@/components/Button";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { HiddenText } from "@/components/HiddenText";
+import { APP_PATH } from "@/router/path";
 
 type QueryBoundaryProps = {
   loadingMessage: string;
@@ -98,6 +100,7 @@ export const QueryBoundary = ({
             onReset={reset}
             fallback={({ error, reset: retry }) => (
               <QueryErrorFallback
+                isUnauthorized={isUnauthorizedApiError(error)}
                 message={getApiErrorMessage(error, errorMessage)}
                 onMount={clearCompletionAnnouncement}
                 onRetry={() => handleRetry(retry)}
@@ -171,16 +174,21 @@ const QueryLoadingMessage = ({
 };
 
 type QueryErrorFallbackProps = {
+  isUnauthorized: boolean;
   message: string;
   onMount: () => void;
   onRetry: () => void;
 };
 
 const QueryErrorFallback = ({
+  isUnauthorized,
   message,
   onMount,
   onRetry,
 }: QueryErrorFallbackProps): ReactElement => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   useEffect(() => {
     onMount();
   }, [onMount]);
@@ -188,9 +196,22 @@ const QueryErrorFallback = ({
   return (
     <Message role="alert">
       {message}
-      <Button level="secondary" size="s" type="button" onClick={onRetry}>
-        다시 시도
-      </Button>
+      {isUnauthorized ? (
+        <Button
+          level="secondary"
+          size="s"
+          type="button"
+          onClick={() =>
+            navigate(APP_PATH.LOGIN, { state: { from: location } })
+          }
+        >
+          로그인하기
+        </Button>
+      ) : (
+        <Button level="secondary" size="s" type="button" onClick={onRetry}>
+          다시 시도
+        </Button>
+      )}
     </Message>
   );
 };
