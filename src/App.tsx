@@ -26,6 +26,7 @@ import { UserPermissionBootstrap } from "@/components/UserPermissionBootstrap";
 import { useAuth } from "@/contexts";
 import { ComingSoonPage } from "@/pages/ComingSoonPage";
 import { APP_PATH } from "@/router/path";
+import { clearReturnPath, isAuthFlowPath } from "@/router/returnPath";
 
 const FIRST_VISIT_STORAGE_KEY = "guiderun.firstVisitSeen";
 const FIRST_VISIT_REDIRECT_EXCLUDED_PATHS = [
@@ -46,6 +47,7 @@ const App = () => {
   const shouldRenderOutlet = useFirstVisitIntroGate();
 
   useSessionExpiryNotice();
+  useReturnPathCleanup();
 
   return (
     <AppWrapper>
@@ -76,6 +78,19 @@ const App = () => {
 };
 
 export default App;
+
+const useReturnPathCleanup = (): void => {
+  const { isAuthenticated } = useAuth();
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    if (!isAuthenticated || isAuthFlowPath(pathname)) {
+      return;
+    }
+
+    clearReturnPath();
+  }, [isAuthenticated, pathname]);
+};
 
 const SESSION_EXPIRY_TOAST_CONTENT = "로그인이 만료됐어요";
 const SESSION_EXPIRY_SR_ANNOUNCEMENT =

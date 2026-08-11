@@ -1,7 +1,8 @@
 import type { ReactElement } from 'react';
+import { useEffect } from 'react';
 
 import styled from '@emotion/styled';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import { ANALYTICS_EVENT, trackEvent } from '@/api/core';
 import {
@@ -12,14 +13,38 @@ import {
   PageLayout,
   Text,
 } from '@/components';
+import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
+import type { ReturnLocation } from '@/router/returnPath';
+import { saveReturnPath } from '@/router/returnPath';
 
 import { KakaoLoginButton } from './components/KakaoLoginButton';
 
 const GUIDERUN_LANDING_URL = 'https://about.guiderun.org/';
 
+type IntroLocationState = {
+  from?: ReturnLocation;
+  srAnnouncement?: string;
+};
+
 export const IntroPage = (): ReactElement => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { isAuthReady, isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    if (!isAuthReady || isAuthenticated) {
+      return;
+    }
+
+    const from = (location.state as IntroLocationState | null)?.from;
+
+    if (!from) {
+      return;
+    }
+
+    saveReturnPath(from);
+  }, [isAuthReady, isAuthenticated, location.state]);
 
   const handleKakaoLogin = () => {
     const params = new URLSearchParams({

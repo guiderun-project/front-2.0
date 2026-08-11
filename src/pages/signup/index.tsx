@@ -23,6 +23,7 @@ import {
 import { useAuth } from '@/contexts';
 import { useRouteBlockerConfirm } from '@/hooks/useRouteBlockerConfirm';
 import { APP_PATH } from '@/router/path';
+import { clearReturnPath } from '@/router/returnPath';
 
 import { Stepper } from '@/pages/signup/components/Stepper';
 import { BasicInfoStep } from '@/pages/signup/components/steps/BasicInfoStep';
@@ -184,6 +185,8 @@ export const SignupPage = (): ReactElement => {
 
   const handleClickFooterButton = async () => {
     if (isCompleteStep) {
+      clearReturnPath();
+
       if (issuedAccessToken) {
         await startSession(issuedAccessToken);
       }

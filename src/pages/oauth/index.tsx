@@ -8,6 +8,7 @@ import { api } from '@/api/services';
 import { PageLayout, Text } from '@/components';
 import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
+import { peekReturnPath } from '@/router/returnPath';
 
 type Status = 'processing' | 'error';
 
@@ -65,7 +66,7 @@ export const KakaoOAuthPage = (): ReactElement => {
         }
 
         await startSession(result.accessToken);
-        navigate(APP_PATH.HOME, { replace: true });
+        navigate(peekReturnPath() ?? APP_PATH.HOME, { replace: true });
       } catch (error) {
         setErrorMessage(getApiErrorMessage(error, OAUTH_ERROR_MESSAGE));
         setStatus('error');
