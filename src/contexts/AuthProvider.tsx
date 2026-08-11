@@ -103,7 +103,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
   }, [fetchAuthUser, queryClient]);
 
   const clearSession = useCallback(() => {
-    clearAccessToken();
+    clearAccessToken('signOut');
     queryClient.setQueryData(AUTH_USER_QUERY_KEY, null);
     resetIdentity();
   }, [queryClient]);
