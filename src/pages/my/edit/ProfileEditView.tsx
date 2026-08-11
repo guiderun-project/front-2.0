@@ -18,8 +18,10 @@ import {
 import { useRouteBlockerConfirm } from '@/hooks/useRouteBlockerConfirm';
 import { useAnnouncedMessage } from '@/hooks/useAnnouncedMessage';
 import { APP_PATH } from '@/router/path';
+import { BIRTH_DATE_ERROR_MESSAGE, PHONE_ERROR_MESSAGE } from '@/utils';
 
 import { AccountSetupSheet } from './components/AccountSetupSheet';
+import { focusFirstInvalidField } from './focusFirstInvalidField';
 import { useMyEdit } from './hooks/useMyEdit';
 
 const LOADING_MESSAGE = '내 정보를 불러오는 중이에요.';
@@ -88,7 +90,8 @@ const MyEditContent = (): ReactElement => {
     hasBirthDateError,
     hasPhoneError,
     isDirty,
-    canSubmit,
+    isSubmitting,
+    validate,
     submit,
   } = useMyEdit();
 
@@ -139,6 +142,13 @@ const MyEditContent = (): ReactElement => {
   }, [isAccountSheetOpen]);
 
   const handleSubmit = async () => {
+    // 버튼은 항상 활성 상태이므로 검증은 클릭 시점에 한다.
+    // 검증 대상(생년월일·전화번호)은 모두 '기본 정보' 섹션 안에 있다.
+    if (!validate()) {
+      focusFirstInvalidField(basicInfoSectionRef);
+      return;
+    }
+
     const isSucceeded = await submit();
 
     if (isSucceeded) {
@@ -173,9 +183,7 @@ const MyEditContent = (): ReactElement => {
         <Input
           aria-required={true}
           clearable
-          errorText={
-            hasBirthDateError ? '올바른 생년월일을 입력해주세요.' : undefined
-          }
+          errorText={hasBirthDateError ? BIRTH_DATE_ERROR_MESSAGE : undefined}
           inputMode="numeric"
           label="생년월일 8자리"
           placeholder="YYYY.MM.DD"
@@ -187,7 +195,7 @@ const MyEditContent = (): ReactElement => {
           autoComplete="tel-national"
           clearable
           error={hasPhoneError}
-          errorText={hasPhoneError ? '올바른 전화번호를 입력해주세요.' : undefined}
+          errorText={hasPhoneError ? PHONE_ERROR_MESSAGE : undefined}
           inputMode="numeric"
           label="전화번호"
           type="tel"
@@ -238,7 +246,7 @@ const MyEditContent = (): ReactElement => {
 
       <FooterButton>
         <FooterButton.Button
-          disabled={!canSubmit}
+          disabled={isSubmitting}
           fullWidth
           size="l"
           onClick={handleSubmit}

@@ -69,6 +69,7 @@ export const useRunningEdit = () => {
   );
 
   const [values, setValues] = useState<RunningEditFormValues>(initialValues);
+  const [hasSubmitAttempted, setHasSubmitAttempted] = useState(false);
 
   const setField = <Key extends keyof RunningEditFormValues>(
     key: Key,
@@ -103,16 +104,27 @@ export const useRunningEdit = () => {
 
   // 10KM 기록은 필수. 시·분·초 6자리를 모두 입력해야 한다(0 허용).
   // 진입 시 기록이 비어 있어도(예: 가입 시 'E 기록없음' 선택) 에러로 보이지 않도록,
-  // 기록 필드가 초기값에서 바뀐 경우에만 에러를 노출한다.
+  // 기록 필드가 초기값에서 바뀐 경우에만 에러를 노출한다. 저장을 시도한 뒤부터는
+  // 손대지 않은 빈 기록도 에러로 안내한다.
   const isRecordComplete = isRunningRecordComplete(values.record);
   const recordError =
-    isRecordDirty && !isRecordComplete ? RECORD_ERROR_MESSAGE : undefined;
+    (isRecordDirty || hasSubmitAttempted) && !isRecordComplete
+      ? RECORD_ERROR_MESSAGE
+      : undefined;
 
-  const canSubmit = isDirty && isRecordComplete && !isPending;
+  /**
+   * 저장 시도 시점의 검증. 에러 노출을 켜고 유효 여부를 반환한다.
+   * 오류 표시와 호출측 포커스 이동이 같은 이벤트에서 일어나야 하므로 동기 함수다.
+   */
+  const validate = (): boolean => {
+    setHasSubmitAttempted(true);
 
-  /** 변경된 러닝 정보를 저장한다. 성공하면 true, 실패하면 false 를 반환한다. */
+    return isRecordComplete;
+  };
+
+  /** 러닝 정보를 저장한다. 성공하면 true, 실패하면 false 를 반환한다. */
   const submit = async (): Promise<boolean> => {
-    if (!canSubmit) {
+    if (!isRecordComplete || isPending) {
       return false;
     }
 
@@ -145,8 +157,8 @@ export const useRunningEdit = () => {
     setHopePrefs: (value: string) => setField('hopePrefs', value),
     recordError,
     isDirty,
-    canSubmit,
     isSubmitting: isPending,
+    validate,
     submit,
   };
 };

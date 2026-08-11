@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { RUNNER_TYPE, isRunningRecordComplete } from "@/constants";
+import { BIRTH_DATE_ERROR_MESSAGE, PHONE_ERROR_MESSAGE } from "@/utils";
 
 // "YYYY.MM.DD" (formatBirthDateInput 출력 형식)
 const BIRTH_DATE_PATTERN = /^(\d{4})\.(\d{2})\.(\d{2})$/;
@@ -80,7 +81,7 @@ export const signupSchema = z
     if (!isValidBirthDate(values.birthDate)) {
       ctx.addIssue({
         code: "custom",
-        message: "올바른 생년월일을 입력해주세요.",
+        message: BIRTH_DATE_ERROR_MESSAGE,
         path: ["birthDate"],
       });
     }
@@ -88,7 +89,7 @@ export const signupSchema = z
     if (!PHONE_PATTERN.test(values.phoneNumber)) {
       ctx.addIssue({
         code: "custom",
-        message: "전화번호를 정확히 입력해주세요.",
+        message: PHONE_ERROR_MESSAGE,
         path: ["phoneNumber"],
       });
     }
