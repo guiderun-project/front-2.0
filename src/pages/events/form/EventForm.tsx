@@ -276,7 +276,7 @@ export const EventForm = ({
                   font="body-s-m"
                   id={timeFormatHintId}
                 >
-                  시간은 24시간제 4자리로 입력해주세요.
+                  시간은 24시간 기준으로 입력해주세요.
                 </Text>
               </TimeFields>
               <Controller
