@@ -66,6 +66,7 @@ export const EventForm = ({
   minEventDate,
 }: EventFormProps): ReactElement => {
   const privateHelperId = useId();
+  const timeFormatHintId = useId();
   const submitBlockedHintId = useId();
   const recruitStartDate = form.watch("recruitStartDate");
   const resolvedSubmitLabel =
@@ -232,38 +233,54 @@ export const EventForm = ({
                   />
                 )}
               />
-              <TwoColumnFields>
-                <Controller
-                  control={form.control}
-                  name="startTime"
-                  render={({ field, fieldState }) => (
-                    <MaskedTimeInput
-                      aria-required={true}
-                      controlRef={field.ref}
-                      errorText={fieldState.error?.message}
-                      label="시작시간"
-                      value={field.value}
-                      onBlur={field.onBlur}
-                      onChange={field.onChange}
-                    />
-                  )}
-                />
-                <Controller
-                  control={form.control}
-                  name="endTime"
-                  render={({ field, fieldState }) => (
-                    <MaskedTimeInput
-                      aria-required={true}
-                      controlRef={field.ref}
-                      errorText={fieldState.error?.message}
-                      label="종료 시간"
-                      value={field.value}
-                      onBlur={field.onBlur}
-                      onChange={field.onChange}
-                    />
-                  )}
-                />
-              </TwoColumnFields>
+              <TimeFields>
+                <TwoColumnFields>
+                  <Controller
+                    control={form.control}
+                    name="startTime"
+                    render={({ field, fieldState }) => (
+                      <MaskedTimeInput
+                        aria-required={true}
+                        controlRef={field.ref}
+                        describedById={timeFormatHintId}
+                        errorText={fieldState.error?.message}
+                        label="시작 시간"
+                        value={field.value}
+                        onBlur={field.onBlur}
+                        onChange={field.onChange}
+                      />
+                    )}
+                  />
+                  <Controller
+                    control={form.control}
+                    name="endTime"
+                    render={({ field, fieldState }) => (
+                      <MaskedTimeInput
+                        aria-required={true}
+                        controlRef={field.ref}
+                        describedById={timeFormatHintId}
+                        errorText={fieldState.error?.message}
+                        label="종료 시간"
+                        value={field.value}
+                        onBlur={field.onBlur}
+                        onChange={field.onChange}
+                      />
+                    )}
+                  />
+                </TwoColumnFields>
+                {/* 두 시간 필드가 함께 쓰는 형식 안내. 필드별 helperText 로 두면
+                    반폭에서 줄바꿈이 심해지고 문장이 중복되며, 오류가 나는 순간
+                    errorText 에 밀려 사라지므로 행 아래 한 줄로 상시 노출한다. */}
+                <TimeFormatHint
+                  color="text.tertiary"
+                  font="body-s-m"
+                  id={timeFormatHintId}
+                >
+                  {
+                    "시간은 24시간제 숫자 4자리로 입력해요.\n오후 2시는 1400이에요."
+                  }
+                </TimeFormatHint>
+              </TimeFields>
               <Controller
                 control={form.control}
                 name="place"
@@ -433,6 +450,15 @@ const TwoColumnFields = styled.div(({ theme }) => ({
   gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
   gap: theme.spacing.md,
 }));
+
+const TimeFields = styled.div(({ theme }) => ({
+  display: "grid",
+  gap: theme.spacing.sm,
+}));
+
+const TimeFormatHint = styled(Text)({
+  whiteSpace: "pre-line",
+});
 
 const PrivateField = styled.div(({ theme }) => ({
   display: "grid",
