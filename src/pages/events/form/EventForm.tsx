@@ -271,15 +271,13 @@ export const EventForm = ({
                 {/* 두 시간 필드가 함께 쓰는 형식 안내. 필드별 helperText 로 두면
                     반폭에서 줄바꿈이 심해지고 문장이 중복되며, 오류가 나는 순간
                     errorText 에 밀려 사라지므로 행 아래 한 줄로 상시 노출한다. */}
-                <TimeFormatHint
+                <Text
                   color="text.tertiary"
                   font="body-s-m"
                   id={timeFormatHintId}
                 >
-                  {
-                    "시간은 24시간제 숫자 4자리로 입력해요.\n오후 2시는 1400이에요."
-                  }
-                </TimeFormatHint>
+                  시간은 24시간제 4자리로 입력해주세요.
+                </Text>
               </TimeFields>
               <Controller
                 control={form.control}
@@ -455,10 +453,6 @@ const TimeFields = styled.div(({ theme }) => ({
   display: "grid",
   gap: theme.spacing.sm,
 }));
-
-const TimeFormatHint = styled(Text)({
-  whiteSpace: "pre-line",
-});
 
 const PrivateField = styled.div(({ theme }) => ({
   display: "grid",
