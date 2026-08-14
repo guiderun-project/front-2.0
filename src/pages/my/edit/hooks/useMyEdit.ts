@@ -45,6 +45,7 @@ export const useMyEdit = () => {
   );
 
   const [values, setValues] = useState<MyEditFormValues>(initialValues);
+  const [hasSubmitAttempted, setHasSubmitAttempted] = useState(false);
 
   const setField = <Key extends keyof MyEditFormValues>(
     key: Key,
@@ -54,21 +55,25 @@ export const useMyEdit = () => {
   };
 
   const birthDateISO = toBirthDateISO(values.birthDate);
+  const isBirthDateValid = birthDateISO !== null;
+  const isPhoneValid = isValidKoreanPhone(values.phoneNumber);
+
+  // 타이핑 중에는 입력을 마친 필드에만 오류를 보여준다(생년월일은 8자를 다 채웠을 때,
+  // 전화번호는 한 글자라도 입력했을 때). 저장을 시도한 뒤부터는 빈 필수 값도 안내한다.
   const hasBirthDateError =
-    values.birthDate.length === BIRTH_DATE_MAX_LENGTH && birthDateISO === null;
+    (values.birthDate.length === BIRTH_DATE_MAX_LENGTH || hasSubmitAttempted) &&
+    !isBirthDateValid;
   const hasPhoneError =
-    values.phoneNumber.length > 0 && !isValidKoreanPhone(values.phoneNumber);
+    (values.phoneNumber.length > 0 || hasSubmitAttempted) && !isPhoneValid;
 
   const buildRequestBody = (): UpdatePersonalInfoRequest | null => {
-    const phoneNumber = values.phoneNumber.trim();
-
-    if (birthDateISO === null || !phoneNumber) {
+    if (birthDateISO === null || !isPhoneValid) {
       return null;
     }
 
     const body: UpdatePersonalInfoRequest = {
       birthDate: birthDateISO,
-      phoneNumber,
+      phoneNumber: values.phoneNumber,
       snsId: values.snsId.trim() || null,
     };
 
@@ -98,10 +103,17 @@ export const useMyEdit = () => {
     },
   });
 
-  const canSubmit =
-    buildRequestBody() !== null && isDirty && !isPending && !hasPhoneError;
+  /**
+   * 저장 시도 시점의 검증. 에러 노출을 켜고 유효 여부를 반환한다.
+   * 오류 표시와 호출측 포커스 이동이 같은 이벤트에서 일어나야 하므로 동기 함수다.
+   */
+  const validate = (): boolean => {
+    setHasSubmitAttempted(true);
 
-  /** 변경된 정보를 저장한다. 성공하면 true, 실패하면 false 를 반환한다. */
+    return isBirthDateValid && isPhoneValid;
+  };
+
+  /** 내 정보를 저장한다. 성공하면 true, 실패하면 false 를 반환한다. */
   const submit = async (): Promise<boolean> => {
     const body = buildRequestBody();
 
@@ -131,8 +143,8 @@ export const useMyEdit = () => {
     hasBirthDateError,
     hasPhoneError,
     isDirty,
-    canSubmit,
     isSubmitting: isPending,
+    validate,
     submit,
   };
 };

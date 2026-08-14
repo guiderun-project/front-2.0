@@ -16,6 +16,9 @@ export const BIRTH_DATE_MAX_LENGTH = 10;
 
 const BIRTH_DATE_DIGIT_LENGTH = 8;
 
+/** 생년월일이 비었거나 형식이 맞지 않을 때 공통으로 쓰는 안내 문구. */
+export const BIRTH_DATE_ERROR_MESSAGE = `생년월일 ${BIRTH_DATE_DIGIT_LENGTH}자를 입력해주세요`;
+
 /** 입력값에서 숫자만 추출해 "YYYY.MM.DD" 형태로 만든다. */
 export const formatBirthDateInput = (raw: string): string => {
   const digits = raw.replace(/\D/g, '').slice(0, BIRTH_DATE_DIGIT_LENGTH);

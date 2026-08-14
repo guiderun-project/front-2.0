@@ -5,6 +5,7 @@ import styled from "@emotion/styled";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 
 import { APP_PATH } from "@/router/path";
+import type { ReturnLocation } from "@/router/returnPath";
 import { useAuth } from "@/contexts";
 
 import { Icon } from "@/components/Icon";
@@ -39,7 +40,11 @@ export const BottomNavigation = ({
 
   const handleLogin = () => {
     setIsLoginSheetOpen(false);
-    navigate(APP_PATH.INTRO, { state: { from: location } });
+    navigate(APP_PATH.INTRO, {
+      state: {
+        from: { pathname: APP_PATH.MY, search: "", hash: "" },
+      } satisfies { from: ReturnLocation },
+    });
   };
 
   return (

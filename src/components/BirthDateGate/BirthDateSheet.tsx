@@ -8,6 +8,7 @@ import { api } from "@/api/services";
 import { useAuth } from "@/contexts";
 import { useAnnouncedMessage } from "@/hooks/useAnnouncedMessage";
 import {
+  BIRTH_DATE_ERROR_MESSAGE,
   BIRTH_DATE_MAX_LENGTH,
   formatBirthDateInput,
   toBirthDateISO,
@@ -17,8 +18,6 @@ import { BottomSheet } from "../BottomSheet";
 import { Button } from "../Button";
 import { HiddenText } from "../HiddenText";
 import { Input } from "../Input";
-
-const BIRTH_DATE_ERROR_MESSAGE = "올바른 생년월일을 입력해주세요";
 
 type BirthDateSheetProps = {
   userName: string;

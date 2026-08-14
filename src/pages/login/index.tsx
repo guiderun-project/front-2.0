@@ -16,6 +16,7 @@ import {
 import { ACCOUNT_FIND_TYPE } from '@/constants';
 import { useAuth } from '@/contexts';
 import { APP_PATH } from '@/router/path';
+import { peekReturnPath } from '@/router/returnPath';
 
 const LOGIN_FORM_ID = 'login-form';
 const LOGIN_ERROR_MESSAGE = '아이디 또는 비밀번호를 확인해주세요';
@@ -44,7 +45,7 @@ export const LoginPage = (): ReactElement => {
     try {
       const { accessToken } = await api.auth.loginPost({ accountId, password });
       await startSession(accessToken);
-      navigate(APP_PATH.HOME, { replace: true });
+      navigate(peekReturnPath() ?? APP_PATH.HOME, { replace: true });
     } catch (error) {
       setErrorText(getApiErrorMessage(error, LOGIN_ERROR_MESSAGE));
     } finally {

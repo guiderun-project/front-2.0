@@ -1,11 +1,16 @@
-type AccessTokenChangeListener = (accessToken: string | null) => void;
+export type AccessTokenClearReason = 'signOut' | 'sessionExpired';
+
+type AccessTokenChangeListener = (
+  accessToken: string | null,
+  reason?: AccessTokenClearReason,
+) => void;
 
 let accessTokenMemory: string | null = null;
 const accessTokenChangeListeners = new Set<AccessTokenChangeListener>();
 
-const notifyAccessTokenChange = () => {
+const notifyAccessTokenChange = (reason?: AccessTokenClearReason) => {
   accessTokenChangeListeners.forEach((listener) => {
-    listener(accessTokenMemory);
+    listener(accessTokenMemory, reason);
   });
 };
 
@@ -18,9 +23,11 @@ export const setAccessToken = (accessToken: string) => {
   notifyAccessTokenChange();
 };
 
-export const clearAccessToken = () => {
+export const clearAccessToken = (
+  reason: AccessTokenClearReason = 'sessionExpired',
+) => {
   accessTokenMemory = null;
-  notifyAccessTokenChange();
+  notifyAccessTokenChange(reason);
 };
 
 export const subscribeAccessTokenChange = (

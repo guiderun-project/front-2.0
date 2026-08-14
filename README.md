@@ -1,74 +1,122 @@
-# React + TypeScript + Vite
+# 가이드런프로젝트
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> 함께 연결된 안전한 러닝
 
-Currently, two official plugins are available:
+**가이드런프로젝트**는 시각장애러너(VI)와 가이드러너를 *모임* 단위로 연결해, 두 사람이 함께 안전하게 달릴 수 있도록 돕는 러닝 커뮤니티 서비스입니다.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+혼자서는 달리기 어려운 시각장애러너와, 함께 달릴 파트너를 찾는 가이드러너가 있습니다. 가이드런은 훈련·대회 모임을 열고 참가 신청을 받아, 두 러너를 짝지어주고 당일 출석까지 한 흐름으로 이어줍니다.
 
-## React Compiler
+이 저장소는 가이드런 서비스의 **모바일 웹 프론트엔드(v2)** 입니다.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 핵심 기능
 
-## Expanding the ESLint configuration
+- **모임 탐색** — 다가오는 모임과 지난 모임을 훈련/대회 유형, 모집 상태로 필터링하고 검색합니다.
+- **모임 만들기** — 승인된 회원이 모임을 열고 정보를 수정하거나 모집을 마감합니다.
+- **참가 신청** — 러너가 모임에 신청하고, 모임별 추가 질문에 답합니다.
+- **매칭** — 신청자 중 시각장애러너와 가이드러너를 짝지어 짝을 확정하거나 취소합니다.
+- **출석 체크** — 모임 당일 참가자 출석과 러닝 기록을 남깁니다.
+- **모임 댓글** — 모임 상세에서 참가자들이 이야기를 나눕니다.
+- **나의 활동** — 참여·주최한 모임, 함께 달린 파트너, 활동 요약을 확인합니다.
+- **이동지원 연락처** — 모임 장소까지의 이동을 도울 연락처를 안내합니다.
+- **로그인과 승인** — 카카오 또는 아이디 로그인 후, 운영진 승인을 받은 회원만 신청·매칭 기능을 사용합니다.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 러닝 그룹
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+러너의 10km 기록을 A~E 그룹으로 환산해 매칭과 모임 모집 기준으로 사용합니다. 같은 그룹 이름이라도 시각장애러너와 가이드러너의 기준 구간은 다릅니다.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+| 그룹 | 시각장애러너 | 가이드러너 |
+| --- | --- | --- |
+| A | ~50분 | ~45분 |
+| B | 51~56분 | 46~52분 |
+| C | 57~65분 | 53~59분 |
+| D | 66분~ | 60분~ |
+| E | 기록 없음 | 기록 없음 |
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## 접근성
+
+이 서비스는 스크린리더로 화면을 읽는 러너가 실제 사용자입니다. 접근성은 나중에 덧붙이는 항목이 아니라 기능의 전제로 다룹니다.
+
+- 라우트가 바뀌면 페이지 제목을 라이브 리전으로 낭독해, 화면 전환과 리다이렉트가 조용히 지나가지 않게 합니다.
+- 아이콘만 있는 버튼과 폼 컨트롤에 접근 가능한 이름을 붙입니다.
+- 키보드 조작과 보이는 포커스 상태를 유지합니다.
+- 중요한 상태를 색상만으로 전달하지 않습니다.
+- 라이트/다크 모드를 CSS 변수와 `data-color-mode`로 지원합니다.
+
+## 기술 스택
+
+| 영역 | 사용 기술 |
+| --- | --- |
+| 프레임워크 | React 19, TypeScript, Vite |
+| 스타일 | Emotion, `src/styles`의 디자인 토큰 |
+| 라우팅 | React Router 7 |
+| 서버 상태 | TanStack Query |
+| 폼 | React Hook Form, Zod |
+| 접근성 컴포넌트 | React Aria Components |
+| 네트워크 | Axios (`src/api`) |
+| 목 API | MSW |
+| 분석 | PostHog |
+| 배포 | Netlify (SPA 리다이렉트) |
+
+## 시작하기
+
+Node 24와 pnpm 10을 기준으로 개발합니다 (CI 기준 pnpm 10.30.2).
+
+```bash
+pnpm install
+cp .env.example .env
+pnpm dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+`VITE_API_BASE_URL`이 없으면 앱이 시작되지 않습니다. 카카오 로그인을 확인하려면 `VITE_KAKAO_REST_API_KEY`와 `VITE_KAKAO_REDIRECT_URI`도 채워야 합니다. 자세한 항목은 [.env.example](.env.example)을 참고하세요.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+백엔드 없이 화면을 확인하려면 `VITE_ENABLE_MSW=true`로 목 API를 켭니다. `VITE_MOCK_AUTHENTICATED=false`로 두면 비로그인(게스트) 상태로 시작합니다.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+같은 네트워크의 실제 모바일 기기에서 확인할 때는 `pnpm dev:mobile`을 사용합니다.
+
+## 스크립트
+
+| 명령 | 설명 |
+| --- | --- |
+| `pnpm dev` | 개발 서버 실행 |
+| `pnpm dev:mobile` | 외부 기기 접속용 개발 서버 실행 (`0.0.0.0:5173`) |
+| `pnpm build` | 타입 검사 후 프로덕션 빌드 (`tsc -b && vite build`) |
+| `pnpm lint` | ESLint 실행 |
+| `pnpm preview` | 빌드 결과 로컬 미리보기 |
+| `pnpm msw:init` | MSW 워커 파일 재생성 |
+
+## 프로젝트 구조
+
 ```
-# front-2.0
+src
+├── api
+│   ├── core        Axios 클라이언트, 토큰 저장소, 요청 헬퍼, 분석
+│   ├── services    도메인별 API 서비스 모듈
+│   ├── types       API 요청·응답 타입
+│   └── constants   API 공용 상수
+├── components      앱 전역 공용 컴포넌트
+├── constants       역할·러너 타입 등 도메인 상수
+├── contexts        인증 등 전역 컨텍스트
+├── hooks           공용 훅
+├── mocks           MSW 핸들러와 픽스처
+├── pages           라우트 단위 페이지 (페이지 전용 코드는 해당 폴더에 co-locate)
+├── router          라우트 정의, 경로 상수, 접근 제어
+├── styles          테마, 전역 스타일, 디자인 토큰
+└── utils           공용 유틸리티
+```
+
+`src` 아래 경로는 `@/` 별칭으로 import 합니다.
+
+## 기여
+
+코드 작성 규칙(스타일, API 레이어, 인증, 목 API, 페이지 구성)은 [CLAUDE.md](CLAUDE.md)와 [AGENTS.md](AGENTS.md)에 정리되어 있습니다. 변경 전에 읽어주세요.
+
+작업을 마치기 전에 다음을 실행합니다.
+
+```bash
+pnpm lint
+pnpm build
+```
+
+## 더 알아보기
+
+가이드런 프로젝트 소개: [about.guiderun.org](https://about.guiderun.org/)

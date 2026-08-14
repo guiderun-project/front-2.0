@@ -1,6 +1,6 @@
-import { useId, type ChangeEvent, type ReactElement } from 'react';
+import { type ChangeEvent, type ReactElement } from 'react';
 
-import { HiddenText, Input } from '@/components';
+import { Input } from '@/components';
 
 import { formatTimeInput } from '../utils';
 
@@ -12,35 +12,27 @@ type MaskedTimeInputProps = Omit<
   onChange?: (value: string) => void;
 };
 
-// placeholder "HH:mm" 은 스크린리더가 철자로 읽어 입력 규칙을 전달하지 못하므로,
-// SR 전용 힌트를 aria-describedby 로 연결해 포커스 시 형식이 낭독되게 한다.
-const TIME_FORMAT_HINT =
-  '24시간제 숫자 4자리로 입력해요. 예를 들어 오전 8시 30분은 0830이에요.';
-
 export const MaskedTimeInput = ({
   value,
-  describedById,
   onChange,
   ...props
 }: MaskedTimeInputProps): ReactElement => {
-  const hintId = useId();
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     onChange?.(formatTimeInput(event.target.value));
   };
 
   return (
-    <>
-      <Input
-        {...props}
-        autoComplete="off"
-        describedById={[describedById, hintId].filter(Boolean).join(' ')}
-        inputMode="numeric"
-        onChange={handleChange}
-        pattern="[0-2][0-9]:[0-5][0-9]"
-        placeholder="HH:mm"
-        value={value}
-      />
-      <HiddenText id={hintId}>{TIME_FORMAT_HINT}</HiddenText>
-    </>
+    <Input
+      {...props}
+      autoComplete="off"
+      inputMode="numeric"
+      onChange={handleChange}
+      pattern="[0-2][0-9]:[0-5][0-9]"
+      // 12를 넘는 시각을 예로 들어 24시간제임을 형식만으로 알린다.
+      // 문장 형태의 형식 안내는 두 시간 필드가 공유하는 힌트가 담당하고,
+      // 그 힌트를 호출부에서 describedById 로 연결한다.
+      placeholder="14:00"
+      value={value}
+    />
   );
 };

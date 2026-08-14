@@ -27,6 +27,7 @@ import { useRouteBlockerConfirm } from '@/hooks/useRouteBlockerConfirm';
 import { useAnnouncedMessage } from '@/hooks/useAnnouncedMessage';
 import { APP_PATH } from '@/router/path';
 
+import { focusFirstInvalidField } from './focusFirstInvalidField';
 import { HOPE_PREFS_MAX_LENGTH, useRunningEdit } from './hooks/useRunningEdit';
 
 const LOADING_MESSAGE = '러닝 정보를 불러오는 중이에요.';
@@ -66,6 +67,7 @@ const MyRunningEditContent = (): ReactElement => {
   const { showToast } = useToast();
   const [isExitConfirmOpen, setIsExitConfirmOpen] = useState(false);
   const exitResolverRef = useRef<((v: boolean) => void) | null>(null);
+  const fieldsRef = useRef<HTMLDivElement>(null);
   const {
     values,
     userType,
@@ -74,7 +76,8 @@ const MyRunningEditContent = (): ReactElement => {
     setHopePrefs,
     recordError,
     isDirty,
-    canSubmit,
+    isSubmitting,
+    validate,
     submit,
   } = useRunningEdit();
 
@@ -130,6 +133,12 @@ const MyRunningEditContent = (): ReactElement => {
   };
 
   const handleSubmit = async () => {
+    // 버튼은 항상 활성 상태이므로 검증은 클릭 시점에 한다.
+    if (!validate()) {
+      focusFirstInvalidField(fieldsRef);
+      return;
+    }
+
     const isSucceeded = await submit();
 
     if (isSucceeded) {
@@ -153,7 +162,7 @@ const MyRunningEditContent = (): ReactElement => {
   };
 
   return (
-    <Fields>
+    <Fields ref={fieldsRef}>
       <HiddenText role="status">{announcedGroupChangeNotice}</HiddenText>
       <HiddenText role="alert">{announcedSubmitFailure}</HiddenText>
       <TimeInput
@@ -178,7 +187,7 @@ const MyRunningEditContent = (): ReactElement => {
 
       <FooterButton>
         <FooterButton.Button
-          disabled={!canSubmit}
+          disabled={isSubmitting}
           fullWidth
           size="l"
           onClick={handleSubmit}

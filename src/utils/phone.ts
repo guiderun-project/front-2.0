@@ -1,5 +1,8 @@
 export const PHONE_DIGIT_LENGTH = 11;
 
+/** 전화번호가 비었거나 형식이 맞지 않을 때 공통으로 쓰는 안내 문구. */
+export const PHONE_ERROR_MESSAGE = `전화번호 ${PHONE_DIGIT_LENGTH}자를 입력해주세요`;
+
 /** 한국 휴대전화 번호 형식인지 검사한다. 숫자만 있는 문자열을 입력으로 받는다. (01X + 7~8자리) */
 export const isValidKoreanPhone = (digits: string): boolean =>
   /^01[0-9]\d{7,8}$/.test(digits);
