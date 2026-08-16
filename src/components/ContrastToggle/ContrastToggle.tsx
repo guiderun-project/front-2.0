@@ -5,7 +5,8 @@ import styled from '@emotion/styled';
 import { IconButton } from '@/components/Icon';
 import { useContrastMode } from '@/styles/useContrastMode';
 
-const CONTRAST_TOGGLE_SIZE = 30;
+const CONTRAST_TOGGLE_WIDTH = 32;
+const CONTRAST_TOGGLE_HEIGHT = 30;
 const CONTRAST_TOGGLE_ICON_SIZE = 16;
 
 type ContrastToggleProps = {
@@ -41,7 +42,7 @@ export const ContrastToggle = ({
       icon={isHighContrast ? 'contrast-filled' : 'contrast-lined'}
       iconSize={CONTRAST_TOGGLE_ICON_SIZE}
       shape="round"
-      size={CONTRAST_TOGGLE_SIZE}
+      size={CONTRAST_TOGGLE_WIDTH}
       onClick={handleToggleContrastMode}
       {...props}
     />
@@ -50,6 +51,7 @@ export const ContrastToggle = ({
 
 const ToggleButton = styled(IconButton)(({ theme }) => ({
   flexShrink: 0,
+  height: theme.pxToRem(CONTRAST_TOGGLE_HEIGHT),
   border: '1px solid transparent',
   backgroundColor: theme.color.bg['dim-soft'],
 
