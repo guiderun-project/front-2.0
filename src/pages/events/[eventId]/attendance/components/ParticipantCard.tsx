@@ -1,6 +1,7 @@
 import type { ReactElement, ReactNode } from 'react';
 
 import styled from '@emotion/styled';
+import { highContrastBoundary } from '@/styles/highContrastStyles';
 
 type ParticipantCardProps = {
   children: ReactNode;
@@ -23,4 +24,6 @@ const ParticipantCardRoot = styled.div(({ theme }) => ({
   borderRadius: theme.radius.lg,
   boxSizing: 'border-box',
   backgroundColor: theme.color.bg.subtle,
+
+  ...highContrastBoundary(theme),
 }));

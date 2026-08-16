@@ -5,6 +5,7 @@ import styled from '@emotion/styled';
 import { Text } from '@/components';
 
 import type { MatchSectionId } from '../matchPageState';
+import { highContrastBoundary } from '@/styles/highContrastStyles';
 
 type MatchSegmentNavProps = {
   activeSection: MatchSectionId;
@@ -60,6 +61,8 @@ const SegmentBar = styled.div(({ theme }) => ({
   gap: theme.spacing.none,
   padding: theme.spacing['2xl'],
   backgroundColor: theme.color.bg.default,
+
+  ...highContrastBoundary(theme),
 }));
 
 const SegmentButton = styled.button<{ $isActive: boolean }>(

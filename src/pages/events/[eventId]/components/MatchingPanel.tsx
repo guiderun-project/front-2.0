@@ -18,6 +18,10 @@ import {
 } from "../utils";
 import { AnnouncedPanelState } from "./PanelState";
 import { ProfileAvatar } from "./ProfileAvatar";
+import {
+  highContrastBoundary,
+  HIGH_CONTRAST_SELECTOR,
+} from "@/styles/highContrastStyles";
 
 type MatchingPanelProps = {
   data?: MatchingStatusViewModel;
@@ -453,6 +457,7 @@ const MyPartnerCard = styled.article(({ theme }) => ({
   borderRadius: theme.pxToRem(20),
   backgroundColor: theme.color.bg.default,
   boxSizing: "border-box",
+  ...highContrastBoundary(theme),
 }));
 
 const PartnerList = styled.div(({ theme }) => ({
@@ -477,6 +482,7 @@ const GroupList = styled.div(({ theme }) => ({
   gap: theme.spacing["3xl"],
   borderRadius: theme.radius.xl,
   backgroundColor: theme.color.bg.elevated,
+  ...highContrastBoundary(theme),
 }));
 
 const GroupCard = styled.article<{ $hasDivider: boolean }>(
@@ -538,6 +544,13 @@ const ParticipantSlot = styled.div<{ $variant: ParticipantSlotVariant }>(
     backgroundColor:
       $variant === "unmatched" ? theme.color.bg.surface : theme.color.bg.subtle,
     boxSizing: "border-box",
+
+    [HIGH_CONTRAST_SELECTOR]: {
+      borderColor:
+        $variant === "unmatched"
+          ? theme.color.border.strong
+          : theme.color.border.default,
+    },
   }),
 );
 
@@ -584,6 +597,10 @@ const SectionDivider = styled.div(({ theme }) => ({
   width: "100%",
   height: theme.spacing.lg,
   backgroundColor: theme.color.border.subtle,
+
+  [HIGH_CONTRAST_SELECTOR]: {
+    height: "1px",
+  },
 }));
 
 const CriteriaSection = styled.section(({ theme }) => ({

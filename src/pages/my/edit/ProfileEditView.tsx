@@ -23,6 +23,7 @@ import { BIRTH_DATE_ERROR_MESSAGE, PHONE_ERROR_MESSAGE } from '@/utils';
 import { AccountSetupSheet } from './components/AccountSetupSheet';
 import { focusFirstInvalidField } from './focusFirstInvalidField';
 import { useMyEdit } from './hooks/useMyEdit';
+import { HIGH_CONTRAST_SELECTOR } from '@/styles/highContrastStyles';
 
 const LOADING_MESSAGE = '내 정보를 불러오는 중이에요.';
 const ERROR_MESSAGE = '내 정보를 불러오지 못했어요.';
@@ -306,4 +307,8 @@ const SectionHeading = styled.div(({ theme }) => ({
 const Divider = styled.div(({ theme }) => ({
   height: theme.pxToRem(12),
   backgroundColor: theme.color.border.subtle,
+
+  [HIGH_CONTRAST_SELECTOR]: {
+    height: "1px",
+  },
 }));

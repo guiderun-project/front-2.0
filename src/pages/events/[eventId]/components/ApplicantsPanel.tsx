@@ -13,6 +13,7 @@ import {
 } from "../utils";
 import { AnnouncedPanelState } from "./PanelState";
 import { ProfileAvatar } from "./ProfileAvatar";
+import { highContrastBoundary } from "@/styles/highContrastStyles";
 
 type ApplicantsPanelProps = {
   data?: EventApplicantListResponse;
@@ -218,6 +219,7 @@ const SummaryCard = styled.div(({ theme }) => ({
   padding: theme.spacing["2xl"],
   borderRadius: theme.pxToRem(20),
   backgroundColor: theme.color.bg.elevated,
+  ...highContrastBoundary(theme),
 }));
 
 const SummaryHeader = styled.div(({ theme }) => ({
@@ -252,6 +254,7 @@ const GroupCard = styled.article(({ theme }) => ({
   padding: theme.spacing["2xl"],
   borderRadius: theme.radius.xl,
   backgroundColor: theme.color.bg.elevated,
+  ...highContrastBoundary(theme),
 }));
 
 const GroupSection = styled.section<{ $hasDivider: boolean }>(
@@ -299,6 +302,7 @@ const PersonRow = styled.div(({ theme }) => ({
   borderRadius: theme.radius.md,
   boxSizing: "border-box",
   backgroundColor: theme.color.bg.subtle,
+  ...highContrastBoundary(theme),
 }));
 
 const ClickablePersonRow = styled.button(({ theme }) => ({
@@ -313,6 +317,7 @@ const ClickablePersonRow = styled.button(({ theme }) => ({
   borderRadius: theme.radius.md,
   boxSizing: "border-box",
   backgroundColor: theme.color.bg.subtle,
+  ...highContrastBoundary(theme),
   cursor: "pointer",
   textAlign: "left",
   touchAction: "manipulation",
