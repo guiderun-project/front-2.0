@@ -1,6 +1,6 @@
 import type { Theme } from '@emotion/react';
 
-export const HIGH_CONTRAST_SELECTOR = ':root[data-contrast="high"] &';
+export const HIGH_CONTRAST_SELECTOR = '&:is(:root[data-contrast="high"] *)';
 
 type HighContrastBoundaryOptions = {
   width?: 1 | 2;
