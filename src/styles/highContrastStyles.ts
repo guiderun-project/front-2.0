@@ -6,17 +6,16 @@ type HighContrastBoundaryOptions = {
   width?: 1 | 2;
 };
 
-export const highContrastOutline = (
+export const highContrastBoundaryStyle = (
   theme: Theme,
   { width = 1 }: HighContrastBoundaryOptions = {},
 ) => ({
-  outline: `${width}px solid ${theme.color.border.default}`,
-  outlineOffset: `-${width}px`,
+  boxShadow: `inset 0 0 0 ${width}px ${theme.color.border.default}`,
 });
 
 export const highContrastBoundary = (
   theme: Theme,
   options?: HighContrastBoundaryOptions,
 ) => ({
-  [HIGH_CONTRAST_SELECTOR]: highContrastOutline(theme, options),
+  [HIGH_CONTRAST_SELECTOR]: highContrastBoundaryStyle(theme, options),
 });

@@ -5,7 +5,7 @@ import styled from '@emotion/styled';
 
 import {
   HIGH_CONTRAST_SELECTOR,
-  highContrastOutline,
+  highContrastBoundaryStyle,
 } from '@/styles/highContrastStyles';
 import { highContrastColorRoles, resolveColorToken, type ColorToken } from '@/styles/tokens';
 
@@ -94,7 +94,7 @@ const collapsesToSurface = (background: ColorToken | undefined) =>
 
 const createHighContrastStyles = (theme: Theme, tokens: ButtonHighContrastTokens) => ({
   ...(tokens.border === undefined && collapsesToSurface(tokens.background)
-    ? highContrastOutline(theme)
+    ? highContrastBoundaryStyle(theme)
     : {}),
   ...(collapsesToSurface(tokens.background) &&
   highContrastColorRoles[tokens.content] === 'inverse-content'
