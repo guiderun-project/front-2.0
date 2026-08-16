@@ -3,6 +3,7 @@ import { Fragment, useId, type ReactElement } from "react";
 import styled from "@emotion/styled";
 
 import { Text } from "@/components";
+import { highContrastBoundary } from "@/styles/highContrastStyles";
 
 import { useUpcomingEvents } from "@/pages/home/hooks/useUpcomingEvents";
 import { HomeSectionMessage } from "@/pages/home/components/HomeSectionMessage";
@@ -61,6 +62,8 @@ const Panel = styled.ul(({ theme }) => ({
   borderRadius: theme.radius.md,
   backgroundColor: theme.color.bg.elevated,
   boxShadow: `0 ${theme.pxToRem(4)} ${theme.pxToRem(12)} ${theme.color.bg.overlay}`,
+
+  ...highContrastBoundary(theme),
 }));
 
 const RowDivider = styled.li(({ theme }) => ({

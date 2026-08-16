@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { Badge, Icon, RunnerTypeAvatar, Text } from '@/components';
 import { RUNNER_TYPE_LABELS } from '@/constants';
 import { APP_PATH } from '@/router/path';
+import { highContrastBoundary } from '@/styles/highContrastStyles';
 
 import {
   formatDday,
@@ -122,6 +123,8 @@ const CardLink = styled(Link)(({ theme }) => ({
     outline: `2px solid ${theme.color.border.focused}`,
     outlineOffset: theme.spacing.xs,
   },
+
+  ...highContrastBoundary(theme),
 }));
 
 const TitleRow = styled.div(({ theme }) => ({
@@ -154,6 +157,8 @@ const MatchedPartnerBox = styled.div(({ theme }) => ({
   padding: theme.spacing.lg,
   borderRadius: theme.pxToRem(10),
   backgroundColor: theme.color.bg['brand-soft'],
+
+  ...highContrastBoundary(theme),
 }));
 
 const PartnerLabel = styled(Text)({
@@ -181,4 +186,6 @@ const MatchPendingNotice = styled.div(({ theme }) => ({
   padding: theme.spacing.lg,
   borderRadius: theme.pxToRem(10),
   backgroundColor: theme.color.bg.subtle,
+
+  ...highContrastBoundary(theme),
 }));
