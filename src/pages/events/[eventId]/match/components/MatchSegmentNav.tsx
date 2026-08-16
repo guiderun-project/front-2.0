@@ -3,9 +3,12 @@ import type { ReactElement, RefObject } from 'react';
 import styled from '@emotion/styled';
 
 import { Text } from '@/components';
+import {
+  HIGH_CONTRAST_SELECTOR,
+  highContrastBoundary,
+} from '@/styles/highContrastStyles';
 
 import type { MatchSectionId } from '../matchPageState';
-import { highContrastBoundary } from '@/styles/highContrastStyles';
 
 type MatchSegmentNavProps = {
   activeSection: MatchSectionId;
@@ -62,7 +65,9 @@ const SegmentBar = styled.div(({ theme }) => ({
   padding: theme.spacing['2xl'],
   backgroundColor: theme.color.bg.default,
 
-  ...highContrastBoundary(theme),
+  [HIGH_CONTRAST_SELECTOR]: {
+    boxShadow: `inset 0 -1px 0 0 ${theme.color.border.default}`,
+  },
 }));
 
 const SegmentButton = styled.button<{ $isActive: boolean }>(
@@ -88,5 +93,7 @@ const SegmentButton = styled.button<{ $isActive: boolean }>(
     '@media (prefers-reduced-motion: reduce)': {
       transition: 'none',
     },
+
+    ...($isActive ? highContrastBoundary(theme) : {}),
   }),
 );
