@@ -3,7 +3,10 @@ import type { ReactElement } from 'react';
 import type { Theme } from '@emotion/react';
 import styled from '@emotion/styled';
 
-import { HIGH_CONTRAST_SELECTOR } from '@/styles/highContrastStyles';
+import {
+  HIGH_CONTRAST_SELECTOR,
+  highContrastOutline,
+} from '@/styles/highContrastStyles';
 import { highContrastColorRoles, resolveColorToken, type ColorToken } from '@/styles/tokens';
 
 import { Icon } from '../Icon';
@@ -82,17 +85,22 @@ export const Button = ({
 
 type ButtonHighContrastTokens = {
   background?: ColorToken;
+  border?: unknown;
   content: ColorToken;
 };
 
 const collapsesToSurface = (background: ColorToken | undefined) =>
   background === undefined || highContrastColorRoles[background] === 'surface';
 
-const createHighContrastStyles = (theme: Theme, tokens: ButtonHighContrastTokens) =>
-  collapsesToSurface(tokens.background) &&
+const createHighContrastStyles = (theme: Theme, tokens: ButtonHighContrastTokens) => ({
+  ...(tokens.border === undefined && collapsesToSurface(tokens.background)
+    ? highContrastOutline(theme)
+    : {}),
+  ...(collapsesToSurface(tokens.background) &&
   highContrastColorRoles[tokens.content] === 'inverse-content'
     ? { color: theme.color.text.primary }
-    : {};
+    : {}),
+});
 
 const StyledButton = styled.button<ButtonStyleProps>(
   ({ $fullWidth, $level, $size, $status, theme }) => {
