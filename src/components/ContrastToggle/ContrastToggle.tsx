@@ -3,6 +3,7 @@ import type { ComponentPropsWithoutRef, ReactElement } from 'react';
 import styled from '@emotion/styled';
 
 import { Icon } from '@/components/Icon';
+import { highContrastBoundary } from '@/styles/highContrastStyles';
 import { useContrastMode } from '@/styles/useContrastMode';
 
 type ContrastToggleProps = {
@@ -31,7 +32,6 @@ export const ContrastToggle = ({
 
   return (
     <ToggleButton
-      $pressed={isHighContrast}
       aria-label={ariaLabel}
       aria-pressed={isHighContrast}
       disabled={disabled}
@@ -39,29 +39,30 @@ export const ContrastToggle = ({
       onClick={handleToggleContrastMode}
       {...props}
     >
-      <Icon
-        color={isHighContrast ? 'icon.primary' : 'icon.secondary'}
-        icon={isHighContrast ? 'contrast-filled' : 'contrast-lined'}
-        size={16}
-      />
+      <ToggleControl $pressed={isHighContrast}>
+        <Icon
+          color={isHighContrast ? 'icon.primary' : 'icon.secondary'}
+          icon={isHighContrast ? 'contrast-filled' : 'contrast-lined'}
+          size={16}
+        />
+      </ToggleControl>
     </ToggleButton>
   );
 };
 
-const ToggleButton = styled.button<{ $pressed: boolean }>(({ $pressed, theme }) => ({
+const ToggleButton = styled.button(({ theme }) => ({
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
   flexShrink: 0,
   width: theme.pxToRem(38),
   height: theme.pxToRem(38),
-  padding: 0,
-  border: `1px solid ${$pressed ? theme.color.border.subtle : 'transparent'}`,
+  padding: theme.spacing.s,
+  border: 0,
   borderRadius: theme.radius.full,
-  background: $pressed ? theme.color.bg.elevated : theme.color.bg['dim-soft'],
-  boxShadow: $pressed ? theme.effect['color-mode-toggle-light-shadow'] : 'none',
+  background: theme.color.bg['dim-soft'],
   cursor: 'pointer',
-  transition: 'background-color 120ms ease, box-shadow 120ms ease, transform 120ms ease',
+  transition: 'transform 120ms ease',
 
   '&:active': {
     transform: 'scale(0.98)',
@@ -83,5 +84,25 @@ const ToggleButton = styled.button<{ $pressed: boolean }>(({ $pressed, theme }) 
     '&:active': {
       transform: 'none',
     },
+  },
+
+  ...highContrastBoundary(theme),
+}));
+
+const ToggleControl = styled.span<{ $pressed: boolean }>(({ $pressed, theme }) => ({
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '100%',
+  height: '100%',
+  border: `1px solid ${$pressed ? theme.color.border.subtle : 'transparent'}`,
+  borderRadius: theme.radius.full,
+  background: $pressed ? theme.color.bg.elevated : 'transparent',
+  boxShadow: $pressed ? theme.effect['color-mode-toggle-light-shadow'] : 'none',
+  transition:
+    'background-color 120ms ease, border-color 120ms ease, box-shadow 120ms ease',
+
+  '@media (prefers-reduced-motion: reduce)': {
+    transition: 'none',
   },
 }));
