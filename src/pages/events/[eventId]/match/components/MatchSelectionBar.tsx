@@ -4,12 +4,13 @@ import { keyframes } from '@emotion/react';
 import styled from '@emotion/styled';
 
 import { HiddenText, IconButton, Text } from '@/components';
-
-import type { SelectablePerson } from '../useEventMatchPage';
 import {
   HIGH_CONTRAST_SELECTOR,
   highContrastBoundaryStyle,
 } from '@/styles/highContrastStyles';
+import { useContrastMode } from '@/styles/useContrastMode';
+
+import type { SelectablePerson } from '../useEventMatchPage';
 
 type MatchSelectionBarProps = {
   canCreateMatching: boolean;
@@ -29,6 +30,7 @@ export const MatchSelectionBar = ({
   onCreateMatching,
 }: MatchSelectionBarProps): ReactElement | null => {
   const selectionLabelId = useId();
+  const { contrastMode } = useContrastMode();
   const hasSelection = selectedVi !== null || selectedGuides.length > 0;
 
   if (!hasSelection) {
@@ -75,7 +77,9 @@ export const MatchSelectionBar = ({
           </SelectionItems>
           <SelectionClearButton
             aria-label="선택 모두 해제"
-            color="badge.text.primitive"
+            color={
+              contrastMode === 'high' ? 'icon.primary' : 'badge.text.primitive'
+            }
             icon="close-lined"
             iconSize={19.2}
             shape="round"
@@ -276,7 +280,6 @@ const SelectionClearButton = styled(IconButton)(({ theme }) => ({
 
   [HIGH_CONTRAST_SELECTOR]: {
     backgroundColor: theme.color.bg.default,
-    color: theme.color.icon.primary,
     ...highContrastBoundaryStyle(theme),
   },
 }));

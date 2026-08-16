@@ -292,6 +292,8 @@ const PersonBoxRoot = styled.label<{ $selected: boolean }>(
     '@media (prefers-reduced-motion: reduce)': {
       transition: 'none',
     },
+
+    ...highContrastBoundary(theme),
   }),
 );
 
