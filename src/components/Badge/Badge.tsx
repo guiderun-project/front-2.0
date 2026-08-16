@@ -2,7 +2,8 @@ import type { ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
-import { resolveColorToken } from '@/styles/tokens';
+import { highContrastBoundary } from '@/styles/highContrastStyles';
+import { highContrastColorRoles, resolveColorToken } from '@/styles/tokens';
 
 import {
   BADGE_COLOR_STYLES,
@@ -76,6 +77,10 @@ const StyledBadge = styled.span<BadgeStyleProps>(
       verticalAlign: 'middle',
       whiteSpace: 'nowrap',
       wordBreak: 'normal',
+
+      ...(highContrastColorRoles[$background] === 'surface'
+        ? highContrastBoundary(theme)
+        : {}),
     };
   },
 );

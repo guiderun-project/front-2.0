@@ -1,0 +1,4 @@
+<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<!-- TODO(디자인 확인 필요): 고대비 모드 토글용 임시 아이콘이다. Figma 아이콘 세트에 대비(contrast) 아이콘이 없어 기존 아이콘 규약(24x24, currentColor)에 맞춰 직접 그렸다. contrast-lined 와 짝을 이루는 선택 상태다. 디자인 확정 시 교체한다. -->
+<path fill-rule="evenodd" clip-rule="evenodd" d="M12 2A10 10 0 0 1 12 22A10 10 0 0 1 12 2ZM12 5A7 7 0 0 0 12 19Z" fill="currentColor"/>
+</svg>

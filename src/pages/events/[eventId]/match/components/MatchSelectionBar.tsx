@@ -4,6 +4,11 @@ import { keyframes } from '@emotion/react';
 import styled from '@emotion/styled';
 
 import { HiddenText, IconButton, Text } from '@/components';
+import {
+  HIGH_CONTRAST_SELECTOR,
+  highContrastBoundaryStyle,
+} from '@/styles/highContrastStyles';
+import { useContrastMode } from '@/styles/useContrastMode';
 
 import type { SelectablePerson } from '../useEventMatchPage';
 
@@ -25,6 +30,7 @@ export const MatchSelectionBar = ({
   onCreateMatching,
 }: MatchSelectionBarProps): ReactElement | null => {
   const selectionLabelId = useId();
+  const { contrastMode } = useContrastMode();
   const hasSelection = selectedVi !== null || selectedGuides.length > 0;
 
   if (!hasSelection) {
@@ -71,7 +77,9 @@ export const MatchSelectionBar = ({
           </SelectionItems>
           <SelectionClearButton
             aria-label="선택 모두 해제"
-            color="badge.text.primitive"
+            color={
+              contrastMode === 'high' ? 'icon.primary' : 'badge.text.primitive'
+            }
             icon="close-lined"
             iconSize={19.2}
             shape="round"
@@ -185,6 +193,13 @@ const SelectionPanel = styled.div(({ theme }) => ({
   '@media (prefers-reduced-motion: reduce)': {
     animation: 'none',
   },
+
+  [HIGH_CONTRAST_SELECTOR]: {
+    border: `1px solid ${theme.color.border.default}`,
+    backgroundColor: theme.color.bg.default,
+    backgroundImage: 'none',
+    boxShadow: 'none',
+  },
 }));
 
 const SelectionContent = styled.div(({ theme }) => ({
@@ -223,6 +238,10 @@ const SelectionLabel = styled(Text)(({ theme }) => ({
       color: theme.colorPrimitive.cyan['400'],
     },
   },
+
+  [HIGH_CONTRAST_SELECTOR]: {
+    color: theme.color.text.primary,
+  },
 }));
 
 const SelectionName = styled(Text)<{ $isPlaceholder: boolean }>(
@@ -235,6 +254,10 @@ const SelectionName = styled(Text)<{ $isPlaceholder: boolean }>(
       : theme.colorPrimitive.neutral['0'],
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
+
+    [HIGH_CONTRAST_SELECTOR]: {
+      color: theme.color.text.primary,
+    },
   }),
 );
 
@@ -253,6 +276,11 @@ const SelectionClearButton = styled(IconButton)(({ theme }) => ({
   '&:active:not(:disabled)': {
     backgroundColor: theme.colorPrimitive.neutral['0-a16'],
     opacity: 0.8,
+  },
+
+  [HIGH_CONTRAST_SELECTOR]: {
+    backgroundColor: theme.color.bg.default,
+    ...highContrastBoundaryStyle(theme),
   },
 }));
 
@@ -287,6 +315,21 @@ const SelectionActionButton = styled.button(({ theme }) => {
     '&:focus-visible': {
       outline: `2px solid ${theme.colorPrimitive.cyan['500-a24']}`,
       outlineOffset: theme.spacing.xs,
+    },
+
+    [HIGH_CONTRAST_SELECTOR]: {
+      backgroundColor: theme.color.bg['brand-primary'],
+      color: theme.color.text.inverse,
+
+      '&:disabled': {
+        backgroundColor: theme.color.bg.default,
+        color: theme.color.text.primary,
+        ...highContrastBoundaryStyle(theme),
+      },
+
+      '&:focus-visible': {
+        outline: `2px solid ${theme.color.border.focused}`,
+      },
     },
 
     '&:disabled': {

@@ -8,6 +8,7 @@ import { Badge, CheckBox, HiddenText, RunnerTypeAvatar, Text } from '@/component
 import { RUNNER_TYPE_LABELS } from '@/constants';
 
 import type { EventGroupLabelContext } from '../../utils';
+import { highContrastBoundary } from '@/styles/highContrastStyles';
 
 type MatchParticipantCardProps = {
   applicationGroup: RunningGroup;
@@ -133,6 +134,8 @@ const ParticipantCard = styled.label<{ $isSelected: boolean }>(
     '@media (prefers-reduced-motion: reduce)': {
       transition: 'none',
     },
+
+    ...highContrastBoundary(theme, { width: $isSelected ? 2 : 1 }),
   }),
 );
 
@@ -186,5 +189,7 @@ const CommentBox = styled.div(({ theme }) => ({
   padding: `${theme.spacing.md} ${theme.spacing.lg}`,
   borderRadius: theme.radius.sm,
   backgroundColor: theme.color.bg.surface,
+
+  ...highContrastBoundary(theme),
   boxSizing: 'border-box',
 }));

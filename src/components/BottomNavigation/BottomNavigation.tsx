@@ -6,6 +6,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 
 import { APP_PATH } from "@/router/path";
 import type { ReturnLocation } from "@/router/returnPath";
+import { highContrastBoundary } from "@/styles/highContrastStyles";
 import { useAuth } from "@/contexts";
 
 import { Icon } from "@/components/Icon";
@@ -177,6 +178,8 @@ const ActivePill = styled.span<{ $isVisible: boolean }>`
   @media (prefers-reduced-motion: reduce) {
     transition: none;
   }
+
+  ${({ theme }) => highContrastBoundary(theme)}
 `;
 
 const NavigationTrack = styled.div<{ $activeIndex: number }>`

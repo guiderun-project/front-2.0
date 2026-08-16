@@ -4,6 +4,7 @@ import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
 
 import { Icon } from '@/components/Icon';
+import { highContrastBoundary } from '@/styles/highContrastStyles';
 
 import {
   TOAST_CLOSE_TRANSITION,
@@ -75,6 +76,8 @@ const ToastRoot = styled(motion.div)(({ theme }) => {
     borderRadius: theme.radius.full,
     backgroundColor: theme.color.bg.glass,
     boxShadow: theme.effect['toast-shadow'],
+
+    ...highContrastBoundary(theme, { width: 2 }),
     color: theme.color.text.primary,
     fontFamily: typography.fontFamily,
     fontSize: typography.fontSize,

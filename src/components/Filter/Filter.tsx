@@ -6,6 +6,7 @@ import { HiddenText } from '@/components/HiddenText';
 import { Icon } from '@/components/Icon';
 import { Select, type SelectOption } from '@/components/Select';
 import { Text } from '@/components/Text';
+import { highContrastBoundary } from '@/styles/highContrastStyles';
 
 import type { FilterProps, FilterVariant } from './Filter.types';
 
@@ -271,6 +272,9 @@ const FilterTrigger = styled.button<{ $variant: FilterVariant }>`
       transform: none;
     }
   }
+
+  ${({ $variant, theme }) =>
+    $variant === 'solid' ? highContrastBoundary(theme) : ''}
 `;
 
 const FilterLabel = styled(Text)`

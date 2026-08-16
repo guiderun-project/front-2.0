@@ -4,6 +4,7 @@ export * from "./BottomSheet";
 export * from "./Button";
 export * from "./CheckBox";
 export * from "./ColorModeToggle";
+export * from "./ContrastToggle";
 export * from "./ErrorBoundary";
 export * from "./Filter";
 export * from "./FooterButton";

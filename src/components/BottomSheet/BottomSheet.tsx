@@ -11,6 +11,7 @@ import {
 import { IconButton } from '@/components/Icon';
 import { Text } from '@/components/Text';
 import { useKeyboardInset } from '@/hooks/useKeyboardInset';
+import { highContrastBoundary } from '@/styles/highContrastStyles';
 
 import type { BottomSheetHeading } from './BottomSheet.types';
 
@@ -294,6 +295,8 @@ const Sheet = styled.div<{ $maxHeight: string; $keyboardInset: number }>(
     borderTopRightRadius: theme.pxToRem(20),
     backgroundColor: theme.color.bg.default,
     boxShadow: theme.effect['bottom-shadow'],
+
+    ...highContrastBoundary(theme, { width: 2 }),
   }),
 );
 

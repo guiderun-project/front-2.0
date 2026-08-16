@@ -17,6 +17,13 @@ Sync these token families:
 - Effects: `src/styles/tokens/effect.ts`
 - Gradients: `src/styles/tokens/gradient.ts` when requested
 
+## Out of scope
+
+- **High contrast tokens are not compared against Figma.** Do not read, compare, or update `src/styles/tokens/highContrast.ts`.
+- High contrast values do not come from Figma. They are generated in code from the role table (`highContrastColorRoles`) and the polarity palette. A missing Figma counterpart is expected, so never report it as a difference.
+- The real effect values live in `effectValues` inside `effect.ts`. The exported `effect` object holds CSS variable references, so do not compare it against Figma.
+- Adding or removing a color token requires updating `highContrastColorRoles` in the same change. The table is typed `satisfies Record<ColorToken, HighContrastRole>`, so a missing entry fails `pnpm build`. Fix it by assigning the new token a role (`surface`, `content`, `outline`, `inverse-surface`, or `inverse-content`) rather than by consulting Figma.
+
 Read [references/guiderun-token-sync.md](references/guiderun-token-sync.md) before doing a full comparison or update.
 
 ## Language

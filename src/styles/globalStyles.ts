@@ -1,6 +1,13 @@
 import { css } from '@emotion/react';
 
-import { color, colorModeCssVariables, gradientModeCssVariables } from './tokens';
+import {
+  color,
+  colorModeCssVariables,
+  effectCssVariables,
+  gradientModeCssVariables,
+  highContrastCssVariables,
+  highContrastRoleVariable,
+} from './tokens';
 
 export const globalStyles = css`
   @font-face {
@@ -19,25 +26,47 @@ export const globalStyles = css`
     font-display: swap;
   }
 
-  :root,
-  :root[data-color-mode='light'] {
-    ${colorModeCssVariables.light}
-    ${gradientModeCssVariables.light}
-    color-scheme: light;
-  }
+  @layer theme.base, theme.contrast;
 
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-color-mode='light']) {
+  @layer theme.base {
+    :root,
+    :root[data-color-mode='light'] {
+      ${colorModeCssVariables.light}
+      ${gradientModeCssVariables.light}
+      ${effectCssVariables}
+      color-scheme: light;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-color-mode='light']) {
+        ${colorModeCssVariables.dark}
+        ${gradientModeCssVariables.dark}
+        color-scheme: dark;
+      }
+    }
+
+    :root[data-color-mode='dark'] {
       ${colorModeCssVariables.dark}
       ${gradientModeCssVariables.dark}
       color-scheme: dark;
     }
   }
 
-  :root[data-color-mode='dark'] {
-    ${colorModeCssVariables.dark}
-    ${gradientModeCssVariables.dark}
-    color-scheme: dark;
+  @layer theme.contrast {
+    :root[data-contrast='high'],
+    :root[data-color-mode='light'][data-contrast='high'] {
+      ${highContrastCssVariables.light}
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-color-mode='light'])[data-contrast='high'] {
+        ${highContrastCssVariables.dark}
+      }
+    }
+
+    :root[data-color-mode='dark'][data-contrast='high'] {
+      ${highContrastCssVariables.dark}
+    }
   }
 
   :root {
@@ -84,5 +113,10 @@ export const globalStyles = css`
 
   ::selection {
     background: ${color.bg.overlay};
+  }
+
+  :root[data-contrast='high'] ::selection {
+    color: ${highContrastRoleVariable['inverse-content']};
+    background: ${highContrastRoleVariable['inverse-surface']};
   }
 `;

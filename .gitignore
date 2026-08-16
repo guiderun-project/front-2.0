@@ -27,3 +27,6 @@ dist-ssr
 
 # Claude Code worktrees (local-only mirror, not source)
 .claude/worktrees/
+
+# Playwright MCP 세션 산출물
+.playwright-mcp/
