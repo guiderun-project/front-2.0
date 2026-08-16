@@ -28,6 +28,7 @@ import { AuthProvider } from '@/contexts';
 import { APP_PATH } from '@/router/path';
 import { router } from '@/router/router';
 import { ColorModeProvider } from '@/styles/colorMode';
+import { ContrastModeProvider } from '@/styles/contrastMode';
 import { globalStyles } from '@/styles/globalStyles';
 import { theme } from '@/styles/theme';
 
@@ -145,9 +146,11 @@ const renderBootstrapLoader = () => {
       <ThemeProvider theme={theme}>
         <Global styles={globalStyles} />
         <ColorModeProvider>
-          <PageLayout background={background} gradient={gradient}>
-            {showLoader ? <LoaderScreen /> : null}
-          </PageLayout>
+          <ContrastModeProvider>
+            <PageLayout background={background} gradient={gradient}>
+              {showLoader ? <LoaderScreen /> : null}
+            </PageLayout>
+          </ContrastModeProvider>
         </ColorModeProvider>
       </ThemeProvider>
     </StrictMode>,
@@ -179,9 +182,11 @@ const bootstrap = async () => {
             <ThemeProvider theme={theme}>
               <Global styles={globalStyles} />
               <ColorModeProvider>
-                <ToastProvider>
-                  <RouterProvider router={router} />
-                </ToastProvider>
+                <ContrastModeProvider>
+                  <ToastProvider>
+                    <RouterProvider router={router} />
+                  </ToastProvider>
+                </ContrastModeProvider>
               </ColorModeProvider>
             </ThemeProvider>
           </AuthProvider>
