@@ -67,6 +67,11 @@ export const globalStyles = css`
     :root[data-color-mode='dark'][data-contrast='high'] {
       ${highContrastCssVariables.dark}
     }
+
+    :root[data-contrast='high'] :is(a, button) {
+      outline: 1px solid ${highContrastRoleVariable.outline};
+      outline-offset: -1px;
+    }
   }
 
   :root {
