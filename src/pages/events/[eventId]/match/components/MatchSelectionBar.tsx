@@ -7,6 +7,7 @@ import { HiddenText, IconButton, Text } from '@/components';
 import {
   HIGH_CONTRAST_SELECTOR,
   highContrastBoundaryStyle,
+  highContrastDisabledStyle,
 } from '@/styles/highContrastStyles';
 import { useContrastMode } from '@/styles/useContrastMode';
 
@@ -325,6 +326,7 @@ const SelectionActionButton = styled.button(({ theme }) => {
         backgroundColor: theme.color.bg.default,
         color: theme.color.text.primary,
         ...highContrastBoundaryStyle(theme),
+        ...highContrastDisabledStyle,
       },
 
       '&:focus-visible': {

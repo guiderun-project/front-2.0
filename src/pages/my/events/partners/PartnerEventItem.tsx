@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 
 import { Text } from '@/components';
 import { APP_PATH } from '@/router/path';
+import { highContrastBoundary } from '@/styles/highContrastStyles';
 
 import { formatEventDateTimeSrLabel } from '../utils';
 import type { MyActivityPartnerEvent } from './types';
@@ -55,6 +56,8 @@ const EventCard = styled(Link)(({ theme }) => ({
     outline: `2px solid ${theme.color.border.focused}`,
     outlineOffset: theme.spacing.xs,
   },
+
+  ...highContrastBoundary(theme),
 }));
 
 const EventName = styled(Text)({

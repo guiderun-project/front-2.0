@@ -86,7 +86,10 @@ Keep `CLAUDE.md` and `AGENTS.md` aligned when changing agent instructions.
 - Use `useContrastMode()` for contrast state and never read the `data-contrast` attribute directly in components.
 - Background layers collapse to one color in high contrast, so surfaces that relied on background steps need a boundary. Use `highContrastBoundary` from `src/styles/highContrastStyles.ts`.
 - `highContrastBoundary` draws an `outline` with a negative `outline-offset` so it adds no layout shift and follows `border-radius`. Use `width: 2` for overlays that sit on a same-color scrim.
+- Keep the boundary an `outline`. Do not reimplement it as an `inset box-shadow`: inset shadows paint below descendants, so a full-bleed child with an opaque background (a list row inside a sheet) erases the container's left and right edges while hovered or selected.
 - Do not add a boundary to elements that already have a visible border. Look up `highContrastColorRoles[backgroundToken]` and only add one when the background collapses to `surface`.
+- Disabled states lose their color difference in high contrast, so a boundary alone does not separate them from default. Spread `highContrastDisabledStyle` from `src/styles/highContrastStyles.ts` into the disabled high contrast block.
+- `highContrastDisabledStyle` is a flat `opacity` reduction and is the one sanctioned exception to the `#000` / `#FFF` rule. It renders disabled controls at low contrast on purpose, which WCAG 1.4.3 allows for inactive components. Do not reuse it for enabled states.
 - Ancestor-conditional Emotion selectors must start with `&`. Use `HIGH_CONTRAST_SELECTOR` rather than writing `:root[data-contrast='high'] &`, which Emotion expands into a selector that never matches.
 - Gradients and shadows do not survive high contrast. Classify them in `highContrastGradientRoles` and `highContrastEffectRoles` instead of branching in components.
 
