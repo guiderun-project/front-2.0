@@ -575,6 +575,8 @@ const LinkIconCircle = styled.span(({ theme }) => ({
   borderRadius: theme.radius.full,
   backgroundColor: theme.color.bg.default,
   transform: "translate(-50%, -50%)",
+
+  ...highContrastBoundary(theme),
 }));
 
 const QuestionMarkChip = styled.span(({ theme }) => ({
@@ -587,6 +589,8 @@ const QuestionMarkChip = styled.span(({ theme }) => ({
   backgroundColor: theme.color.bg["dim-soft"],
   overflow: "hidden",
   flexShrink: 0,
+
+  ...highContrastBoundary(theme),
 }));
 
 const QuestionMark = styled(Text)({

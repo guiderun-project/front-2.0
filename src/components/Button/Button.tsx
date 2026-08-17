@@ -6,6 +6,7 @@ import styled from '@emotion/styled';
 import {
   HIGH_CONTRAST_SELECTOR,
   highContrastBoundaryStyle,
+  highContrastDisabledStyle,
 } from '@/styles/highContrastStyles';
 import { highContrastColorRoles, resolveColorToken, type ColorToken } from '@/styles/tokens';
 
@@ -147,7 +148,8 @@ const StyledButton = styled.button<ButtonStyleProps>(
       userSelect: 'none',
       verticalAlign: 'middle',
       whiteSpace: 'nowrap',
-      transition: 'background-color 120ms ease, border-color 120ms ease, color 120ms ease, transform 120ms ease',
+      transition:
+        'background-color 120ms ease, border-color 120ms ease, color 120ms ease, opacity 120ms ease, transform 120ms ease',
 
       '&:active:not(:disabled)': {
         ...pressedColorStyles,
@@ -167,7 +169,10 @@ const StyledButton = styled.button<ButtonStyleProps>(
         color: resolveColorToken(disabledTokens.content),
         cursor: 'not-allowed',
 
-        [HIGH_CONTRAST_SELECTOR]: createHighContrastStyles(theme, disabledTokens),
+        [HIGH_CONTRAST_SELECTOR]: {
+          ...createHighContrastStyles(theme, disabledTokens),
+          ...highContrastDisabledStyle,
+        },
       },
 
       '@media (prefers-reduced-motion: reduce)': {
