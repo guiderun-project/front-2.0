@@ -5,6 +5,7 @@ import styled from '@emotion/styled';
 import { Button } from '@/components/Button';
 import { HiddenText } from '@/components/HiddenText';
 import { Text } from '@/components/Text';
+import { highContrastBoundary } from '@/styles/highContrastStyles';
 
 import { Popup } from './Popup';
 import { CONFIRM_POPUP_INITIAL_FOCUS } from './ConfirmPopup.types';
@@ -222,6 +223,8 @@ const Panel = styled.div(({ theme }) => ({
   borderRadius: theme.radius.lg,
   backgroundColor: theme.color.bg.elevated,
   boxShadow: theme.effect['card-shadow'],
+
+  ...highContrastBoundary(theme, { width: 2 }),
   outline: 'none',
 
   '&:focus-visible': {

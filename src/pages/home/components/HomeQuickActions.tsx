@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 
 import { Text } from '@/components';
 import { APP_PATH } from '@/router/path';
+import { highContrastBoundary } from '@/styles/highContrastStyles';
 
 type ActionTone = 'teal' | 'cyan';
 
@@ -62,6 +63,8 @@ const ActionLink = styled(Link, {
       outline: 2px solid ${theme.color.border.focused};
       outline-offset: ${theme.spacing.xs};
     }
+
+    ${highContrastBoundary(theme)}
   `,
 );
 

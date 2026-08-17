@@ -31,6 +31,10 @@ Expected local Figma styles:
 - `src/styles/theme.ts`: theme exposure
 - `src/styles/emotion.d.ts`: Emotion theme typing if new fields are added
 
+Not synced:
+
+- `src/styles/tokens/highContrast.ts`: high contrast tokens. Generated in code from the role table, not from Figma, so never compare it.
+
 ## Figma Export Pattern
 
 Use `use_figma` and return compact JSON/string output. Selection-based variable tools may report "nothing selected".

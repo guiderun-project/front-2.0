@@ -10,6 +10,7 @@ import { formatTimeRangeSrLabel } from "@/utils";
 
 import { formatKoreanDate, formatKoreanTime, formatTimeRange } from "../utils";
 import { CommentsSection } from "./CommentsSection";
+import { highContrastBoundary } from "@/styles/highContrastStyles";
 
 type DetailPanelProps = {
   canShowComments: boolean;
@@ -163,6 +164,7 @@ const DetailCard = styled.article(({ theme }) => ({
   padding: theme.spacing["2xl"],
   borderRadius: theme.pxToRem(20),
   backgroundColor: theme.color.bg.elevated,
+  ...highContrastBoundary(theme),
 }));
 
 const InfoRow = styled.div(({ theme }) => ({
@@ -240,6 +242,7 @@ const ShareIconCircle = styled.span(({ theme }) => ({
   height: theme.pxToRem(48),
   borderRadius: theme.radius.full,
   backgroundColor: theme.color.bg.elevated,
+  ...highContrastBoundary(theme),
   transition:
     "background-color 120ms ease, opacity 120ms ease, transform 120ms ease",
 }));

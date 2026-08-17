@@ -10,6 +10,8 @@ import ChevronUpLinedIcon from "@/assets/icons/chevron-up-lined.svg?react";
 import CheckLinedIcon from "@/assets/icons/check-lined.svg?react";
 import CheckThickLinedIcon from "@/assets/icons/check-thick-lined.svg?react";
 import CloseLinedIcon from "@/assets/icons/close-lined.svg?react";
+import ContrastFilledIcon from "@/assets/icons/contrast-filled.svg?react";
+import ContrastLinedIcon from "@/assets/icons/contrast-lined.svg?react";
 import DeleteFilledIcon from "@/assets/icons/delete-filled.svg?react";
 import DeleteLinedIcon from "@/assets/icons/delete-lined.svg?react";
 import DownloadLinedIcon from "@/assets/icons/download-lined.svg?react";
@@ -53,6 +55,9 @@ export const iconRegistry = {
   "check-lined": CheckLinedIcon,
   "check-thick-lined": CheckThickLinedIcon,
   "close-lined": CloseLinedIcon,
+  // TODO(디자인 확인 필요): 고대비 모드 토글용 임시 아이콘이다. Figma 아이콘 세트에 대비(contrast) 아이콘이 없어 직접 그렸다. 디자인 확정 시 에셋을 교체한다.
+  "contrast-filled": ContrastFilledIcon,
+  "contrast-lined": ContrastLinedIcon,
   "delete-filled": DeleteFilledIcon,
   "delete-lined": DeleteLinedIcon,
   "download-lined": DownloadLinedIcon,

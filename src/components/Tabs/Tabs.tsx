@@ -10,6 +10,8 @@ import {
   Tabs as AriaTabs,
 } from 'react-aria-components';
 
+import { HIGH_CONTRAST_SELECTOR } from '@/styles/highContrastStyles';
+
 import type {
   TabsLayout,
   TabsListProps,
@@ -264,6 +266,10 @@ const ActiveIndicator = styled.span(({ theme }) => ({
 
   '@media (prefers-reduced-motion: reduce)': {
     transition: 'none',
+  },
+
+  [HIGH_CONTRAST_SELECTOR]: {
+    height: '4px',
   },
 }));
 

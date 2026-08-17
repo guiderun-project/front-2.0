@@ -12,6 +12,7 @@ import {
   ColorModeToggle,
   CONFIRM_POPUP_VARIANT,
   ConfirmPopup,
+  ContrastToggle,
   Filter,
   HiddenText,
   Icon,
@@ -533,6 +534,17 @@ const COLOR_MODE_TOGGLE_CODE_EXAMPLES = [
   {
     label: "Disabled",
     code: `<ColorModeToggle disabled />`,
+  },
+] as const;
+
+const CONTRAST_TOGGLE_CODE_EXAMPLES = [
+  {
+    label: "Default",
+    code: `<ContrastToggle />`,
+  },
+  {
+    label: "Disabled",
+    code: `<ContrastToggle disabled />`,
   },
 ] as const;
 
@@ -1263,6 +1275,7 @@ export const DesignPage = () => {
           </Text>
         </HeaderCopy>
         <HeaderControls>
+          <ContrastToggle />
           <ColorModeToggle />
           <BackgroundControls aria-label="Page background">
             <BackgroundOptionGroup aria-label="Color background" role="group">
@@ -1843,6 +1856,23 @@ export const DesignPage = () => {
           <ColorModeToggle disabled />
         </ColorModeToggleShowcase>
         <CodeExamples examples={COLOR_MODE_TOGGLE_CODE_EXAMPLES} />
+      </ShowcaseSection>
+
+      <ShowcaseSection>
+        <SectionTitle>
+          <Text as="h2" font="heading-s-m">
+            ContrastToggle
+          </Text>
+          <Text color="text.tertiary" font="detail-m-r">
+            고대비 on / off, disabled. 라이트·다크와 직교하는 축이라 컬러 모드와
+            별개로 동작한다
+          </Text>
+        </SectionTitle>
+        <ColorModeToggleShowcase>
+          <ContrastToggle />
+          <ContrastToggle disabled />
+        </ColorModeToggleShowcase>
+        <CodeExamples examples={CONTRAST_TOGGLE_CODE_EXAMPLES} />
       </ShowcaseSection>
 
       <ShowcaseSection>

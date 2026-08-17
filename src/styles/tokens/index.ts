@@ -9,7 +9,7 @@ export {
   semanticColorModes,
 } from './color';
 export type { ColorMode, ColorToken, PrimitiveColorToken } from './color';
-export { effect } from './effect';
+export { effect, effectCssVariables } from './effect';
 export type { EffectToken } from './effect';
 export { fontFamily, fontWeight } from './font';
 export {
@@ -22,6 +22,12 @@ export {
   resolveGradientToken,
 } from './gradient';
 export type { GradientToken } from './gradient';
+export {
+  highContrastColorRoles,
+  highContrastCssVariables,
+  highContrastRoleVariable,
+} from './highContrast';
+export type { ContrastMode, HighContrastRole } from './highContrast';
 export { layout } from './layout';
 export { pxToRem, radius, spacing } from './size';
 export { typography } from './typography';

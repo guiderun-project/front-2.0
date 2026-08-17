@@ -31,6 +31,10 @@ Expected Figma styles:
 - `src/styles/theme.ts`
 - `src/styles/emotion.d.ts`
 
+동기화 대상이 아닌 파일:
+
+- `src/styles/tokens/highContrast.ts`: 고대비 모드 토큰. Figma 가 아니라 역할표에서 코드로 생성하므로 비교하지 않는다.
+
 ## Figma Export Pattern
 
 Figma selection-dependent helpers may fail with "nothing selected". Prefer a Plugin API style query when available.

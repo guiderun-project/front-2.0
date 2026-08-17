@@ -1,8 +1,13 @@
 import type { ReactElement } from 'react';
 
+import type { Theme } from '@emotion/react';
 import styled from '@emotion/styled';
 
-import { resolveColorToken } from '@/styles/tokens';
+import {
+  HIGH_CONTRAST_SELECTOR,
+  highContrastBoundaryStyle,
+} from '@/styles/highContrastStyles';
+import { highContrastColorRoles, resolveColorToken, type ColorToken } from '@/styles/tokens';
 
 import { Icon } from '../Icon';
 import { Text } from '../Text';
@@ -78,6 +83,25 @@ export const Button = ({
   );
 };
 
+type ButtonHighContrastTokens = {
+  background?: ColorToken;
+  border?: unknown;
+  content: ColorToken;
+};
+
+const collapsesToSurface = (background: ColorToken | undefined) =>
+  background === undefined || highContrastColorRoles[background] === 'surface';
+
+const createHighContrastStyles = (theme: Theme, tokens: ButtonHighContrastTokens) => ({
+  ...(tokens.border === undefined && collapsesToSurface(tokens.background)
+    ? highContrastBoundaryStyle(theme)
+    : {}),
+  ...(collapsesToSurface(tokens.background) &&
+  highContrastColorRoles[tokens.content] === 'inverse-content'
+    ? { color: theme.color.text.primary }
+    : {}),
+});
+
 const StyledButton = styled.button<ButtonStyleProps>(
   ({ $fullWidth, $level, $size, $status, theme }) => {
     const sizeStyle = BUTTON_SIZE_STYLES[$size];
@@ -135,11 +159,15 @@ const StyledButton = styled.button<ButtonStyleProps>(
         outlineOffset: theme.spacing.xs,
       },
 
+      [HIGH_CONTRAST_SELECTOR]: createHighContrastStyles(theme, defaultTokens),
+
       '&:disabled': {
         border: disabledBorderStyle,
         backgroundColor: disabledTokens.background ? resolveColorToken(disabledTokens.background) : 'transparent',
         color: resolveColorToken(disabledTokens.content),
         cursor: 'not-allowed',
+
+        [HIGH_CONTRAST_SELECTOR]: createHighContrastStyles(theme, disabledTokens),
       },
 
       '@media (prefers-reduced-motion: reduce)': {

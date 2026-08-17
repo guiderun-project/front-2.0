@@ -60,7 +60,7 @@ Keep `CLAUDE.md` and `AGENTS.md` aligned when changing agent instructions.
 - Do not use raw hex, rgba, or CSS color names in shared components.
 - Use primitive colors only for semantic token definitions, token documentation, swatch UI, or justified exceptions.
 - If primitive colors are used directly, leave a short reason because primitive values may change.
-- Use CSS variables and `data-color-mode` for light/dark behavior instead of hardcoding mode branches in components.
+- Use CSS variables with `data-color-mode` and `data-contrast` for light/dark and high contrast behavior instead of hardcoding mode branches in components.
 - Keep styles close to the component they belong to. Extract styling helpers only when they remove real duplication.
 - Keep styled declarations used by only one component near that component, usually at the bottom of the component file.
 - Do not create a separate `styles.ts` file only to separate JSX from styles.
@@ -74,6 +74,21 @@ Keep `CLAUDE.md` and `AGENTS.md` aligned when changing agent instructions.
 - `fontWeight`, `spacing`, `radius`, `typography`, `pxToRem`, and `color` are available from Emotion `theme`.
 - Color tokens are semantic CSS variable references.
 - Prefer `theme.color` in app UI and reserve `theme.colorPrimitive` for token infrastructure or documented exceptions.
+
+## High Contrast Mode
+
+- High contrast is an axis orthogonal to light/dark. `data-color-mode` sets the polarity and `data-contrast="high"` sets contrast.
+- High contrast uses only `#000` and `#FFF`. Raw color values for it live only in `src/styles/tokens/highContrast.ts`.
+- Do not assign colors per token for high contrast. Assign a role in `highContrastColorRoles` and let the polarity palette resolve the color.
+- `highContrastColorRoles` is typed `satisfies Record<ColorToken, HighContrastRole>`, so adding a color token breaks the build until its role is assigned. Keep it that way.
+- Valid pairings are `surface` with `content`, and `inverse-surface` with `inverse-content`. Any other pairing renders same-color-on-same-color.
+- Do not follow the OS `prefers-contrast` setting. High contrast is driven by the in-app toggle only.
+- Use `useContrastMode()` for contrast state and never read the `data-contrast` attribute directly in components.
+- Background layers collapse to one color in high contrast, so surfaces that relied on background steps need a boundary. Use `highContrastBoundary` from `src/styles/highContrastStyles.ts`.
+- `highContrastBoundary` draws an `outline` with a negative `outline-offset` so it adds no layout shift and follows `border-radius`. Use `width: 2` for overlays that sit on a same-color scrim.
+- Do not add a boundary to elements that already have a visible border. Look up `highContrastColorRoles[backgroundToken]` and only add one when the background collapses to `surface`.
+- Ancestor-conditional Emotion selectors must start with `&`. Use `HIGH_CONTRAST_SELECTOR` rather than writing `:root[data-contrast='high'] &`, which Emotion expands into a selector that never matches.
+- Gradients and shadows do not survive high contrast. Classify them in `highContrastGradientRoles` and `highContrastEffectRoles` instead of branching in components.
 
 ## Extending Theme Tokens
 

@@ -17,6 +17,7 @@ import {
 } from '../../utils';
 import type { SelectablePerson } from '../useEventMatchPage';
 import { SectionState } from './MatchStates';
+import { highContrastBoundary } from '@/styles/highContrastStyles';
 
 type MatchCompletedPanelProps = {
   completed: MatchingCompletedResponse;
@@ -291,6 +292,8 @@ const PersonBoxRoot = styled.label<{ $selected: boolean }>(
     '@media (prefers-reduced-motion: reduce)': {
       transition: 'none',
     },
+
+    ...highContrastBoundary(theme),
   }),
 );
 
@@ -302,6 +305,8 @@ const GuideBox = styled.div(({ theme }) => ({
   minWidth: 0,
   borderRadius: theme.radius.lg,
   backgroundColor: theme.color.bg.subtle,
+
+  ...highContrastBoundary(theme),
   overflow: 'hidden',
   boxSizing: 'border-box',
 }));
@@ -352,5 +357,7 @@ const LinkBadge = styled.span(({ theme }) => ({
   height: theme.pxToRem(28),
   borderRadius: theme.radius.full,
   backgroundColor: theme.color.bg.default,
+
+  ...highContrastBoundary(theme),
   transform: 'translate(-50%, -50%)',
 }));

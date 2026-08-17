@@ -13,6 +13,7 @@ import { MatchSegmentNav } from "./MatchSegmentNav";
 import { MatchSelectionBar } from "./MatchSelectionBar";
 import { PanelState } from "./MatchStates";
 import { MatchWaitingPanel } from "./MatchWaitingPanel";
+import { HIGH_CONTRAST_SELECTOR } from '@/styles/highContrastStyles';
 
 type MatchMessageContentProps = {
   pageState: MatchMessageState;
@@ -221,4 +222,8 @@ const SectionDivider = styled.div(({ theme }) => ({
   width: "100%",
   height: theme.spacing.lg,
   backgroundColor: theme.color.border.subtle,
+
+  [HIGH_CONTRAST_SELECTOR]: {
+    height: "1px",
+  },
 }));

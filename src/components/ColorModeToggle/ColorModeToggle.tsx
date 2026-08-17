@@ -4,6 +4,7 @@ import styled from '@emotion/styled';
 
 import { HiddenText } from '@/components/HiddenText';
 import { Icon, type IconName } from '@/components/Icon';
+import { highContrastBoundary } from '@/styles/highContrastStyles';
 import { useColorMode } from '@/styles/useColorMode';
 import { resolveColorToken, type ColorMode, type ColorToken } from '@/styles/tokens';
 
@@ -120,6 +121,8 @@ const ToggleRoot = styled.div<{ $disabled: boolean }>`
   border-radius: ${({ theme }) => theme.radius.full};
   background: ${({ theme }) => theme.color.bg['dim-soft']};
   opacity: ${({ $disabled }) => ($disabled ? 0.48 : 1)};
+
+  ${({ theme }) => highContrastBoundary(theme)}
 `;
 
 const ToggleIndicator = styled.span<{ $value: ColorMode }>`

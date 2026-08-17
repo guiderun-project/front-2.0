@@ -11,6 +11,7 @@ import {
 import styled from '@emotion/styled';
 
 import { useKeyboardInset } from '@/hooks/useKeyboardInset';
+import { HIGH_CONTRAST_SELECTOR } from '@/styles/highContrastStyles';
 
 import { Button, ButtonGroup } from '../Button';
 import { Icon } from '../Icon';
@@ -137,6 +138,10 @@ const FixedArea = styled.footer<{
     padding: `${theme.spacing.lg} ${theme.spacing.none} calc(${theme.spacing.lg} + env(safe-area-inset-bottom))`,
     gap: theme.spacing.md,
     transform: 'translateX(50%)',
+
+    [HIGH_CONTRAST_SELECTOR]: {
+      boxShadow: `inset 0 1px 0 0 ${theme.color.border.default}`,
+    },
   }),
 );
 

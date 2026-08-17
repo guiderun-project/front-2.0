@@ -17,6 +17,13 @@ allowed-tools: Bash(rg *), Bash(sed *), Bash(git *), Bash(pnpm lint), Bash(pnpm 
 - Effect: `src/styles/tokens/effect.ts`
 - Gradient: `src/styles/tokens/gradient.ts` (`gradient` 정리를 명시적으로 요청한 경우)
 
+## 동기화 제외
+
+- **고대비 모드 토큰은 Figma 비교 대상이 아니다.** `src/styles/tokens/highContrast.ts` 는 읽지도, 비교하지도, 업데이트하지도 않는다.
+- 고대비 값은 Figma 에서 오지 않는다. 역할표(`highContrastColorRoles`)에 지정한 역할과 극성 팔레트로 코드에서 생성한다. Figma 에 대응 변수가 없어도 누락이 아니므로 차이로 보고하지 않는다.
+- `effect.ts` 의 실제 값은 `effectValues` 에 있다. `effect` 는 CSS 변수 참조 문자열이므로 Figma 와 비교하지 않는다.
+- 색상 토큰을 추가하거나 삭제하면 `highContrastColorRoles` 도 함께 갱신해야 한다. 역할표가 `satisfies Record<ColorToken, HighContrastRole>` 로 묶여 있어 누락되면 `pnpm build` 가 실패한다. 이때는 Figma 를 다시 보지 말고 새 토큰의 역할(`surface` / `content` / `outline` / `inverse-surface` / `inverse-content`)만 지정한다.
+
 상세 기준은 [references/guiderun-token-sync.md](references/guiderun-token-sync.md)를 먼저 읽는다.
 
 ## 언어
