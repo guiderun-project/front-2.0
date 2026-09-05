@@ -8,6 +8,7 @@ import {
   type UseFormReturn,
 } from 'react-hook-form';
 
+import { ANALYTICS_EVENT, trackEvent } from '@/api/core';
 import type { EventDetailResponse, UserInfoGetResponse } from '@/api/types';
 import {
   Badge,
@@ -77,10 +78,31 @@ export const EventApplyForm = ({
     id: number;
     fieldName?: EventApplyInvalidFocusFieldName;
   }>({ id: 0 });
+  const applicationStartedTrackedRef = useRef(false);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
   // 면책 동의 저장 안내. 상시 마운트된 status 리전을 빈 상태로 두고 잠시 후
   // 텍스트를 주입해야 iOS VoiceOver/TalkBack이 변경을 안정적으로 낭독한다.
   const [agreementAnnouncement, setAgreementAnnouncement] = useState('');
+
+  useEffect(() => {
+    if (isEditMode || applicationStartedTrackedRef.current) {
+      return;
+    }
+
+    applicationStartedTrackedRef.current = true;
+    trackEvent(ANALYTICS_EVENT.APPLICATION_STARTED, {
+      eventCategory: event.eventCategory,
+      eventId: event.eventId,
+      eventType: event.eventType,
+      participantType: user.type,
+    });
+  }, [
+    event.eventCategory,
+    event.eventId,
+    event.eventType,
+    isEditMode,
+    user.type,
+  ]);
 
   // 로딩 화면(또는 면책 동의 시트)이 폼으로 교체될 때 스크린리더가 전환을
   // 인지하도록 페이지 제목 h1으로 포커스를 옮긴다(EventApplyCompleted와 동일 패턴).

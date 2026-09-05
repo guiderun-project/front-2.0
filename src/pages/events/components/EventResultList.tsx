@@ -12,6 +12,7 @@ type EventListItem = EventListGetResponse["items"][number];
 type EventResultListProps = {
   items: EventListItem[];
   page: number;
+  source: "browse" | "search";
   totalPages: number;
   onPageChange: (page: number) => void;
 };
@@ -20,6 +21,7 @@ export const EventResultList = ({
   items,
   onPageChange,
   page,
+  source,
   totalPages,
 }: EventResultListProps): ReactElement => {
   return (
@@ -28,7 +30,7 @@ export const EventResultList = ({
           지우므로 role="list" 로 개수·경계 안내를 복원한다. */}
       <List aria-label="모임 목록" role="list">
         {items.map((event) => (
-          <EventListCard event={event} key={event.id} />
+          <EventListCard event={event} key={event.id} source={source} />
         ))}
       </List>
       <PaginationWrap>
