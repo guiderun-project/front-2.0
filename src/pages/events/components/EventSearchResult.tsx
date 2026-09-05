@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import { useEffect, useRef, type ReactElement } from "react";
 
 import styled from "@emotion/styled";
 
@@ -6,6 +6,7 @@ import {
   EVENT_LIST_TYPE_FILTERS,
   RECRUIT_STATUS_FILTERS,
 } from "@/api/constants/common";
+import { ANALYTICS_EVENT, trackEvent } from "@/api/core";
 import type { EventListTypeFilter, RecruitStatusFilter } from "@/api/types";
 import { Icon, Text } from "@/components";
 
@@ -32,16 +33,50 @@ export const EventSearchResult = ({
   recruitFilter,
   typeFilter,
 }: EventSearchResultProps): ReactElement => {
+  const resolvedTypeFilter = typeFilter ?? EVENT_LIST_TYPE_FILTERS.TOTAL;
+  const resolvedRecruitFilter =
+    recruitFilter ?? RECRUIT_STATUS_FILTERS.ALL;
   const { data } = useSearchEvents({
     keyword,
-    type: typeFilter ?? EVENT_LIST_TYPE_FILTERS.TOTAL,
-    recruitStatus: recruitFilter ?? RECRUIT_STATUS_FILTERS.ALL,
+    type: resolvedTypeFilter,
+    recruitStatus: resolvedRecruitFilter,
     page,
   });
 
   const { items } = data;
   const { totalCount, totalPages } = data.pagination;
   const isEmpty = items.length === 0;
+  const lastTrackedSearchRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const trackingKey = [
+      keyword,
+      page,
+      resolvedRecruitFilter,
+      resolvedTypeFilter,
+      totalCount,
+    ].join(":");
+
+    if (lastTrackedSearchRef.current === trackingKey) {
+      return;
+    }
+
+    lastTrackedSearchRef.current = trackingKey;
+    trackEvent(ANALYTICS_EVENT.EVENT_SEARCH_RESULTS_VIEWED, {
+      hasKeyword: keyword.trim().length > 0,
+      keywordLength: keyword.trim().length,
+      page,
+      recruitStatus: resolvedRecruitFilter,
+      resultCount: totalCount,
+      type: resolvedTypeFilter,
+    });
+  }, [
+    keyword,
+    page,
+    resolvedRecruitFilter,
+    resolvedTypeFilter,
+    totalCount,
+  ]);
 
   return (
     <>
@@ -72,6 +107,7 @@ export const EventSearchResult = ({
         <EventResultList
           items={items}
           page={page}
+          source="search"
           totalPages={totalPages}
           onPageChange={onPageChange}
         />

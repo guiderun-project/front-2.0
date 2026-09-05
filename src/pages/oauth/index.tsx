@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, type ReactElement } from 'react';
 import styled from '@emotion/styled';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import { getApiErrorMessage } from '@/api/core';
+import { ANALYTICS_EVENT, getApiErrorMessage, trackEvent } from '@/api/core';
 import { api } from '@/api/services';
 import { PageLayout, Text } from '@/components';
 import { useAuth } from '@/contexts';
@@ -55,6 +55,9 @@ export const KakaoOAuthPage = (): ReactElement => {
         const result = await api.auth.kakaoOAuthLoginPost({ code });
 
         if (result.status === 'SIGNUP_REQUIRED') {
+          trackEvent(ANALYTICS_EVENT.SIGNUP_STARTED, {
+            provider: result.provider,
+          });
           navigate(APP_PATH.SIGNUP, {
             replace: true,
             state: {

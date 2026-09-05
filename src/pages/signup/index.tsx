@@ -11,7 +11,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { ANALYTICS_EVENT, getApiErrorMessage, trackEvent } from '@/api/core';
+import {
+  ANALYTICS_EVENT,
+  getAnalyticsAgeBand,
+  getApiErrorMessage,
+  trackEvent,
+} from '@/api/core';
 import { api } from '@/api/services';
 import {
   ConfirmPopup,
@@ -47,6 +52,7 @@ import { toSignupRequest } from '@/pages/signup/utils';
 
 // 카카오 OAuth SIGNUP_REQUIRED 응답에서 전달받는 router state
 type SignupLocationState = {
+  provider?: 'KAKAO';
   signupToken?: string;
 };
 
@@ -97,8 +103,9 @@ export const SignupPage = (): ReactElement => {
     ],
   });
 
+  const signupLocationState = location.state as SignupLocationState | null;
   const signupToken =
-    (location.state as SignupLocationState | null)?.signupToken ??
+    signupLocationState?.signupToken ??
     (import.meta.env.DEV ? DEV_FALLBACK_SIGNUP_TOKEN : '');
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -135,11 +142,16 @@ export const SignupPage = (): ReactElement => {
   // 단계 전환 시 새 화면의 제목(h1)으로 포커스를 옮겨, 직전 버튼에 남은 포커스를 이동시키고
   // 키보드·스크린리더 사용자에게 단계 변경을 알린다.
   useEffect(() => {
+    trackEvent(ANALYTICS_EVENT.SIGNUP_STEP_VIEWED, {
+      provider: signupLocationState?.provider ?? 'unknown',
+      step,
+    });
+
     const heading = stepAreaRef.current?.querySelector<HTMLElement>('h1');
     if (!heading) return;
     heading.setAttribute('tabindex', '-1');
     heading.focus();
-  }, [step]);
+  }, [signupLocationState?.provider, step]);
 
   const handleClose = () =>
     navigate(isCompleteStep ? APP_PATH.HOME : APP_PATH.INTRO);
@@ -168,7 +180,12 @@ export const SignupPage = (): ReactElement => {
       });
       setIssuedAccessToken(response.accessToken);
       trackEvent(ANALYTICS_EVENT.SIGNUP_COMPLETED, {
+        ageBand: getAnalyticsAgeBand(values.birthDate),
         disabilityType: values.disabilityType,
+        gender: values.gender,
+        hasExperience: values.hasExperience,
+        provider: signupLocationState?.provider ?? 'unknown',
+        recordDegree: values.recordDegree,
       });
       goNext();
     } catch (error) {

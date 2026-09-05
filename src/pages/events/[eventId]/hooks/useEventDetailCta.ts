@@ -62,12 +62,14 @@ export const useEventDetailCta = ({
     getEventDetailCtaActionProps,
     isCancelApplicationPending,
   } = useEventDetailCtaActionProps({
-      canAccessProtectedTabs,
-      eventId,
-      isApplyPermissionChecking,
-      onApply,
-      onRestrictedAccess,
-    });
+    canAccessProtectedTabs,
+    eventCategory: event.eventCategory,
+    eventId,
+    eventType: event.eventType,
+    isApplyPermissionChecking,
+    onApply,
+    onRestrictedAccess,
+  });
   const isEventDateStarted = hasEventDateStarted(eventDate, currentTime);
 
   useEffect(() => {

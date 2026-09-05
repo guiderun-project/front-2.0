@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import { useEffect, useRef, type ReactElement } from "react";
 
 import { ANALYTICS_EVENT, trackEvent } from "@/api/core";
 import {
@@ -58,6 +58,31 @@ export const EventDetailPage = (): ReactElement => {
     openRestrictedSheet,
     shouldShowOperationActionsInMenu,
   } = useEventDetailPage();
+  const trackedEventDetailIdRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (!isValidEventId || trackedEventDetailIdRef.current === eventId) {
+      return;
+    }
+
+    trackedEventDetailIdRef.current = eventId;
+    trackEvent(ANALYTICS_EVENT.EVENT_DETAIL_VIEWED, {
+      eventCategory: event.eventCategory,
+      eventId,
+      eventType: event.eventType,
+      isPrivate: event.isPrivate,
+      recruitStatus: event.recruitStatus,
+      viewerRelation:
+        event.viewer === null
+          ? "guest"
+          : event.viewer.isOrganizer
+            ? "organizer"
+            : event.viewer.isApplied
+              ? "applicant"
+              : "member",
+    });
+  }, [event, eventId, isValidEventId]);
+
   const matchingStatus = useEventMatchingStatus({
     eventId,
     enabled:

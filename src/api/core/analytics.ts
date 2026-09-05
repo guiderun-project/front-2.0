@@ -1,6 +1,11 @@
 import posthog from 'posthog-js';
 
-import type { RoleEnum, UserType } from '@/api/types';
+import type {
+  Gender,
+  RoleEnum,
+  RunningGroup,
+  UserType,
+} from '@/api/types';
 
 export const POSTHOG_PROJECT_TOKEN = import.meta.env.VITE_POSTHOG_PROJECT_TOKEN;
 
@@ -11,8 +16,16 @@ export const isPostHogEnabled = () => {
 export const ANALYTICS_EVENT = {
   APPROVAL_GATE_BLOCKED: 'approval_gate_blocked',
   INTRO_CTA_CLICKED: 'intro_cta_clicked',
+  SIGNUP_STARTED: 'signup_started',
+  SIGNUP_STEP_VIEWED: 'signup_step_viewed',
   SIGNUP_COMPLETED: 'signup_completed',
+  EVENT_SEARCH_RESULTS_VIEWED: 'event_search_results_viewed',
+  EVENT_LIST_CARD_CLICKED: 'event_list_card_clicked',
+  EVENT_DETAIL_VIEWED: 'event_detail_viewed',
+  APPLICATION_STARTED: 'application_started',
   APPLICATION_SUBMITTED: 'application_submitted',
+  APPLICATION_UPDATED: 'application_updated',
+  APPLICATION_CANCELED: 'application_canceled',
   APPLICATION_COMPLETED_ACTION: 'application_completed_action',
   EVENT_TYPE_SELECTED: 'event_type_selected',
   EVENT_CREATED: 'event_created',
@@ -39,9 +52,63 @@ export const trackEvent = (
 };
 
 type IdentifiableUser = {
+  birthDate: string | null;
+  gender: Gender;
+  recordDegree: RunningGroup;
   userId: string;
   role: RoleEnum;
   type: UserType;
+};
+
+export type AnalyticsAgeBand =
+  | 'under_20'
+  | '20s'
+  | '30s'
+  | '40s'
+  | '50_plus';
+
+export const getAnalyticsAgeBand = (
+  birthDate: string | null,
+  referenceDate = new Date(),
+): AnalyticsAgeBand | undefined => {
+  const match = birthDate?.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+
+  if (!match) {
+    return undefined;
+  }
+
+  const [, birthYearText, birthMonthText, birthDayText] = match;
+  const birthYear = Number(birthYearText);
+  const birthMonth = Number(birthMonthText);
+  const birthDay = Number(birthDayText);
+  const hasHadBirthdayThisYear =
+    referenceDate.getMonth() + 1 > birthMonth ||
+    (referenceDate.getMonth() + 1 === birthMonth &&
+      referenceDate.getDate() >= birthDay);
+  const age =
+    referenceDate.getFullYear() - birthYear - (hasHadBirthdayThisYear ? 0 : 1);
+
+  if (age < 0 || age > 120) {
+    return undefined;
+  }
+
+  if (age < 20) {
+    return 'under_20';
+  }
+
+  if (age < 30) {
+    return '20s';
+  }
+
+  if (age < 40) {
+    return '30s';
+  }
+
+  if (age < 50) {
+    return '40s';
+  }
+
+  return '50_plus';
 };
 
 export const identifyUser = (user: IdentifiableUser) => {
@@ -49,7 +116,12 @@ export const identifyUser = (user: IdentifiableUser) => {
     return;
   }
 
+  const ageBand = getAnalyticsAgeBand(user.birthDate);
+
   posthog.identify(user.userId, {
+    ...(ageBand ? { ageBand } : {}),
+    gender: user.gender,
+    recordDegree: user.recordDegree,
     role: user.role,
     type: user.type,
   });

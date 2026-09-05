@@ -3,8 +3,9 @@ import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
-import { getApiErrorMessage } from '@/api/core';
+import { ANALYTICS_EVENT, getApiErrorMessage, trackEvent } from '@/api/core';
 import { api } from '@/api/services';
+import type { EventCategory, EventType } from '@/api/types';
 import { useToast } from '@/components';
 import { APP_PATH } from '@/router/path';
 
@@ -13,7 +14,9 @@ import type { EventDetailCtaButtonConfig } from '../utils/eventDetailCtaButtonCo
 
 type UseEventDetailCtaActionPropsParams = {
   canAccessProtectedTabs: boolean;
+  eventCategory: EventCategory;
   eventId: number;
+  eventType: EventType;
   isApplyPermissionChecking?: boolean;
   onApply?: () => void;
   onRestrictedAccess: () => void;
@@ -32,7 +35,9 @@ export type EventDetailCancelApplicationConfirm = {
 
 export const useEventDetailCtaActionProps = ({
   canAccessProtectedTabs,
+  eventCategory,
   eventId,
+  eventType,
   isApplyPermissionChecking = false,
   onApply,
   onRestrictedAccess,
@@ -47,6 +52,11 @@ export const useEventDetailCtaActionProps = ({
     mutationFn: () => api.application.cancelDelete({ eventId }),
     onSuccess: () => {
       setIsCancelApplicationConfirmOpen(false);
+      trackEvent(ANALYTICS_EVENT.APPLICATION_CANCELED, {
+        eventCategory,
+        eventId,
+        eventType,
+      });
       showToast({
         type: 'success',
         icon: 'check-lined',
