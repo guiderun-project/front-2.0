@@ -130,6 +130,20 @@ const resolveDecoration = (
   colorMode: ColorMode,
 ): string => (decoration === 'none' ? 'none' : highContrastPalette[colorMode][decoration]);
 
+export const resolveHighContrastColor = (
+  token: ColorToken,
+  colorMode: ColorMode,
+): string => highContrastPalette[colorMode][highContrastColorRoles[token]];
+
+export const resolveHighContrastGradientColor = (
+  token: GradientToken,
+  colorMode: ColorMode,
+): string | null => {
+  const decoration = highContrastGradientRoles[token];
+
+  return decoration === 'none' ? null : highContrastPalette[colorMode][decoration];
+};
+
 export const highContrastRoleVariable = {
   surface: 'var(--hc-surface)',
   content: 'var(--hc-content)',
