@@ -18,14 +18,18 @@ export {
   gradientBaseColor,
   gradientModeCssVariables,
   gradientTokenMap,
+  gradientTopColor,
   resolveGradientBackgroundHeight,
   resolveGradientToken,
+  resolveGradientTopColor,
 } from './gradient';
-export type { GradientToken } from './gradient';
+export type { BackgroundGradientToken, GradientToken } from './gradient';
 export {
   highContrastColorRoles,
   highContrastCssVariables,
   highContrastRoleVariable,
+  resolveHighContrastColor,
+  resolveHighContrastGradientColor,
 } from './highContrast';
 export type { ContrastMode, HighContrastRole } from './highContrast';
 export { layout } from './layout';

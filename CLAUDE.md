@@ -93,6 +93,15 @@ Keep `CLAUDE.md` and `AGENTS.md` aligned when changing agent instructions.
 - Ancestor-conditional Emotion selectors must start with `&`. Use `HIGH_CONTRAST_SELECTOR` rather than writing `:root[data-contrast='high'] &`, which Emotion expands into a selector that never matches.
 - Gradients and shadows do not survive high contrast. Classify them in `highContrastGradientRoles` and `highContrastEffectRoles` instead of branching in components.
 
+## Native WebView Status Bar
+
+- The app shell owns the status bar. Web code reports the page top edge color and icon style through `useNativeStatusBar` in `src/hooks/useNativeStatusBar.ts`.
+- `PageLayout` already calls the hook, so route-level pages need no extra wiring. Do not post the bridge message from a page or component.
+- Derive `style` from the resolved color relative luminance. Do not map it from `colorMode`, because high contrast keeps both polarities and a polarity map puts same-color icons on a same-color status bar.
+- Adding a `bg.*` gradient requires declaring its top color in `gradientTopColor` in `src/styles/tokens/gradient.ts`. The map is typed `satisfies Record<ColorMode, Record<BackgroundGradientToken, string | null>>`, so the build breaks until the top color is assigned. Keep it that way.
+- Use `null` in `gradientTopColor` when a gradient starts fully transparent. The resolver falls back to the page background color.
+- `window.ReactNativeWebView` is absent in a plain browser, so the bridge is a no-op outside the app webview.
+
 ## Extending Theme Tokens
 
 - Do not invent new theme tokens inline inside components.

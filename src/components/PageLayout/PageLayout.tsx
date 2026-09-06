@@ -7,6 +7,7 @@ import {
 
 import styled from '@emotion/styled';
 
+import { useNativeStatusBar } from '@/hooks/useNativeStatusBar';
 import {
   resolveGradientBackgroundHeight,
   resolveColorToken,
@@ -47,8 +48,10 @@ const GRADIENT_FALLBACK_BACKGROUNDS = {
 
 type PageLayoutBackgroundLayers = {
   backgroundColor: string;
+  backgroundToken: PageLayoutColorBackground;
   gradientHeight?: string;
   gradientImage?: string;
+  gradientToken: PageLayoutGradientToken | null;
 };
 
 type StyledPageLayoutProps = {
@@ -65,6 +68,11 @@ export const PageLayout = ({
   const backgroundLayers = useMemo(
     () => resolvePageLayoutBackgroundLayers(background, gradient),
     [background, gradient],
+  );
+
+  useNativeStatusBar(
+    backgroundLayers.backgroundToken,
+    backgroundLayers.gradientToken ?? undefined,
   );
 
   useLayoutEffect(() => {
@@ -127,10 +135,12 @@ const resolvePageLayoutBackgroundLayers = (
 
   return {
     backgroundColor: resolveColorToken(backgroundToken),
+    backgroundToken,
     gradientHeight: gradientToken
       ? resolveGradientBackgroundHeight(gradientToken)
       : undefined,
     gradientImage: gradientToken ? resolveGradientToken(gradientToken) : undefined,
+    gradientToken,
   };
 };
 

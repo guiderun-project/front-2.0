@@ -56,6 +56,11 @@ type KakaoJavascriptSdk = {
   };
 };
 
+type ReactNativeWebViewBridge = {
+  postMessage: (message: string) => void;
+};
+
 interface Window {
   Kakao?: KakaoJavascriptSdk;
+  ReactNativeWebView?: ReactNativeWebViewBridge;
 }
