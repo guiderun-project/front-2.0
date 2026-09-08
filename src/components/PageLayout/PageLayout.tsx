@@ -7,7 +7,7 @@ import {
 
 import styled from '@emotion/styled';
 
-import { useNativeStatusBar } from '@/hooks/useNativeStatusBar';
+import { useNativeAppBars } from '@/hooks/useNativeAppBars';
 import {
   resolveGradientBackgroundHeight,
   resolveColorToken,
@@ -70,7 +70,7 @@ export const PageLayout = ({
     [background, gradient],
   );
 
-  useNativeStatusBar(
+  useNativeAppBars(
     backgroundLayers.backgroundToken,
     backgroundLayers.gradientToken ?? undefined,
   );

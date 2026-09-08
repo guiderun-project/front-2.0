@@ -5,15 +5,21 @@ import { Outlet } from 'react-router-dom';
 
 import {
   BottomNavigation,
+  BOTTOM_NAVIGATION_BACKGROUND_TOKEN,
   BOTTOM_NAVIGATION_OFFSET_PX,
 } from '@/components/BottomNavigation';
+import { NativeBottomBarBackgroundContext } from '@/hooks/useNativeAppBars';
 
 export const BottomNavigationLayout = (): ReactElement => {
   return (
-    <BottomNavigationLayoutRoot>
-      <Outlet />
-      <BottomNavigation />
-    </BottomNavigationLayoutRoot>
+    <NativeBottomBarBackgroundContext.Provider
+      value={BOTTOM_NAVIGATION_BACKGROUND_TOKEN}
+    >
+      <BottomNavigationLayoutRoot>
+        <Outlet />
+        <BottomNavigation />
+      </BottomNavigationLayoutRoot>
+    </NativeBottomBarBackgroundContext.Provider>
   );
 };
 
