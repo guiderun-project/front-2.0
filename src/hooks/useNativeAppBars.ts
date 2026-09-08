@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { createContext, useContext, useEffect } from 'react';
 
 import {
   resolveGradientTopColor,
@@ -13,18 +13,26 @@ import {
 import { useColorMode } from '@/styles/useColorMode';
 import { useContrastMode } from '@/styles/useContrastMode';
 
-export type StatusBarBackgroundToken = Extract<ColorToken, `bg.${string}`>;
+export type AppBarBackgroundToken = Extract<ColorToken, `bg.${string}`>;
 
-type StatusBarStyle = 'dark' | 'light';
+type AppBarStyle = 'dark' | 'light';
 
-type StatusBarPayload = {
+type AppBarPayload = {
   backgroundColor: string;
-  style: StatusBarStyle;
+  style: AppBarStyle;
 };
 
 type RgbChannels = [red: number, green: number, blue: number];
 
 const STATUS_BAR_MESSAGE_TYPE = 'SET_STATUS_BAR';
+const BOTTOM_BAR_MESSAGE_TYPE = 'SET_BOTTOM_BAR';
+const APP_BAR_MESSAGE_TYPES = [
+  STATUS_BAR_MESSAGE_TYPE,
+  BOTTOM_BAR_MESSAGE_TYPE,
+] as const;
+
+type AppBarMessageType = (typeof APP_BAR_MESSAGE_TYPES)[number];
+
 const BACKGROUND_TOKEN_PREFIX = 'bg.';
 const HEX_COLOR_PATTERN = /^#[0-9a-f]+$/i;
 const RGB_COLOR_PATTERN = /^rgba?\(([^)]+)\)$/i;
@@ -32,38 +40,52 @@ const CHANNEL_SEPARATOR_PATTERN = /[\s,/]+/;
 const SRGB_LINEAR_CUTOFF = 0.03928;
 const DARK_ICON_LUMINANCE_THRESHOLD = 0.179;
 
-let lastSentPayload: StatusBarPayload | null = null;
+const lastSentPayloads: Record<AppBarMessageType, AppBarPayload | null> = {
+  [STATUS_BAR_MESSAGE_TYPE]: null,
+  [BOTTOM_BAR_MESSAGE_TYPE]: null,
+};
 
-export const useNativeStatusBar = (
-  background: StatusBarBackgroundToken,
+export const NativeBottomBarBackgroundContext =
+  createContext<AppBarBackgroundToken | null>(null);
+
+export const useNativeAppBars = (
+  background: AppBarBackgroundToken,
   gradient?: BackgroundGradientToken,
 ): void => {
   const { colorMode } = useColorMode();
   const { contrastMode } = useContrastMode();
+  const bottomBarBackground = useContext(NativeBottomBarBackgroundContext);
 
   useEffect(() => {
-    const payload = resolveStatusBarPayload({
-      background,
-      colorMode,
-      contrastMode,
-      gradient,
-    });
-
-    if (payload === null) {
-      return;
-    }
-
-    lastSentPayload = payload;
-    postStatusBarMessage(payload);
-  }, [background, colorMode, contrastMode, gradient]);
+    sendAppBarMessage(
+      STATUS_BAR_MESSAGE_TYPE,
+      resolveAppBarPayload({ background, colorMode, contrastMode, gradient }),
+    );
+    sendAppBarMessage(
+      BOTTOM_BAR_MESSAGE_TYPE,
+      resolveAppBarPayload({
+        background: bottomBarBackground ?? background,
+        colorMode,
+        contrastMode,
+      }),
+    );
+  }, [background, bottomBarBackground, colorMode, contrastMode, gradient]);
 
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (document.visibilityState !== 'visible' || lastSentPayload === null) {
+      if (document.visibilityState !== 'visible') {
         return;
       }
 
-      postStatusBarMessage(lastSentPayload);
+      APP_BAR_MESSAGE_TYPES.forEach((messageType) => {
+        const payload = lastSentPayloads[messageType];
+
+        if (payload === null) {
+          return;
+        }
+
+        postAppBarMessage(messageType, payload);
+      });
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -74,7 +96,22 @@ export const useNativeStatusBar = (
   }, []);
 };
 
-const postStatusBarMessage = (payload: StatusBarPayload): void => {
+const sendAppBarMessage = (
+  messageType: AppBarMessageType,
+  payload: AppBarPayload | null,
+): void => {
+  if (payload === null) {
+    return;
+  }
+
+  lastSentPayloads[messageType] = payload;
+  postAppBarMessage(messageType, payload);
+};
+
+const postAppBarMessage = (
+  messageType: AppBarMessageType,
+  payload: AppBarPayload,
+): void => {
   const bridge = window.ReactNativeWebView;
 
   if (!bridge) {
@@ -83,32 +120,32 @@ const postStatusBarMessage = (payload: StatusBarPayload): void => {
 
   bridge.postMessage(
     JSON.stringify({
-      type: STATUS_BAR_MESSAGE_TYPE,
+      type: messageType,
       payload,
     }),
   );
 };
 
-type StatusBarPayloadInput = {
-  background: StatusBarBackgroundToken;
+type AppBarPayloadInput = {
+  background: AppBarBackgroundToken;
   colorMode: ColorMode;
   contrastMode: ContrastMode;
   gradient?: BackgroundGradientToken;
 };
 
-const resolveStatusBarPayload = ({
+const resolveAppBarPayload = ({
   background,
   colorMode,
   contrastMode,
   gradient,
-}: StatusBarPayloadInput): StatusBarPayload | null => {
-  const topColor = resolveTopEdgeColor({
+}: AppBarPayloadInput): AppBarPayload | null => {
+  const edgeColor = resolveEdgeColor({
     background,
     colorMode,
     contrastMode,
     gradient,
   });
-  const channels = parseRgbChannels(topColor);
+  const channels = parseRgbChannels(edgeColor);
 
   if (channels === null) {
     return null;
@@ -123,12 +160,12 @@ const resolveStatusBarPayload = ({
   };
 };
 
-const resolveTopEdgeColor = ({
+const resolveEdgeColor = ({
   background,
   colorMode,
   contrastMode,
   gradient,
-}: StatusBarPayloadInput): string => {
+}: AppBarPayloadInput): string => {
   const backgroundColor =
     contrastMode === 'high'
       ? resolveHighContrastColor(background, colorMode)
@@ -147,7 +184,7 @@ const resolveTopEdgeColor = ({
 };
 
 const resolveSemanticBackgroundColor = (
-  token: StatusBarBackgroundToken,
+  token: AppBarBackgroundToken,
   colorMode: ColorMode,
 ): string => {
   const backgroundColors: Record<string, string> =

@@ -7,11 +7,13 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { APP_PATH } from "@/router/path";
 import type { ReturnLocation } from "@/router/returnPath";
 import { highContrastBoundary } from "@/styles/highContrastStyles";
+import { resolveColorToken } from "@/styles/tokens";
 import { useAuth } from "@/contexts";
 
 import { Icon } from "@/components/Icon";
 import {
   BOTTOM_NAVIGATION_ARIA_LABEL,
+  BOTTOM_NAVIGATION_BACKGROUND_TOKEN,
   BOTTOM_NAVIGATION_ITEMS,
   BOTTOM_NAVIGATION_OFFSET_PX,
 } from "@/components/BottomNavigation/BottomNavigation.constants";
@@ -145,7 +147,7 @@ const Navigation = styled.nav`
     env(safe-area-inset-bottom)
   );
   border-top: 1px solid ${({ theme }) => theme.color.border.subtle};
-  background: ${({ theme }) => theme.color.bg.subtle};
+  background: ${resolveColorToken(BOTTOM_NAVIGATION_BACKGROUND_TOKEN)};
   transform: translateX(-50%);
 `;
 
