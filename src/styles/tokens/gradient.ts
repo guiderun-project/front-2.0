@@ -88,6 +88,8 @@ export const gradientTokenMap = {
 
 export type GradientToken = keyof typeof gradientTokenMap;
 
+export type BackgroundGradientToken = Extract<GradientToken, `bg.${string}`>;
+
 export const resolveGradientToken = (token: GradientToken): GradientValue => gradientTokenMap[token];
 
 export const gradientBackgroundHeight = {
@@ -97,6 +99,30 @@ export const gradientBackgroundHeight = {
 
 export const resolveGradientBackgroundHeight = (token: GradientToken): string =>
   gradientBackgroundHeight[token as keyof typeof gradientBackgroundHeight] ?? '100%';
+
+export const gradientTopColor = {
+  light: {
+    'bg.subtle': '#F0F3F9',
+    'bg.brand-main': '#5ECCF0',
+    'bg.brand-event': '#B2DCFF',
+    'bg.brand-event-overlay': '#0F2342',
+    'bg.footer': null,
+    'bg.footer-subtle': null,
+  },
+  dark: {
+    'bg.subtle': '#F0F3F9',
+    'bg.brand-main': '#0C5B7D',
+    'bg.brand-event': '#0F2342',
+    'bg.brand-event-overlay': '#0F2342',
+    'bg.footer': null,
+    'bg.footer-subtle': null,
+  },
+} as const satisfies Record<ColorMode, Record<BackgroundGradientToken, string | null>>;
+
+export const resolveGradientTopColor = (
+  token: BackgroundGradientToken,
+  colorMode: ColorMode,
+): string | null => gradientTopColor[colorMode][token];
 
 const flattenGradients = (
   value: Record<string, unknown>,

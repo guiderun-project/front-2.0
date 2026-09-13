@@ -1,9 +1,14 @@
 import { APP_PATH } from '@/router/path';
+import type { ColorToken } from '@/styles/tokens';
 
 import type { IconName } from '../Icon';
 
 export const BOTTOM_NAVIGATION_OFFSET_PX = 64;
 export const BOTTOM_NAVIGATION_ARIA_LABEL = '하단 메뉴';
+export const BOTTOM_NAVIGATION_BACKGROUND_TOKEN = 'bg.subtle' satisfies Extract<
+  ColorToken,
+  `bg.${string}`
+>;
 
 type BottomNavigationItem = {
   label: string;

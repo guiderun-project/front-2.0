@@ -80,6 +80,7 @@ export const EventBrowseResult = ({
         <EventResultList
           items={items}
           page={page}
+          source="browse"
           totalPages={totalPages}
           onPageChange={onPageChange}
         />

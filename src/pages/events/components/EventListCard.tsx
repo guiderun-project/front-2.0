@@ -3,6 +3,7 @@ import type { ReactElement } from "react";
 import styled from "@emotion/styled";
 import { Link } from "react-router-dom";
 
+import { ANALYTICS_EVENT, trackEvent } from "@/api/core";
 import type { EventListGetResponse } from "@/api/types";
 import { Icon, Text } from "@/components";
 import { APP_PATH } from "@/router/path";
@@ -14,14 +15,27 @@ type EventListItem = EventListGetResponse["items"][number];
 
 type EventListCardProps = {
   event: EventListItem;
+  source: "browse" | "search";
 };
 
-export const EventListCard = ({ event }: EventListCardProps): ReactElement => {
+export const EventListCard = ({
+  event,
+  source,
+}: EventListCardProps): ReactElement => {
   const typeLabel = getEventTypeBadgeConfig(event.type).label;
+
+  const handleClick = () => {
+    trackEvent(ANALYTICS_EVENT.EVENT_LIST_CARD_CLICKED, {
+      eventId: event.id,
+      eventType: event.type,
+      recruitStatus: event.recruitStatus,
+      source,
+    });
+  };
 
   return (
     <CardItem>
-      <CardLink to={APP_PATH.EVENT_DETAIL(event.id)}>
+      <CardLink to={APP_PATH.EVENT_DETAIL(event.id)} onClick={handleClick}>
         <CardBody>
           <RecruitStatusBadge recruitStatus={event.recruitStatus} size="s" />
           <CardName color="text.primary" font="body-l-sb">

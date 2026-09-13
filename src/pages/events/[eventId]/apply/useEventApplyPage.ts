@@ -167,7 +167,12 @@ export const useEventApplyPage = () => {
     },
     onSuccess: () => {
       void invalidateEventQueries();
-      trackEvent(ANALYTICS_EVENT.APPLICATION_SUBMITTED, { eventId });
+      trackEvent(ANALYTICS_EVENT.APPLICATION_SUBMITTED, {
+        eventCategory: event.eventCategory,
+        eventId,
+        eventType: event.eventType,
+        participantType: user?.type,
+      });
       setIsCompleted(true);
     },
     onError: (error) => {
@@ -194,6 +199,12 @@ export const useEventApplyPage = () => {
     },
     onSuccess: () => {
       void invalidateEventQueries();
+      trackEvent(ANALYTICS_EVENT.APPLICATION_UPDATED, {
+        eventCategory: event.eventCategory,
+        eventId,
+        eventType: event.eventType,
+        participantType: user?.type,
+      });
       handleViewEvent();
       window.setTimeout(() => {
         showToast({

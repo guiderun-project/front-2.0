@@ -93,6 +93,20 @@ Keep `CLAUDE.md` and `AGENTS.md` aligned when changing agent instructions.
 - Ancestor-conditional Emotion selectors must start with `&`. Use `HIGH_CONTRAST_SELECTOR` rather than writing `:root[data-contrast='high'] &`, which Emotion expands into a selector that never matches.
 - Gradients and shadows do not survive high contrast. Classify them in `highContrastGradientRoles` and `highContrastEffectRoles` instead of branching in components.
 
+## Native WebView App Bars
+
+- The app shell owns both the top status bar and the bottom bar (home indicator / navigation bar). Web code reports each edge color and icon style through `useNativeAppBars` in `src/hooks/useNativeAppBars.ts`.
+- The hook posts `SET_STATUS_BAR` and `SET_BOTTOM_BAR` separately. Do not send one shared payload to both, because the two edges usually resolve to different colors and each needs its own `style`.
+- `PageLayout` already calls the hook, so route-level pages need no extra wiring. Do not post the bridge message from a page or component.
+- Derive `style` from the resolved color relative luminance. Do not map it from `colorMode`, because high contrast keeps both polarities and a polarity map puts same-color icons on a same-color bar.
+- The status bar color is the page top edge, so it uses the gradient top color when a `bg.*` gradient is present.
+- The bottom bar color ignores the gradient. Every `bg.*` gradient fades into the page background color, so the bottom edge is the page background token.
+- When fixed bottom UI covers the bottom edge, that UI owns the color. Declare it with `NativeBottomBarBackgroundContext` from the layout that renders the UI, as `BottomNavigationLayout` does with `BOTTOM_NAVIGATION_BACKGROUND_TOKEN`.
+- `FooterButton` needs no override. Its `gradient.bg.footer` and `gradient.bg.footer-subtle` end in the page background color, so the bottom edge already matches.
+- Adding a `bg.*` gradient requires declaring its top color in `gradientTopColor` in `src/styles/tokens/gradient.ts`. The map is typed `satisfies Record<ColorMode, Record<BackgroundGradientToken, string | null>>`, so the build breaks until the top color is assigned. Keep it that way.
+- Use `null` in `gradientTopColor` when a gradient starts fully transparent. The resolver falls back to the page background color.
+- `window.ReactNativeWebView` is absent in a plain browser, so the bridge is a no-op outside the app webview.
+
 ## Extending Theme Tokens
 
 - Do not invent new theme tokens inline inside components.
