@@ -1,10 +1,11 @@
 import type { ReactElement } from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import styled from '@emotion/styled';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import { ANALYTICS_EVENT, trackEvent } from '@/api/core';
+import { api } from '@/api/services';
 import {
   Button,
   Graphic,
@@ -14,13 +15,16 @@ import {
   Text,
 } from '@/components';
 import { useAuth } from '@/contexts';
+import { useCheckWebview } from '@/hooks/useCheckWebview';
 import { APP_PATH } from '@/router/path';
 import type { ReturnLocation } from '@/router/returnPath';
 import { saveReturnPath } from '@/router/returnPath';
 
 import { KakaoLoginButton } from './components/KakaoLoginButton';
+import { AppleLoginButton } from './components/AppleLoginButton';
 
 const GUIDERUN_LANDING_URL = 'https://about.guiderun.org/';
+const LOCAL_HOSTNAMES = new Set(['localhost', '127.0.0.1']);
 
 type IntroLocationState = {
   from?: ReturnLocation;
@@ -28,6 +32,12 @@ type IntroLocationState = {
 };
 
 export const IntroPage = (): ReactElement => {
+  const [applePending, setApplePending] = useState(false);
+  const [appleError, setAppleError] = useState('');
+  const { isWebview } = useCheckWebview();
+  const isLocalhost =
+    typeof window !== 'undefined' && LOCAL_HOSTNAMES.has(window.location.hostname);
+  const isAppleLoginVisible = isWebview || isLocalhost;
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthReady, isAuthenticated } = useAuth();
@@ -58,6 +68,27 @@ export const IntroPage = (): ReactElement => {
     window.location.href = `https://kauth.kakao.com/oauth/authorize?${params.toString()}`;
   };
 
+  const handleAppleLogin = async () => {
+    if (applePending) return;
+    setApplePending(true);
+    setAppleError('');
+    try {
+      const toBase64Url = (bytes: Uint8Array) =>
+        btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+      const verifier = toBase64Url(crypto.getRandomValues(new Uint8Array(32)));
+      const challenge = toBase64Url(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier))));
+      // This is a short-lived browser binding, never an access/refresh token.
+      sessionStorage.setItem('apple-login-verifier', verifier);
+      const { authorizationUrl } = await api.auth.appleOAuthStartPost({ challenge });
+      trackEvent(ANALYTICS_EVENT.INTRO_CTA_CLICKED, { variant: 'apple' });
+      window.location.assign(authorizationUrl);
+    } catch {
+      sessionStorage.removeItem('apple-login-verifier');
+      setAppleError('Apple 로그인을 시작하지 못했어요. 잠시 후 다시 시도해 주세요.');
+      setApplePending(false);
+    }
+  };
+
   const handleIdLogin = () => {
     trackEvent(ANALYTICS_EVENT.INTRO_CTA_CLICKED, { variant: 'id' });
     navigate(APP_PATH.LOGIN);
@@ -77,7 +108,7 @@ export const IntroPage = (): ReactElement => {
           <Text align="center" color="text.tertiary" font="body-m-m">
             첫 방문이라면,
             <br />
-            먼저 카카오톡 회원가입이 필요해요
+            카카오 또는 Apple 계정으로 가입해 주세요
           </Text>
         </TitleSection>
 
@@ -111,6 +142,21 @@ export const IntroPage = (): ReactElement => {
 
           <LoginButtonGroup>
             <KakaoLoginButton onClick={handleKakaoLogin} />
+            {isAppleLoginVisible && (
+              <>
+                <AppleLoginButton
+                  disabled={applePending}
+                  onClick={() => {
+                    void handleAppleLogin();
+                  }}
+                />
+                {appleError && (
+                  <Text align="center" font="body-s-sb" role="alert">
+                    {appleError}
+                  </Text>
+                )}
+              </>
+            )}
             <Button
               fullWidth
               level="line-type"
