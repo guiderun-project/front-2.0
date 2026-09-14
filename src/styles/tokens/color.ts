@@ -289,8 +289,8 @@ export const semanticColorAliases = {
   },
   dark: {
     apple: {
-      background: "primitive.apple.black",
-      content: "primitive.apple.white",
+      background: "primitive.apple.white",
+      content: "primitive.apple.black",
     },
     bg: {
       default: "primitive.neutral.950",
