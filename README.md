@@ -120,3 +120,11 @@ pnpm build
 ## 더 알아보기
 
 가이드런 프로젝트 소개: [about.guiderun.org](https://about.guiderun.org/)
+
+### Apple login
+
+`/intro` offers Apple login below Kakao inside the native WebView (`window.ReactNativeWebView`) and on local hosts (`localhost`, `127.0.0.1`) for development. The frontend uses the existing `VITE_API_BASE_URL`; no Apple private key or client secret belongs in Vite variables. The BE must configure its Apple key and matching frontend/callback URLs (see backend `run/docs/apple-login.md`).
+
+Flow: POST `/oauth/apple/start` -> Apple -> BE form POST callback -> `/oauth?provider=apple#ticket=...` -> POST `/oauth/apple/exchange`. A random verifier in sessionStorage binds the one-use ticket to its initiating tab; access tokens remain memory-only. Returning users start a session, new users enter existing signup with provider `APPLE`. Kakao accounts are not automatically linked.
+
+With MSW enabled and `VITE_MOCK_AUTHENTICATED=false`, the button simulates a returning Apple user. To exercise signup, keep `apple-login-verifier` in sessionStorage and open `/oauth?provider=apple#ticket=mock-apple-signup`. Missing/unknown tickets exercise the failure screen. Live testing uses `dev.guiderun.org` with `dev-api.guiderun.org`.

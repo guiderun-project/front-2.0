@@ -9,7 +9,7 @@ export type KakaoOAuthLoginQuery = {
   code: string;
 };
 
-export type KakaoOAuthLoginResponse =
+export type SocialOAuthLoginResponse =
   | {
       status: 'LOGIN_SUCCESS';
       accessToken: string;
@@ -22,7 +22,7 @@ export type KakaoOAuthLoginResponse =
   | {
       status: 'SIGNUP_REQUIRED';
       signupToken: string;
-      provider: 'KAKAO';
+      provider: 'KAKAO' | 'APPLE';
     };
 
 export type LoginPostRequest = {
@@ -147,3 +147,9 @@ export type RenewalPasswordPatchRequest = {
   token: string;
   newPassword: string;
 };
+
+// Retained for existing Kakao callers.
+export type KakaoOAuthLoginResponse = SocialOAuthLoginResponse;
+export type AppleOAuthStartRequest = { challenge: string };
+export type AppleOAuthStartResponse = { authorizationUrl: string };
+export type AppleOAuthExchangeRequest = { ticket: string; verifier: string };
