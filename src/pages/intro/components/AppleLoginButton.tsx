@@ -44,9 +44,10 @@ const StyledButton = styled.button`
   padding: ${({ theme }) => theme.spacing.none};
   border: ${({ theme }) => theme.pxToRem(1)} solid ${({ theme }) => theme.color.border.strong};
   border-radius: ${({ theme }) => theme.radius.md};
-  /* Apple 버튼 브랜딩은 흰 배경과 검은 콘텐츠만 허용한다. */
-  background: #FFF;
-  color: #000;
+  /* Apple 로그인 검정 버튼은 흰색 콘텐츠를 사용한다. */
+  border-color: #000;
+  background: #000;
+  color: #FFF;
   cursor: pointer;
 
   &:disabled {
@@ -69,6 +70,7 @@ const LogoArea = styled.span`
 const AppleLogo = styled(AppleSymbol)`
   height: ${({ theme }) => theme.pxToRem(24)};
   width: auto;
+  fill: currentColor;
 `;
 
 const LabelArea = styled.span`
