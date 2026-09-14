@@ -44,10 +44,9 @@ const StyledButton = styled.button`
   padding: ${({ theme }) => theme.spacing.none};
   border: ${({ theme }) => theme.pxToRem(1)} solid ${({ theme }) => theme.color.border.strong};
   border-radius: ${({ theme }) => theme.radius.md};
-  /* Apple 로그인 검정 버튼은 흰색 콘텐츠를 사용한다. */
-  border-color: #000;
-  background: #000;
-  color: #FFF;
+  border-color: ${({ theme }) => theme.color.apple.background};
+  background: ${({ theme }) => theme.color.apple.background};
+  color: ${({ theme }) => theme.color.apple.content};
   cursor: pointer;
 
   &:disabled {
