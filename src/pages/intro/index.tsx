@@ -108,7 +108,9 @@ export const IntroPage = (): ReactElement => {
           <Text align="center" color="text.tertiary" font="body-m-m">
             첫 방문이라면,
             <br />
-            카카오 또는 Apple 계정으로 가입해 주세요
+            {isWebview
+              ? '카카오 또는 Apple 계정으로 가입해 주세요'
+              : '카카오 계정으로 가입해 주세요'}
           </Text>
         </TitleSection>
 
