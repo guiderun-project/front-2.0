@@ -1,16 +1,16 @@
-import type { ReactElement } from 'react';
+import type { ReactElement } from "react";
 
-import styled from '@emotion/styled';
-import { Controller, type Control } from 'react-hook-form';
+import styled from "@emotion/styled";
+import { Controller, type Control } from "react-hook-form";
 
-import type { AdditionalQuestionDetail } from '@/api/types';
-import { Radio, Text } from '@/components';
+import type { AdditionalQuestionDetail } from "@/api/types";
+import { Radio, Text } from "@/components";
 
-import type { EventApplyFormValues } from '../schema';
+import type { EventApplyFormValues } from "../schema";
 
 type AdditionalSelectQuestionProps = {
   control: Control<EventApplyFormValues>;
-  question: Extract<AdditionalQuestionDetail, { type: 'SELECT' }>;
+  question: Extract<AdditionalQuestionDetail, { type: "SELECT" }>;
 };
 
 export const AdditionalSelectQuestion = ({
@@ -34,10 +34,7 @@ export const AdditionalSelectQuestion = ({
               const isSelected = field.value === optionValue;
 
               return (
-                <OptionLabel
-                  key={option.optionId}
-                  $selected={isSelected}
-                >
+                <OptionLabel key={option.optionId} $selected={isSelected}>
                   <Radio
                     ref={optionIndex === 0 ? field.ref : undefined}
                     aria-label={option.value}
@@ -61,9 +58,9 @@ export const AdditionalSelectQuestion = ({
 };
 
 const QuestionCard = styled.div(({ theme }) => ({
-  display: 'grid',
-  width: '100%',
-  overflow: 'hidden',
+  display: "grid",
+  width: "100%",
+  overflow: "hidden",
   border: `1px solid ${theme.color.border.subtle}`,
   borderRadius: theme.radius.md,
   background: theme.color.bg.default,
@@ -75,39 +72,43 @@ const QuestionHeader = styled.div(({ theme }) => ({
 }));
 
 const OptionList = styled.div({
-  display: 'grid',
+  display: "grid",
 });
 
-const OptionLabel = styled.label<{ $selected: boolean }>(({ theme, $selected }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  width: '100%',
-  minHeight: theme.pxToRem(56),
-  gap: theme.spacing.lg,
-  padding: theme.spacing.xl,
-  borderTop: `1px solid ${theme.color.border.subtle}`,
-  background: $selected ? theme.color.bg['brand-soft'] : theme.color.bg.default,
-  cursor: 'pointer',
-  transition: 'background-color 120ms ease, transform 120ms ease',
+const OptionLabel = styled.label<{ $selected: boolean }>(
+  ({ theme, $selected }) => ({
+    display: "flex",
+    alignItems: "center",
+    width: "100%",
+    minHeight: theme.pxToRem(56),
+    gap: theme.spacing.lg,
+    padding: theme.spacing.xl,
+    borderTop: `1px solid ${theme.color.border.subtle}`,
+    background: $selected
+      ? theme.color.bg["brand-soft"]
+      : theme.color.bg.default,
+    cursor: "pointer",
+    transition: "background-color 120ms ease, transform 120ms ease",
 
-  '&:first-of-type': {
-    borderTop: 0,
-  },
-
-  '&:active': {
-    transform: 'scale(0.99)',
-  },
-
-  '&:focus-visible': {
-    outline: `2px solid ${theme.color.border.focused}`,
-    outlineOffset: theme.spacing.xs,
-  },
-
-  '@media (prefers-reduced-motion: reduce)': {
-    transition: 'none',
-
-    '&:active': {
-      transform: 'none',
+    "&:first-of-type": {
+      borderTop: 0,
     },
-  },
-}));
+
+    "&:active": {
+      transform: "scale(0.99)",
+    },
+
+    "&:focus-visible": {
+      outline: `2px solid ${theme.color.border.focused}`,
+      outlineOffset: theme.spacing.xs,
+    },
+
+    "@media (prefers-reduced-motion: reduce)": {
+      transition: "none",
+
+      "&:active": {
+        transform: "none",
+      },
+    },
+  }),
+);
