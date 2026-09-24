@@ -1,15 +1,15 @@
-import type { KeyboardEvent, ReactElement } from 'react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import type { KeyboardEvent, ReactElement } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-import styled from '@emotion/styled';
+import styled from "@emotion/styled";
 import {
   Controller,
   type SubmitErrorHandler,
   type UseFormReturn,
-} from 'react-hook-form';
+} from "react-hook-form";
 
-import { ANALYTICS_EVENT, trackEvent } from '@/api/core';
-import type { EventDetailResponse, UserInfoGetResponse } from '@/api/types';
+import { ANALYTICS_EVENT, trackEvent } from "@/api/core";
+import type { EventDetailResponse, UserInfoGetResponse } from "@/api/types";
 import {
   Badge,
   FooterButton,
@@ -21,10 +21,10 @@ import {
   Text,
   Textarea,
   type SelectOptions,
-} from '@/components';
+} from "@/components";
 
-import { AdditionalSelectQuestion } from './components/AdditionalSelectQuestion';
-import { AdditionalTextQuestion } from './components/AdditionalTextQuestion';
+import { AdditionalSelectQuestion } from "./components/AdditionalSelectQuestion";
+import { AdditionalTextQuestion } from "./components/AdditionalTextQuestion";
 import {
   COMPETITION_COURSE_OPTIONS,
   createGeneralTrainingOptions,
@@ -33,13 +33,13 @@ import {
   getPrimarySelectLabel,
   GROUP_TRAINING_OPTIONS,
   type EventApplyGroupValue,
-} from './constants';
-import { focusFirstHeading } from './focusFirstHeading';
-import type { EventApplyFormValues } from './schema';
+} from "./constants";
+import { focusFirstHeading } from "./focusFirstHeading";
+import type { EventApplyFormValues } from "./schema";
 import {
   getFirstInvalidEventApplyFieldName,
   type EventApplyInvalidFocusFieldName,
-} from './validationFocus';
+} from "./validationFocus";
 
 const AGREEMENT_ANNOUNCE_DELAY_MS = 150;
 
@@ -82,7 +82,7 @@ export const EventApplyForm = ({
   const submitButtonRef = useRef<HTMLButtonElement>(null);
   // 면책 동의 저장 안내. 상시 마운트된 status 리전을 빈 상태로 두고 잠시 후
   // 텍스트를 주입해야 iOS VoiceOver/TalkBack이 변경을 안정적으로 낭독한다.
-  const [agreementAnnouncement, setAgreementAnnouncement] = useState('');
+  const [agreementAnnouncement, setAgreementAnnouncement] = useState("");
 
   useEffect(() => {
     if (isEditMode || applicationStartedTrackedRef.current) {
@@ -108,7 +108,7 @@ export const EventApplyForm = ({
   // 인지하도록 페이지 제목 h1으로 포커스를 옮긴다(EventApplyCompleted와 동일 패턴).
   useEffect(() => {
     const frameId = window.requestAnimationFrame(() => {
-      focusFirstHeading(document.querySelector('main'));
+      focusFirstHeading(document.querySelector("main"));
     });
 
     return () => {
@@ -123,7 +123,7 @@ export const EventApplyForm = ({
 
     const timeoutId = window.setTimeout(() => {
       setAgreementAnnouncement(
-        '동의가 저장되어 신청서 입력 화면으로 이동했어요.',
+        "동의가 저장되어 신청서 입력 화면으로 이동했어요.",
       );
     }, AGREEMENT_ANNOUNCE_DELAY_MS);
 
@@ -193,7 +193,7 @@ export const EventApplyForm = ({
   // IME 조합 중에는 무시하고, textarea 줄바꿈과 버튼 동작은 그대로 둔다.
   const handleFormKeyDown = (event: KeyboardEvent<HTMLFormElement>) => {
     if (
-      event.key !== 'Enter' ||
+      event.key !== "Enter" ||
       event.nativeEvent.isComposing ||
       !(event.target instanceof HTMLInputElement)
     ) {
@@ -210,7 +210,7 @@ export const EventApplyForm = ({
           <DescriptionRow>
             <Badge
               size="m"
-              tone={event.eventType === 'COMPETITION' ? 'cyan' : 'gray'}
+              tone={event.eventType === "COMPETITION" ? "cyan" : "gray"}
               variant="solid"
             >
               {EVENT_TYPE_LABELS[event.eventType]}
@@ -218,12 +218,12 @@ export const EventApplyForm = ({
             <EventName>{event.name}</EventName>
           </DescriptionRow>
         }
-        title={'신청 정보를\n입력해주세요'}
+        title={"신청 정보를\n입력해주세요"}
         topNavigation={{
           right: [
             {
-              ariaLabel: '이벤트 상세로 이동',
-              icon: 'delete-lined',
+              ariaLabel: "이벤트 상세로 이동",
+              icon: "delete-lined",
               onClick: onBack,
             },
           ],
@@ -300,9 +300,8 @@ export const EventApplyForm = ({
                   />
                 )}
               />
-              {/* TODO: 대회 Figma 추가 질문 위치 이동 확정 필요 */}
               {event.additionalQuestions.map((question) =>
-                question.type === 'TEXT' ? (
+                question.type === "TEXT" ? (
                   <AdditionalTextQuestion
                     key={question.questionId}
                     control={form.control}
@@ -321,7 +320,7 @@ export const EventApplyForm = ({
 
           <HiddenText role="status">{agreementAnnouncement}</HiddenText>
           <HiddenText role="status">
-            {isSubmitting ? '신청서를 제출하고 있어요.' : ''}
+            {isSubmitting ? "신청서를 제출하고 있어요." : ""}
           </HiddenText>
 
           <FooterButton>
@@ -332,7 +331,7 @@ export const EventApplyForm = ({
               size="l"
               type="submit"
             >
-              {isEditMode ? '신청서 수정하기' : '참여 신청하기'}
+              {isEditMode ? "신청서 수정하기" : "참여 신청하기"}
             </FooterButton.Button>
           </FooterButton>
         </Form>
@@ -345,11 +344,11 @@ const createPrimarySelectOptions = (
   event: EventDetailResponse,
   user: UserInfoGetResponse,
 ): SelectOptions<EventApplyGroupValue> => {
-  if (event.eventType === 'COMPETITION') {
+  if (event.eventType === "COMPETITION") {
     return COMPETITION_COURSE_OPTIONS;
   }
 
-  if (event.eventCategory === 'GROUP') {
+  if (event.eventCategory === "GROUP") {
     return GROUP_TRAINING_OPTIONS;
   }
 
@@ -357,43 +356,43 @@ const createPrimarySelectOptions = (
 };
 
 const DescriptionRow = styled.span(({ theme }) => ({
-  display: 'inline-flex',
-  alignItems: 'center',
-  maxWidth: '100%',
+  display: "inline-flex",
+  alignItems: "center",
+  maxWidth: "100%",
   gap: theme.spacing.md,
-  verticalAlign: 'middle',
+  verticalAlign: "middle",
 }));
 
 const EventName = styled.span({
   minWidth: 0,
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap",
 });
 
 const Form = styled.form(({ theme }) => ({
-  display: 'grid',
-  paddingTop: theme.spacing['4xl'],
+  display: "grid",
+  paddingTop: theme.spacing["4xl"],
 }));
 
 const FormSection = styled.section(({ theme }) => ({
-  display: 'grid',
+  display: "grid",
   gap: theme.spacing.lg,
-  paddingInline: theme.spacing['2xl'],
+  paddingInline: theme.spacing["2xl"],
 }));
 
 const SectionHeader = styled.div({
-  display: 'grid',
+  display: "grid",
 });
 
 const FieldStack = styled.div(({ theme }) => ({
-  display: 'grid',
+  display: "grid",
   gap: theme.spacing.lg,
-  width: '100%',
+  width: "100%",
 }));
 
 const Divider = styled.div(({ theme }) => ({
   height: theme.spacing.lg,
-  marginBlock: theme.spacing['2xl'],
+  marginBlock: theme.spacing["2xl"],
   background: theme.color.border.subtle,
 }));

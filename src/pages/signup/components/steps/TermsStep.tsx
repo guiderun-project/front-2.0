@@ -68,8 +68,12 @@ export const TermsStep = (): ReactElement => {
   return (
     <StepLayout title={SIGNUP_COPY.terms.title}>
       <AllRow>
-        <CheckBox checked={allChecked} onChange={toggleAll} />
-        <Text color="text.primary" font="body-m-sb">
+        <CheckBox
+          aria-label="전체 동의하기"
+          checked={allChecked}
+          onChange={toggleAll}
+        />
+        <Text aria-hidden={true} color="text.primary" font="body-m-sb">
           전체 동의하기
         </Text>
       </AllRow>
@@ -79,18 +83,21 @@ export const TermsStep = (): ReactElement => {
         {TERMS_SECTIONS.map((section) => {
           const config = SECTION_CONFIG[section.key];
           if (!config) return null;
+          const itemLabel = section.required
+            ? `${section.title} (필수)`
+            : section.title;
           return (
             <ItemRow key={section.key}>
               <ItemLabel>
                 <CheckBox
+                  aria-label={itemLabel}
                   checked={agreements[config.agreementKey]}
                   onChange={(event) =>
                     setAgreement(config.field, event.target.checked)
                   }
                 />
-                <Text color="text.secondary" font="body-s-m">
-                  {section.title}
-                  {section.required && " (필수)"}
+                <Text aria-hidden={true} color="text.secondary" font="body-s-m">
+                  {itemLabel}
                 </Text>
               </ItemLabel>
               <DetailLink
