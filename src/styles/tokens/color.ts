@@ -4,6 +4,10 @@ export type ColorMode = "light" | "dark";
 
 // Primitive color values can change when Figma tokens are updated. Prefer semantic color tokens in product components.
 export const colorPrimitive = {
+  apple: {
+    black: "#000000",
+    white: "#FFFFFF",
+  },
   neutral: {
     "0": "#FFFFFF",
     "50": "#F7F9FB",
@@ -103,6 +107,8 @@ export const colorPrimitive = {
 } as const;
 
 export const primitiveColorTokenMap = {
+  "primitive.apple.black": "#000000",
+  "primitive.apple.white": "#FFFFFF",
   "primitive.neutral.0": "#FFFFFF",
   "primitive.neutral.50": "#F7F9FB",
   "primitive.neutral.75": "#F3F7FA",
@@ -185,6 +191,10 @@ type SemanticColorAliasGroup = {
 
 export const semanticColorAliases = {
   light: {
+    apple: {
+      background: "primitive.apple.black",
+      content: "primitive.apple.white",
+    },
     bg: {
       default: "primitive.neutral.0",
       subtle: "primitive.neutral.100",
@@ -278,6 +288,10 @@ export const semanticColorAliases = {
     },
   },
   dark: {
+    apple: {
+      background: "primitive.apple.white",
+      content: "primitive.apple.black",
+    },
     bg: {
       default: "primitive.neutral.950",
       subtle: "primitive.neutral.900",
@@ -398,6 +412,10 @@ export const semanticColorModes =
   resolveSemanticColorAliases(semanticColorAliases);
 
 export const color = {
+  apple: {
+    background: "var(--color-apple-background)",
+    content: "var(--color-apple-content)",
+  },
   bg: {
     default: "var(--color-bg-default)",
     subtle: "var(--color-bg-subtle)",
@@ -492,6 +510,8 @@ export const color = {
 } as const;
 
 export const colorTokenMap = {
+  "apple.background": "var(--color-apple-background)",
+  "apple.content": "var(--color-apple-content)",
   "bg.default": "var(--color-bg-default)",
   "bg.subtle": "var(--color-bg-subtle)",
   "bg.surface": "var(--color-bg-surface)",

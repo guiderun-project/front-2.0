@@ -39,9 +39,9 @@ const FormDesignPage = lazy(() =>
 const IntroPage = lazy(() =>
   import('@/pages/intro').then(({ IntroPage }) => ({ default: IntroPage })),
 );
-const KakaoOAuthPage = lazy(() =>
-  import('@/pages/oauth').then(({ KakaoOAuthPage }) => ({
-    default: KakaoOAuthPage,
+const SocialOAuthPage = lazy(() =>
+  import('@/pages/oauth').then(({ SocialOAuthPage }) => ({
+    default: SocialOAuthPage,
   })),
 );
 const LoginPage = lazy(() =>
@@ -264,7 +264,7 @@ export const router = createBrowserRouter([
       {
         path: 'oauth',
         element: createLazyRouteElement(
-          KakaoOAuthPage,
+          SocialOAuthPage,
           'public',
           createRouteFallback('bg.subtle'),
           ROUTE_PAGE_TITLES.OAUTH,

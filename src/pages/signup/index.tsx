@@ -50,9 +50,9 @@ import { signupSchema } from '@/pages/signup/schema';
 import type { SignupFormValues, SignupStepId } from '@/pages/signup/types';
 import { toSignupRequest } from '@/pages/signup/utils';
 
-// 카카오 OAuth SIGNUP_REQUIRED 응답에서 전달받는 router state
+// 소셜 OAuth SIGNUP_REQUIRED 응답에서 전달받는 router state
 type SignupLocationState = {
-  provider?: 'KAKAO';
+  provider?: 'KAKAO' | 'APPLE';
   signupToken?: string;
 };
 

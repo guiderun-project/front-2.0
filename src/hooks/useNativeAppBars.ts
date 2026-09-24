@@ -13,6 +13,8 @@ import {
 import { useColorMode } from '@/styles/useColorMode';
 import { useContrastMode } from '@/styles/useContrastMode';
 
+import { useCheckWebview } from './useCheckWebview';
+
 export type AppBarBackgroundToken = Extract<ColorToken, `bg.${string}`>;
 
 type AppBarStyle = 'dark' | 'light';
@@ -54,12 +56,14 @@ export const useNativeAppBars = (
 ): void => {
   const { colorMode } = useColorMode();
   const { contrastMode } = useContrastMode();
+  const { isWebview } = useCheckWebview();
   const bottomBarBackground = useContext(NativeBottomBarBackgroundContext);
 
   useEffect(() => {
     sendAppBarMessage(
       STATUS_BAR_MESSAGE_TYPE,
       resolveAppBarPayload({ background, colorMode, contrastMode, gradient }),
+      isWebview,
     );
     sendAppBarMessage(
       BOTTOM_BAR_MESSAGE_TYPE,
@@ -68,12 +72,17 @@ export const useNativeAppBars = (
         colorMode,
         contrastMode,
       }),
+      isWebview,
     );
-  }, [background, bottomBarBackground, colorMode, contrastMode, gradient]);
+  }, [background, bottomBarBackground, colorMode, contrastMode, gradient, isWebview]);
 
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState !== 'visible') {
+        return;
+      }
+
+      if (!isWebview) {
         return;
       }
 
@@ -84,7 +93,7 @@ export const useNativeAppBars = (
           return;
         }
 
-        postAppBarMessage(messageType, payload);
+        postAppBarMessage(messageType, payload, isWebview);
       });
     };
 
@@ -93,32 +102,32 @@ export const useNativeAppBars = (
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, []);
+  }, [isWebview]);
 };
 
 const sendAppBarMessage = (
   messageType: AppBarMessageType,
   payload: AppBarPayload | null,
+  isWebview: boolean,
 ): void => {
   if (payload === null) {
     return;
   }
 
   lastSentPayloads[messageType] = payload;
-  postAppBarMessage(messageType, payload);
+  postAppBarMessage(messageType, payload, isWebview);
 };
 
 const postAppBarMessage = (
   messageType: AppBarMessageType,
   payload: AppBarPayload,
+  isWebview: boolean,
 ): void => {
-  const bridge = window.ReactNativeWebView;
-
-  if (!bridge) {
+  if (!isWebview) {
     return;
   }
 
-  bridge.postMessage(
+  window.ReactNativeWebView?.postMessage(
     JSON.stringify({
       type: messageType,
       payload,
