@@ -40,13 +40,14 @@ export const AdditionalSelectQuestion = ({
                 >
                   <Radio
                     ref={optionIndex === 0 ? field.ref : undefined}
+                    aria-label={option.value}
                     checked={isSelected}
                     name={field.name}
                     value={optionValue}
                     onBlur={field.onBlur}
                     onChange={() => field.onChange(optionValue)}
                   />
-                  <Text color="text.primary" font="body-m-m">
+                  <Text aria-hidden={true} color="text.primary" font="body-m-m">
                     {option.value}
                   </Text>
                 </OptionLabel>
