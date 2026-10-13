@@ -12,6 +12,7 @@ import styled from '@emotion/styled';
 
 import loadingDark from '@/assets/lotties/loading_dark.json';
 import loadingWhite from '@/assets/lotties/loading_white.json';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { HiddenText } from '@/components/HiddenText';
 import { useColorMode } from '@/styles/useColorMode';
 
@@ -76,15 +77,17 @@ export const Loader = ({
     <LoaderWrapper role="status" aria-live="polite" {...props}>
       <HiddenText>{announcedLabel}</HiddenText>
       <LoaderAnimation aria-hidden={true}>
-        <Suspense fallback={null}>
-          <Lottie
-            key={colorMode}
-            animationData={animationData}
-            autoplay={true}
-            loop={true}
-            style={{ width: '100%', height: '100%' }}
-          />
-        </Suspense>
+        <ErrorBoundary fallback={null}>
+          <Suspense fallback={null}>
+            <Lottie
+              key={colorMode}
+              animationData={animationData}
+              autoplay={true}
+              loop={true}
+              style={{ width: '100%', height: '100%' }}
+            />
+          </Suspense>
+        </ErrorBoundary>
       </LoaderAnimation>
     </LoaderWrapper>
   );
