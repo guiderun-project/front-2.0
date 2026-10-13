@@ -184,12 +184,13 @@ export const EventForm = ({
                     <PrivateLabel>
                       <CheckBox
                         aria-describedby={privateHelperId}
+                        aria-label="비공개 모임"
                         checked={field.value}
                         name={field.name}
                         onBlur={field.onBlur}
                         onChange={field.onChange}
                       />
-                      <Text color="text.primary" font="body-l-m">
+                      <Text aria-hidden={true} color="text.primary" font="body-l-m">
                         비공개 모임
                       </Text>
                     </PrivateLabel>

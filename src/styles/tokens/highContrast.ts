@@ -34,6 +34,8 @@ const highContrastPalette = {
 } as const satisfies Record<ColorMode, Record<HighContrastRole, string>>;
 
 export const highContrastColorRoles = {
+  'apple.background': 'inverse-surface',
+  'apple.content': 'inverse-content',
   'bg.default': 'surface',
   'bg.subtle': 'surface',
   'bg.surface': 'surface',

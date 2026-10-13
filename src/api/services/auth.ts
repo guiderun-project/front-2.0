@@ -1,6 +1,10 @@
 import { publicApi } from '@/api/core/client';
 import { handleApiRequest } from '@/api/core/request';
 import type {
+  AppleOAuthStartRequest,
+  AppleOAuthStartResponse,
+  AppleOAuthExchangeRequest,
+  SocialOAuthLoginResponse,
   AccessTokenReissuePostResponse,
   AccountIdVerificationIssueRequest,
   CheckCertificationTokenPostRequest,
@@ -21,6 +25,18 @@ import type {
 } from '@/api/types/auth';
 
 class AuthApi {
+  appleOAuthStartPost = (body: AppleOAuthStartRequest) =>
+    handleApiRequest(async () => {
+      const response = await publicApi.post<AppleOAuthStartResponse>('/oauth/apple/start', body);
+      return response.data;
+    });
+
+  appleOAuthExchangePost = (body: AppleOAuthExchangeRequest) =>
+    handleApiRequest(async () => {
+      const response = await publicApi.post<SocialOAuthLoginResponse>('/oauth/apple/exchange', body);
+      return response.data;
+    });
+
   /**
    * 카카오 인가 코드로 로그인한다.
    * 기존 회원은 accessToken을 받고, 신규 회원은 signupToken을 받아 회원가입 플로우로 이동한다.

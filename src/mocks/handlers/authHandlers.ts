@@ -1,6 +1,8 @@
 import { http, HttpResponse, type HttpHandler } from 'msw';
 
 import type {
+  AppleOAuthStartRequest,
+  AppleOAuthExchangeRequest,
   AccountIdVerificationIssueRequest,
   CheckCertificationTokenPostRequest,
   LoginPostRequest,
@@ -54,6 +56,25 @@ const createVerificationResponse = (
 };
 
 export const authHandlers: HttpHandler[] = [
+  http.post(apiUrl('/oauth/apple/start'), async ({ request }) => {
+    const body = await request.json() as AppleOAuthStartRequest;
+    if (!/^[A-Za-z0-9_-]{43}$/.test(body.challenge)) return badRequest('Invalid challenge.');
+    return HttpResponse.json({ authorizationUrl: `${window.location.origin}/oauth?provider=apple#ticket=mock-apple-login` });
+  }),
+  http.post(apiUrl('/oauth/apple/exchange'), async ({ request }) => {
+    const body = await request.json() as AppleOAuthExchangeRequest;
+    if (!body.verifier || !['mock-apple-login', 'mock-apple-signup'].includes(body.ticket)) {
+      return unauthorized('Apple login expired.');
+    }
+    if (body.ticket === 'mock-apple-signup') {
+      return HttpResponse.json({ status: 'SIGNUP_REQUIRED', signupToken: 'mock-signup-token', provider: 'APPLE' });
+    }
+    activateMockRefreshSession();
+    setMockSessionUser(DEFAULT_MOCK_SESSION_USER_ID);
+    return HttpResponse.json({ status: 'LOGIN_SUCCESS', accessToken: 'mock-access-token',
+      user: { userId: DEFAULT_MOCK_SESSION_USER_ID, role: 'USER', disabilityType: 'VI' } },
+      { headers: { 'Set-Cookie': refreshTokenCookie } });
+  }),
   http.post(apiUrl('/oauth/login/kakao'), ({ request }: { request: Request }) => {
     const code = new URL(request.url).searchParams.get('code');
 

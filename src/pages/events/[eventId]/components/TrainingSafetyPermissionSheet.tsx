@@ -5,6 +5,8 @@ import styled from '@emotion/styled';
 import { BottomSheet, Button, CheckBox, Icon, Text } from '@/components';
 import { APP_PATH } from '@/router/path';
 
+const AGREEMENT_LABEL = '훈련 참여 및 안전 면책 동의 (필수)';
+
 type TrainingSafetyPermissionSheetProps = {
   open: boolean;
   isSubmitting: boolean;
@@ -56,12 +58,13 @@ export const TrainingSafetyPermissionSheet = ({
         <AgreementRow>
           <AgreementLabel>
             <CheckBox
+              aria-label={AGREEMENT_LABEL}
               checked={checked}
               disabled={isSubmitting}
               onChange={(event) => setChecked(event.target.checked)}
             />
-            <Text color="text.secondary" font="body-m-m">
-              훈련 참여 및 안전 면책 동의 (필수)
+            <Text aria-hidden={true} color="text.secondary" font="body-m-m">
+              {AGREEMENT_LABEL}
             </Text>
           </AgreementLabel>
           <DetailLink

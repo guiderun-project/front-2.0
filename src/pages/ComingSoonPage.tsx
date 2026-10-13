@@ -4,7 +4,13 @@ import styled from "@emotion/styled";
 
 import mainDarkLottie from "@/assets/lotties/main_dark.json";
 import mainLightLottie from "@/assets/lotties/main_light.json";
-import { ColorModeToggle, PageLayout, PageTitle, Text } from "@/components";
+import {
+  ColorModeToggle,
+  ErrorBoundary,
+  PageLayout,
+  PageTitle,
+  Text,
+} from "@/components";
 import { useColorMode } from "@/styles/useColorMode";
 
 const Lottie = lazy(() => import("lottie-react"));
@@ -14,15 +20,17 @@ const ComingSoonGraphic = () => {
   const animationData = colorMode === "dark" ? mainDarkLottie : mainLightLottie;
 
   return (
-    <Suspense fallback={null}>
-      <Lottie
-        key={colorMode}
-        animationData={animationData}
-        autoplay={true}
-        loop={true}
-        style={{ width: "100%", height: "100%" }}
-      />
-    </Suspense>
+    <ErrorBoundary fallback={null}>
+      <Suspense fallback={null}>
+        <Lottie
+          key={colorMode}
+          animationData={animationData}
+          autoplay={true}
+          loop={true}
+          style={{ width: "100%", height: "100%" }}
+        />
+      </Suspense>
+    </ErrorBoundary>
   );
 };
 
