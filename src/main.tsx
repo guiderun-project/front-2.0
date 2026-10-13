@@ -47,6 +47,8 @@ const EVENT_DETAIL_RESERVED_PATHS = [
   APP_PATH.EVENT_SEARCH,
   APP_PATH.EVENT_SUPPORT,
 ] as const;
+const STALE_CHUNK_RELOAD_STORAGE_KEY = 'guiderun-stale-chunk-reload-at';
+const STALE_CHUNK_RELOAD_COOLDOWN_MS = 60_000;
 const postHogOptions = {
   api_host: import.meta.env.VITE_POSTHOG_HOST,
   defaults: '2026-05-30',
@@ -169,6 +171,31 @@ const renderWithPostHogProvider = (children: ReactNode) => {
   );
 };
 
+const reloadOnStaleChunk = () => {
+  if (!navigator.onLine) {
+    return;
+  }
+
+  try {
+    const lastReloadAt = Number(
+      window.sessionStorage.getItem(STALE_CHUNK_RELOAD_STORAGE_KEY),
+    );
+
+    if (Date.now() - lastReloadAt < STALE_CHUNK_RELOAD_COOLDOWN_MS) {
+      return;
+    }
+
+    window.sessionStorage.setItem(
+      STALE_CHUNK_RELOAD_STORAGE_KEY,
+      String(Date.now()),
+    );
+  } catch {
+    return;
+  }
+
+  window.location.reload();
+};
+
 const bootstrap = async () => {
   renderBootstrapLoader();
 
@@ -195,5 +222,7 @@ const bootstrap = async () => {
     </StrictMode>,
   );
 };
+
+window.addEventListener('vite:preloadError', reloadOnStaleChunk);
 
 void bootstrap();
