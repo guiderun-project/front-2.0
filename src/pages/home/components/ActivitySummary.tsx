@@ -4,7 +4,7 @@ import styled from "@emotion/styled";
 
 import mainDarkLottie from "@/assets/lotties/main_dark.json";
 import mainLightLottie from "@/assets/lotties/main_light.json";
-import { HiddenText, Text } from "@/components";
+import { ErrorBoundary, HiddenText, Text } from "@/components";
 import { useAuth } from "@/contexts";
 import { useHomeSummary } from "@/pages/home/hooks/useHomeSummary";
 import { getRunnerStageHeadline } from "@/pages/home/utils";
@@ -18,15 +18,17 @@ const MainRunnerLottie = (): ReactElement => {
   const animationData = colorMode === "dark" ? mainDarkLottie : mainLightLottie;
 
   return (
-    <Suspense fallback={null}>
-      <Lottie
-        key={colorMode}
-        animationData={animationData}
-        autoplay={true}
-        loop={true}
-        style={{ width: "100%", height: "100%" }}
-      />
-    </Suspense>
+    <ErrorBoundary fallback={null}>
+      <Suspense fallback={null}>
+        <Lottie
+          key={colorMode}
+          animationData={animationData}
+          autoplay={true}
+          loop={true}
+          style={{ width: "100%", height: "100%" }}
+        />
+      </Suspense>
+    </ErrorBoundary>
   );
 };
 
