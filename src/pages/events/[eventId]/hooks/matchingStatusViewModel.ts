@@ -1,28 +1,27 @@
 import type {
   EventMatchingStatusResponse,
-  MatchingGroup,
-  MatchingPartner,
-  MatchingRow,
-  MatchingUser,
+  MatchingStatusGroup,
+  MatchingStatusRow,
+  MatchingStatusUser,
 } from '@/api/types';
 
 type MatchingStatusRowType = 'matched' | 'unmatchedVi' | 'unmatchedGuide';
 
 export type MatchingStatusViewRow = {
-  guides: MatchingUser[];
+  guides: MatchingStatusUser[];
   id: string;
   type: MatchingStatusRowType;
-  vi: MatchingUser | null;
+  vi: MatchingStatusUser | null;
 };
 
-type MatchingStatusViewGroup = Omit<MatchingGroup, 'rows'> & {
+type MatchingStatusViewGroup = Omit<MatchingStatusGroup, 'rows'> & {
   rows: MatchingStatusViewRow[];
 };
 
 export type MatchingStatusViewModel = {
   groups: MatchingStatusViewGroup[];
   isEmpty: boolean;
-  myPartners: MatchingPartner[];
+  myPartners: MatchingStatusUser[];
 };
 
 export const createMatchingStatusViewModel = (
@@ -45,7 +44,7 @@ export const createMatchingStatusViewModel = (
 };
 
 const createViewRows = (
-  row: MatchingRow,
+  row: MatchingStatusRow,
   rowKey: string,
 ): MatchingStatusViewRow[] => {
   if (row.vi && row.guides.length > 0) {

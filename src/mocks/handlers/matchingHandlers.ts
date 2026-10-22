@@ -1,11 +1,11 @@
 import { http, HttpResponse, type HttpHandler } from 'msw';
 
-import type { RunningGroup } from '@/api/types/common';
 import type {
+  MatchingRunningGroup,
   MatchingCompletedRow,
   MatchingCreateRequest,
-  MatchingRow,
-  MatchingUser,
+  MatchingStatusRow,
+  MatchingStatusUser,
 } from '@/api/types/matching';
 import {
   buildApplicantForm,
@@ -16,20 +16,19 @@ import {
   getMatchingSummary,
   isMatched,
   mockDb,
-  toMatchingPartner,
   toMatchingUser,
   visibleRunningGroups,
 } from '@/mocks/fixtures';
 import { apiUrl, badRequest, notFound } from '@/mocks/http';
 
 type CompletedRowEntry = {
-  runningGroup: RunningGroup;
+  runningGroup: MatchingRunningGroup;
   row: MatchingCompletedRow;
 };
 
 type StatusRowEntry = {
-  runningGroup: RunningGroup;
-  row: MatchingRow;
+  runningGroup: MatchingRunningGroup;
+  row: MatchingStatusRow;
 };
 
 const findAppliedForm = (eventId: number, userId: string) => {
@@ -42,13 +41,7 @@ const getMatchingUser = (eventId: number, userId: string) => {
   return form ? toMatchingUser(form) : null;
 };
 
-const getMatchingPartner = (eventId: number, userId: string) => {
-  const form = findAppliedForm(eventId, userId);
-
-  return form ? toMatchingPartner(form) : null;
-};
-
-const isMatchingUser = (user: MatchingUser | null): user is MatchingUser => {
+const isMatchingUser = (user: MatchingStatusUser | null): user is MatchingStatusUser => {
   return user !== null;
 };
 
@@ -73,7 +66,9 @@ const createWaitingGroups = (eventId: number) => {
             isFirstParticipation: user.firstParticipation,
             hopePartner: form.partner,
             additionalComment: form.detail,
-            additionalAnswers: applicantForm?.additionalAnswers ?? [],
+            additionalAnswers: applicantForm?.additionalAnswers.length
+              ? applicantForm.additionalAnswers
+              : null,
           };
         });
 
@@ -98,7 +93,7 @@ const createCompletedRows = (eventId: number): CompletedRowEntry[] => {
 
       return [
         {
-          runningGroup: vi.applyGroup,
+          runningGroup: vi.applyGroup ?? '',
           row: {
             vi,
             guides: matching.guideIds
@@ -184,7 +179,7 @@ export const matchingHandlers: HttpHandler[] = [
             ...currentMatching.guideIds,
           ]
             .filter((userId) => userId !== currentUser.userId)
-            .map((userId) => getMatchingPartner(eventId, userId))
+            .map((userId) => getMatchingUser(eventId, userId))
             .filter((user) => Boolean(user))
         : [];
 

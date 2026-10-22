@@ -9,31 +9,30 @@ export type EventMatchingStatusPath = {
 };
 
 export type EventMatchingStatusResponse = {
-  myPartners: MatchingPartner[];
-  groups: MatchingGroup[];
+  myPartners: MatchingStatusUser[];
+  groups: MatchingStatusGroup[];
 };
 
-export type MatchingPartner = MatchingUser & {
-  defaultGroup: RunningGroup;
-};
-
-export type MatchingGroup = {
-  runningGroup: RunningGroup;
+export type MatchingStatusGroup = {
+  runningGroup: MatchingRunningGroup;
   totalCount: number;
-  rows: MatchingRow[];
+  rows: MatchingStatusRow[];
 };
 
-export type MatchingRow = {
-  vi: MatchingUser | null;
-  guides: MatchingUser[];
+export type MatchingStatusRow = {
+  vi: MatchingStatusUser | null;
+  guides: MatchingStatusUser[];
 };
 
-export type MatchingUser = {
+export type MatchingStatusUser = {
   userId: string;
   name: string;
   type: UserType;
-  applyGroup: RunningGroup;
+  applyGroup: RunningGroup | null;
+  defaultGroup: RunningGroup | null;
 };
+
+export type MatchingRunningGroup = RunningGroup | '';
 
 export type MatchingWaitingPath = EventMatchingStatusPath;
 
@@ -47,7 +46,7 @@ export type MatchingWaitingResponse = {
 };
 
 export type MatchingWaitingGroup = {
-  runningGroup: RunningGroup;
+  runningGroup: MatchingRunningGroup;
   totalCount: number;
   participants: MatchingWaitingParticipant[];
 };
@@ -60,12 +59,14 @@ export type MatchingWaitingParticipant = {
   isFirstParticipation: boolean;
   hopePartner: string | null;
   additionalComment: string | null;
-  additionalAnswers: Array<{
-    questionId: number;
-    questionTitle: string;
-    questionType: AdditionalQuestionType;
-    answer: string | null;
-  }>;
+  additionalAnswers: MatchingWaitingAdditionalAnswer[] | null;
+};
+
+export type MatchingWaitingAdditionalAnswer = {
+  questionId: number;
+  questionTitle: string;
+  questionType: AdditionalQuestionType;
+  answer: string | null;
 };
 
 export type MatchingCompletedPath = EventMatchingStatusPath;
@@ -79,14 +80,14 @@ export type MatchingCompletedResponse = {
 };
 
 export type MatchingCompletedGroup = {
-  runningGroup: RunningGroup;
+  runningGroup: MatchingRunningGroup;
   totalCount: number;
   rows: MatchingCompletedRow[];
 };
 
 export type MatchingCompletedRow = {
-  vi: MatchingUser;
-  guides: MatchingUser[];
+  vi: MatchingStatusUser;
+  guides: MatchingStatusUser[];
 };
 
 export type MatchingCreatePath = EventMatchingStatusPath;

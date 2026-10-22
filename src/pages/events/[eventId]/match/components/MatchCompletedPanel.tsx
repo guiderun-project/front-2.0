@@ -5,7 +5,7 @@ import styled from '@emotion/styled';
 import type {
   MatchingCompletedResponse,
   MatchingCompletedRow,
-  MatchingUser,
+  MatchingStatusUser,
 } from '@/api/types';
 import { CheckBox, HiddenText, Icon, RunnerTypeAvatar, Text } from '@/components';
 import { RUNNER_TYPE_LABELS } from '@/constants';
@@ -26,7 +26,7 @@ type MatchCompletedPanelProps = {
   onToggleParticipant: (person: SelectablePerson) => void;
 };
 
-const toSelectablePerson = (user: MatchingUser): SelectablePerson => ({
+const toSelectablePerson = (user: MatchingStatusUser): SelectablePerson => ({
   userId: user.userId,
   name: user.name,
   type: user.type,
@@ -132,7 +132,7 @@ const CompletedPair = ({
 };
 
 type PersonSelectProps = {
-  person: MatchingUser;
+  person: MatchingStatusUser;
   selected: boolean;
   partnerText?: string;
   onToggle: (person: SelectablePerson) => void;
@@ -194,7 +194,7 @@ const withWaGwa = (word: string): string => {
 };
 
 // 시각장애러너 체크박스에서 낭독할 가이드러너 매칭 정보.
-const getGuidesPartnerLabel = (guides: MatchingUser[]): string => {
+const getGuidesPartnerLabel = (guides: MatchingStatusUser[]): string => {
   if (guides.length === 0) {
     return '가이드러너 매칭 없음';
   }
@@ -205,7 +205,7 @@ const getGuidesPartnerLabel = (guides: MatchingUser[]): string => {
 };
 
 // 가이드러너 체크박스에서 낭독할 시각장애러너 매칭 정보.
-const getViPartnerLabel = (vi: MatchingUser): string =>
+const getViPartnerLabel = (vi: MatchingStatusUser): string =>
   `${withWaGwa(`시각장애러너 ${vi.name}`)} 매칭`;
 
 const GroupStack = styled.div(({ theme }) => ({

@@ -3,7 +3,11 @@ import type { ReactElement } from 'react';
 import styled from '@emotion/styled';
 
 import { EVENT_CATEGORIES, EVENT_TYPES } from '@/api/constants';
-import type { MatchingWaitingParticipant, RunningGroup } from '@/api/types';
+import type {
+  MatchingRunningGroup,
+  MatchingWaitingParticipant,
+  RunningGroup,
+} from '@/api/types';
 import { Badge, CheckBox, HiddenText, RunnerTypeAvatar, Text } from '@/components';
 import { RUNNER_TYPE_LABELS } from '@/constants';
 
@@ -11,7 +15,7 @@ import type { EventGroupLabelContext } from '../../utils';
 import { highContrastBoundary } from '@/styles/highContrastStyles';
 
 type MatchParticipantCardProps = {
-  applicationGroup: RunningGroup;
+  applicationGroup: MatchingRunningGroup;
   eventGroupLabelContext: EventGroupLabelContext;
   isSelected: boolean;
   participant: MatchingWaitingParticipant;
@@ -19,7 +23,7 @@ type MatchParticipantCardProps = {
 };
 
 const getOriginalRunningGroupText = (
-  applicationGroup: RunningGroup,
+  applicationGroup: MatchingRunningGroup,
   { eventCategory, eventType }: EventGroupLabelContext,
   originalRunningGroup: RunningGroup | null,
 ): string | null => {
@@ -36,6 +40,9 @@ const getOriginalRunningGroupText = (
     : null;
 };
 
+const getVisibleAnswers = (participant: MatchingWaitingParticipant) =>
+  (participant.additionalAnswers ?? []).filter((item) => Boolean(item.answer));
+
 export const MatchParticipantCard = ({
   applicationGroup,
   eventGroupLabelContext,
@@ -51,6 +58,7 @@ export const MatchParticipantCard = ({
   const partnerText = participant.hopePartner
     ? `희망파트너 ${participant.hopePartner}`
     : null;
+  const visibleAnswers = getVisibleAnswers(participant);
   const participantMeta = [groupText, partnerText].filter(Boolean).join(' ・');
 
   // 체크박스 이름은 짧게 유지해 역할(체크박스)을 빠르게 인지하게 한다.
@@ -64,6 +72,7 @@ export const MatchParticipantCard = ({
     participant.additionalComment
       ? `추가 코멘트 ${participant.additionalComment}`
       : null,
+    ...visibleAnswers.map((item) => `${item.questionTitle} ${item.answer}`),
   ]
     .filter(Boolean)
     .join(', ');
@@ -101,11 +110,24 @@ export const MatchParticipantCard = ({
           ) : null}
         </Profile>
 
-        {participant.additionalComment ? (
+        {/* TODO: 디자인 반영 시 수정 필요 */}
+        {participant.additionalComment || visibleAnswers.length > 0 ? (
           <CommentBox>
-            <Text color="text.tertiary" font="body-s-m">
-              {participant.additionalComment}
-            </Text>
+            {participant.additionalComment ? (
+              <Text color="text.tertiary" font="body-s-m">
+                {participant.additionalComment}
+              </Text>
+            ) : null}
+            {visibleAnswers.map((item) => (
+              <AnswerItem key={item.questionId}>
+                <Text color="text.tertiary" font="detail-m-m">
+                  {item.questionTitle}
+                </Text>
+                <AnswerText color="text.primary" font="body-s-m">
+                  {item.answer}
+                </AnswerText>
+              </AnswerItem>
+            ))}
           </CommentBox>
         ) : null}
       </InfoColumn>
@@ -185,6 +207,8 @@ const ParticipantMeta = styled(Text)({
 
 const CommentBox = styled.div(({ theme }) => ({
   display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing.md,
   width: '100%',
   padding: `${theme.spacing.md} ${theme.spacing.lg}`,
   borderRadius: theme.radius.sm,
@@ -193,3 +217,17 @@ const CommentBox = styled.div(({ theme }) => ({
   ...highContrastBoundary(theme),
   boxSizing: 'border-box',
 }));
+
+const AnswerItem = styled.div(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing.s,
+  minWidth: 0,
+}));
+
+const AnswerText = styled(Text)({
+  display: 'block',
+  minWidth: 0,
+  wordBreak: 'keep-all',
+  overflowWrap: 'anywhere',
+});
