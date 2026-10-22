@@ -12,8 +12,8 @@ React 19 + TypeScript + Vite 기반 SPA. v2 아키텍처 기반(라우터·API �
 - **UI**: React 19, React Router DOM 7
 - **스타일**: Emotion (`@emotion/react`, `@emotion/styled`)
 - **서버 상태**: TanStack Query 5
-- **HTTP**: Axios 1.13 — `publicApi` / `privateApi` 두 인스턴스, 401 시 `/oauth/login/reissue` 로 1회 재발급
-- **목 서버**: MSW 2.12 (`VITE_ENABLE_MSW=true` 일 때만 활성)
+- **HTTP**: Axios 1.20 — `publicApi` / `privateApi` 두 인스턴스, 401 시 `/oauth/login/reissue` 로 1회 재발급
+- **목 서버**: MSW 2.15 (`VITE_ENABLE_MSW=true` 일 때만 활성)
 - **패키지 매니저**: pnpm
 
 ## 디렉토리 규약
