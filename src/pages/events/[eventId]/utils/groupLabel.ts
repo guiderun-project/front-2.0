@@ -1,4 +1,8 @@
-import type { EventCategory, EventType, RunningGroup } from '@/api/types';
+import type {
+  EventCategory,
+  EventType,
+  MatchingRunningGroup,
+} from '@/api/types';
 import { EVENT_CATEGORIES, EVENT_TYPES } from '@/api/constants';
 
 import {
@@ -16,8 +20,12 @@ export type EventGroupLabelContext = {
 
 export const getEventGroupDisplayLabel = (
   context: EventGroupLabelContext,
-  group: RunningGroup,
+  group: MatchingRunningGroup,
 ): string => {
+  if (group === '') {
+    return '희망 그룹 미입력';
+  }
+
   if (!isEventVisibleRunningGroup(group)) {
     return `${group}그룹`;
   }
@@ -51,7 +59,7 @@ export const getEventPrimaryGroupLabel = ({
 };
 
 const isEventVisibleRunningGroup = (
-  group: RunningGroup,
+  group: Exclude<MatchingRunningGroup, ''>,
 ): group is EventVisibleRunningGroup => {
   return EVENT_VISIBLE_RUNNING_GROUPS.some((displayGroup) => displayGroup === group);
 };

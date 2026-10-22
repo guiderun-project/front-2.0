@@ -3,7 +3,7 @@ import { useId, useState, type ReactElement } from "react";
 import styled from "@emotion/styled";
 
 import { getApiErrorMessage } from "@/api/core";
-import type { MatchingPartner, MatchingUser, RunningGroup } from "@/api/types";
+import type { MatchingStatusUser, RunningGroup } from "@/api/types";
 import { HiddenText, Icon, Text } from "@/components";
 import { RUNNER_TYPE_LABELS } from "@/constants";
 import type { AppTheme } from "@/styles/theme";
@@ -132,7 +132,7 @@ const MatchingGroupCard = ({
 };
 
 type MyPartnerSummaryProps = {
-  partners: MatchingPartner[];
+  partners: MatchingStatusUser[];
 };
 
 const MyPartnerSummary = ({
@@ -149,9 +149,11 @@ const MyPartnerSummary = ({
           {partners.map((partner) => (
             <PartnerItem key={partner.userId}>
               <ProfileAvatar name={partner.name} type={partner.type} />
-              <Text color="text.tertiary" font="detail-m-m">
-                기존 {partner.defaultGroup}그룹
-              </Text>
+              {partner.defaultGroup ? (
+                <Text color="text.tertiary" font="detail-m-m">
+                  기존 {partner.defaultGroup}그룹
+                </Text>
+              ) : null}
             </PartnerItem>
           ))}
         </PartnerList>
@@ -164,7 +166,7 @@ const MyPartnerSummary = ({
   );
 };
 
-const getMyPartnerSummaryDescription = (partners: MatchingPartner[]) => {
+const getMyPartnerSummaryDescription = (partners: MatchingStatusUser[]) => {
   if (partners.length === 0) {
     return "내 파트너 아직 파트너 매칭 전이에요";
   }
@@ -172,7 +174,13 @@ const getMyPartnerSummaryDescription = (partners: MatchingPartner[]) => {
   return `내 파트너 ${partners
     .map(
       (partner) =>
-        `${RUNNER_TYPE_LABELS[partner.type]} ${partner.name} 기존 ${partner.defaultGroup}그룹`,
+        [
+          RUNNER_TYPE_LABELS[partner.type],
+          partner.name,
+          partner.defaultGroup ? `기존 ${partner.defaultGroup}그룹` : null,
+        ]
+          .filter(Boolean)
+          .join(" "),
     )
     .join(", ")}`;
 };
@@ -243,7 +251,7 @@ const getMatchingRowDescription = (row: MatchingStatusViewRow) => {
   return "시각장애러너 매칭되지 않음, 가이드러너 매칭되지 않음";
 };
 
-const formatMatchingUserNames = (users: MatchingUser[]) => {
+const formatMatchingUserNames = (users: MatchingStatusUser[]) => {
   return users.map((user) => user.name).join(", ");
 };
 
